@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EMBERHOLD — Systemübersicht</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f0f16; --panel:#171721; --panel2:#1d1d29; --line:#2a2a35;
+  --ink:#e8e4dc; --mut:#8b8577; --ember:#e07a3f; --ember2:#c9502e;
+  --ash:#6b7b8c; --moss:#7d9463; --arc:#9b7fb8; --gold:#d4a94a;
+}
+body{background:var(--bg);color:var(--ink);
+  font:15px/1.62 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;padding:0 0 80px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+h1,h2,h3,h4{font-weight:600;letter-spacing:-.01em;line-height:1.25}
+
+/* Kopf */
+header.top{padding:64px 0 40px;border-bottom:1px solid var(--line);margin-bottom:44px;
+  background:radial-gradient(900px 320px at 22% -8%,rgba(224,122,63,.16),transparent 70%)}
+.kicker{color:var(--ember);font-size:12px;letter-spacing:.22em;text-transform:uppercase;
+  font-weight:600;margin-bottom:14px}
+h1{font-size:clamp(40px,7vw,68px);letter-spacing:.02em}
+h1 span{color:var(--ember)}
+.tag{color:var(--mut);font-size:16px;margin-top:14px;max-width:62ch}
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:24px}
+.pill{border:1px solid var(--line);background:var(--panel);border-radius:999px;
+  padding:5px 13px;font-size:12.5px;color:var(--mut)}
+
+section{margin-bottom:56px}
+h2{font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--ember);
+  margin-bottom:20px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin-bottom:12px}
+p.lead{color:var(--mut);max-width:76ch;margin-bottom:22px}
+
+/* Pitch */
+.pitch{background:var(--panel);border-left:3px solid var(--ember);border-radius:0 10px 10px 0;
+  padding:24px 28px;font-size:18px;line-height:1.6}
+.pitch em{color:var(--ember);font-style:normal;font-weight:600}
+
+/* Statistiken */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+.stat b{display:block;font-size:26px;font-weight:600;color:var(--ember);letter-spacing:-.02em}
+.stat span{display:block;font-size:13.5px;margin-top:3px}
+.stat em{display:block;font-size:12px;color:var(--mut);font-style:normal;margin-top:5px}
+
+/* Schichten */
+.layers{display:grid;gap:14px}
+.layer{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:22px 24px;
+  position:relative;overflow:hidden}
+.layer::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--c)}
+.layer h3{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.layer h3 small{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--c);
+  font-weight:600}
+.layer p{color:var(--mut);font-size:14px;max-width:80ch}
+.layer ul{list-style:none;margin-top:14px;display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:8px}
+.layer li{font-size:13.5px;color:var(--ink);background:var(--panel2);border-radius:7px;
+  padding:9px 13px;border:1px solid var(--line)}
+.layer li b{color:var(--c);font-weight:600}
+.bridge{display:flex;align-items:center;gap:14px;padding:16px 24px;background:var(--panel2);
+  border:1px dashed var(--line);border-radius:12px;font-size:14px;color:var(--mut)}
+.bridge b{color:var(--ink);font-weight:600}
+.arrows{color:var(--ember);font-size:19px;letter-spacing:-2px;flex-shrink:0}
+
+/* Helden */
+.heroes{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}
+.hero{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px 22px;
+  border-top:3px solid var(--accent)}
+.hero h4{font-size:17px}
+.hero .role{color:var(--accent);font-size:12px;letter-spacing:.1em;text-transform:uppercase;
+  margin:4px 0 14px;font-weight:600}
+.hero dl{display:grid;gap:9px}
+.hero dt{font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:var(--mut)}
+.hero dd{font-size:13.5px;line-height:1.5}
+.hero dd b{color:var(--accent);font-weight:600}
+
+/* Regeln */
+.rules{list-style:none;display:grid;gap:10px}
+.rules li{display:flex;gap:16px;background:var(--panel);border:1px solid var(--line);
+  border-radius:10px;padding:16px 20px;align-items:flex-start}
+.rules .num{flex-shrink:0;width:30px;height:30px;border-radius:8px;background:var(--ember);
+  color:#12121a;font-weight:700;display:grid;place-items:center;font-size:14px}
+.rules h4{font-size:15px;margin-bottom:3px}
+.rules p{font-size:13.5px;color:var(--mut)}
+
+/* Diagramme */
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:16px;align-items:start}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px 22px}
+.card h3{font-size:15px;margin-bottom:4px}
+.card .note{color:var(--mut);font-size:13px;margin-bottom:14px}
+.chart{width:100%;height:auto;display:block}
+.ax{fill:#8b8577;font-size:11px;font-family:inherit}
+.ax.bold{fill:#e8e4dc;font-weight:600}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;font-size:12.5px;color:var(--mut)}
+.legend span{display:flex;align-items:center;gap:6px}
+.legend i{width:11px;height:3px;border-radius:2px;display:block}
+.finding{margin-top:14px;padding:12px 15px;background:var(--panel2);border-radius:8px;
+  border-left:2px solid var(--ember);font-size:13px;color:var(--ink)}
+
+/* Tabellen */
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-weight:600;color:var(--mut);font-size:11px;letter-spacing:.1em;
+  text-transform:uppercase;padding:9px 10px;border-bottom:1px solid var(--line)}
+td{padding:9px 10px;border-bottom:1px solid var(--line)}
+.clock td{text-align:center}
+.clock td:first-child{text-align:left;font-weight:500}
+.clock td:nth-child(2){text-align:left}
+.mut{color:var(--mut)}
+.full{background:rgba(224,122,63,.20);color:var(--ember);font-weight:600}
+.part{background:rgba(224,122,63,.07);color:var(--ink)}
+.low{color:var(--mut)}
+tbody tr:hover{background:rgba(255,255,255,.02)}
+
+/* Nicht-Liste */
+.nope{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+.nope div{background:var(--panel);border:1px solid var(--line);border-radius:9px;
+  padding:13px 16px;font-size:13.5px}
+.nope b{display:block;color:var(--ember2);margin-bottom:3px}
+.nope span{color:var(--mut);font-size:12.5px}
+
+/* Roadmap */
+.road{display:grid;gap:10px}
+.phase{display:grid;grid-template-columns:150px 1fr;gap:20px;background:var(--panel);
+  border:1px solid var(--line);border-radius:10px;padding:18px 22px}
+.phase .when b{display:block;font-size:15px}
+.phase .when span{color:var(--mut);font-size:12.5px}
+.phase .what h4{font-size:14px;margin-bottom:5px}
+.phase .what p{font-size:13.5px;color:var(--mut)}
+.phase .gate{margin-top:9px;font-size:12.5px;color:var(--ember);
+  padding:7px 11px;background:rgba(224,122,63,.08);border-radius:6px;display:inline-block}
+
+footer{border-top:1px solid var(--line);margin-top:56px;padding-top:24px;
+  color:var(--mut);font-size:12.5px}
+@media(max-width:640px){
+  .phase{grid-template-columns:1fr;gap:10px}
+  header.top{padding:40px 0 30px}
+}
+</style>
+</head>
+<body>
+
+<header class="top"><div class="wrap">
+  <p class="kicker">Game Design · Systemübersicht · Arbeitstitel</p>
+  <h1>EMBER<span>HOLD</span></h1>
+  <p class="tag">Reines Solo-PvE: ein Idle-RPG mit Bullet-Heaven-Kern. Eine Festung,
+  die rund um die Uhr produziert — und persönliche Ausritte gegen Hunderte Gegner,
+  als Bogenschütze, Magier oder Runenwächter.</p>
+  <div class="pills">
+    <span class="pill">Browser · Android · iOS · Steam</span>
+    <span class="pill">Defold · Lua</span>
+    <span class="pill">F2P + Premium</span>
+    <span class="pill">High Fantasy</span>
+    <span class="pill">Solo-PvE · offline spielbar</span>
+  </div>
+</div></header>
+
+<div class="wrap">
+
+<section>
+  <div class="pitch">Deine Festung schmiedet die Ausrüstung.
+  <em>Deine Ausrüstung entscheidet, welche Karten dir im Kampf angeboten werden.</em>
+  Deine Kämpfe erobern das Land, das deine Festung versorgt.</div>
+</section>
+
+<section>
+  <h2>Kennzahlen</h2>
+  <div class="stats">
+<div class="stat"><b>8 Min</b><span>Standard-Run</span><em>21 Kartenzüge, erster bei 35 Sek</em></div>
+<div class="stat"><b>24→72 h</b><span>Offline-Kappe</span><em>ausbaubar über Perks und Steward</em></div>
+<div class="stat"><b>6</b><span>Helden zum Start</span><em>je eine eigene Auto-Angriffs-Regel</em></div>
+<div class="stat"><b>20</b><span>Territorien</span><em>5 Biome, Korruptionsstufen T0–T10</em></div>
+<div class="stat"><b>3,1 h</b><span>bis Aufstieg 1</span><em>≈ 4–5 Tage bei 40 Min/Tag</em></div>
+<div class="stat"><b>0,83 MB</b><span>Web-Build</span><em>lädt in unter 2 Sekunden</em></div>
+<div class="stat"><b>1.500</b><span>Gegner gleichzeitig</span><em>bei 60 fps auf Mittelklasse-Android</em></div>
+<div class="stat"><b>82 %</b><span>max. Build-Fertigstellung</span><em>selbst die 20-Min-Jagd lässt Luft</em></div></div>
+</section>
+
+<section>
+  <h2>Die drei Schichten</h2>
+  <p class="lead">Keine zwei Spiele nebeneinander. Eine geschlossene Schleife, in der
+  jede Schicht die andere begrenzt und freischaltet.</p>
+  <div class="layers">
+
+    <div class="layer" style="--c:var(--ember)">
+      <h3><small>Schicht 1 · aktiv</small> Die Sortie</h3>
+      <p>Bullet-Heaven. Ein Verb — Bewegung — plus eine Fähigkeit, den Ember-Stoß.
+      Vier Längen von 3 bis 20 Minuten, mechanisch verschieden, nicht nur zeitlich.</p>
+      <ul>
+        <li><b>21</b> Kartenzüge in der 8-Min-Sortie</li>
+        <li><b>22 %</b> Chance auf die Wunschkarte</li>
+        <li><b>Overtime</b> — Risiko ist ein Angebot</li>
+        <li><b>12</b> Waffen · <b>12</b> Evolutionen</li>
+      </ul>
+    </div>
+
+    <div class="bridge">
+      <span class="arrows">▲&nbsp;▼</span>
+      <span><b>Hold → Sortie:</b> Startwerte, Kartensaaten, Rerolls.
+      <b>Sortie → Hold:</b> Territorien, seltene Materialien, Relikte, Warden-Kills.</span>
+    </div>
+
+    <div class="layer" style="--c:var(--moss)">
+      <h3><small>Schicht 2 · idle</small> Der Hold</h3>
+      <p>Acht Gebäude mit acht Taktungen. Läuft offline. Lagerkapazität ist das
+      einzige Tor — kein Timer, keine Energie, keine Sperre.</p>
+      <ul>
+        <li><b>25 Min</b> Tiefmine → der Pausen-Spieler</li>
+        <li><b>8 h</b> Runenwebstuhl → über Nacht</li>
+        <li><b>48 h</b> Wardenkammer → Wochenende</li>
+        <li><b>24→72 h</b> Offline-Kappe</li>
+      </ul>
+    </div>
+
+    <div class="layer" style="--c:var(--gold)">
+      <h3><small>Schicht 3 · Brücke</small> Die Karte</h3>
+      <p>20 Territorien in 5 Biomen. Jedes ist gleichzeitig Kampfszenario,
+      Produktionsknoten und die einzige Quelle einer bestimmten Ressource.</p>
+      <ul>
+        <li><b>T0–T10</b> Korruptionsstufen</li>
+        <li><b>5 Wardens</b> — je einer pro Biom</li>
+        <li><b>kein Verfall</b> — erobert bleibt erobert</li>
+        <li><b>Volk → Gebäude → Held</b> Freischaltkette</li>
+      </ul>
+    </div>
+
+  </div>
+</section>
+
+<section>
+  <h2>Die sieben Regeln</h2>
+  <p class="lead">Abgeleitet aus dem, woran vergleichbare Spiele gescheitert sind.
+  Jede Feature-Entscheidung wird gegen sie geprüft.</p>
+  <ul class="rules">
+<li><span class="num">1</span><div><h4>Jede Sitzung bringt Fortschritt</h4><p>Ein verlorener Run kostet nie die Basis-Belohnung, nur den freiwilligen Overtime-Bonus.</p></div></li>
+<li><span class="num">2</span><div><h4>Jedes Material hat zwei Wege</h4><p>Ein Idle-Weg (langsam, garantiert) und ein Aktiv-Weg (schnell, könnens-gegated). Keine harten Wände.</p></div></li>
+<li><span class="num">3</span><div><h4>Es gibt keinen toten Loot</h4><p>Jeder Gegenstand zerlegt sich in Emberstaub. Jeder Drop zahlt auf das Zielitem ein.</p></div></li>
+<li><span class="num">4</span><div><h4>Prestige wird verdient</h4><p>Aufstieg verlangt den Sieg über einen Warden. Der Reset ist ein Triumph, kein Knopf.</p></div></li>
+<li><span class="num">5</span><div><h4>Der Rhythmus ist ungleichmäßig</h4><p>Min 0–1: ein Pick. Min 2–5: zwei. Min 6–8: vier bis fünf. Dieselbe Handlung, dreimal andere Bedeutung.</p></div></li>
+<li><span class="num">6</span><div><h4>Bequemlichkeit, nie Macht</h4><p>Kein verkaufbares Gear, keine Statboosts, keine Energie, kein Pay-to-Win.</p></div></li>
+<li><span class="num">7</span><div><h4>Abwesenheit wird nie bestraft</h4><p>Gebäude laufen voll und stoppen. Territorien gehen nie verloren. Kein Verfall, kein FOMO.</p></div></li></ul>
+</section>
+
+<section>
+  <h2>Helden</h2>
+  <p class="lead">Jeder ist über eine eigene Auto-Angriffs-Regel definiert — das
+  Einzige, was der Spieler nicht steuert, und deshalb das, was das Spielgefühl
+  bestimmt. Jede Regel erzwingt ein anderes Bewegungsmuster.</p>
+  <div class="heroes">
+<article class="hero" style="--accent:#e07a3f">
+  <header><h4>Aelric Fernstreich</h4><p class="role">Der Langbogenschütze · Menschen</p></header>
+  <dl>
+    <dt>Auto-Angriff</dt><dd>Schießt auf den <b>entferntesten</b> Gegner. Pfeile durchbohren.</dd>
+    <dt>Bewegungsmuster</dt><dd>Kiten · Gegner in Linien sortieren</dd>
+    <dt>Signatur</dt><dd>Salve — Durchbohrung erhöht Schaden statt ihn zu senken</dd>
+  </dl>
+</article>
+<article class="hero" style="--accent:#7d9463">
+  <header><h4>Sylwen Dornsang</h4><p class="role">Die Dornsängerin · Sylvani</p></header>
+  <dl>
+    <dt>Auto-Angriff</dt><dd>Suchende Pfeile pflanzen <b>Dornenfelder</b> für 6 Sek.</dd>
+    <dt>Bewegungsmuster</dt><dd>Kreisen · Felder als Labyrinth bauen</dd>
+    <dt>Signatur</dt><dd>Wurzelfeld — berührende Felder verbinden sich zum Netz</dd>
+  </dl>
+</article>
+<article class="hero" style="--accent:#c9502e">
+  <header><h4>Maerhold Glutwirker</h4><p class="role">Der Emberwright · Zirkel</p></header>
+  <dl>
+    <dt>Auto-Angriff</dt><dd>Schwere Feuerkugeln. Schaden skaliert mit <b>Gegnern im Radius</b>.</dd>
+    <dt>Bewegungsmuster</dt><dd>Ködern · Massen sammeln statt fliehen</dd>
+    <dt>Signatur</dt><dd>Feuersbrunst — Kills entzünden Nachbarn</dd>
+  </dl>
+</article>
+<article class="hero" style="--accent:#9b7fb8">
+  <header><h4>Vashti Sturmruf</h4><p class="role">Die Sturmruferin · Zirkel</p></header>
+  <dl>
+    <dt>Auto-Angriff</dt><dd>Kettenblitz vom <b>nächsten</b> Gegner. Kurze Reichweite.</dd>
+    <dt>Bewegungsmuster</dt><dd>Gefährliche Nähe · Blinzeln als Rettung</dd>
+    <dt>Signatur</dt><dd>Statisches Feld — +1 Sprung je treffer­freier Sekunde</dd>
+  </dl>
+</article>
+<article class="hero" style="--accent:#d4a94a">
+  <header><h4>Dorn Steinbart</h4><p class="role">Der Runenwächter · Zwerge</p></header>
+  <dl>
+    <dt>Auto-Angriff</dt><dd>Kein Projektil. Rotierende Runen + Schadensaura im Nahbereich.</dd>
+    <dt>Bewegungsmuster</dt><dd>Durchpflügen · Schaden nehmen und umwandeln</dd>
+    <dt>Signatur</dt><dd>Bollwerk — 40 % erlittener Schaden wird Schild</dd>
+  </dl>
+</article>
+<article class="hero" style="--accent:#6b7b8c">
+  <header><h4>Kaelen Schattenmal</h4><p class="role">Der Schattenmark · Menschen</p></header>
+  <dl>
+    <dt>Auto-Angriff</dt><dd>Zielt auf den Gegner mit den <b>meisten HP</b>. Hinrichtung < 18 %.</dd>
+    <dt>Bewegungsmuster</dt><dd>Elitenjagd · die Masse überleben, nicht bekämpfen</dd>
+    <dt>Signatur</dt><dd>Ernte — jede Hinrichtung setzt den Ember-Stoß zurück</dd>
+  </dl>
+</article></div>
+</section>
+
+<section>
+  <h2>Balancing — verifiziert, nicht geschätzt</h2>
+  <div class="grid2">
+
+    <div class="card">
+      <h3>Idle-Herzschlag &amp; Wall-Erkennung</h3>
+      <p class="note">Wartezeit bis zum nächsten Hold-Upgrade (logarithmisch)</p>
+      <svg viewBox="0 0 560 230" class="chart" role="img"><line x1="52" y1="28.0" x2="540" y2="28.0" stroke="#2a2a33" stroke-width="1"/><text x="45" y="32.0" class="ax" text-anchor="end">229</text><line x1="52" y1="70.5" x2="540" y2="70.5" stroke="#2a2a33" stroke-width="1"/><text x="45" y="74.5" class="ax" text-anchor="end">61</text><line x1="52" y1="113.0" x2="540" y2="113.0" stroke="#2a2a33" stroke-width="1"/><text x="45" y="117.0" class="ax" text-anchor="end">16</text><line x1="52" y1="155.5" x2="540" y2="155.5" stroke="#2a2a33" stroke-width="1"/><text x="45" y="159.5" class="ax" text-anchor="end">4</text><line x1="52" y1="198.0" x2="540" y2="198.0" stroke="#2a2a33" stroke-width="1"/><text x="45" y="202.0" class="ax" text-anchor="end">1</text><text x="52.0" y="215" class="ax" text-anchor="middle">1</text><text x="159.4" y="215" class="ax" text-anchor="middle">25</text><text x="271.4" y="215" class="ax" text-anchor="middle">50</text><text x="316.1" y="215" class="ax" text-anchor="middle">60</text><text x="428.1" y="215" class="ax" text-anchor="middle">85</text><text x="540.0" y="215" class="ax" text-anchor="middle">110</text><polyline points="52.0,152.9 56.5,171.8 61.0,181.4 65.4,187.3 69.9,191.1 74.4,193.6 78.9,195.2 83.3,196.1 87.8,196.6 92.3,196.6 96.8,196.3 101.2,195.7 105.7,195.0 110.2,194.0 114.7,192.9 119.2,191.6 123.6,190.2 128.1,188.7 132.6,187.1 137.1,185.4 141.5,183.6 146.0,181.7 150.5,179.8 155.0,177.8 159.4,198.0 163.9,195.9 168.4,193.8 172.9,191.6 177.4,189.4 181.8,187.1 186.3,184.8 190.8,182.5 195.3,180.2 199.7,177.8 204.2,175.4 208.7,172.9 213.2,170.5 217.7,168.0 222.1,165.5 226.6,162.9 231.1,160.4 235.6,157.8 240.0,155.2 244.5,152.6 249.0,150.0 253.5,147.4 257.9,144.7 262.4,142.0 266.9,139.4 271.4,158.9 275.9,156.1 280.3,153.4 284.8,150.7 289.3,148.0 293.8,145.2 298.2,142.4 302.7,139.7 307.2,136.9 311.7,134.1 316.1,131.3 320.6,128.5 325.1,125.6 329.6,122.8 334.1,120.0 338.5,117.1 343.0,114.3 347.5,111.4 352.0,108.6 356.4,105.7 360.9,102.8 365.4,99.9 369.9,97.0 374.3,94.1 378.8,91.2 383.3,110.5 387.8,107.6 392.3,104.7 396.7,101.7 401.2,98.8 405.7,95.9 410.2,92.9 414.6,90.0 419.1,87.0 423.6,84.0 428.1,81.1 432.6,78.1 437.0,75.1 441.5,72.2 446.0,69.2 450.5,66.2 454.9,63.2 459.4,60.2 463.9,57.2 468.4,54.2 472.8,51.2 477.3,48.2 481.8,45.2 486.3,42.2 490.8,39.2 495.2,58.4 499.7,55.3 504.2,52.3 508.7,49.3 513.1,46.3 517.6,43.2 522.1,40.2 526.6,37.1 531.0,34.1 535.5,31.0 540.0,28.0" fill="none" stroke="#e07a3f" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/><text x="6" y="12" class="ax">Minuten</text><text x="296" y="12" class="ax" text-anchor="middle">Hold-Stufe</text></svg>
+      <div class="legend"><span><i style="background:#e07a3f"></i>Wartezeit in Minuten</span></div>
+      <div class="finding"><b>Die Wall beginnt bei Hold-Stufe 85.</b> Deshalb muss
+      Warden 1 bei Stufe 60 besiegbar sein — der Spieler steigt auf, <i>bevor</i> er
+      stecken bleibt, nicht weil er stecken geblieben ist.</div>
+    </div>
+
+    <div class="card">
+      <h3>Tier-Skalierung</h3>
+      <p class="note">Gegner-HP ×1,35 · Spielermacht ×1,36 · Belohnung ×1,38 je Stufe</p>
+      <svg viewBox="0 0 560 230" class="chart" role="img"><line x1="52" y1="28.0" x2="540" y2="28.0" stroke="#2a2a33" stroke-width="1"/><text x="45" y="32.0" class="ax" text-anchor="end">50×</text><line x1="52" y1="70.5" x2="540" y2="70.5" stroke="#2a2a33" stroke-width="1"/><text x="45" y="74.5" class="ax" text-anchor="end">38×</text><line x1="52" y1="113.0" x2="540" y2="113.0" stroke="#2a2a33" stroke-width="1"/><text x="45" y="117.0" class="ax" text-anchor="end">25×</text><line x1="52" y1="155.5" x2="540" y2="155.5" stroke="#2a2a33" stroke-width="1"/><text x="45" y="159.5" class="ax" text-anchor="end">13×</text><line x1="52" y1="198.0" x2="540" y2="198.0" stroke="#2a2a33" stroke-width="1"/><text x="45" y="202.0" class="ax" text-anchor="end">0×</text><text x="52.0" y="215" class="ax" text-anchor="middle">T0</text><text x="149.6" y="215" class="ax" text-anchor="middle">T2</text><text x="247.2" y="215" class="ax" text-anchor="middle">T4</text><text x="344.8" y="215" class="ax" text-anchor="middle">T6</text><text x="442.4" y="215" class="ax" text-anchor="middle">T8</text><text x="540.0" y="215" class="ax" text-anchor="middle">T10</text><polyline points="52.0,194.6 100.8,193.4 149.6,191.8 198.4,189.7 247.2,186.8 296.0,182.8 344.8,177.5 393.6,170.3 442.4,160.7 491.2,147.6 540.0,130.0" fill="none" stroke="#6b7b8c" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/><polyline points="52.0,194.6 100.8,192.9 149.6,190.3 198.4,186.5 247.2,181.0 296.0,173.1 344.8,161.7 393.6,145.3 442.4,121.8 491.2,88.3 540.0,40.6" fill="none" stroke="#e07a3f" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/><polyline points="52.0,194.6 100.8,193.3 149.6,191.6 198.4,189.1 247.2,185.7 296.0,181.1 344.8,174.6 393.6,165.7 442.4,153.5 491.2,136.6 540.0,113.2" fill="none" stroke="#d4a94a" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/><text x="6" y="12" class="ax">Faktor</text><text x="296" y="12" class="ax" text-anchor="middle">Korruptionsstufe</text></svg>
+      <div class="legend"><span><i style="background:#6b7b8c"></i>Gegner-HP</span><span><i style="background:#e07a3f"></i>Spielermacht</span><span><i style="background:#d4a94a"></i>Belohnung</span></div>
+      <div class="finding">Macht schlägt HP → jede Stufe ist erreichbar, aber erst
+      nach Ausbau. Belohnung schlägt beides → <b>Hochpushen lohnt sich immer</b>,
+      es gibt keinen Punkt, an dem Farmen auf niedriger Stufe effizienter wäre.</div>
+    </div>
+
+    <div class="card">
+      <h3>Der ungleichmäßige Rhythmus</h3>
+      <p class="note">Kartenzüge pro Minute in einer 8-Minuten-Sortie</p>
+      <svg viewBox="0 0 560 210" class="chart" role="img"><line x1="46" y1="18.0" x2="546" y2="18.0" stroke="#2a2a33"/><text x="39" y="22.0" class="ax" text-anchor="end">4</text><line x1="46" y1="57.5" x2="546" y2="57.5" stroke="#2a2a33"/><text x="39" y="61.5" class="ax" text-anchor="end">3</text><line x1="46" y1="97.0" x2="546" y2="97.0" stroke="#2a2a33"/><text x="39" y="101.0" class="ax" text-anchor="end">2</text><line x1="46" y1="136.5" x2="546" y2="136.5" stroke="#2a2a33"/><text x="39" y="140.5" class="ax" text-anchor="end">1</text><line x1="46" y1="176.0" x2="546" y2="176.0" stroke="#2a2a33"/><text x="39" y="180.0" class="ax" text-anchor="end">0</text><rect x="57.9" y="136.5" width="38.8" height="39.5" fill="#6b7b8c" rx="2"/><text x="77.2" y="192" class="ax" text-anchor="middle">0–1</text><text x="77.2" y="130.5" class="ax bold" text-anchor="middle">1</text><rect x="120.4" y="97.0" width="38.8" height="79.0" fill="#6b7b8c" rx="2"/><text x="139.8" y="192" class="ax" text-anchor="middle">1–2</text><text x="139.8" y="91.0" class="ax bold" text-anchor="middle">2</text><rect x="182.9" y="97.0" width="38.8" height="79.0" fill="#6b7b8c" rx="2"/><text x="202.2" y="192" class="ax" text-anchor="middle">2–3</text><text x="202.2" y="91.0" class="ax bold" text-anchor="middle">2</text><rect x="245.4" y="97.0" width="38.8" height="79.0" fill="#6b7b8c" rx="2"/><text x="264.8" y="192" class="ax" text-anchor="middle">3–4</text><text x="264.8" y="91.0" class="ax bold" text-anchor="middle">2</text><rect x="307.9" y="57.5" width="38.8" height="118.5" fill="#6b7b8c" rx="2"/><text x="327.2" y="192" class="ax" text-anchor="middle">4–5</text><text x="327.2" y="51.5" class="ax bold" text-anchor="middle">3</text><rect x="370.4" y="57.5" width="38.8" height="118.5" fill="#e07a3f" rx="2"/><text x="389.8" y="192" class="ax" text-anchor="middle">5–6</text><text x="389.8" y="51.5" class="ax bold" text-anchor="middle">3</text><rect x="432.9" y="18.0" width="38.8" height="158.0" fill="#e07a3f" rx="2"/><text x="452.2" y="192" class="ax" text-anchor="middle">6–7</text><text x="452.2" y="12.0" class="ax bold" text-anchor="middle">4</text><rect x="495.4" y="18.0" width="38.8" height="158.0" fill="#e07a3f" rx="2"/><text x="514.8" y="192" class="ax" text-anchor="middle">7–8</text><text x="514.8" y="12.0" class="ax bold" text-anchor="middle">4</text></svg>
+      <div class="legend"><span><i style="background:#6b7b8c"></i>Aufbau &amp; Druck</span><span><i style="background:#e07a3f"></i>Wende &amp; Machtrausch</span></div>
+      <div class="finding">Der Mittelboss bei 4:10 senkt die XP-Rate absichtlich um
+      30 %. <b>Ohne dieses Tal gibt es keinen Berg danach.</b> Die Schatzflut bei
+      7:00 schüttet angesammelten Aufwand in einem sichtbaren Schwall aus.</div>
+    </div>
+
+    <div class="card">
+      <h3>Multi-Clock: Abdeckung je Rückkehr</h3>
+      <p class="note">Füllstand der Hold-Gebäude nach Abwesenheitsdauer</p>
+      <table class="clock"><thead><tr><th>Gebäude</th><th>Füllzeit</th><th>0.5 h</th><th>2 h</th><th>8 h</th><th>12 h</th><th>1 Tag</th><th>Wochenende</th></tr></thead><tbody><tr><td>Tiefmine</td><td class='mut'>25 Min</td><td class='full'>100%</td><td class='full'>100%</td><td class='full'>100%</td><td class='full'>100%</td><td class='full'>100%</td><td class='full'>100%</td></tr><tr><td>Holzfälle</td><td class='mut'>40 Min</td><td class='part'>75%</td><td class='full'>100%</td><td class='full'>100%</td><td class='full'>100%</td><td class='full'>100%</td><td class='full'>100%</td></tr><tr><td>Emberschmiede</td><td class='mut'>2 h</td><td class='low'>25%</td><td class='full'>100%</td><td class='full'>100%</td><td class='full'>100%</td><td class='full'>100%</td><td class='full'>100%</td></tr><tr><td>Arkanum</td><td class='mut'>4 h</td><td class='low'>12%</td><td class='part'>50%</td><td class='full'>100%</td><td class='full'>100%</td><td class='full'>100%</td><td class='full'>100%</td></tr><tr><td>Runenwebstuhl</td><td class='mut'>8 h</td><td class='low'>6%</td><td class='low'>25%</td><td class='full'>100%</td><td class='full'>100%</td><td class='full'>100%</td><td class='full'>100%</td></tr><tr><td>Übungshof</td><td class='mut'>12 h</td><td class='low'>4%</td><td class='low'>17%</td><td class='part'>67%</td><td class='full'>100%</td><td class='full'>100%</td><td class='full'>100%</td></tr><tr><td>Skriptorium</td><td class='mut'>24 h</td><td class='low'>2%</td><td class='low'>8%</td><td class='part'>33%</td><td class='part'>50%</td><td class='full'>100%</td><td class='full'>100%</td></tr><tr><td>Wardenkammer</td><td class='mut'>48 h</td><td class='low'>1%</td><td class='low'>4%</td><td class='low'>17%</td><td class='low'>25%</td><td class='part'>50%</td><td class='full'>100%</td></tr></tbody></table>
+      <div class="finding">Jede Rückkehr-Taktung — 30 Minuten, Arbeitstag, über Nacht,
+      Wochenende — findet mindestens ein volles Gebäude vor.
+      <b>Nie „nichts zu tun", nie „alles verpasst".</b></div>
+    </div>
+
+  </div>
+</section>
+
+<section>
+  <h2>Der wichtigste strategische Befund</h2>
+  <div class="card">
+    <h3>Bezahlte Nutzerakquise funktioniert bei diesem Modell nicht — und das ist Absicht</h3>
+    <p class="note" style="margin-bottom:16px">Weil wir bewusst keine Macht verkaufen
+    (Regel 6), liegt der LTV nach 180 Tagen bei 0,21–1,32 $. Tier-1-CPIs liegen bei
+    1,50–3,00 $.</p>
+    <table>
+      <thead><tr><th>Szenario</th><th>ARPDAU</th><th>Werbe-Anteil</th><th>LTV 180 T</th>
+      <th>Tier-1-UA tragfähig?</th></tr></thead>
+      <tbody>
+        <tr><td>Konservativ</td><td>0,033 $</td><td>61 %</td><td>0,21 $</td><td class="mut">nein</td></tr>
+        <tr><td><b>Basis</b></td><td><b>0,066 $</b></td><td>59 %</td><td><b>0,62 $</b></td><td class="mut">nein</td></tr>
+        <tr><td>Optimistisch</td><td>0,108 $</td><td>54 %</td><td>1,32 $</td><td class="mut">grenzwertig</td></tr>
+      </tbody>
+    </table>
+    <div class="finding">Die Wachstumsstrategie ist deshalb eine andere:
+    <b>(1)</b> der 0,83-MB-Web-Build als virale Eintrittstür mit CPI null —
+    weshalb die Engine-Entscheidung eine Marketing-Entscheidung ist ·
+    <b>(2)</b> organisches Kurzvideo, mit einer absichtlich clipbaren Sekunde bei ~5:00,
+    wenn die Farbe zurückkehrt · <b>(3)</b> Steam-Premium als gleichrangiger Kanal:
+    25.000 Verkäufe ≈ zwei Monate F2P-Umsatz bei 25.000 DAU, ohne einen Cent UA ·
+    <b>(4)</b> bezahlte UA erst bei nachgewiesener D30 &gt; 8 %, nur Tier 2/3.</div>
+  </div>
+</section>
+
+<section>
+  <h2>Technischer Kern</h2>
+  <div class="grid2">
+    <div class="card">
+      <h3>Engine: Defold</h3>
+      <table>
+        <thead><tr><th></th><th>Defold</th><th>Godot</th><th>Unity 6</th></tr></thead>
+        <tbody>
+          <tr><td>HTML5</td><td class="full">0,83 MB</td><td>~5 MB</td><td>~7,7 MB</td></tr>
+          <tr><td>Android</td><td class="full">2,56 MB</td><td>~25 MB</td><td>~20 MB</td></tr>
+          <tr><td>iOS</td><td class="full">1,35 MB</td><td>~30 MB</td><td>~25 MB</td></tr>
+          <tr><td>Sprache</td><td>Lua</td><td class="mut">GDScript*</td><td>C#</td></tr>
+          <tr><td>Ökosystem</td><td class="mut">klein</td><td>groß</td><td>sehr groß</td></tr>
+        </tbody>
+      </table>
+      <p class="note" style="margin-top:10px">* C# lässt sich in Godot bis heute nicht
+      ins Web exportieren.</p>
+      <div class="finding">Ein 0,83-MB-Build lädt in unter zwei Sekunden. Das ist kein
+      technisches Detail, sondern der wichtigste Marketingkanal.</div>
+    </div>
+
+    <div class="card">
+      <h3>Architektur: zwei getrennte Hälften</h3>
+      <p class="note" style="margin-bottom:14px">Die wichtigste technische Entscheidung.</p>
+      <div style="background:var(--panel2);border:1px solid var(--line);border-radius:9px;
+        padding:16px 18px;margin-bottom:12px">
+        <b style="color:var(--moss)">sim-core</b> — reines Lua, keine Engine-Abhängigkeit
+        <p class="mut" style="font-size:13px;margin-top:6px">Idle-Ökonomie · Speicherstand ·
+        Offline-Berechnung · Fortschrittsmathematik · Loot-Auflösung</p>
+      </div>
+      <div style="background:var(--panel2);border:1px solid var(--line);border-radius:9px;
+        padding:16px 18px">
+        <b style="color:var(--ember)">game-client</b> — Defold
+        <p class="mut" style="font-size:13px;margin-top:6px">Bullet-Heaven-ECS
+        (Structure-of-Arrays) · Rendering · Eingabe · UI · Hold-Diorama</p>
+      </div>
+      <div class="finding">Balance läuft als <b>Regressionstest in der CI</b>. Eine
+      Änderung, die Aufstiegs-Zyklen aus dem 6–12-h-Korridor wirft, macht den Build rot.
+      Balance kann nicht mehr versehentlich kaputtgehen.</div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Entwicklungsplan</h2>
+  <div class="road">
+    <div class="phase"><div class="when"><b>Phase 0</b><span>6–8 Wochen · 1–2 Personen</span></div>
+      <div class="what"><h4>Prototyp</h4>
+      <p>Ein Held, ein Territorium, 15 Karten, Platzhaltergrafik. Keine Meta, kein Hold,
+      kein Backend. Nur eine Frage: <i>Machen acht Minuten Kämpfen Spaß?</i></p>
+      <div class="gate">Abbruch, wenn 10 Testpersonen keinen zweiten Run starten. Nicht anpassen — beenden.</div></div></div>
+
+    <div class="phase"><div class="when"><b>Phase 1</b><span>3 Monate</span></div>
+      <div class="what"><h4>Vertical Slice</h4>
+      <p>2 Helden, 3 Territorien, Hold mit 4 Gebäuden, Ausrüstung + Zerlegung,
+      Offline-Berechnung, lokaler Save + optionaler Cloud-Save, finale Art-Direction an einem Biom bewiesen.</p>
+      <div class="gate">30 Testspieler über 14 Tage · Zielwert D7 ≥ 25 %</div></div></div>
+
+    <div class="phase"><div class="when"><b>Phase 2</b><span>5–6 Monate</span></div>
+      <div class="what"><h4>Soft Launch</h4>
+      <p>4 Helden, 12 Territorien, voller Hold, Runen, Aufstieg, Rewarded Ads,
+      Remote Config. Philippinen, Polen, Kanada. Mindestens 8 Wochen iterieren.</p>
+      <div class="gate">Freigabe nur bei D1 ≥ 32 % · D7 ≥ 14 % · D30 ≥ 6 %</div></div></div>
+
+    <div class="phase"><div class="when"><b>Phase 3</b><span>Monat 9–12</span></div>
+      <div class="what"><h4>Globaler Launch</h4>
+      <p>6 Helden, 20 Territorien, Emberpass, volle Monetarisierung, Web-Build als
+      Marketingkanal, Steam-Premium gleichzeitig.</p></div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Was bewusst nicht ins Spiel kommt</h2>
+  <p class="lead">Diese Liste ist so wichtig wie das Feature-Set. Jede dieser Ideen wird
+  irgendwann jemand vorschlagen; die Antwort steht hier schon.</p>
+  <div class="nope">
+    <div><b>Energie-System</b><span>Bestraft Spielen. Ersetzt durch den täglichen Soft-Cap.</span></div>
+    <div><b>Verkaufbare Macht</b><span>Regel 6. Der gesamte Retention-Ansatz hängt daran.</span></div>
+    <div><b>Territorien-Verfall</b><span>Erhöht kurz die Sessions, zerstört D30.</span></div>
+    <div><b>Login-Serien mit Verlust</b><span>Bestraft Abwesenheit. Belohnungen sammeln sich stattdessen an.</span></div>
+    <div><b>PvP</b><span>Erzwingt Balance-Kompromisse und macht Pay-to-Win-Vorwürfe unvermeidlich.</span></div>
+    <div><b>Koop / Mehrspieler</b><span>Der gesamte Entwicklungsfokus bleibt auf der persönlichen PvE-Reise.</span></div>
+    <div><b>Gilden & soziale Pflichten</b><span>Fortschritt soll niemals von anderen Spielern abhängen.</span></div>
+    <div><b>Globale Bestenlisten</b><span>Persönliche Rekorde ersetzen Wettbewerb und aufwendige Cheat-Abwehr.</span></div>
+    <div><b>Onlinepflicht</b><span>Cloud-Save und Live-Inhalte sind optional; der Kernfortschritt bleibt lokal spielbar.</span></div>
+    <div><b>Echtgeld-Lootboxen</b><span>Regulatorisch riskant, rufschädigend, unnötig.</span></div>
+    <div><b>Zeitexklusive Helden</b><span>Kosmetik darf exklusiv sein, Spielinhalt nicht.</span></div>
+    <div><b>Auto-Battle-Knopf</b><span>Der Kampf <i>ist</i> das Spiel. Der Idle-Layer ist bereits die Antwort.</span></div>
+  </div>
+</section>
+
+<footer>
+  <p>Alle Zahlen stammen aus der begleitenden Balancing-Simulation, nicht aus Schätzungen.
+  Die Skripte gehören ins Repository und laufen als Regressionstests in der CI mit.
+  Vollständiges GDD und Balancing-Workbook separat.</p>
+  <p style="margin-top:8px">„Emberhold" ist ein Arbeitstitel — vor Phase 2 durch eine
+  Marken- und App-Store-Recherche prüfen lassen.</p>
+</footer>
+
+</div>
+</body>
+</html>

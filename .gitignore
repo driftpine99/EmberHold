@@ -1,0 +1,35 @@
+# Betriebssystem
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editoren und lokale Agent-Konfiguration
+.idea/
+.vscode/
+.codex/
+.agents/
+*.swp
+*.swo
+
+# Temporäre Dateien und Logs
+*.log
+*.tmp
+*.temp
+*.bak
+~$*
+
+# Lokale Geheimnisse
+.env
+.env.*
+!.env.example
+
+# Abhängigkeiten und generierte Ausgaben
+node_modules/
+dist/
+build/
+coverage/
+
+# Lokale Spielstände und Testartefakte
+saves/
+test-results/
+screenshots/local/
