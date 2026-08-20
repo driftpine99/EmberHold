@@ -11,12 +11,15 @@ Territorien, welche die Festung versorgen.
 
 ## Aktueller Stand
 
-Das Projekt befindet sich in **Phase 0: Kampfprototyp**.
+Das Projekt befindet sich im Übergang vom **Kampfprototyp zum kleinen
+Hold-Validierungsslice**.
 
 Der aktuelle Build enthält einen Helden, ein Territorium, mehrere Waffen und
 Passive, fünf Gegnerfamilien, Eliten, einen Mittelboss, Evolutionen,
-Extraktion und Overtime. Der Hold, das Backend und die Monetarisierung gehören
-bewusst noch nicht zu dieser Phase.
+Extraktion und Overtime. Hinzu kommt ein bewusst kleiner Kraterhold mit
+Tiefmine, Emberschmiede, lokaler Speicherung, Offline-Produktion und einer
+ersten dauerhaften Bogenverbesserung. Backend und Monetarisierung bleiben
+weiterhin außerhalb des Scopes.
 
 Die einzige Produktfrage der Phase 0 lautet:
 
@@ -26,7 +29,7 @@ Die einzige Produktfrage der Phase 0 lautet:
 ## Prototyp starten
 
 1. `prototype/web/index.html` im Browser öffnen.
-2. **Ausrücken** wählen.
+2. Im Hold die **Tiefmine reparieren** und eine Sortie wählen.
 3. Mit WASD oder Pfeiltasten bewegen.
 4. Den Ember-Stoß mit der Leertaste auslösen.
 5. Karten mit 1, 2 oder 3 wählen.
@@ -70,7 +73,7 @@ ROADMAP.md                Aktueller Entwicklungsplan
 
 - Solo-PvE, keine Ranglisten, Gilden, PvP- oder Koop-Systeme.
 - Der Kernfortschritt funktioniert lokal und ohne Onlinekonto.
-- Erst den Kampf testen, danach den Hold bauen.
+- Den Hold nur in kleinen, messbaren Produktionsketten erweitern.
 - Keine neue Engine, bevor der Phase-0-Test bestanden ist.
 - Kleine Änderungen mit klaren Abnahmekriterien.
 - `main` enthält nur startbare und geprüfte Versionen.

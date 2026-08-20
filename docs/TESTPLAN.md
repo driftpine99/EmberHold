@@ -1,7 +1,8 @@
 # EMBERHOLD — Prototyp Phase 0
 
-Ein Held (Aelric), ein Territorium, 8-Minuten-Run. Keine Meta, kein Hold,
-kein Backend. **Eine einzige Frage: Macht das Kämpfen Spaß?**
+Ein Held (Aelric), ein Territorium, 8-Minuten-Run und ein kleiner funktionaler
+Kraterhold. Kein Backend. Der Kampf bleibt unverändert messbar; zusätzlich wird
+geprüft, ob `Sortie → Produktion → Verbesserung → Sortie` verständlich ist.
 
 `../prototype/web/index.html` ist eigenständig — Doppelklick genügt, kein
 Server, keine Installation. Läuft auf Desktop und Handy.
@@ -17,6 +18,21 @@ Server, keine Installation. Läuft auf Desktop und Handy.
 | Pause | `Esc` oder `P` · Pausenbutton oben rechts |
 | **T** | **Live-Tuning** — Dichte, Schaden, HP, XP-Kurve. Wirkt sofort, auch mitten im Run. |
 | **F3** | Entwickler-Anzeige — FPS, Entities, Pick-Zeiten gegen die Spezifikation |
+
+## Hold-MVP testen
+
+1. Tiefmine kostenlos reparieren.
+2. Nach 15 Sekunden das erste Erz einsammeln oder direkt ein
+   3-Minuten-Scharmützel spielen.
+3. Nach der Rückkehr Sortiebeute und Minenlager einsammeln.
+4. Emberschmiede für 10 Erz reparieren; sie verbraucht automatisch 5 Erz je
+   Barren und benötigt dafür 30 Sekunden.
+5. Zwei Barren einsammeln und den Wächterbogen verstärken.
+6. Im nächsten Run muss links `Wächterbogen +10 %` erscheinen.
+7. Seite neu laden: Ressourcen, Gebäude und Verbesserung müssen erhalten sein.
+
+Die kurzen Timer dienen nur dazu, den vollständigen Loop innerhalb weniger
+Minuten zu testen. Die langfristigen GDD-Zeiten sind noch nicht aktiv.
 
 ## Automatisierter Balance-Vertrag
 
@@ -46,6 +62,11 @@ Run-Bericht muss seine Pflichtfelder enthalten und `D` darf nicht erneut mit
 der Entwickleranzeige kollidieren. Pause und Fortsetzen müssen den Run zudem
 im selben Modus und ohne Zustandsverlust weiterführen.
 
+Der zusätzliche Hold-Check prüft Mine und Schmiede mit festen Zeitstempeln,
+lokale Speicherung, die einmalige Auszahlung einer Run-Belohnung, Rückkehr in
+den Hold und die Übernahme des +10-%-Schadensbonus in den nächsten Run. Die
+Kampf-Balance-Suite läuft immer ohne Hold-Bonus.
+
 Die Einzelruns streuen derzeit stark: erster Zug 17,5–40,5 Sekunden und
 16–40 Kartenzüge. Der Vertrag bewertet deshalb vorerst den Seed-Mittelwert;
 die Streuung bleibt ein Tuningthema vor dem externen Spieltest.
@@ -64,6 +85,9 @@ in der Spitze, 58 FPS auf Desktop und Handy, Bot-Überlebenszeit im Median
 - Lichtradius, der mit der Buildstärke wächst
 - Nicht blockierendes First-Run-Onboarding und deutliche Warden-Ankündigung
 - Klarer Extraktions-/Neustartfluss mit kopierbarem Run-Bericht
+- Kraterhold mit Tiefmine, Emberschmiede und zwei sichtbar gesperrten Slots
+- Lokale Offline-Produktion mit 24-Stunden-Kappe
+- Erste dauerhafte Hold→Run-Verbesserung über den Wächterbogen
 - Balanceziele für vier Run-Längen (3 / 8 / 15 / 20 Min); die Phase-0-UI bietet
   bewusst nur 3 und 8 Minuten an
 - Regel 1 umgesetzt: Tod kostet nur den Overtime-Bonus, nie die Basis

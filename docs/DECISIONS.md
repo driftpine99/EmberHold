@@ -95,3 +95,19 @@ prozeduralen Basaltplatten, Warden-Ringen, Ember-Vents, Randpfeilern und roten
 Boss-Telegrafien um. Diese Elemente bleiben dekorativ und verändern weder
 Kollision noch Spawnfläche oder Kameralogik. Individuelle Produktions-Assets
 werden erst nach bestandenem Phase-0-Gate beauftragt oder generiert.
+
+## D-010 – Zwei-Gebäude-Hold als Browser-Validierungsslice
+
+**Status:** beschlossen
+
+Nach positivem internem Kampftest wird der bestehende Browserprototyp um einen
+kleinen Hold-Loop erweitert. Funktional sind zunächst nur Tiefmine und
+Emberschmiede: `Eisenerz → Barren → Wächterbogen +10 % Schaden`. Arkanum,
+Übungshof und äußere Kraterringe bleiben sichtbar gesperrt.
+
+Für schnelle Validierung produziert die Tiefmine 1 Erz je 15 Sekunden bis zu
+20 Erz; die Schmiede verarbeitet 5 Erz in 30 Sekunden zu einem Barren und
+lagert höchstens 4. Diese Testwerte ersetzen nicht die langfristigen
+Multi-Clock-Zeiten des GDD. Der Zustand wird lokal gespeichert und höchstens
+24 Stunden offline fortgeschrieben. Es gibt weiterhin kein Konto, Backend oder
+Monetarisierungssystem.

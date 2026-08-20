@@ -19,6 +19,11 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 - Kopierbarer Run-Bericht am Ende eines Laufs
 - Abhängigkeitsfreier UX-Smoke-Test als Teil von `npm test`
 - Vollständige Spielpause über Button, `Esc` oder `P`
+- Kraterhold als neuer Start- und Rückkehrbildschirm
+- Tiefmine und Emberschmiede als erste funktionale Produktionskette
+- Lokaler Hold-Speicherstand mit deterministischer Offline-Produktion
+- Dauerhafte Wächterbogen-Verbesserung für die nächste Sortie
+- Hold-Flow-Prüfung für Produktion, Persistenz und einmalige Run-Auszahlung
 
 ### Changed
 
@@ -31,6 +36,7 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 - Extraktion, Overtime, Tod und Neustart verständlicher beschriftet
 - Drei-Minuten-Scharmützel startet beim Wiederholen nicht mehr als Acht-Minuten-Run
 - Entwickleranzeige von `D` auf `F3` verlegt, damit WASD konfliktfrei funktioniert
+- Run-Beute wird einmalig in Eisenerz umgerechnet und im Hold eingelagert
 
 ### Known issues
 

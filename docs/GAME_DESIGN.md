@@ -1348,6 +1348,11 @@ Barrierefreiheit und bessere Wiederspielbarkeit vorhandener Inhalte.
 Ein Held, ein Territorium, 15 Karten, keine Meta, keine Grafik (Platzhalter-
 Formen). Keine Speicherung, kein Hold, kein Backend.
 
+> **Implementierungsnotiz:** Nach einem positiven internen Kampftest enthält
+> der Browserbuild gemäß D-010 einen bewusst isolierten Zwei-Gebäude-Hold zur
+> Validierung des Rückkehrloops. Er hebt das externe Phase-0-Gate nicht auf und
+> ist noch nicht der vollständige Phase-1-Vertical-Slice.
+
 > **Abbruchkriterium:** Wenn zehn externe Testpersonen nicht freiwillig einen
 > zweiten Run starten, wird das Projekt hier beendet. Nicht angepasst — beendet.
 

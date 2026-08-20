@@ -61,7 +61,12 @@ globalThis.innerWidth = 1000;
 globalThis.addEventListener = noop;
 globalThis.requestAnimationFrame = () => 0;
 globalThis.matchMedia = () => ({ matches: false });
-globalThis.localStorage = { getItem: () => null, setItem: noop };
+const storage = new Map();
+globalThis.localStorage = {
+  getItem: (key) => storage.has(key) ? storage.get(key) : null,
+  setItem: (key, value) => storage.set(key, String(value)),
+  removeItem: (key) => storage.delete(key),
+};
 globalThis.document = {
   body: makeElement("body"),
   createElement: (tag) => makeElement(tag),
@@ -119,14 +124,67 @@ try {
 } catch (error) {
   uxError = error instanceof Error ? error.message : String(error);
 }
+let holdFlow = false;
+let holdError = "";
+try {
+  Object.assign(engine.H, {
+    ore: 0, bars: 0, runs: 0, mineLevel: 1, mineStored: 0,
+    forgeLevel: 0, forgeStored: 0, forgeWorking: false, forgeProgress: 0,
+    bowUpgrade: 0, lastAt: 1000,
+  });
+  engine.advanceHold(16000);
+  const producedOnce = Math.abs(engine.H.mineStored - 1) < 1e-9;
+  engine.advanceHold(16000);
+  const timestampIdempotent = Math.abs(engine.H.mineStored - 1) < 1e-9;
+
+  Object.assign(engine.H, {
+    ore: 15, mineLevel: 0, mineStored: 0, forgeLevel: 1, forgeStored: 0,
+    forgeWorking: false, forgeProgress: 0, lastAt: 1000,
+  });
+  engine.advanceHold(31000);
+  const forgedOne = engine.H.forgeStored === 1 && engine.H.forgeWorking && engine.H.ore === 5;
+
+  engine.H.mineLevel = 0;
+  engine.H.forgeLevel = 0;
+  engine.H.forgeWorking = false;
+  engine.H.forgeProgress = 0;
+  engine.H.ore = 7;
+  engine.H.bars = 2;
+  engine.H.bowUpgrade = 0;
+  engine.H.lastAt = 16000;
+  engine.saveHold();
+  engine.H.ore = 0;
+  engine.loadHold(16000);
+  const persisted = engine.H.ore === 7 && engine.H.bars === 2;
+
+  elements.get("btnBowUpgrade")?.onclick?.();
+  const upgraded = engine.H.bowUpgrade === 1 && engine.H.bars === 0;
+
+  engine.begin(180);
+  const upgradeApplied = Math.abs(engine.S.holdDmg - 1.1) < 1e-9;
+  engine.S.reward = 1023;
+  engine.S.rewardGranted = false;
+  const beforeOre = engine.H.ore, beforeRuns = engine.H.runs;
+  const firstDeposit = engine.depositRunReward();
+  const secondDeposit = engine.depositRunReward();
+  const depositedOnce = firstDeposit === 10 && secondDeposit === 0 &&
+    engine.H.ore === beforeOre + 10 && engine.H.runs === beforeRuns + 1;
+  engine.showHold();
+  const returnedToHold = engine.S.running === false && elements.get("start").getAttribute("aria-hidden") === "false";
+  holdFlow = producedOnce && timestampIdempotent && forgedOne && persisted && upgraded &&
+    upgradeApplied && depositedOnce && returnedToHold;
+} catch (error) {
+  holdError = error instanceof Error ? error.message : String(error);
+}
 const output = {
-  pass: report.pass && reproducible && uxFlow,
-  checks: { ...report.checks, reproducible, uxFlow },
+  pass: report.pass && reproducible && uxFlow && holdFlow,
+  checks: { ...report.checks, reproducible, uxFlow, holdFlow },
   targets: report.targets,
   seeds: report.seeds,
   summary: report.summary,
 };
 if (uxError) output.uxError = uxError;
+if (holdError) output.holdError = holdError;
 
 console.log(JSON.stringify(output, null, 2));
 if (!output.pass) process.exitCode = 1;

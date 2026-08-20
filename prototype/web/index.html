@@ -117,6 +117,63 @@ button.b.danger{background:#c9402e;color:#fff}
 .help kbd{background:#1d1d29;border:1px solid #2e2e3c;border-radius:5px;padding:2px 8px;
   font:inherit;font-size:11.5px;color:#e8e4dc;flex-shrink:0;min-width:74px;text-align:center}
 
+/* ---------- Kraterhold ---------- */
+#start.holdsheet{justify-content:flex-start;background:
+  radial-gradient(circle at 50% 39%,rgba(100,35,20,.28),transparent 24%),
+  linear-gradient(rgba(8,8,12,.91),rgba(8,8,12,.97));padding:18px 20px 28px}
+.holdhead{width:min(920px,100%);display:flex;align-items:flex-end;justify-content:space-between;
+  gap:16px;text-align:left}.holdhead .kick{margin:0}.holdhead h1{font-size:clamp(25px,5vw,42px)}
+.holdresources{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.holdres{background:rgba(23,23,33,.9);border:1px solid #2b2b38;border-radius:8px;
+  padding:6px 11px;min-width:92px}.holdres b{display:block;color:#e8e4dc;font-size:17px;
+  font-variant-numeric:tabular-nums}.holdres span{display:block;color:#777164;font-size:9px;
+  letter-spacing:.12em;text-transform:uppercase}
+.holdstage{position:relative;width:min(820px,100%);margin:12px auto 0;padding-top:185px}
+.crater{position:absolute;left:50%;top:0;width:420px;height:210px;transform:translateX(-50%);
+  border-radius:50%;background:radial-gradient(ellipse,#221710 0 8%,#352119 9% 12%,#17171e 13% 27%,
+  #343039 28% 30%,#12131a 31% 46%,#292a32 47% 50%,#0b0c11 51% 68%,#24252d 69% 72%,transparent 73%);
+  box-shadow:0 22px 46px rgba(0,0,0,.7),inset 0 0 35px rgba(0,0,0,.85)}
+.embercore{position:absolute;left:50%;top:64px;transform:translateX(-50%);width:54px;height:82px;
+  display:grid;place-items:center;filter:drop-shadow(0 0 17px rgba(224,86,42,.72))}
+.embercore:before{content:"";width:28px;height:64px;background:linear-gradient(#ffd18a,#e05a2e 48%,#711f19);
+  clip-path:polygon(50% 0,82% 35%,68% 100%,32% 100%,18% 35%);animation:corepulse 2.4s ease-in-out infinite}
+.embercore:after{content:"";position:absolute;bottom:-5px;width:62px;height:18px;border:6px solid #373740;
+  border-radius:50%;box-shadow:0 0 14px rgba(224,90,45,.42)}
+@keyframes corepulse{50%{filter:brightness(1.3);transform:scale(.95,1.05)}}
+@media (prefers-reduced-motion:reduce){.embercore:before{animation:none}}
+.holdstatus{position:absolute;top:146px;left:50%;transform:translateX(-50%);font-size:11px;
+  color:#a88672;width:min(620px,92vw);text-align:center}
+.holdgrid{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.holdbuilding,.holdupgrade{background:rgba(20,20,29,.94);border:1px solid #2b2b38;border-radius:11px;
+  padding:13px 14px;text-align:left;min-width:0}.holdbuilding.ready{border-color:#8d4c32}
+.buildingtop{display:flex;justify-content:space-between;gap:12px;align-items:start}
+.buildingtop b{font-size:15px}.buildingtop span{font-size:10px;color:#e07a3f;white-space:nowrap}
+.holdbuilding p,.holdupgrade p{font-size:11.5px;color:#8b8577;margin-top:4px}
+.prodbar{height:4px;border-radius:2px;background:#292934;margin:10px 0 7px;overflow:hidden}
+.prodbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#9b4a2d,#e07a3f)}
+.buildingfoot{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.buildingstate{font-size:10.5px;color:#a8a396;font-variant-numeric:tabular-nums}
+.smallaction{pointer-events:auto;border:1px solid #3a3a48;background:#20202b;color:#d5d0c6;
+  border-radius:7px;padding:7px 10px;font:inherit;font-size:11px;cursor:pointer;white-space:nowrap}
+.smallaction:hover:not(:disabled){border-color:#e07a3f;color:#ffc48a}
+.smallaction:disabled{opacity:.38;cursor:default}
+.holdlower{display:grid;grid-template-columns:1.35fr .65fr;gap:10px;margin-top:10px}
+.holdupgrade{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.holdupgrade.done{border-color:#7d9463}.holdupgrade b{font-size:13px}
+.lockedslots{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.lockedslot{display:grid;place-items:center;background:rgba(13,13,19,.82);border:1px dashed #30303b;
+  border-radius:9px;color:#5d5a53;font-size:10px;text-align:center;padding:9px}
+.holdsortie{margin-top:14px}.holdsortie .btnrow{margin-top:0}
+.holdnote{color:#5f5b53;font-size:10px;margin-top:7px}
+
+@media (max-width:620px){
+  #start.holdsheet{padding:14px 12px 24px}.holdhead{align-items:flex-start;flex-direction:column}
+  .holdresources{justify-content:flex-start}.holdres{min-width:82px;padding:5px 9px}
+  .holdstage{padding-top:160px}.crater{width:330px;height:165px}.embercore{top:43px}
+  .holdstatus{top:126px}.holdgrid,.holdlower{grid-template-columns:1fr}.holdbuilding{padding:11px 12px}
+  .holdupgrade{align-items:flex-start}.holdsortie button.b{padding:11px 18px}
+}
+
 /* ---------- Dev-Overlay ---------- */
 #dev{position:absolute;right:10px;top:64px;background:rgba(12,12,18,.9);
   border:1px solid #262633;border-radius:8px;padding:10px 12px;font-size:11px;
@@ -237,21 +294,41 @@ button.b.danger{background:#c9402e;color:#fff}
     <button id="reroll" class="panel">Neu ziehen (1)</button>
   </div>
 
-  <!-- Start -->
-  <div id="start" class="sheet on" role="dialog" aria-modal="true" aria-hidden="false">
-    <p class="kick">Prototyp · Phase 0 · Aelric Fernstreich</p>
-    <h1>EMBER<span>HOLD</span></h1>
-    <p class="sub">Acht Minuten. Ein Bogenschütze. Die Frage, die dieser Prototyp
-    beantworten soll: <b style="color:#e8e4dc">Macht das Kämpfen Spaß?</b></p>
-    <div class="help">
-      <div><kbd>WASD / ←↑↓→</kbd><span>Bewegen — Aelric schießt automatisch.</span></div>
-      <div><kbd>Leertaste</kbd><span>Ember-Stoß — kurzer Sprint, 0,35 Sek unverwundbar, 12 Sek Abklingzeit.</span></div>
-      <div><kbd>Mobil</kbd><span>Links wischen zum Bewegen, rechts tippen für den Ember-Stoß.</span></div>
-      <div><kbd>1 / 2 / 3</kbd><span>Karte wählen · <b>R</b> neu ziehen</span></div>
+  <!-- Hold / Start -->
+  <div id="start" class="sheet holdsheet on" role="dialog" aria-modal="true" aria-hidden="false">
+    <div class="holdhead">
+      <div><p class="kick">Kraterhold · Innerer Produktionsring</p><h1>Die letzte <span>Glut</span></h1></div>
+      <div class="holdresources" aria-label="Ressourcen">
+        <div class="holdres"><b id="holdore">0</b><span>Eisenerz</span></div>
+        <div class="holdres"><b id="holdbars">0</b><span>Barren</span></div>
+        <div class="holdres"><b id="holdruns">0</b><span>Sortien</span></div>
+      </div>
     </div>
-    <div class="btnrow">
-      <button class="b" id="btnStart">Ausrücken</button>
-      <button class="b ghost" id="btnStart3">Scharmützel (3 Min)</button>
+    <div class="holdstage">
+      <div class="crater" aria-hidden="true"></div><div class="embercore" aria-hidden="true"></div>
+      <div class="holdstatus" id="holdstatus">Der innere Ring wartet auf Reparaturen.</div>
+      <div class="holdgrid">
+        <section class="holdbuilding" id="minecard">
+          <div class="buildingtop"><b>Tiefmine</b><span id="minelevel">Ruine</span></div>
+          <p>Fördert 1 Eisenerz alle 15 Sekunden. Lagerkapazität: 20.</p>
+          <div class="prodbar"><i id="minebar"></i></div>
+          <div class="buildingfoot"><span class="buildingstate" id="minestate">Noch nicht repariert</span><button class="smallaction" id="btnMine">Kostenlos reparieren</button></div>
+        </section>
+        <section class="holdbuilding" id="forgecard">
+          <div class="buildingtop"><b>Emberschmiede</b><span id="forgelevel">Ruine</span></div>
+          <p>Verarbeitet automatisch 5 Eisenerz in 30 Sekunden zu 1 Barren.</p>
+          <div class="prodbar"><i id="forgebar"></i></div>
+          <div class="buildingfoot"><span class="buildingstate" id="forgestate">Benötigt 10 Eisenerz</span><button class="smallaction" id="btnForge">Reparieren · 10</button></div>
+        </section>
+      </div>
+      <div class="holdlower">
+        <section class="holdupgrade" id="bowupgrade"><div><b>Wächterbogen verstärken</b><p>2 Barren · dauerhaft +10 % Schaden in Sortien</p></div><button class="smallaction" id="btnBowUpgrade">Verstärken</button></section>
+        <div class="lockedslots"><div class="lockedslot">Arkanum<br>äußerer Ring</div><div class="lockedslot">Übungshof<br>äußerer Ring</div></div>
+      </div>
+    </div>
+    <div class="holdsortie">
+      <div class="btnrow"><button class="b" id="btnStart">Sortie · 8 Min</button><button class="b ghost" id="btnStart3">Scharmützel · 3 Min</button></div>
+      <p class="holdnote">Lokaler Prototyp · Offline-Produktion bis maximal 24 Stunden · weitere Ringe gesperrt</p>
     </div>
   </div>
 
@@ -287,8 +364,8 @@ button.b.danger{background:#c9402e;color:#fff}
     <p class="sub" id="oversub"></p>
     <div class="statgrid" id="ovstats"></div>
     <div class="btnrow">
-      <button class="b" id="btnAgain">Gleichen Run wiederholen</button>
-      <button class="b ghost" id="btnMenu">Modus wählen</button>
+      <button class="b" id="btnMenu">Zum Hold</button>
+      <button class="b ghost" id="btnAgain">Gleichen Run wiederholen</button>
     </div>
     <button class="copyline" id="btnCopy">Run-Bericht kopieren</button>
   </div>
@@ -298,9 +375,9 @@ button.b.danger{background:#c9402e;color:#fff}
 <script>
 "use strict";
 // ===========================================================================
-//  EMBERHOLD — Prototyp Phase 0
-//  Ein Held, ein Territorium, 8 Minuten. Keine Meta, kein Hold, kein Backend.
-//  Verbindliche Phase-0-Werte stehen hier; siehe docs/DECISIONS.md (D-006).
+//  EMBERHOLD — Kampfprototyp + kleiner Hold-Validierungsslice
+//  Ein Held, ein Territorium, zwei Hold-Gebäude. Kein Backend.
+//  Verbindliche Kampfwerte stehen in D-006, Hold-Scope und Testzeiten in D-010.
 // ===========================================================================
 
 const CFG = {
@@ -680,6 +757,8 @@ function newRun(runLen, seed){
     events:{elite:0, boss:false, surge:false},
     bladeAng:0, ot:0, otActive:false,
     reward:0, baseReward:0,
+    rewardGranted:false, holdOre:0,
+    holdDmg:HEADLESS?1:(1+0.10*(META?.bowUpgrade||0)),
     cool:{}, seed:runSeed,
     fps:60, worstFps:999, peakEnemies:0,
   };
@@ -699,7 +778,7 @@ function xpNeed(L){ return CFG.XP_C * Math.pow(L, CFG.XP_K); }
 function stat(){
   const p = S.Pa;
   return {
-    dmg:   (1 + 0.15*(p.wetz||0)) * CFG.DMG_GLOBAL,
+    dmg:   (1 + 0.15*(p.wetz||0)) * CFG.DMG_GLOBAL * (S.holdDmg||1),
     aspd:  1 + 0.12*(p.sehne||0),
     area:  1 + 0.18*(p.linse||0),
     proj:  (p.koecher||0),
@@ -1657,9 +1736,141 @@ function render(){
 //  HUD
 // ===========================================================================
 const el = id=>document.getElementById(id);
+
+// ===========================================================================
+//  HOLD-MVP — lokaler, deterministischer Produktionszustand
+// ===========================================================================
+const HOLD_KEY='emberhold:hold:v1';
+const HOLD_CFG=Object.freeze({
+  OFFLINE_CAP:86400, MINE_SEC:15, MINE_CAP:20,
+  FORGE_COST:10, FORGE_INPUT:5, FORGE_SEC:30, FORGE_CAP:4,
+  BOW_COST:2,
+});
+function freshHold(now){
+  return {version:1,ore:0,bars:0,runs:0,mineLevel:0,mineStored:0,
+    forgeLevel:0,forgeStored:0,forgeWorking:false,forgeProgress:0,
+    bowUpgrade:0,lastAt:Number.isFinite(now)?now:Date.now()};
+}
+function cleanHold(raw,now){
+  const h=freshHold(now), src=raw&&typeof raw==='object'?raw:{};
+  const num=(key,min,max)=>Math.min(max,Math.max(min,Number.isFinite(+src[key])?+src[key]:h[key]));
+  h.ore=num('ore',0,1e9); h.bars=num('bars',0,1e9); h.runs=num('runs',0,1e7)|0;
+  h.mineLevel=num('mineLevel',0,1)|0; h.mineStored=num('mineStored',0,HOLD_CFG.MINE_CAP);
+  h.forgeLevel=num('forgeLevel',0,1)|0; h.forgeStored=num('forgeStored',0,HOLD_CFG.FORGE_CAP)|0;
+  h.forgeWorking=!!src.forgeWorking; h.forgeProgress=num('forgeProgress',0,HOLD_CFG.FORGE_SEC);
+  h.bowUpgrade=num('bowUpgrade',0,1)|0;
+  h.lastAt=Number.isFinite(+src.lastAt)?+src.lastAt:h.lastAt;
+  if(!h.forgeLevel||h.forgeStored>=HOLD_CFG.FORGE_CAP){ h.forgeWorking=false; h.forgeProgress=0; }
+  return h;
+}
+let META=freshHold(Date.now()), holdOpen=true, holdUiT=0, holdSaveT=0, holdNotice='', holdNoticeUntil=0;
+function saveHold(){
+  try { localStorage.setItem(HOLD_KEY,JSON.stringify(META)); return true; } catch(_){ return false; }
+}
+function loadHold(now){
+  now=Number.isFinite(now)?now:Date.now();
+  let raw=null;
+  try { raw=JSON.parse(localStorage.getItem(HOLD_KEY)||'null'); } catch(_){}
+  META=cleanHold(raw,now); advanceHold(now); saveHold(); return META;
+}
+function advanceHold(now){
+  now=Number.isFinite(now)?now:Date.now();
+  if(now<META.lastAt){ META.lastAt=now; return {seconds:0,mine:0,bars:0}; }
+  const seconds=Math.min((now-META.lastAt)/1000,HOLD_CFG.OFFLINE_CAP);
+  META.lastAt=now;
+  const mineBefore=META.mineStored, barsBefore=META.forgeStored;
+  if(META.mineLevel) META.mineStored=Math.min(HOLD_CFG.MINE_CAP,META.mineStored+seconds/HOLD_CFG.MINE_SEC);
+
+  let left=seconds, guard=0;
+  while(META.forgeLevel&&left>0&&META.forgeStored<HOLD_CFG.FORGE_CAP&&guard++<12){
+    if(!META.forgeWorking){
+      if(META.ore<HOLD_CFG.FORGE_INPUT) break;
+      META.ore-=HOLD_CFG.FORGE_INPUT; META.forgeWorking=true; META.forgeProgress=0;
+    }
+    const used=Math.min(left,HOLD_CFG.FORGE_SEC-META.forgeProgress);
+    META.forgeProgress+=used; left-=used;
+    if(META.forgeProgress>=HOLD_CFG.FORGE_SEC-.0001){
+      META.forgeStored++; META.forgeWorking=false; META.forgeProgress=0;
+    }
+  }
+  if(META.forgeLevel&&!META.forgeWorking&&META.forgeStored<HOLD_CFG.FORGE_CAP&&META.ore>=HOLD_CFG.FORGE_INPUT){
+    META.ore-=HOLD_CFG.FORGE_INPUT; META.forgeWorking=true; META.forgeProgress=0;
+  }
+  return {seconds,mine:META.mineStored-mineBefore,bars:META.forgeStored-barsBefore};
+}
+function rewardOre(reward){ return Math.max(3,Math.round(Math.log2(Math.max(0,reward)+1))); }
+function depositRunReward(){
+  if(HEADLESS||!S||S.rewardGranted) return 0;
+  // Erst die Zeit waehrend der Sortie abrechnen; ihre Beute existiert erst jetzt.
+  advanceHold(Date.now());
+  const ore=rewardOre(S.reward); META.ore+=ore; META.runs++; S.holdOre=ore; S.rewardGranted=true;
+  saveHold(); return ore;
+}
+function holdMessage(){
+  if(!META.mineLevel) return 'Der innere Ring wartet auf die Reparatur der Tiefmine.';
+  if(!META.forgeLevel) return 'Sammle 10 Eisenerz, um die Emberschmiede zu reparieren.';
+  if(!META.bowUpgrade) return 'Erz wird zu Barren. Der Wächterbogen wartet auf Verstärkung.';
+  return 'Der innere Ring arbeitet. Weitere Kraterringe bleiben gesperrt.';
+}
+function renderHold(message){
+  if(message){ holdNotice=message; holdNoticeUntil=Date.now()+3200; }
+  el('holdore').textContent=Math.floor(META.ore).toLocaleString('de-DE');
+  el('holdbars').textContent=Math.floor(META.bars).toLocaleString('de-DE');
+  el('holdruns').textContent=META.runs.toLocaleString('de-DE');
+  el('holdstatus').textContent=Date.now()<holdNoticeUntil?holdNotice:holdMessage();
+
+  const mineN=Math.floor(META.mineStored), mineOn=META.mineLevel>0, mb=el('btnMine');
+  el('minelevel').textContent=mineOn?'Stufe 1':'Ruine';
+  el('minestate').textContent=mineOn?(mineN+' / '+HOLD_CFG.MINE_CAP+' Erz im Lager'):'Noch nicht repariert';
+  el('minebar').style.width=(mineOn?META.mineStored/HOLD_CFG.MINE_CAP*100:0)+'%';
+  mb.textContent=mineOn?(mineN?'Einsammeln · '+mineN:'Produziert…'):'Kostenlos reparieren';
+  mb.disabled=mineOn&&!mineN; el('minecard').classList.toggle('ready',mineN>0);
+
+  const forgeN=META.forgeStored, forgeOn=META.forgeLevel>0, fb=el('btnForge');
+  el('forgelevel').textContent=forgeOn?'Stufe 1':'Ruine';
+  el('forgebar').style.width=(forgeOn&&META.forgeWorking?META.forgeProgress/HOLD_CFG.FORGE_SEC*100:0)+'%';
+  if(!forgeOn){
+    el('forgestate').textContent=META.mineLevel?('Benötigt '+HOLD_CFG.FORGE_COST+' Eisenerz'):'Zuerst die Tiefmine reparieren';
+    fb.textContent='Reparieren · '+HOLD_CFG.FORGE_COST;
+    fb.disabled=!META.mineLevel||META.ore<HOLD_CFG.FORGE_COST;
+  } else {
+    el('forgestate').textContent=forgeN?(forgeN+' / '+HOLD_CFG.FORGE_CAP+' Barren bereit'):
+      (META.forgeWorking?('Schmelzt · '+Math.floor(META.forgeProgress/HOLD_CFG.FORGE_SEC*100)+' %'):'Benötigt 5 Eisenerz');
+    fb.textContent=forgeN?'Einsammeln · '+forgeN:(META.forgeWorking?'Schmilzt…':'Wartet auf Erz'); fb.disabled=!forgeN;
+  }
+  el('forgecard').classList.toggle('ready',forgeN>0);
+
+  const up=el('btnBowUpgrade'), done=META.bowUpgrade>0;
+  up.textContent=done?'Verstärkt':'Verstärken · '+HOLD_CFG.BOW_COST; up.disabled=done||META.bars<HOLD_CFG.BOW_COST;
+  el('bowupgrade').classList.toggle('done',done);
+}
+function mineAction(){
+  advanceHold(Date.now());
+  if(!META.mineLevel){ META.mineLevel=1; META.lastAt=Date.now(); saveHold(); renderHold('Die Tiefmine ist repariert. Die erste Förderung beginnt.'); return; }
+  const n=Math.floor(META.mineStored); if(!n) return;
+  META.mineStored-=n; META.ore+=n; advanceHold(Date.now()); saveHold(); renderHold(n+' Eisenerz eingesammelt.');
+}
+function forgeAction(){
+  advanceHold(Date.now());
+  if(!META.forgeLevel){
+    if(!META.mineLevel||META.ore<HOLD_CFG.FORGE_COST) return;
+    META.ore-=HOLD_CFG.FORGE_COST; META.forgeLevel=1; advanceHold(Date.now()); saveHold();
+    renderHold('Die Emberschmiede brennt wieder.'); return;
+  }
+  const n=META.forgeStored; if(!n) return;
+  META.forgeStored=0; META.bars+=n; advanceHold(Date.now()); saveHold(); renderHold(n+' Barren eingesammelt.');
+}
+function upgradeBow(){
+  advanceHold(Date.now());
+  if(META.bowUpgrade||META.bars<HOLD_CFG.BOW_COST) return;
+  META.bars-=HOLD_CFG.BOW_COST; META.bowUpgrade=1; saveHold();
+  renderHold('Wächterbogen verstärkt: dauerhaft +10 % Schaden.');
+}
+
 let slotSig='';
 function renderSlots(){
   const parts=[];
+  if(S.holdDmg>1) parts.push({c:'#e07a3f',n:'Wächterbogen',l:'+10%',e:true});
   for (const w of WEAPONS){
     const lv=S.W[w.id]; if(!lv) continue;
     const evo=!!S.evo[w.id];
@@ -1808,6 +2019,7 @@ function endRun(survived){
   S.reward = base + bonus;
   S.result = survived?'Extrahiert':'Gefallen';
   if (HEADLESS) return;
+  depositRunReward();
   S.running=false;
   setSheet('extract',false);
   const cards=el('cards'); cards.classList.remove('on'); cards.setAttribute('aria-hidden','true');
@@ -1832,10 +2044,11 @@ function endRun(survived){
     statTile(S.level,'Stufe') +
     statTile(fmtTime(S.otActive?S.runLen+S.ot:S.t),'Zeit') +
     statTile(S.pickTimes.length,'Kartenzüge') +
-    statTile(S.reward.toLocaleString('de-DE'),'Beute gesamt');
+    statTile(S.reward.toLocaleString('de-DE'),'Beute gesamt') +
+    statTile('+'+S.holdOre,'Eisenerz für Hold');
   const mode=S.runLen===180?'3-Minuten-Scharmützel':Math.round(S.runLen/60)+'-Minuten-Run';
   el('btnAgain').textContent=mode+' wiederholen';
-  setSheet('over',true,'btnAgain');
+  setSheet('over',true,'btnMenu');
 }
 
 function buildText(){
@@ -1861,6 +2074,7 @@ function runReportText(){
     'Erster Kartenzug: '+(S.pickTimes.length?S.pickTimes[0].toFixed(1)+' s':'–'),
     'Basis-Beute: '+S.baseReward,
     'Overtime-Bonus: '+bonus,
+    'Eisenerz für Hold: '+(S.holdOre||0),
     'Build: '+buildText(),
     'Evolutionen: '+evos,
     'Schlechteste FPS: '+fps,
@@ -1888,6 +2102,9 @@ function showStartMenu(){
   if(!S) return;
   S.running=false; setSheet('over',false); setSheet('extract',false); setSheet('pause',false);
   hideBossAlert(); if(coachStep) hideCoach(false);
+  holdOpen=true;
+  const gained=S.holdOre?('Sortiebeute eingelagert: +'+S.holdOre+' Eisenerz.'):'';
+  advanceHold(Date.now()); saveHold(); renderHold(gained);
   setSheet('start',true,'btnStart');
 }
 
@@ -2028,6 +2245,12 @@ function frame(ts){
   let dt=(ts-last)/1000; last=ts;
   if (dt>0.25) dt=0.25;
 
+  if(holdOpen){
+    holdUiT+=dt; holdSaveT+=dt;
+    if(holdUiT>=.25){ holdUiT=0; advanceHold(Date.now()); renderHold(); }
+    if(holdSaveT>=5){ holdSaveT=0; saveHold(); }
+  }
+
   if (S && S.running && S.phase==='run'){
     readKeys();
     updateOnboarding();
@@ -2066,6 +2289,7 @@ function frame(ts){
 // ===========================================================================
 function begin(len){
   newRun(len);
+  holdOpen=false; saveHold();
   slotSig=''; renderSlots();
   document.querySelectorAll('.sheet').forEach(s=>{ s.classList.remove('on'); s.setAttribute('aria-hidden','true'); });
   const cards=el('cards'); cards.classList.remove('on'); cards.setAttribute('aria-hidden','true');
@@ -2084,6 +2308,9 @@ el('btnAgain').onclick   = ()=>begin(S&&S.runLen?S.runLen:480);
 el('btnMenu').onclick    = showStartMenu;
 el('btnCopy').onclick    = copyRunReport;
 el('reroll').onclick     = doReroll;
+el('btnMine').onclick    = mineAction;
+el('btnForge').onclick   = forgeAction;
+el('btnBowUpgrade').onclick = upgradeBow;
 
 
 // ===========================================================================
@@ -2126,9 +2353,12 @@ buildTune();
 
 buildSprites();
 resize();
+loadHold(Date.now());
 newRun(480);            // damit der Hintergrund schon lebt
 S.running=false;
+renderHold(); holdOpen=true;
 requestAnimationFrame(frame);
+addEventListener('beforeunload',()=>{ advanceHold(Date.now()); saveHold(); });
 
 /** Kartenwahl eines Spielers mit Plan: fokussiert wenige Waffen bis zur
  *  Evolution statt breit zu streuen. Der Unterschied zur Zufallswahl zeigt,
@@ -2279,7 +2509,9 @@ function runBalanceSuite(opts){
 }
 
 // Für automatisierte Tests
-window.__EH = { get S(){return S;}, CFG, begin, input, pacingReport, runReportText, headlessRun, runBalanceSuite, nearEnemies,
+window.__EH = { get S(){return S;}, get H(){return META;}, CFG, HOLD_CFG, begin, input,
+                pacingReport, runReportText, headlessRun, runBalanceSuite, nearEnemies,
+                advanceHold, saveHold, loadHold, depositRunReward, showHold:showStartMenu,
                 tick:(d)=>{HEADLESS=true; step(d); while(pendingPicks>0){currentOffer=buildOffer(); applyOffer(currentOffer[0]); pendingPicks--;} HEADLESS=false;},
                 targetEnemies,
                 counts:()=>{let e=0,p=0,g=0;

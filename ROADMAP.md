@@ -72,6 +72,24 @@ Gate für Phase 1:
 - Es gibt keine wiederkehrende Beschwerde, die den Kernloop grundsätzlich
   infrage stellt.
 
+## H0.1 – Hold-Validierungsslice im Browser
+
+Ziel: Nach einem positiven internen Kampftest prüfen, ob bereits eine einzige
+Produktionskette den Wunsch nach der nächsten Sortie verstärkt. Dieser Slice
+ist noch kein vollständiger Beginn von Phase 1.
+
+- [x] Kraterhold als Startbildschirm integrieren
+- [x] Tiefmine mit Lagerkappe und Offline-Produktion umsetzen
+- [x] Emberschmiede als erste Verarbeitungskette umsetzen
+- [x] Run-Belohnung genau einmal in Eisenerz umwandeln
+- [x] Wächterbogen als erste dauerhafte Hold→Run-Verbesserung anbinden
+- [x] Lokalen Speicherstand und deterministische Hold-Tests ergänzen
+- [ ] Hold→Run→Hold-Schleife mit externen Spielern prüfen
+
+Die Produktionszeiten sind für diesen Test auf 15 beziehungsweise 30 Sekunden
+komprimiert. Langfristige Multi-Clock-Zeiten werden erst nach positivem Test
+kalibriert.
+
 ## Phase 1 – Solo-PvE Vertical Slice
 
 Wird erst nach bestandenem Phase-0-Gate begonnen.
