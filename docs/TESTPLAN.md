@@ -15,7 +15,7 @@ Server, keine Installation. Läuft auf Desktop und Handy.
 | Karte wählen | Klick oder 1 / 2 / 3 |
 | Neu ziehen | R |
 | **T** | **Live-Tuning** — Dichte, Schaden, HP, XP-Kurve. Wirkt sofort, auch mitten im Run. |
-| **D** | Entwickler-Anzeige — FPS, Entities, Pick-Zeiten gegen die Spezifikation |
+| **F3** | Entwickler-Anzeige — FPS, Entities, Pick-Zeiten gegen die Spezifikation |
 
 ## Automatisierter Balance-Vertrag
 
@@ -29,18 +29,23 @@ und 1789. Der aktuelle Stand:
 | Größe | Ist | Vertrag |
 |---|---:|---:|
 | Erster Kartenzug, Mittelwert | 25,4 s | 25–45 s; Zielwert 35 s |
-| Kartenzüge in 8 Min, Mittelwert | 22,25 | 21 ± 3 |
-| Rhythmus pro Minute | 1,75 · 2,13 · 2,63 · 2,13 · 2,13 · 2,50 · 3,13 · 5,88 | 1 · 2 · 2 · 2 · 3 · 3 · 4 · 4 |
-| Kartenzüge bei −10 % XP-Kosten | 21,5 | — |
-| Kartenzüge bei +10 % XP-Kosten | 17,0 | — |
-| Verhältnis der beiden Varianten | 1,265 | ≤ 1,75 |
+| Kartenzüge in 8 Min, Mittelwert | 23,38 | 21 ± 3 |
+| Rhythmus pro Minute | 1,75 · 2,13 · 2,63 · 2,13 · 2,13 · 3,00 · 3,88 · 5,75 | 1 · 2 · 2 · 2 · 3 · 3 · 4 · 4 |
+| Kartenzüge bei −10 % XP-Kosten | 18,75 | — |
+| Kartenzüge bei +10 % XP-Kosten | 16,38 | — |
+| Verhältnis der beiden Varianten | 1,145 | ≤ 1,75 |
 
 Ein Wiederholungslauf mit demselben Seed muss bitgenau dasselbe Ergebnis
 liefern. Der Test endet mit Fehlercode, sobald ein Korridor oder diese
 Reproduzierbarkeit verletzt wird.
 
+Zusätzlich prüft derselbe abhängigkeitfreie Test den UX-Fluss: Ein
+3-Minuten-Scharmützel muss im gleichen Modus neu starten, der kopierbare
+Run-Bericht muss seine Pflichtfelder enthalten und `D` darf nicht erneut mit
+der Entwickleranzeige kollidieren.
+
 Die Einzelruns streuen derzeit stark: erster Zug 17,5–40,5 Sekunden und
-16–42 Kartenzüge. Der Vertrag bewertet deshalb vorerst den Seed-Mittelwert;
+16–40 Kartenzüge. Der Vertrag bewertet deshalb vorerst den Seed-Mittelwert;
 die Streuung bleibt ein Tuningthema vor dem externen Spieltest.
 
 Letzte manuelle Browserreferenz vor Einführung der festen Seeds: 1.039 Gegner
@@ -55,6 +60,8 @@ in der Spitze, 58 FPS auf Desktop und Handy, Bot-Überlebenszeit im Median
   Schatzflut bei 7:00, Extraktion bei 8:00 mit Overtime-Angebot
 - Ember-Stoß mit 0,35 s Unverwundbarkeit
 - Lichtradius, der mit der Buildstärke wächst
+- Nicht blockierendes First-Run-Onboarding und deutliche Warden-Ankündigung
+- Klarer Extraktions-/Neustartfluss mit kopierbarem Run-Bericht
 - Balanceziele für vier Run-Längen (3 / 8 / 15 / 20 Min); die Phase-0-UI bietet
   bewusst nur 3 und 8 Minuten an
 - Regel 1 umgesetzt: Tod kostet nur den Overtime-Bonus, nie die Basis

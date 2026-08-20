@@ -35,7 +35,7 @@ Abnahme:
 - [ ] Kartenwahl auf Desktop und Mobil prüfen
 - [ ] Evolution in normalen 8-Minuten-Runs erreichbar machen
 - [ ] Lesbarkeit von Gegnerfamilien und Bosswarnungen prüfen
-- [ ] Testbericht am Run-Ende kopierbar machen
+- [x] Testbericht am Run-Ende kopierbar machen
 
 Abnahme:
 

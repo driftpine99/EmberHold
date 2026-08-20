@@ -15,6 +15,9 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 - Abhängigkeitsfreier Node-Test für den integrierten Headless-Spielpfad
 - Prozedurale Warden-Arena mit Basaltboden, Ember-Vents und Randpfeilern
 - Lesbare Boss-Telegrafien für Ringsalve und Ansturm
+- Nicht blockierendes First-Run-Onboarding und Warden-Ankündigung
+- Kopierbarer Run-Bericht am Ende eines Laufs
+- Abhängigkeitsfreier UX-Smoke-Test als Teil von `npm test`
 
 ### Changed
 
@@ -24,6 +27,9 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 - Phase-0-XP-Kurve, Evolution und runlängenabhängige Pick-Ziele vereinheitlicht
 - Gameplay-Zufall vom Rendering getrennt und seedbar gemacht
 - Rechten Warden-Arena-Entwurf als visuelle Phase-0-Kampfrichtung festgelegt
+- Extraktion, Overtime, Tod und Neustart verständlicher beschriftet
+- Drei-Minuten-Scharmützel startet beim Wiederholen nicht mehr als Acht-Minuten-Run
+- Entwickleranzeige von `D` auf `F3` verlegt, damit WASD konfliktfrei funktioniert
 
 ### Known issues
 
