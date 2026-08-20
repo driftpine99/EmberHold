@@ -70,7 +70,7 @@ globalThis.document = {
     return elements.get(id);
   },
   querySelectorAll: (selector) => selector === ".sheet"
-    ? ["start", "extract", "over"].map((id) => globalThis.document.getElementById(id))
+    ? ["start", "pause", "extract", "over"].map((id) => globalThis.document.getElementById(id))
     : [],
 };
 
@@ -97,6 +97,10 @@ let uxFlow = false;
 let uxError = "";
 try {
   engine.begin(180);
+  elements.get("pausebtn")?.onclick?.();
+  const enteredPause = engine.S.phase === "pause";
+  elements.get("btnResume")?.onclick?.();
+  const resumedCleanly = engine.S.phase === "run" && engine.S.runLen === 180;
   engine.S.result = "Extrahiert";
   engine.S.t = 180;
   engine.S.kills = 321;
@@ -111,7 +115,7 @@ try {
   elements.get("btnAgain")?.onclick?.();
   const sameModeRestart = engine.S.runLen === 180 && engine.S.phase === "run";
   const shortcutSafe = html.includes("e.code==='F3'") && !html.includes("e.code==='KeyD') toggleDev");
-  uxFlow = reportComplete && sameModeRestart && shortcutSafe;
+  uxFlow = enteredPause && resumedCleanly && reportComplete && sameModeRestart && shortcutSafe;
 } catch (error) {
   uxError = error instanceof Error ? error.message : String(error);
 }

@@ -18,6 +18,7 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 - Nicht blockierendes First-Run-Onboarding und Warden-Ankündigung
 - Kopierbarer Run-Bericht am Ende eines Laufs
 - Abhängigkeitsfreier UX-Smoke-Test als Teil von `npm test`
+- Vollständige Spielpause über Button, `Esc` oder `P`
 
 ### Changed
 

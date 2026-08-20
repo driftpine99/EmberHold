@@ -14,6 +14,7 @@ Server, keine Installation. Läuft auf Desktop und Handy.
 | Ember-Stoß | Leertaste · mobil: rechts tippen |
 | Karte wählen | Klick oder 1 / 2 / 3 |
 | Neu ziehen | R |
+| Pause | `Esc` oder `P` · Pausenbutton oben rechts |
 | **T** | **Live-Tuning** — Dichte, Schaden, HP, XP-Kurve. Wirkt sofort, auch mitten im Run. |
 | **F3** | Entwickler-Anzeige — FPS, Entities, Pick-Zeiten gegen die Spezifikation |
 
@@ -42,7 +43,8 @@ Reproduzierbarkeit verletzt wird.
 Zusätzlich prüft derselbe abhängigkeitfreie Test den UX-Fluss: Ein
 3-Minuten-Scharmützel muss im gleichen Modus neu starten, der kopierbare
 Run-Bericht muss seine Pflichtfelder enthalten und `D` darf nicht erneut mit
-der Entwickleranzeige kollidieren.
+der Entwickleranzeige kollidieren. Pause und Fortsetzen müssen den Run zudem
+im selben Modus und ohne Zustandsverlust weiterführen.
 
 Die Einzelruns streuen derzeit stark: erster Zug 17,5–40,5 Sekunden und
 16–40 Kartenzüge. Der Vertrag bewertet deshalb vorerst den Seed-Mittelwert;

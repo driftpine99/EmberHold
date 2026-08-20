@@ -30,6 +30,7 @@ Die einzige Produktfrage der Phase 0 lautet:
 3. Mit WASD oder Pfeiltasten bewegen.
 4. Den Ember-Stoß mit der Leertaste auslösen.
 5. Karten mit 1, 2 oder 3 wählen.
+6. Mit `Esc`, `P` oder dem Pausenbutton pausieren und fortsetzen.
 
 Der Prototyp ist eigenständig und benötigt für den lokalen Test keine
 Installation und keinen Server.

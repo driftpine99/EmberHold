@@ -18,7 +18,7 @@ canvas{display:block;position:absolute;inset:0;width:100%;height:100%}
 
 /* ---------- HUD ---------- */
 #hud{position:absolute;top:0;left:0;right:0;padding:10px 14px}
-#topbar{padding-right:102px}   /* Platz fuer die T/FPS-Buttons */
+#topbar{padding-right:146px}   /* Platz fuer Pause, T und FPS */
 #topbar{display:flex;align-items:center;gap:12px}
 #clock{font-variant-numeric:tabular-nums;font-size:22px;font-weight:600;letter-spacing:.02em}
 #clock.ot{color:#e05038}
@@ -27,7 +27,7 @@ canvas{display:block;position:absolute;inset:0;width:100%;height:100%}
 #kills{margin-left:auto;font-size:12px;color:#8b8577;font-variant-numeric:tabular-nums;
   white-space:nowrap}
 #xpwrap{height:4px;background:#1e1e28;border-radius:2px;margin-top:8px;overflow:hidden;
-  margin-right:102px}
+  margin-right:146px}
 #xpbar{height:100%;width:0;background:linear-gradient(90deg,#6bb8d4,#8fd4e8);
   transition:width .08s linear}
 #hpwrap{height:6px;background:#1e1e28;border-radius:3px;margin-top:5px;overflow:hidden;
@@ -126,7 +126,7 @@ button.b.danger{background:#c9402e;color:#fff}
 #dev b{color:#e8e4dc;font-weight:600}
 #dev .ok{color:#7d9463}#dev .bad{color:#c9402e}
 #dev hr{border:none;border-top:1px solid #262633;margin:7px 0}
-#devbtn{position:absolute;right:10px;top:14px;width:38px;height:32px;border-radius:8px;
+#devbtn{position:absolute;right:54px;top:14px;width:38px;height:32px;border-radius:8px;
   border:1px solid #262633;background:rgba(23,23,33,.7);color:#5a5a68;font-size:9px;
   pointer-events:auto;cursor:pointer;font-weight:600}
 #devbtn.on{color:#e07a3f;border-color:#e07a3f}
@@ -149,10 +149,15 @@ button.b.danger{background:#c9402e;color:#fff}
   background:#e07a3f;cursor:pointer;border:none}
 #tune .note{color:#5a5a68;font-size:10px;line-height:1.45;margin-top:8px;
   padding-top:8px;border-top:1px solid #262633}
-#tunebtn{position:absolute;right:54px;top:14px;width:32px;height:32px;border-radius:8px;
+#tunebtn{position:absolute;right:98px;top:14px;width:32px;height:32px;border-radius:8px;
   border:1px solid #262633;background:rgba(23,23,33,.7);color:#5a5a68;font-size:12px;
   pointer-events:auto;cursor:pointer;font-weight:600}
 #tunebtn.on{color:#e07a3f;border-color:#e07a3f}
+#pausebtn{position:absolute;right:10px;top:14px;width:38px;height:32px;border-radius:8px;
+  border:1px solid #383846;background:rgba(23,23,33,.82);color:#a8a396;font-size:12px;
+  pointer-events:auto;cursor:pointer;font-weight:700;letter-spacing:-.08em}
+#pausebtn:hover,#pausebtn.on{color:#ffc48a;border-color:#e07a3f}
+#pausebtn:disabled{opacity:.35;cursor:default;border-color:#262633;color:#5a5a68}
 #joyring{position:absolute;width:104px;height:104px;border-radius:50%;
   border:1.5px solid rgba(224,122,63,.26);display:none;pointer-events:none;
   transform:translate(-50%,-50%)}
@@ -188,6 +193,8 @@ button.b.danger{background:#c9402e;color:#fff}
 .copyline:hover{color:#e07a3f}
 
 @media (max-width:560px){
+  #devbtn,#tunebtn{display:none}
+  #topbar{padding-right:54px}#xpwrap{margin-right:54px}
   #coach{left:14px;right:100px;width:auto;transform:translateY(18px)}
   #coach.on{transform:translateY(0)}
   .help{gap:6px}.help div{font-size:12.5px}
@@ -209,6 +216,7 @@ button.b.danger{background:#c9402e;color:#fff}
   </div>
 
   <div id="slots"></div>
+  <button id="pausebtn" class="panel" title="Pause (Esc oder P)" aria-label="Spiel pausieren">Ⅱ</button>
   <button id="devbtn" class="panel" title="Entwickleranzeige (F3)" aria-label="Entwickleranzeige">FPS</button>
   <button id="tunebtn" class="panel" title="Live-Tuning (T)" aria-label="Live-Tuning">T</button>
   <div id="tune"><h4>Live-Tuning</h4><div id="tunerows"></div><div class="note">Wirkt sofort, auch mitten im Run. Taste <b style="color:#8b8577">T</b> blendet um. Nichts hiervon wird gespeichert — Neuladen setzt zurück.</div></div>
@@ -244,6 +252,17 @@ button.b.danger{background:#c9402e;color:#fff}
     <div class="btnrow">
       <button class="b" id="btnStart">Ausrücken</button>
       <button class="b ghost" id="btnStart3">Scharmützel (3 Min)</button>
+    </div>
+  </div>
+
+  <!-- Pause -->
+  <div id="pause" class="sheet" role="dialog" aria-modal="true" aria-hidden="true">
+    <p class="kick" id="pausekick">Run pausiert</p>
+    <h1>Die Glut wartet</h1>
+    <p class="sub">Kampf, Gegner und Timer stehen vollständig still.</p>
+    <div class="statgrid" id="pausestats"></div>
+    <div class="btnrow">
+      <button class="b" id="btnResume">Weiterkämpfen</button>
     </div>
   </div>
 
@@ -648,7 +667,7 @@ let HEADLESS = false;
 function newRun(runLen, seed){
   const runSeed = seedRandom(seed);
   S = {
-    t:0, running:false, phase:'run',        // run | cards | extract | over
+    t:0, running:false, phase:'run',        // run | pause | cards | extract | over
     runLen: runLen,
     x:0, y:0, vx:0, vy:0, aimx:1, aimy:0,
     hp:CFG.HP, maxhp:CFG.HP, iframe:0,
@@ -1678,6 +1697,10 @@ function updateHUD(){
     dc.beginPath(); dc.arc(39,39,37,-1.5708,-1.5708+(1-S.dashCd/CFG.DASH_CD)*6.2832);
     dc.stroke();
   }
+  const pb=el('pausebtn'), canPause=S.running&&(S.phase==='run'||S.phase==='pause');
+  pb.disabled=!canPause; pb.classList.toggle('on',S.phase==='pause');
+  pb.textContent=S.phase==='pause'?'▶':'Ⅱ';
+  pb.setAttribute('aria-label',S.phase==='pause'?'Spiel fortsetzen':'Spiel pausieren');
 }
 
 // ------------------------------------------------------------------ First-Run-Hilfe
@@ -1743,6 +1766,21 @@ function statTile(v,l){ return `<div><b>${v}</b><span>${l}</span></div>`; }
 function setSheet(id,on,focusId){
   const node=el(id); node.classList.toggle('on',on); node.setAttribute('aria-hidden',on?'false':'true');
   if(on&&focusId) requestAnimationFrame(()=>el(focusId).focus());
+}
+function togglePause(){
+  if(!S||!S.running) return;
+  if(S.phase==='run'){
+    S.phase='pause'; acc=0;
+    el('pausekick').textContent=fmtTime(S.t)+' · Run pausiert';
+    el('pausestats').innerHTML=
+      statTile(S.kills.toLocaleString('de-DE'),'Kills')+
+      statTile(S.level,'Stufe')+
+      statTile(S.pickTimes.length,'Kartenzüge');
+    setSheet('pause',true,'btnResume');
+  } else if(S.phase==='pause'){
+    setSheet('pause',false); S.phase='run';
+    last=0; acc=0;
+  }
 }
 function showExtract(){
   S.baseReward = Math.round(S.kills*1.0 + S.gemsTaken*0.6);
@@ -1848,7 +1886,7 @@ async function copyRunReport(){
 }
 function showStartMenu(){
   if(!S) return;
-  S.running=false; setSheet('over',false); setSheet('extract',false);
+  S.running=false; setSheet('over',false); setSheet('extract',false); setSheet('pause',false);
   hideBossAlert(); if(coachStep) hideCoach(false);
   setSheet('start',true,'btnStart');
 }
@@ -1885,6 +1923,9 @@ const input = {x:0,y:0};
 const keys = {};
 addEventListener('keydown', e=>{
   keys[e.code]=1;
+  if((e.code==='Escape'||e.code==='KeyP')&&!e.repeat&&S&&S.running&&(S.phase==='run'||S.phase==='pause')){
+    e.preventDefault(); togglePause(); return;
+  }
   if (S && S.phase==='cards'){
     if (e.code==='Digit1') takeCard(0);
     if (e.code==='Digit2') takeCard(1);
@@ -2037,6 +2078,8 @@ el('btnStart').onclick   = ()=>begin(480);
 el('btnStart3').onclick  = ()=>begin(180);
 el('btnLeave').onclick   = ()=>endRun(true);
 el('btnOT').onclick      = startOvertime;
+el('pausebtn').onclick   = togglePause;
+el('btnResume').onclick  = togglePause;
 el('btnAgain').onclick   = ()=>begin(S&&S.runLen?S.runLen:480);
 el('btnMenu').onclick    = showStartMenu;
 el('btnCopy').onclick    = copyRunReport;
