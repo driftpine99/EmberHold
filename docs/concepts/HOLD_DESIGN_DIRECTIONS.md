@@ -2,6 +2,8 @@
 
 ![Drei Hold-Entwürfe](hold-concepts-v1.png)
 
+**Ausgewählte Richtung:** C – Kraterhold (rechts)
+
 Der Bogen ist eine visuelle Exploration, kein fertiges Spiel-Asset. Alle drei
 Varianten zeigen dieselben Kernfunktionen in einer gemeinsamen isometrischen
 Kamera und Ember-Farbwelt.
@@ -39,10 +41,11 @@ Warden- und Ember-Kern im Zentrum.
 
 ## Empfehlung
 
-Für den kosteneffizienten Vertical Slice verwenden wir **A als Layoutbasis**.
-Die Basis startet mit einem Kern und vier bis sechs festen Gebäudeslots. Aus B
-übernehmen wir später die starke Mine-zu-Leuchtfeuer-Silhouette als visuelle
-Identität, ohne bereits eine mehrstöckige Navigation bauen zu müssen.
+Der Kraterhold ist die verbindliche visuelle Zielrichtung. Für den
+kosteneffizienten Vertical Slice bauen wir trotzdem nicht sofort alle Ringe:
+Spielbar sind zunächst nur der Ember-Kern, ein innerer Produktionsring und vier
+bis sechs feste Gebäudeslots. Der äußere Ring erscheint als beschädigte,
+gesperrte Kulisse und wird später abschnittsweise wiederaufgebaut.
 
 Vor der Umsetzung braucht es als nächsten Entwurf einen funktionalen
 Low-Fidelity-Bildschirm: Gebäudeslots, Ressourcenleiste, Bauzustände und der

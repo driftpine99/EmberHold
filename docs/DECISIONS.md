@@ -74,3 +74,13 @@ kein Backend und keine bezahlte Produktions-Pipeline. Tests laufen ohne
 Projektabhängigkeiten lokal und in GitHub Actions. KI-Agenten werden nur für
 klar abgegrenzte Parallelprüfungen eingesetzt; Integration und technische
 Entscheidungen bleiben zentral.
+
+## D-008 – Kraterhold als visuelle Basisrichtung
+
+**Status:** beschlossen
+
+Der konzentrische Kraterhold ist die visuelle Zielrichtung für Basis und
+Kampfgebiet. Im Vertical Slice werden nur Ember-Kern, innerer Produktionsring
+und wenige Gebäudeslots funktional umgesetzt. Weitere Ringe bleiben sichtbare,
+aber gesperrte Ruinen. So bleibt die langfristige Größe erkennbar, ohne sie
+bereits produzieren zu müssen.
