@@ -18,8 +18,10 @@ Der aktuelle Build enthält einen Helden, ein Territorium, mehrere Waffen und
 Passive, fünf Gegnerfamilien, Eliten, einen Mittelboss, Evolutionen,
 Extraktion und Overtime. Hinzu kommt ein bewusst kleiner Kraterhold mit
 Tiefmine, Emberschmiede, lokaler Speicherung, Offline-Produktion und einer
-ersten dauerhaften Bogenverbesserung. Backend und Monetarisierung bleiben
-weiterhin außerhalb des Scopes.
+ersten dauerhaften Bogenverbesserung. Aelric und die Gegner nutzen inzwischen
+handgemalt wirkende Raster-Atlanten mit Lauf-, Bogen-, Dash- und
+Blickrichtungsanimationen. Backend, Ton und Monetarisierung bleiben weiterhin
+außerhalb des Scopes.
 
 Die einzige Produktfrage der Phase 0 lautet:
 
@@ -62,7 +64,9 @@ docs/
 prototype/
   web/
     index.html            Spielbarer Phase-0-Prototyp
+    assets/               Lokale Figuren- und Gegneratlanten
 tools/
+  extract-atlas-alpha.cjs Reproduzierbare Transparenzaufbereitung
   run-balance-suite.mjs   Abhängigkeitsfreier Balance-Test
 package.json              Lokale Testbefehle
 CHANGELOG.md              Nachvollziehbare Änderungen

@@ -3,7 +3,7 @@ import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 
-// Der Phase-0-Prototyp bleibt eine einzelne, direkt startbare HTML-Datei.
+// Der Phase-0-Prototyp bleibt direkt startbar und lädt nur lokale Bild-Assets.
 // Dieser kleine DOM-Shim lädt exakt denselben Spielcode in Node, ohne eine
 // Browser- oder Test-Abhängigkeit ins Projekt zu ziehen. Er simuliert nicht das
 // Rendering; geprüft wird ausschließlich der integrierte Headless-Spielpfad.
@@ -82,6 +82,15 @@ globalThis.document = {
 const here = path.dirname(fileURLToPath(import.meta.url));
 const prototypePath = path.resolve(here, "../prototype/web/index.html");
 const html = fs.readFileSync(prototypePath, "utf8");
+const artPaths = [
+  path.resolve(here, "../prototype/web/assets/aelric-atlas-v1.png"),
+  path.resolve(here, "../prototype/web/assets/enemy-atlas-v1.png"),
+];
+const artAssets = artPaths.every((assetPath) => {
+  if (!fs.existsSync(assetPath)) return false;
+  const png = fs.readFileSync(assetPath);
+  return png.length > 100_000 && png.subarray(1, 4).toString("ascii") === "PNG" && png[25] === 6;
+});
 const match = html.match(/<script>([\s\S]*)<\/script>/);
 if (!match) throw new Error("Inline script not found in prototype/web/index.html");
 
@@ -98,6 +107,11 @@ const repeat = engine.headlessRun(report.runLen, {
   immortal: true,
 });
 const reproducible = JSON.stringify(repeat) === JSON.stringify(report.runs.baseline[0]);
+engine.begin(180);
+engine.tick(engine.CFG.TICK);
+const visualState = engine.S.bowKick > 0 &&
+  Number.isFinite(engine.S.shotAimx) && Number.isFinite(engine.S.shotAimy) &&
+  html.includes("loadRasterArt()") && html.includes("enemyDirection(i)");
 let uxFlow = false;
 let uxError = "";
 try {
@@ -177,8 +191,8 @@ try {
   holdError = error instanceof Error ? error.message : String(error);
 }
 const output = {
-  pass: report.pass && reproducible && uxFlow && holdFlow,
-  checks: { ...report.checks, reproducible, uxFlow, holdFlow },
+  pass: report.pass && reproducible && artAssets && visualState && uxFlow && holdFlow,
+  checks: { ...report.checks, reproducible, artAssets, visualState, uxFlow, holdFlow },
   targets: report.targets,
   seeds: report.seeds,
   summary: report.summary,

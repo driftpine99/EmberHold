@@ -111,3 +111,27 @@ lagert höchstens 4. Diese Testwerte ersetzen nicht die langfristigen
 Multi-Clock-Zeiten des GDD. Der Zustand wird lokal gespeichert und höchstens
 24 Stunden offline fortgeschrieben. Es gibt weiterhin kein Konto, Backend oder
 Monetarisierungssystem.
+
+## D-011 – Zwei KI-Atlanten als kostengünstiger visueller Testpass
+
+**Status:** beschlossen
+
+Diese Entscheidung ist die eng begrenzte Ausnahme zum letzten Satz von D-009.
+Sie erlaubt einen visuellen Prototyp-Pass, aber noch keine Produktionspipeline.
+
+Vor dem externen Phase-0-Test werden genau zwei lokale Raster-Atlanten
+integriert: sechs Posen für Aelric sowie fünf Gegnerfamilien plus Elite und
+Boss. Damit soll der Test nicht mehr durch abstrakte Kreis- und Rautenfiguren
+verfälscht werden. Es entsteht weiterhin keine bezahlte Produktionspipeline.
+
+Die Atlanten werden beim Laden einmal in kleine Sprites, vier Lichtstufen und
+acht Blickrichtungen umgerechnet. Der Frame-Pfad bleibt bei einem gecachten
+`drawImage` je Gegner. Prozedurale Platzhalter bleiben als Fehler-Fallback
+erhalten. Animationen ändern keine Trefferflächen, Werte, Zufallsfolgen oder
+Spawnlogik. Pfeile, Treffer-, Licht- und Bosswarn-Effekte bleiben bewusst
+prozedural.
+
+Die Bilder gelten als Prototyp-Assets, nicht als automatisch freigegebene
+Store-Assets. Vor einer Veröffentlichung werden Herkunft, Nutzungsrechte,
+visuelle Konsistenz und gegebenenfalls eine finale Neuproduktion separat
+geprüft.

@@ -24,6 +24,11 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 - Lokaler Hold-Speicherstand mit deterministischer Offline-Produktion
 - Dauerhafte Wächterbogen-Verbesserung für die nächste Sortie
 - Hold-Flow-Prüfung für Produktion, Persistenz und einmalige Run-Auszahlung
+- Sechsphasiger Aelric-Atlas mit Idle-, Lauf-, Bogen- und Dash-Posen
+- Eigenständige Designs für fünf Gegnerfamilien, Elite und Warden-Boss
+- Acht vorgerenderte Blickrichtungen und vier Lichtstufen pro Gegnerfamilie
+- Reproduzierbare Alpha-Aufbereitung für KI-generierte Sprite-Atlanten
+- Automatische Prüfung der lokalen RGBA-Assets und des Bogen-Animationszustands
 
 ### Changed
 
@@ -37,6 +42,8 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 - Drei-Minuten-Scharmützel startet beim Wiederholen nicht mehr als Acht-Minuten-Run
 - Entwickleranzeige von `D` auf `F3` verlegt, damit WASD konfliktfrei funktioniert
 - Run-Beute wird einmalig in Eisenerz umgerechnet und im Hold eingelagert
+- Prozedurale Figurenplatzhalter durch lokale Raster-Art mit schnellem Fallback ersetzt
+- Bogenangriff zeigt jetzt Spannungs-, Release- und Rückstoßphase
 
 ### Known issues
 

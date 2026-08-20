@@ -515,6 +515,8 @@ const LIT_TIERS = 3;                 // dunkel / halb / voll beleuchtet
 const SPR = { enemy:[], elite:null, boss:null, gem:null, gemBig:null,
               arrow:[], orb:null, blade:null, frost:null, eproj:null,
               floorTile:null, emberVent:null, wardPillar:null };
+const ART = { hero:[], enemy:[], elite:null, boss:null,
+              heroReady:false, enemyReady:false };
 
 /** Deterministischer Hash nur fuer Weltdeko. Veraendert niemals den Spiel-RNG. */
 function visualHash(x,y,salt){
@@ -615,6 +617,82 @@ function buildSprites(){
     g.moveTo(10,0); g.lineTo(4,-3.2); g.lineTo(4,3.2); g.closePath(); g.fill();
     SPR.arrow[i]=cv;
   }
+}
+
+// ===========================================================================
+//  RASTER-ART — KI-Atlanten werden genau einmal in kleine Laufzeit-Sprites
+//  umgewandelt. Bis zum Laden bleibt das schnelle prozedurale Fallback aktiv.
+// ===========================================================================
+const ENEMY_DIRECTIONS = 8;
+const ENEMY_SOURCE_FACING = 2.62; // Atlasfiguren blicken nach links unten
+const ENEMY_BOB = Float32Array.from({length:64},(_,i)=>Math.sin(i/64*6.2832)*1.05);
+
+function atlasCell(image, index, columns, rows, size, shade, glow, flash){
+  const cv=mkCanvas(size), g=cv.getContext('2d');
+  const sw=image.naturalWidth/columns, sh=image.naturalHeight/rows;
+  const sx=(index%columns)*sw, sy=((index/columns)|0)*sh;
+  g.imageSmoothingEnabled=true; g.imageSmoothingQuality='high';
+  if(glow){ g.shadowColor=glow; g.shadowBlur=Math.max(5,size*.08); }
+  g.drawImage(image,sx,sy,sw,sh,0,0,size,size);
+  g.shadowBlur=0;
+  if(shade>0){
+    g.globalCompositeOperation='source-atop';
+    g.fillStyle='rgba(7,8,13,'+shade+')'; g.fillRect(0,0,size,size);
+    g.globalCompositeOperation='source-over';
+  }
+  if(flash){
+    g.globalCompositeOperation='source-atop';
+    g.fillStyle='rgba(255,244,222,.68)'; g.fillRect(0,0,size,size);
+    g.globalCompositeOperation='source-over';
+  }
+  return cv;
+}
+
+function directionalSprites(base){
+  const out=[];
+  for(let d=0;d<ENEMY_DIRECTIONS;d++){
+    const cv=mkCanvas(base.width), g=cv.getContext('2d');
+    g.imageSmoothingEnabled=true; g.imageSmoothingQuality='high';
+    g.translate(cv.width/2,cv.height/2);
+    g.rotate(d/ENEMY_DIRECTIONS*6.2832-ENEMY_SOURCE_FACING);
+    g.drawImage(base,-base.width/2,-base.height/2);
+    out[d]=cv;
+  }
+  return out;
+}
+
+function buildHeroArt(image){
+  ART.hero.length=0;
+  for(let frame=0;frame<6;frame++) ART.hero[frame]=atlasCell(image,frame,3,2,84,0,'rgba(224,122,63,.28)',false);
+  ART.heroReady=true;
+}
+
+function buildEnemyArt(image){
+  const sizes=[58,62,66,62,66];
+  ART.enemy.length=0;
+  for(let fam=0;fam<5;fam++){
+    ART.enemy[fam]=[];
+    for(let tier=0;tier<4;tier++){
+      const shade=tier===0?.72:(tier===1?.38:0);
+      const base=atlasCell(image,fam,4,2,sizes[fam],shade,tier>=2?COL.fam[fam]:null,tier===3);
+      ART.enemy[fam][tier]=directionalSprites(base);
+    }
+  }
+  ART.elite=directionalSprites(atlasCell(image,5,4,2,88,0,COL.elite,false));
+  ART.boss=directionalSprites(atlasCell(image,6,4,2,142,0,COL.boss,false));
+  ART.enemyReady=true;
+}
+
+function loadRasterArt(){
+  if(typeof Image==='undefined') return; // Node-Balancing hat absichtlich keinen Bildlader
+  const hero=new Image(); hero.decoding='async';
+  hero.onload=()=>buildHeroArt(hero);
+  hero.onerror=()=>console.warn('Aelric-Atlas nicht geladen; nutze Grafik-Fallback.');
+  hero.src='assets/aelric-atlas-v1.png';
+  const enemy=new Image(); enemy.decoding='async';
+  enemy.onload=()=>buildEnemyArt(enemy);
+  enemy.onerror=()=>console.warn('Gegner-Atlas nicht geladen; nutze Grafik-Fallback.');
+  enemy.src='assets/enemy-atlas-v1.png';
 }
 
 // ===========================================================================
@@ -747,6 +825,7 @@ function newRun(runLen, seed){
     t:0, running:false, phase:'run',        // run | pause | cards | extract | over
     runLen: runLen,
     x:0, y:0, vx:0, vy:0, aimx:1, aimy:0,
+    shotAimx:1, shotAimy:0, bowKick:0,
     hp:CFG.HP, maxhp:CFG.HP, iframe:0,
     dashCd:0, dashT:0, dashIf:0, dashVx:0, dashVy:0,
     level:1, xp:0, need:xpNeed(1),
@@ -896,9 +975,12 @@ function fireWeapons(dt){
       const tgt = farthestEnemy(range*1.25);
       let dx=S.aimx, dy=S.aimy;
       if (tgt>=0){ dx=E.x[tgt]-S.x; dy=E.y[tgt]-S.y; }
+      const aimLen=Math.hypot(dx,dy)||1;
+      S.shotAimx=dx/aimLen; S.shotAimy=dy/aimLen; S.bowKick=.16;
       const dmg = (12 + 5*L) * st.dmg * (L>=5?1.5:1) * (L>=2?1.4:1) * (evo?1.6:1);
       const pierce = evo ? 999 : (2 + (L>=1?1:0) + (L>=3?1:0));
       shoot(S.x,S.y,dx,dy, 760, dmg, pierce, evo?1:0, 9);
+      if(!HEADLESS) fx(S.x+S.shotAimx*25,S.y+S.shotAimy*25,12,.13,'#ffc48a',0);
     }
   }
   // ---- Splitterköcher ---------------------------------------------------
@@ -1382,6 +1464,7 @@ function updateEvents(){
 function step(dt){
   S.t += dt;
   if (S.otActive) S.ot += dt;
+  if (S.bowKick>0) S.bowKick=Math.max(0,S.bowKick-dt);
 
   // Eingabe → Bewegung
   const st=stat();
@@ -1571,6 +1654,72 @@ function drawBossTelegraphs(vx0,vx1,vy0,vy1){
   }
 }
 
+function enemyDirection(i){
+  let dx=E.vx[i], dy=E.vy[i];
+  if(dx*dx+dy*dy<1){ dx=S.x-E.x[i]; dy=S.y-E.y[i]; }
+  const ax=Math.abs(dx), ay=Math.abs(dy);
+  if(ax>ay*2.4142) return dx>=0?0:4;
+  if(ay>ax*2.4142) return dy>=0?2:6;
+  if(dx>=0) return dy>=0?1:7;
+  return dy>=0?3:5;
+}
+
+function drawAelric(){
+  const blink=S.iframe>0&&((S.t*22)|0)%2===0;
+  const moving=Math.hypot(input.x,input.y)>.08;
+  const charging=S.W.bogen&&S.bowKick<=0&&S.cool.bogen<.27;
+  const aimx=S.bowKick>0?S.shotAimx:S.aimx;
+  const aimy=S.bowKick>0?S.shotAimy:S.aimy;
+
+  // Kontakt-Schatten und Glutkern verankern die detailreiche Figur im Raum.
+  ctx.fillStyle='rgba(3,4,7,.58)';
+  ctx.beginPath(); ctx.ellipse(S.x,S.y+12,20,8,0,0,6.2832); ctx.fill();
+  const aura=ctx.createRadialGradient(S.x,S.y,1,S.x,S.y,31);
+  aura.addColorStop(0,'rgba(238,132,66,.24)'); aura.addColorStop(1,'rgba(238,132,66,0)');
+  ctx.fillStyle=aura; ctx.beginPath(); ctx.arc(S.x,S.y,31,0,6.2832); ctx.fill();
+  if(blink) return;
+
+  if(ART.heroReady){
+    let frame=0;
+    if(S.dashT>0) frame=5;
+    else if(S.bowKick>0) frame=4;
+    else if(charging) frame=3;
+    else if(moving) frame=1+(((S.t*8)|0)&1);
+    const spr=ART.hero[frame], angle=Math.atan2(aimy,aimx);
+    const bob=moving&&S.dashT<=0?Math.sin(S.t*16)*1.2:0;
+    ctx.save(); ctx.translate(S.x,S.y-5+bob); ctx.rotate(angle);
+    if(S.dashT>0){
+      ctx.globalAlpha=.18;
+      ctx.drawImage(spr,-spr.width/2-18,-spr.height/2);
+      ctx.globalAlpha=1;
+    }
+    ctx.drawImage(spr,-spr.width/2,-spr.height/2);
+    ctx.restore();
+
+    // Kurze Spannungs- und Release-Linie: billig, aber als Bogenbewegung klar lesbar.
+    if(charging||S.bowKick>0){
+      const pull=charging?(.35+.65*(1-S.cool.bogen/.27)):1;
+      ctx.strokeStyle=S.bowKick>0?'rgba(255,226,169,.94)':'rgba(224,122,63,.58)';
+      ctx.lineWidth=S.bowKick>0?2.5:1.5; ctx.lineCap='round';
+      ctx.beginPath();
+      ctx.moveTo(S.x+aimx*(15+pull*5),S.y+aimy*(15+pull*5));
+      ctx.lineTo(S.x+aimx*(28+(S.bowKick>0?18:0)),S.y+aimy*(28+(S.bowKick>0?18:0)));
+      ctx.stroke();
+    }
+    return;
+  }
+
+  // Offline-/Fehler-Fallback, damit die HTML-Datei immer spielbar bleibt.
+  ctx.fillStyle='rgba(13,13,19,0.85)';
+  ctx.beginPath(); ctx.arc(S.x,S.y,15,0,6.2832); ctx.fill();
+  ctx.shadowColor=COL.playerCore; ctx.shadowBlur=26; ctx.fillStyle=COL.player;
+  ctx.beginPath(); ctx.arc(S.x,S.y,11,0,6.2832); ctx.fill(); ctx.shadowBlur=0;
+  ctx.fillStyle=COL.playerCore; ctx.beginPath(); ctx.arc(S.x,S.y,5.5,0,6.2832); ctx.fill();
+  ctx.strokeStyle='rgba(255,196,138,.55)'; ctx.lineWidth=2.4; ctx.lineCap='round';
+  ctx.beginPath(); ctx.moveTo(S.x+S.aimx*13,S.y+S.aimy*13);
+  ctx.lineTo(S.x+S.aimx*21,S.y+S.aimy*21); ctx.stroke();
+}
+
 function render(){
   ctx.setTransform(DPR,0,0,DPR,0,0);
   ctx.fillStyle = COL.bg; ctx.fillRect(0,0,W,H);
@@ -1631,20 +1780,29 @@ function render(){
   }
   for (let f=0; f<5; f++){
     for (let t=0; t<4; t++){
-      const spr = SPR.enemy[f][t]; const hw=spr.width/2;
+      const artSet=ART.enemyReady?ART.enemy[f][t]:null;
+      const bobPhase=(S.t*(f===1?112:71))|0;
       for (let i=0;i<E.n;i++){
         if (!E.alive[i] || E.kind[i]!==0 || E.fam[i]!==f || E.lit[i]!==t) continue;
-        ctx.drawImage(spr, E.x[i]-hw, E.y[i]-hw);
+        const spr=artSet?artSet[enemyDirection(i)]:SPR.enemy[f][t], hw=spr.width/2;
+        const bob=artSet?ENEMY_BOB[(bobPhase+i*8)&63]:0;
+        ctx.drawImage(spr,E.x[i]-hw,E.y[i]-hw+bob);
       }
     }
   }
   // Elite & Boss separat, mit Lebensbalken
   for (let i=0;i<E.n;i++){
     if (!E.alive[i] || E.kind[i]===0) continue;
-    const spr = E.kind[i]===2?SPR.boss:SPR.elite, hw=spr.width/2;
+    const dir=enemyDirection(i);
+    let spr;
+    if(ART.enemyReady){
+      if(E.kind[i]===2) spr=ART.boss[dir];
+      else spr=ART.elite[dir];
+    } else spr=E.kind[i]===2?SPR.boss:SPR.elite;
+    const hw=spr.width/2;
     ctx.drawImage(spr, E.x[i]-hw, E.y[i]-hw);
     const w=E.kind[i]===2?90:52, h=E.kind[i]===2?6:4;
-    const yy=E.y[i]-(E.kind[i]===2?46:28);
+    const yy=E.y[i]-(E.kind[i]===2?(ART.enemyReady?75:46):(ART.enemyReady?43:28));
     ctx.fillStyle='rgba(0,0,0,.55)'; ctx.fillRect(E.x[i]-w/2,yy,w,h);
     ctx.fillStyle=E.kind[i]===2?COL.boss:COL.elite;
     ctx.fillRect(E.x[i]-w/2,yy,w*Math.max(E.hp[i]/E.max[i],0),h);
@@ -1706,23 +1864,8 @@ function render(){
   }
   ctx.globalAlpha=1;
 
-  // --- Spieler ------------------------------------------------------------
-  const blink = S.iframe>0 && ((S.t*22)|0)%2===0;
-  if (!blink){
-    ctx.fillStyle='rgba(13,13,19,0.85)';                 // dunkler Sockel
-    ctx.beginPath(); ctx.arc(S.x,S.y,15,0,6.2832); ctx.fill();
-    ctx.shadowColor=COL.playerCore; ctx.shadowBlur=26;
-    ctx.fillStyle=COL.player;
-    ctx.beginPath(); ctx.arc(S.x,S.y,11,0,6.2832); ctx.fill();
-    ctx.beginPath(); ctx.arc(S.x,S.y,11,0,6.2832); ctx.fill();
-    ctx.shadowBlur=0;
-    ctx.fillStyle=COL.playerCore;
-    ctx.beginPath(); ctx.arc(S.x,S.y,5.5,0,6.2832); ctx.fill();
-    // Blickrichtung
-    ctx.strokeStyle='rgba(255,196,138,.55)'; ctx.lineWidth=2.4; ctx.lineCap='round';
-    ctx.beginPath(); ctx.moveTo(S.x+S.aimx*13,S.y+S.aimy*13);
-    ctx.lineTo(S.x+S.aimx*21,S.y+S.aimy*21); ctx.stroke();
-  }
+  // --- Spieler: gerenderter Warden mit Bewegung, Bogen und Dash ---------
+  drawAelric();
   ctx.restore();
 
   // --- Vignette: außerhalb des Lichts ist die Welt entfärbt ---------------
@@ -2352,6 +2495,7 @@ el('tunebtn').onclick=toggleTune;
 buildTune();
 
 buildSprites();
+loadRasterArt();
 resize();
 loadHold(Date.now());
 newRun(480);            // damit der Hintergrund schon lebt

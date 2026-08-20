@@ -67,6 +67,25 @@ lokale Speicherung, die einmalige Auszahlung einer Run-Belohnung, Rückkehr in
 den Hold und die Übernahme des +10-%-Schadensbonus in den nächsten Run. Die
 Kampf-Balance-Suite läuft immer ohne Hold-Bonus.
 
+Der Visual-Smoke-Check stellt zusätzlich sicher, dass beide lokalen
+Sprite-Atlanten als echte RGBA-PNGs vorhanden sind, der Bildlader eingebunden
+ist und ein Langbogenschuss den rein visuellen Release-Zustand auslöst.
+
+## Manueller Grafikcheck
+
+1. Aelric muss beim Laufen zwischen zwei Schritten wechseln und sich in die
+   Zielrichtung drehen.
+2. Kurz vor einem Langbogenschuss ist die gespannte Pose sichtbar; beim Schuss
+   folgen Release-Linie, Rückstoßpose und Pfeil.
+3. Die fünf Gegnerfamilien müssen auch ohne Farblegende an ihrer Silhouette
+   unterscheidbar sein.
+4. Gegner drehen sich in acht Richtungen, ohne bei Richtungswechseln sichtbar
+   aus ihrer Position zu springen.
+5. Stürmer-Telegraphie, Elite-Lebensbalken und Bosswarnungen bleiben vor dem
+   detaillierteren Sprite klar lesbar.
+6. Falls Bilder nicht laden, müssen prozedurale Figuren erscheinen und der Run
+   weiterhin spielbar bleiben.
+
 Die Einzelruns streuen derzeit stark: erster Zug 17,5–40,5 Sekunden und
 16–40 Kartenzüge. Der Vertrag bewertet deshalb vorerst den Seed-Mittelwert;
 die Streuung bleibt ein Tuningthema vor dem externen Spieltest.
