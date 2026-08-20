@@ -35,19 +35,22 @@ Konzentrische Bodenringe und Ember-Vents machen Bossmuster sichtbar.
 - sollte als besonderer Höhepunkt reserviert bleiben
 - für normale acht Minuten allein zu statisch und kreisförmig
 
-## Empfohlene Umsetzung
+## Gewählte Umsetzung: C – Warden-Arena
 
-Wir wählen nicht nur ein Bild, sondern verwenden die drei Räume als
-kostengünstiges Set:
+Der rechte Entwurf ist die verbindliche visuelle Richtung für den
+Phase-0-Kampf. Seine Sprache wird kostengünstig auf den gesamten Run übertragen:
 
-1. Außenring A wird die neue Phase-0-Standardarena.
-2. Förderhof-Elemente aus B dienen als modulare Landmarken am Rand.
-3. Die Kreisgravur aus C erscheint beim Mittelboss als temporäre Arena.
+1. Dunkle Basaltplatten ersetzen den abstrakten Gitterboden.
+2. Große konzentrische Warden-Kreise gliedern die offene Welt, ohne Kollision
+   oder zusätzliche Leveldaten zu benötigen.
+3. Ember-Vents und Warden-Pfeiler markieren die äußeren Ringe als reine Kulisse.
+4. Der Boss erhält die volle rote Runen- und Pfeiltelegrafie; normale Gegner
+   bleiben zurückhaltender, damit der Höhepunkt besonders wirkt.
 
-Damit entsteht ein deutlich dichterer Look, ohne drei Biome oder eine große
-Asset-Bibliothek bauen zu müssen. Die gemeinsame Basis besteht aus einem
-Basalt-Bodenset, einem Mauer-/Pfeilerset, einem Industrie-Set und vier
-Effektfarben: Spieler Amber, XP Cyan, Gegnerfamilien Rot/Violett/Grün/Gold.
+Die Umgebung entsteht im Browser prozedural aus vorgerenderten kleinen
+Canvas-Sprites. Es werden weder gekaufte Assets noch eine neue Engine oder
+zusätzliche Laufzeitabhängigkeiten benötigt. Die Entwürfe A und B bleiben als
+mögliche spätere Raumvarianten erhalten, sind aber nicht Teil von Phase 0.
 
 ## Lesbarkeitsregeln
 

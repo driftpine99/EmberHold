@@ -84,3 +84,14 @@ Kampfgebiet. Im Vertical Slice werden nur Ember-Kern, innerer Produktionsring
 und wenige Gebäudeslots funktional umgesetzt. Weitere Ringe bleiben sichtbare,
 aber gesperrte Ruinen. So bleibt die langfristige Größe erkennbar, ohne sie
 bereits produzieren zu müssen.
+
+## D-009 – Warden-Arena als Phase-0-Kampfrichtung
+
+**Status:** beschlossen
+
+Der rechte Kampfentwurf mit konzentrischer Warden-Arena ist die verbindliche
+visuelle Richtung für den Phase-0-Kampf. Der Prototyp setzt ihn zunächst mit
+prozeduralen Basaltplatten, Warden-Ringen, Ember-Vents, Randpfeilern und roten
+Boss-Telegrafien um. Diese Elemente bleiben dekorativ und verändern weder
+Kollision noch Spawnfläche oder Kameralogik. Individuelle Produktions-Assets
+werden erst nach bestandenem Phase-0-Gate beauftragt oder generiert.

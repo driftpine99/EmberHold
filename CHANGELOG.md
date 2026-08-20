@@ -13,6 +13,8 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 - Entscheidungsprotokoll
 - Reproduzierbare Balance-Suite mit festen Seeds und GitHub-Action
 - Abhängigkeitsfreier Node-Test für den integrierten Headless-Spielpfad
+- Prozedurale Warden-Arena mit Basaltboden, Ember-Vents und Randpfeilern
+- Lesbare Boss-Telegrafien für Ringsalve und Ansturm
 
 ### Changed
 
@@ -21,6 +23,7 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 - Vorhandener Browserprototyp als kanonischer Phase-0-Build einsortiert
 - Phase-0-XP-Kurve, Evolution und runlängenabhängige Pick-Ziele vereinheitlicht
 - Gameplay-Zufall vom Rendering getrennt und seedbar gemacht
+- Rechten Warden-Arena-Entwurf als visuelle Phase-0-Kampfrichtung festgelegt
 
 ### Known issues
 

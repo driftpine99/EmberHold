@@ -382,9 +382,74 @@ function famSprite(fam, color, size, glow){
 
 const LIT_TIERS = 3;                 // dunkel / halb / voll beleuchtet
 const SPR = { enemy:[], elite:null, boss:null, gem:null, gemBig:null,
-              arrow:[], orb:null, blade:null, frost:null, eproj:null };
+              arrow:[], orb:null, blade:null, frost:null, eproj:null,
+              floorTile:null, emberVent:null, wardPillar:null };
+
+/** Deterministischer Hash nur fuer Weltdeko. Veraendert niemals den Spiel-RNG. */
+function visualHash(x,y,salt){
+  let n = Math.imul(x|0,374761393) ^ Math.imul(y|0,668265263) ^ Math.imul((salt||0)|0,1442695041);
+  n = Math.imul(n ^ (n>>>13),1274126177);
+  return ((n ^ (n>>>16))>>>0) / 4294967296;
+}
+
+/** Basalt, Glutofen und Pfeiler werden einmal gebaut und danach nur kopiert. */
+function buildArenaSprites(){
+  const T=320, tile=mkCanvas(T), g=tile.getContext('2d');
+  g.fillStyle='#111319'; g.fillRect(0,0,T,T);
+  const bw=64, bh=40;
+  for(let row=0;row<T/bh;row++){
+    const off=(row&1)*-bw/2;
+    for(let col=-1;col<=T/bw;col++){
+      const x=off+col*bw, y=row*bh, h=visualHash(col,row,11);
+      const shade=18+((h*10)|0);
+      g.fillStyle='rgb('+shade+','+(shade+1)+','+(shade+5)+')';
+      g.fillRect(x+1,y+1,bw-2,bh-2);
+      g.strokeStyle='rgba(67,69,77,'+(0.28+h*0.16).toFixed(3)+')';
+      g.lineWidth=1; g.strokeRect(x+1.5,y+1.5,bw-3,bh-3);
+    }
+  }
+  // wenige feste Bruchlinien und Glutadern — nicht pro Frame neu berechnen
+  for(let i=0;i<26;i++){
+    const x=visualHash(i,3,21)*T, y=visualHash(i,9,22)*T;
+    const len=16+visualHash(i,5,23)*34, a=visualHash(i,7,24)*6.2832;
+    g.strokeStyle=i%7===0?'rgba(191,68,34,.34)':'rgba(5,6,9,.66)';
+    g.lineWidth=i%7===0?1.2:1;
+    g.beginPath(); g.moveTo(x,y);
+    g.lineTo(x+Math.cos(a)*len*.5,y+Math.sin(a)*len*.5);
+    g.lineTo(x+Math.cos(a+.42)*len,y+Math.sin(a+.42)*len); g.stroke();
+  }
+  SPR.floorTile=tile;
+
+  const V=82, vent=mkCanvas(V), vg=vent.getContext('2d'), vc=V/2;
+  vg.translate(vc,vc);
+  vg.fillStyle='rgba(3,4,7,.72)'; vg.beginPath(); vg.arc(0,0,35,0,6.2832); vg.fill();
+  vg.strokeStyle='#343741'; vg.lineWidth=8; vg.beginPath(); vg.arc(0,0,28,0,6.2832); vg.stroke();
+  vg.strokeStyle='#11131a'; vg.lineWidth=3; vg.beginPath(); vg.arc(0,0,19,0,6.2832); vg.stroke();
+  const flame=vg.createRadialGradient(0,0,1,0,0,18);
+  flame.addColorStop(0,'rgba(255,220,132,.98)');
+  flame.addColorStop(.24,'rgba(244,119,51,.92)');
+  flame.addColorStop(.62,'rgba(179,47,25,.46)');
+  flame.addColorStop(1,'rgba(100,25,17,0)');
+  vg.fillStyle=flame; vg.beginPath(); vg.arc(0,0,19,0,6.2832); vg.fill();
+  for(let k=0;k<8;k++){
+    const a=k*0.7854; vg.strokeStyle='#53545c'; vg.lineWidth=3;
+    vg.beginPath(); vg.moveTo(Math.cos(a)*24,Math.sin(a)*24); vg.lineTo(Math.cos(a)*34,Math.sin(a)*34); vg.stroke();
+  }
+  SPR.emberVent=vent;
+
+  const P=94, pillar=mkCanvas(P), pg=pillar.getContext('2d'), pc=P/2;
+  pg.translate(pc,pc); pg.rotate(.7854);
+  pg.fillStyle='rgba(3,4,7,.74)'; pg.fillRect(-34,-34,68,68);
+  pg.fillStyle='#242731'; pg.fillRect(-28,-28,56,56);
+  pg.strokeStyle='#4a4c55'; pg.lineWidth=3; pg.strokeRect(-28,-28,56,56);
+  pg.fillStyle='#14161d'; pg.fillRect(-17,-17,34,34);
+  pg.strokeStyle='#8f3927'; pg.lineWidth=2; pg.strokeRect(-13,-13,26,26);
+  pg.fillStyle='#e06c35'; pg.fillRect(-4,-4,8,8);
+  SPR.wardPillar=pillar;
+}
 
 function buildSprites(){
+  buildArenaSprites();
   const sizes=[7,8,8,7,9];
   for (let f=0; f<5; f++){
     SPR.enemy[f]=[];
@@ -430,6 +495,7 @@ const E = {                                   // Gegner
   hp:new Float32Array(CFG.CAP_ENEMY), max:new Float32Array(CFG.CAP_ENEMY),
   fam:new Uint8Array(CFG.CAP_ENEMY),  st:new Uint8Array(CFG.CAP_ENEMY),
   tm:new Float32Array(CFG.CAP_ENEMY), slow:new Float32Array(CFG.CAP_ENEMY),
+  ang:new Float32Array(CFG.CAP_ENEMY),
   kind:new Uint8Array(CFG.CAP_ENEMY),          // 0 normal 1 elite 2 boss
   alive:new Uint8Array(CFG.CAP_ENEMY), lit:new Uint8Array(CFG.CAP_ENEMY),
   n:0, free:[]
@@ -642,7 +708,7 @@ function spawnEnemy(t, fam, kind, atx, aty){
   // bistabil: ein Lauf endet bei 14 Kartenzuegen, der naechste bei 32.
   const scale = 1 + (t/CFG.RUN_LEN)*CFG.HP_SCALE + (S ? S.level*CFG.HP_PER_LVL : 0);
   E.x[i]=atx; E.y[i]=aty; E.vx[i]=0; E.vy[i]=0;
-  E.fam[i]=fam; E.kind[i]=kind||0; E.st[i]=0; E.tm[i]=0; E.slow[i]=0;
+  E.fam[i]=fam; E.kind[i]=kind||0; E.st[i]=0; E.tm[i]=0; E.slow[i]=0; E.ang[i]=0;
   let hp = FAM_HP[fam]*scale;
   if (kind===1) hp*=26; if (kind===2) hp*=90;
   E.hp[i]=hp; E.max[i]=hp; E.alive[i]=1; E.lit[i]=0;
@@ -902,14 +968,20 @@ function bossAI(i,dt,dx,dy,d,sp,scale){
   E.tm[i]-=dt;
   if (E.st[i]===0){                                  // langsam folgen
     E.vx[i]=dx*sp; E.vy[i]=dy*sp;
-    if (E.tm[i]<=0){ E.st[i]=1+((rand()*2)|0); E.tm[i]=1.0; fx(E.x[i],E.y[i],46,0.9,COL.boss,2); }
+    if (E.tm[i]<=0){
+      E.st[i]=1+((rand()*2)|0); E.tm[i]=1.0;
+      // Die Vorschau und der folgende Angriff benutzen exakt denselben Winkel.
+      E.ang[i]=E.st[i]===1 ? rand()*6.2832 : Math.atan2(dy,dx);
+      fx(E.x[i],E.y[i],46,0.9,COL.boss,2);
+    }
   } else if (E.st[i]===1){                           // Muster A: Ringsalve mit Lücke
     E.vx[i]*=0.9; E.vy[i]*=0.9;
     if (E.tm[i]<=0){
-      const gap=rand()*6.2832;
+      const gap=E.ang[i];
       for(let k=0;k<22;k++){
         const a=k/22*6.2832;
-        if (Math.abs(((a-gap+9.42)%6.2832)-3.1416) > 2.75) continue;
+        const da=Math.abs(Math.atan2(Math.sin(a-gap),Math.cos(a-gap)));
+        if (da<0.43) continue;
         const j=alloc(Q,CFG.CAP_EPROJ); if(j<0) break;
         Q.x[j]=E.x[i];Q.y[j]=E.y[i];Q.vx[j]=Math.cos(a)*195;Q.vy[j]=Math.sin(a)*195;
         Q.life[j]=4.2;Q.dmg[j]=14*scale;Q.alive[j]=1;
@@ -918,7 +990,7 @@ function bossAI(i,dt,dx,dy,d,sp,scale){
     }
   } else {                                           // Muster B: Ansturm
     if (E.tm[i]<=0){
-      E.vx[i]=dx*sp*7; E.vy[i]=dy*sp*7;
+      E.vx[i]=Math.cos(E.ang[i])*sp*7; E.vy[i]=Math.sin(E.ang[i])*sp*7;
       E.st[i]=0; E.tm[i]=3.0;
     } else { E.vx[i]*=0.86; E.vy[i]*=0.86; }
   }
@@ -1251,6 +1323,116 @@ window.addEventListener('resize', resize);
 
 function lightRadius(){ return 175 + buildPower()*13; }
 
+const ARENA_STEP=1500, ARENA_RADIUS=690;
+
+/** Zeichnet einen der grossen, in die Festung eingelassenen Warden-Kreise. */
+function drawWardenSeal(cx,cy,rot){
+  ctx.save(); ctx.translate(cx,cy); ctx.rotate(rot);
+  ctx.fillStyle='rgba(5,6,10,.16)';
+  ctx.beginPath(); ctx.arc(0,0,ARENA_RADIUS,0,6.2832); ctx.fill();
+
+  const rings=[118,255,405,555,676];
+  for(let i=0;i<rings.length;i++){
+    const r=rings[i];
+    ctx.strokeStyle='rgba(4,5,8,.76)'; ctx.lineWidth=(i===4?18:13)/SCALE;
+    ctx.beginPath(); ctx.arc(0,0,r,0,6.2832); ctx.stroke();
+    ctx.strokeStyle=i===4?'rgba(92,62,54,.52)':'rgba(69,71,79,.46)';
+    ctx.lineWidth=2/SCALE; ctx.beginPath(); ctx.arc(0,0,r,0,6.2832); ctx.stroke();
+    ctx.strokeStyle='rgba(176,57,34,'+(i===0?'.20':'.10')+')';
+    ctx.lineWidth=1.2/SCALE; ctx.beginPath(); ctx.arc(0,0,r-6,0,6.2832); ctx.stroke();
+  }
+
+  // Radiale Plattenfugen machen den Boden zur Arena statt zu einem Raster.
+  ctx.strokeStyle='rgba(72,73,81,.34)'; ctx.lineWidth=1.3/SCALE;
+  for(let k=0;k<24;k++){
+    const a=k/24*6.2832, inner=(k&1)?118:255;
+    ctx.beginPath();
+    ctx.moveTo(Math.cos(a)*inner,Math.sin(a)*inner);
+    ctx.lineTo(Math.cos(a)*676,Math.sin(a)*676); ctx.stroke();
+  }
+
+  // Das zentrale Warden-Siegel bleibt bewusst dezent: Lesbarkeit vor Dekor.
+  ctx.strokeStyle='rgba(190,73,42,.28)'; ctx.lineWidth=3/SCALE;
+  ctx.beginPath();
+  ctx.moveTo(0,-80); ctx.lineTo(58,0); ctx.lineTo(0,80); ctx.lineTo(-58,0); ctx.closePath(); ctx.stroke();
+  ctx.beginPath(); ctx.arc(0,0,38,0,6.2832); ctx.stroke();
+  ctx.restore();
+}
+
+function drawArenaFloor(vx0,vx1,vy0,vy1){
+  const tile=SPR.floorTile, T=tile.width;
+  ctx.globalAlpha=.94;
+  for(let y=Math.floor(vy0/T)*T;y<vy1;y+=T)
+    for(let x=Math.floor(vx0/T)*T;x<vx1;x+=T) ctx.drawImage(tile,x,y);
+  ctx.globalAlpha=1;
+
+  const sx=Math.floor((vx0-ARENA_RADIUS)/ARENA_STEP)*ARENA_STEP;
+  const sy=Math.floor((vy0-ARENA_RADIUS)/ARENA_STEP)*ARENA_STEP;
+  for(let cy=sy;cy<=vy1+ARENA_RADIUS;cy+=ARENA_STEP){
+    for(let cx=sx;cx<=vx1+ARENA_RADIUS;cx+=ARENA_STEP){
+      if(cx+ARENA_RADIUS<vx0||cx-ARENA_RADIUS>vx1||cy+ARENA_RADIUS<vy0||cy-ARENA_RADIUS>vy1) continue;
+      const gx=Math.round(cx/ARENA_STEP), gy=Math.round(cy/ARENA_STEP);
+      const rot=visualHash(gx,gy,70)*.26-.13;
+      drawWardenSeal(cx,cy,rot);
+
+      // Feste Randbauten zitieren das Crater-Hold-Design, sind aber nur Kulisse.
+      for(let k=0;k<8;k++){
+        const a=rot+k*.7854, r=ARENA_RADIUS+18;
+        const x=cx+Math.cos(a)*r, y=cy+Math.sin(a)*r;
+        if(x<vx0-55||x>vx1+55||y<vy0-55||y>vy1+55) continue;
+        const spr=(k&1)?SPR.wardPillar:SPR.emberVent;
+        ctx.drawImage(spr,x-spr.width/2,y-spr.height/2);
+      }
+    }
+  }
+}
+
+/** Bossmuster im Stil des rechten Konzepts: rote Runen, Pfeile und Angriffskorridor. */
+function drawBossTelegraphs(vx0,vx1,vy0,vy1){
+  for(let i=0;i<E.n;i++){
+    if(!E.alive[i]||E.kind[i]!==2) continue;
+    const x=E.x[i], y=E.y[i];
+    if(x<vx0-480||x>vx1+480||y<vy0-480||y>vy1+480) continue;
+    const active=E.st[i]!==0, charge=Math.max(0,Math.min(1,1-E.tm[i]));
+    const pulse=.5+.5*Math.sin(S.t*7);
+    ctx.save(); ctx.translate(x,y);
+
+    ctx.strokeStyle='rgba(217,55,39,'+(active ? 0.25 : 0.075)+')';
+    ctx.lineWidth=(active ? 3 : 2)/SCALE;
+    for(const r of [78,116,154]){ ctx.beginPath();ctx.arc(0,0,r,0,6.2832);ctx.stroke(); }
+
+    if(E.st[i]===1){
+      const alpha=.24+charge*.34+pulse*.08, gap=E.ang[i];
+      ctx.fillStyle='rgba(224,58,39,'+alpha.toFixed(3)+')';
+      ctx.strokeStyle='rgba(238,65,43,'+Math.min(alpha+.16,.82).toFixed(3)+')';
+      ctx.lineWidth=2.2/SCALE;
+      for(let k=0;k<22;k++){
+        const a=k/22*6.2832;
+        const da=Math.abs(Math.atan2(Math.sin(a-gap),Math.cos(a-gap)));
+        if(da<.43) continue;
+        const c=Math.cos(a),s=Math.sin(a);
+        ctx.beginPath();ctx.moveTo(c*48,s*48);ctx.lineTo(c*142,s*142);ctx.stroke();
+        ctx.save();ctx.translate(c*142,s*142);ctx.rotate(a);
+        ctx.beginPath();ctx.moveTo(9,0);ctx.lineTo(-5,-4);ctx.lineTo(-5,4);ctx.closePath();ctx.fill();ctx.restore();
+      }
+      // Goldener Bogen = die lesbare sichere Luecke in der Salve.
+      ctx.strokeStyle='rgba(255,197,111,'+(.46+charge*.24).toFixed(3)+')';
+      ctx.lineWidth=5/SCALE;ctx.beginPath();ctx.arc(0,0,154,gap-.39,gap+.39);ctx.stroke();
+    } else if(E.st[i]===2){
+      const alpha=.11+charge*.17+pulse*.035, len=430;
+      ctx.rotate(E.ang[i]);
+      ctx.fillStyle='rgba(218,48,34,'+alpha.toFixed(3)+')';
+      ctx.beginPath();ctx.moveTo(30,-24);ctx.lineTo(len,-42);ctx.lineTo(len,42);ctx.lineTo(30,24);ctx.closePath();ctx.fill();
+      ctx.strokeStyle='rgba(238,67,43,'+(.40+charge*.36).toFixed(3)+')';ctx.lineWidth=2.5/SCALE;
+      ctx.beginPath();ctx.moveTo(30,-24);ctx.lineTo(len,-42);ctx.moveTo(30,24);ctx.lineTo(len,42);ctx.stroke();
+      for(let p=120;p<390;p+=90){
+        ctx.beginPath();ctx.moveTo(p-18,-12);ctx.lineTo(p,0);ctx.lineTo(p-18,12);ctx.stroke();
+      }
+    }
+    ctx.restore();
+  }
+}
+
 function render(){
   ctx.setTransform(DPR,0,0,DPR,0,0);
   ctx.fillStyle = COL.bg; ctx.fillRect(0,0,W,H);
@@ -1264,14 +1446,8 @@ function render(){
   const vx0=S.x-VIEW_W/2-60, vx1=S.x+VIEW_W/2+60;
   const vy0=S.y-VIEW_H/2-60, vy1=S.y+VIEW_H/2+60;
 
-  // --- Boden: Gitter, das im Licht warm wird -----------------------------
-  const gs=110;
-  ctx.lineWidth=1/SCALE;
-  ctx.strokeStyle=COL.grid;
-  ctx.beginPath();
-  for (let gx=Math.floor(vx0/gs)*gs; gx<vx1; gx+=gs){ ctx.moveTo(gx,vy0); ctx.lineTo(gx,vy1); }
-  for (let gy=Math.floor(vy0/gs)*gs; gy<vy1; gy+=gs){ ctx.moveTo(vx0,gy); ctx.lineTo(vx1,gy); }
-  ctx.stroke();
+  // --- Boden: Basaltplatten und konzentrische Warden-Arenen --------------
+  drawArenaFloor(vx0,vx1,vy0,vy1);
 
   // --- Lichtkreis: die Farbe kehrt mit deiner Macht zurück ---------------
   const grd = ctx.createRadialGradient(S.x,S.y,0,S.x,S.y,lr);
@@ -1283,6 +1459,9 @@ function render(){
   ctx.beginPath(); ctx.arc(S.x,S.y,lr,0,6.2832); ctx.fill();
   ctx.strokeStyle='rgba(224,122,63,0.045)'; ctx.lineWidth=8/SCALE;
   ctx.beginPath(); ctx.arc(S.x,S.y,lr*0.985,0,6.2832); ctx.stroke();
+
+  // Boss-Vorschauen liegen unter Figuren und Projektilen, aber ueber dem Boden.
+  drawBossTelegraphs(vx0,vx1,vy0,vy1);
 
   // --- Brennender Boden ---------------------------------------------------
   for (let i=0;i<GROUND.x.length;i++){
