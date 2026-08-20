@@ -99,6 +99,8 @@ const engine = globalThis.__EH;
 if (!engine?.runBalanceSuite) throw new Error("Balance suite is not exposed as window.__EH.runBalanceSuite");
 
 const report = engine.runBalanceSuite();
+const evolutionRuns = report.runs.baseline.filter((run) => run.evo.length > 0).length;
+const evolutionReachable = evolutionRuns >= 2;
 const repeat = engine.headlessRun(report.runLen, {
   seed: report.seeds[0],
   xpC: engine.CFG.XP_C,
@@ -192,11 +194,11 @@ try {
   holdError = error instanceof Error ? error.message : String(error);
 }
 const output = {
-  pass: report.pass && reproducible && artAssets && visualState && uxFlow && holdFlow,
-  checks: { ...report.checks, reproducible, artAssets, visualState, uxFlow, holdFlow },
+  pass: report.pass && evolutionReachable && reproducible && artAssets && visualState && uxFlow && holdFlow,
+  checks: { ...report.checks, evolutionReachable, reproducible, artAssets, visualState, uxFlow, holdFlow },
   targets: report.targets,
   seeds: report.seeds,
-  summary: report.summary,
+  summary: { ...report.summary, evolutionRuns, evolutionSeeds: report.seeds.length },
 };
 if (uxError) output.uxError = uxError;
 if (holdError) output.holdError = holdError;

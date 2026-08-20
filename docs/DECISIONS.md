@@ -136,3 +136,21 @@ Die Bilder gelten als Prototyp-Assets, nicht als automatisch freigegebene
 Store-Assets. Vor einer Veröffentlichung werden Herkunft, Nutzungsrechte,
 visuelle Konsistenz und gegebenenfalls eine finale Neuproduktion separat
 geprüft.
+
+## D-012 – Evolution sichtbar und spät fokussierbar
+
+**Status:** beschlossen
+
+Eine Evolution bleibt Waffenstufe 5 plus zugehöriges Passiv Stufe 3. Der
+Prototyp zeigt den Fortschritt permanent im Kampf-HUD und kennzeichnet jede
+Karte, die einen aktiven Evolutionspfad voranbringt.
+
+Ab 7:30 ersetzt das Angebot höchstens eine seiner drei Karten durch den noch
+fehlenden Schritt eines bereits begonnenen Pfads. Die Wahl bleibt freiwillig;
+vorher bleibt der Build vollständig zufallsgetrieben. Der späte Zeitpunkt
+verhindert, dass eine frühe Evolution die XP-Kurve durch zusätzlichen Schaden
+aufschaukelt.
+
+Der CI-Vertrag verlangt mindestens zwei evolvierte Builds unter acht festen,
+fokussiert gespielten 8-Minuten-Seeds. Gleichzeitig bleiben 21 ± 3 Kartenzüge
+und der bestehende Sensitivitätskorridor verbindlich.

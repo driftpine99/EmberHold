@@ -46,15 +46,22 @@ und 1789. Der aktuelle Stand:
 | Größe | Ist | Vertrag |
 |---|---:|---:|
 | Erster Kartenzug, Mittelwert | 25,4 s | 25–45 s; Zielwert 35 s |
-| Kartenzüge in 8 Min, Mittelwert | 23,38 | 21 ± 3 |
-| Rhythmus pro Minute | 1,75 · 2,13 · 2,63 · 2,13 · 2,13 · 3,00 · 3,88 · 5,75 | 1 · 2 · 2 · 2 · 3 · 3 · 4 · 4 |
-| Kartenzüge bei −10 % XP-Kosten | 18,75 | — |
-| Kartenzüge bei +10 % XP-Kosten | 16,38 | — |
-| Verhältnis der beiden Varianten | 1,145 | ≤ 1,75 |
+| Kartenzüge in 8 Min, Mittelwert | 23,50 | 21 ± 3 |
+| Rhythmus pro Minute | 1,75 · 2,13 · 2,63 · 2,13 · 2,13 · 3,00 · 3,88 · 5,88 | 1 · 2 · 2 · 2 · 3 · 3 · 4 · 4 |
+| Kartenzüge bei −10 % XP-Kosten | 18,63 | — |
+| Kartenzüge bei +10 % XP-Kosten | 16,63 | — |
+| Verhältnis der beiden Varianten | 1,120 | ≤ 1,75 |
+| Runs mit Evolution | 3 / 8 | mindestens 2 / 8 |
 
 Ein Wiederholungslauf mit demselben Seed muss bitgenau dasselbe Ergebnis
 liefern. Der Test endet mit Fehlercode, sobald ein Korridor oder diese
 Reproduzierbarkeit verletzt wird.
+
+Die acht Baseline-Runs werden mit einer fokussierten, aber nicht
+allwissenden Kartenstrategie gespielt. Mindestens zwei davon müssen in einer
+normalen 8-Minuten-Sortie eine Evolution abschließen. Ab 7:30 hält das Angebot
+einen bereits begonnenen Evolutionspfad als eine von drei optionalen Karten
+sichtbar; die Voraussetzungen bleiben Waffenstufe 5 plus Passivstufe 3.
 
 Zusätzlich prüft derselbe abhängigkeitfreie Test den UX-Fluss: Ein
 3-Minuten-Scharmützel muss im gleichen Modus neu starten, der kopierbare

@@ -44,6 +44,19 @@ canvas{display:block;position:absolute;inset:0;width:100%;height:100%}
 .slot .lv{margin-left:2px;color:#e8e4dc;font-weight:600;font-variant-numeric:tabular-nums}
 .slot.evo{border-color:#e07a3f;color:#e07a3f}
 .slot.evo .lv{color:#e07a3f}
+.evopath{width:205px;margin-top:3px;padding:7px 9px 8px;background:rgba(13,13,19,.82);
+  border:1px solid #34303a;border-left:3px solid #e07a3f;border-radius:7px;
+  backdrop-filter:blur(4px)}
+.evohead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.evohead span{font-size:8px;letter-spacing:.15em;text-transform:uppercase;color:#8b8577}
+.evohead b{font-size:11px;color:#ffb870;font-weight:650}
+.evoreq{display:flex;align-items:center;gap:4px;margin-top:3px;font-size:9.5px;color:#8b8577}
+.evoreq em{font-style:normal;color:#e8e4dc;font-variant-numeric:tabular-nums}
+.evometer{height:2px;margin-top:6px;background:#292631;border-radius:2px;overflow:hidden}
+.evometer span{display:block;height:100%;background:linear-gradient(90deg,#9f4f31,#ffb870);
+  transition:width .22s ease}
+.evopath.ready{border-color:#e07a3f;box-shadow:0 0 14px rgba(224,122,63,.18)}
+.evopath.ready .evohead span{color:#e07a3f}
 
 /* Ember-Stoß */
 #dash{position:absolute;right:18px;bottom:26px;width:74px;height:74px;border-radius:50%;
@@ -80,6 +93,9 @@ canvas{display:block;position:absolute;inset:0;width:100%;height:100%}
 .card.evocard{border:1px solid #e07a3f;border-top:3px solid #e07a3f;
   background:linear-gradient(160deg,rgba(224,122,63,.13),#171721 62%)}
 .card.evocard .kind{color:#ffb870}
+.card.pathcard{background:linear-gradient(160deg,rgba(224,122,63,.07),#171721 55%)}
+.evolink{margin-top:9px;padding-top:8px;border-top:1px solid rgba(224,122,63,.18);
+  color:#d99a70;font-size:10.5px}
 #reroll{pointer-events:auto;background:none;border:1px solid #2a2a37;color:#8b8577;
   border-radius:8px;padding:8px 18px;font:inherit;font-size:12.5px;cursor:pointer}
 #reroll:disabled{opacity:.32;cursor:default}
@@ -255,6 +271,7 @@ button.b.danger{background:#c9402e;color:#fff}
   #coach{left:14px;right:100px;width:auto;transform:translateY(18px)}
   #coach.on{transform:translateY(0)}
   .help{gap:6px}.help div{font-size:12.5px}
+  .evopath{width:185px;padding:6px 8px}.evoreq{font-size:9px}
 }
 </style>
 </head>
@@ -813,6 +830,7 @@ const PASSIVES = [
 const MAXLV = 5, MAX_W = 6, MAX_P = 6;
 const EVO_PASSIVE_LV = 3;   // gemessen: bei 5 kam in 8 Läufen keine
                             // einzige Evolution zustande
+const EVO_FOCUS_AT = 450;   // letzte 30 Sekunden: fast fertigen Pfad sichtbar halten
 
 // ===========================================================================
 //  SPIELZUSTAND
@@ -1383,9 +1401,38 @@ function buildOffer(){
     for (let i=0;i<pool.length;i++){ a-=pool[i].weight; if(a<=0){idx=i;break;} }
     out.push(pool.splice(idx,1)[0]);
   }
+  // Spaeter Fokus-Schutz: genau eine der drei Karten haelt einen begonnenen
+  // Evolutionspfad offen. Sie wird nicht erzwungen und greift erst ab 7:30,
+  // damit der fruehe Build weiterhin variieren darf.
+  if(S.t>=EVO_FOCUS_AT){
+    const w=WEAPONS.find(x=>x.evo&&S.W[x.id]&&!S.evo[x.id]);
+    if(w){
+      const wl=S.W[w.id]||0, passive=PASSIVES.find(p=>p.id===w.evo.need), pl=S.Pa[passive.id]||0;
+      let focus=null;
+      if(wl<MAXLV) focus={type:'w',w,lv:wl,weight:1};
+      else if(pl<EVO_PASSIVE_LV&&(pl>0||nP<MAX_P)) focus={type:'p',p:passive,lv:pl,weight:1};
+      const already=focus&&out.some(o=>o.type===focus.type&&
+        (o.type==='w'?o.w.id===focus.w.id:o.type==='p'&&o.p.id===focus.p.id));
+      if(focus&&!already&&out.length){
+        let replace=out.length-1;
+        if(out[replace].type==='heal') replace=out.findIndex(o=>o.type!=='heal');
+        if(replace>=0) out[replace]=focus;
+      }
+    }
+  }
   return out;
 }
 function openCards(){ pendingPicks++; }
+function offerEvolutionPath(o){
+  let w=null;
+  if(o.type==='w'&&o.w.evo&&!S.evo[o.w.id]) w=o.w;
+  else if(o.type==='p') w=WEAPONS.find(x=>x.evo&&x.evo.need===o.p.id&&S.W[x.id]&&!S.evo[x.id]);
+  if(!w) return '';
+  const passive=PASSIVES.find(p=>p.id===w.evo.need);
+  const wl=Math.min(MAXLV,(S.W[w.id]||0)+(o.type==='w'&&o.w.id===w.id?1:0));
+  const pl=Math.min(EVO_PASSIVE_LV,(S.Pa[passive.id]||0)+(o.type==='p'&&o.p.id===passive.id?1:0));
+  return `Evolutionspfad: ${w.evo.name} · ${w.name} ${wl}/${MAXLV} + ${passive.name} ${pl}/${EVO_PASSIVE_LV}`;
+}
 function showCards(){
   S.phase='cards';
   currentOffer = buildOffer();
@@ -1393,7 +1440,8 @@ function showCards(){
   document.getElementById('cardlvl').textContent='Stufe '+S.level;
   currentOffer.forEach((o,idx)=>{
     const el=document.createElement('div');
-    el.className='card'+(o.type==='evo'?' evocard':'');
+    const path=offerEvolutionPath(o);
+    el.className='card'+(o.type==='evo'?' evocard':'')+(path?' pathcard':'');
     el.setAttribute('role','button'); el.setAttribute('tabindex','0');
     let kind,name,lvtxt,desc,col;
     if (o.type==='evo'){
@@ -1414,7 +1462,7 @@ function showCards(){
     }
     el.style.setProperty('--c',col);
     el.innerHTML=`<div class="kind">${kind}</div><h3>${name}</h3>
-      <div class="lvtxt">${lvtxt}</div><p>${desc}</p>
+      <div class="lvtxt">${lvtxt}</div><p>${desc}</p>${path?`<div class="evolink">${path}</div>`:''}
       <div class="key">Taste ${idx+1}</div>`;
     el.onclick=()=>takeCard(idx);
     el.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); takeCard(idx); } };
@@ -2080,22 +2128,33 @@ function upgradeBow(){
 
 let slotSig='';
 function renderSlots(){
-  const parts=[];
+  const parts=[], paths=[];
   if(S.holdDmg>1) parts.push({c:'#e07a3f',n:'Wächterbogen',l:'+10%',e:true});
   for (const w of WEAPONS){
     const lv=S.W[w.id]; if(!lv) continue;
     const evo=!!S.evo[w.id];
     parts.push({c:w.col, n:evo?w.evo.name:w.name, l:evo?'EVO':lv, e:evo});
+    if(w.evo&&!evo){
+      const passive=PASSIVES.find(p=>p.id===w.evo.need), pl=S.Pa[passive.id]||0;
+      const ready=lv>=MAXLV&&pl>=EVO_PASSIVE_LV;
+      paths.push({name:w.evo.name,weapon:w.name,wl:Math.min(lv,MAXLV),
+        passive:passive.name,pl:Math.min(pl,EVO_PASSIVE_LV),ready,
+        pct:(Math.min(lv,MAXLV)+Math.min(pl,EVO_PASSIVE_LV))/(MAXLV+EVO_PASSIVE_LV)*100});
+    }
   }
   for (const p of PASSIVES){
     const lv=S.Pa[p.id]; if(!lv) continue;
     parts.push({c:p.col, n:p.name, l:lv, e:false});
   }
-  const sig=parts.map(p=>p.n+p.l).join('|');
+  const sig=parts.map(p=>p.n+p.l).join('|')+'#'+paths.map(p=>p.name+p.wl+p.pl+p.ready).join('|');
   if (sig===slotSig) return; slotSig=sig;
   el('slots').innerHTML = parts.map(p=>
     `<div class="slot${p.e?' evo':''}"><span class="pip" style="background:${p.c}"></span>`+
-    `${p.n}<span class="lv">${p.l}</span></div>`).join('');
+    `${p.n}<span class="lv">${p.l}</span></div>`).join('')+paths.map(p=>
+    `<div class="evopath${p.ready?' ready':''}"><div class="evohead"><span>${p.ready?'Bereit':'Evolution'}</span>`+
+    `<b>${p.name}</b></div><div class="evoreq">${p.weapon} <em>${p.wl}/${MAXLV}</em> + `+
+    `${p.passive} <em>${p.pl}/${EVO_PASSIVE_LV}</em></div><div class="evometer"><span style="width:${p.pct}%"></span></div></div>`
+  ).join('');
 }
 function fmtTime(t){
   const m=Math.floor(t/60), s=Math.floor(t%60);

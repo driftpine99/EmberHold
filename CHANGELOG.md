@@ -47,6 +47,9 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 - Harte Flipbook-Wechsel durch zeitbasierte Crossfades zwischen Idle, Lauf, Bogen und Dash ersetzt
 - Aelrics Drehung und Bewegungsstart/-stopp mit framerateunabhängigem Easing geglättet
 - Gegnerausrichtung von 8 auf 16 vorgerenderte Richtungen erweitert und weich nachgeführt
+- Evolutionspfade im Kampf-HUD und auf relevanten Karten sichtbar gemacht
+- Späten optionalen Fokus-Schutz für fast fertige Evolutionspfade ergänzt
+- CI-Vertrag um die Evolutionserreichbarkeit in 8-Minuten-Runs erweitert
 
 ### Known issues
 

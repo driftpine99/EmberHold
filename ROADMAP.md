@@ -31,9 +31,9 @@ Abnahme:
 
 ### P0.2 – Kernloop und UX
 
-- [ ] Start, Tod, Extraktion und Neustart ohne Erklärung verständlich machen
+- [x] Start, Tod, Extraktion und Neustart ohne Erklärung verständlich machen
 - [ ] Kartenwahl auf Desktop und Mobil prüfen
-- [ ] Evolution in normalen 8-Minuten-Runs erreichbar machen
+- [x] Evolution in normalen 8-Minuten-Runs erreichbar machen
 - [ ] Lesbarkeit von Gegnerfamilien und Bosswarnungen prüfen
 - [x] Testbericht am Run-Ende kopierbar machen
 - [x] Kampf über Button und Tastatur vollständig pausierbar machen
