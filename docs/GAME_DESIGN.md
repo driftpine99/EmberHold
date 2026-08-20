@@ -1,6 +1,6 @@
 # EMBERHOLD
 ### Game Design Document & Technischer Bauplan
-**Arbeitstitel · Version 1.1 Solo-PvE · August 2026**
+**Arbeitstitel · Version 1.2 Solo-PvE · August 2026**
 
 Plattformen: Browser (primär) · Android · iOS · Steam
 Genre: Idle-RPG × Bullet-Heaven · High Fantasy
@@ -283,7 +283,7 @@ Auch die längste Jagd lässt ein Sechstel offen — es gibt immer ein „was w�
 wenn ich diesmal anders gewählt hätte".
 
 Die vier Längen sind **mechanisch** verschieden, nicht nur zeitlich: Eine
-Waffen-Evolution braucht Waffenstufe 5 + Passivstufe 5. Im Scharmützel
+Waffen-Evolution braucht Waffenstufe 5 + Passivstufe 3. Im Scharmützel
 unmöglich, in der Sortie mit Fokus knapp machbar, im Tiefenzug regelmäßig.
 
 ### 5.4 Timeline einer 8-Minuten-Sortie
@@ -295,12 +295,12 @@ Alle Werte aus der Balancing-Simulation, nicht geschätzt.
 | 0:00 | Start, 22 Gegner | 0 | **Verwundbar** — ein Treffer tut weh |
 | 0:35 | **Erster Kartenzug** | 1 | Erste Entscheidung |
 | 1:13 | Zweiter Kartenzug | 2 | Build zeichnet sich ab |
-| 2:00 | **Erster Elite** (benannt, telegrafiert) | 4 | Erste Truhe |
-| 2:00–4:10 | Dichte verdreifacht sich | 4–9 | **Druck** — Rückzüge nötig |
-| 4:10 | **Mittelboss** — Musterkampf | 9 | Können-Test, Rate sinkt bewusst |
-| 5:00 | Dichte-Spitze, ~1.000 Gegner | 12 | **Wende** — du drehst es um |
-| 6:00–7:00 | Vier Kartenzüge in einer Minute | 16 | **Macht** |
-| 7:00 | **Schatzflut** — Truhenwelle + Magnetpuls | 18 | Belohnungsrausch |
+| 2:00 | **Erster Elite** (benannt, telegrafiert) | 3 | Erste Truhe |
+| 2:00–4:10 | Dichte verdreifacht sich | 3–7 | **Druck** — Rückzüge nötig |
+| 4:10 | **Mittelboss** — Musterkampf | 7 | Können-Test, Rate sinkt bewusst |
+| 5:00 | Dichte-Spitze, ~1.000 Gegner | 10 | **Wende** — du drehst es um |
+| 6:00–7:00 | Vier Kartenzüge in einer Minute | 13–17 | **Macht** |
+| 7:00 | **Schatzflut** — Truhenwelle + Magnetpuls | 17 | Belohnungsrausch |
 | 8:00 | **Extraktion** | 21 | Entscheidung |
 
 Der Mittelboss bei 4:10 senkt die XP-Rate absichtlich um 30 % — die Minute, in
@@ -655,7 +655,7 @@ Glücksmünze *(Seltenheitschance)*
 
 ### 9.3 Evolutionen (12)
 
-**Bedingung:** Waffe auf Stufe 5 **+** zugehöriges Passiv auf Stufe 5.
+**Bedingung:** Waffe auf Stufe 5 **+** zugehöriges Passiv auf Stufe 3.
 Die Evolution ersetzt die Waffe und verändert ihr Verhalten grundlegend — nicht
 nur ihre Zahlen. Das ist Vampire Survivors' bester Haken und der Grund, warum
 Runs ein Ziel jenseits des Überlebens haben.
@@ -847,11 +847,13 @@ abspringen. Das erste Prestige ist unser D7-Instrument.
 ### 11.2 Run-XP
 
 ```
-xp_bedarf(L) = 340 × L^0,799
+xp_bedarf(L) = 55 × L^0,95
 ```
 
-Abgeleitet aus zwei Designvorgaben (erster Kartenzug bei 35 s, 21 Züge in
-8 Min), nicht geraten. Die XP-Rate **sättigt**:
+Für Phase 0 ist dies die im ausführbaren Kampfprototyp getestete Kurve. Der
+erste Kartenzug zielt auf 35 Sekunden; über die feste Seed-Suite gilt ein
+akzeptierter Mittelwert von 25–45 Sekunden und 21 ± 3 Züge in 8 Minuten. Die
+XP-Rate **sättigt**:
 
 ```
 rate(t) = 8,6 × Dichte(t) × Buildstärke(t) × Bossdelle(t) × Schatzflut(t)
@@ -1467,6 +1469,7 @@ irgendwann jemand vorschlagen; die Antwort steht hier schon.
 
 ---
 
-*Alle Zahlen in Kapitel 5, 6, 7, 10 und 11 stammen aus der beiliegenden
-Balancing-Simulation (`balance_sim*.py`), nicht aus Schätzungen. Die Skripte
-gehören ins Repository und laufen als Regressionstests in der CI mit.*
+*Langfristige Ökonomieformeln in Kapitel 6, 7, 10 und 11 stammen aus dem
+beiliegenden Workbook und sind noch nicht im Spiel validiert. Für den
+Phase-0-Kampf gelten die Laufzeitwerte aus D-006; der integrierte Headless-Pfad
+läuft über `npm test` als Regressionstest in der CI.*

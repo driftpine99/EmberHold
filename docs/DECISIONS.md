@@ -42,3 +42,35 @@ und auf bestehende Spiele, Marken, Domains und Store-Einträge geprüft.
 Der Quellcode wird zunächst ohne Open-Source-Lizenz veröffentlicht. Eine
 Lizenzentscheidung erfolgt erst, wenn das Geschäftsmodell und der Umgang mit
 Code und Assets feststehen.
+
+## D-006 – Laufzeitcode ist die Phase-0-Balancequelle
+
+**Status:** beschlossen
+
+Für den Kampfprototyp sind die Werte in `prototype/web/index.html` verbindlich.
+Das Workbook bleibt ein langfristiges Designmodell und ist keine ausführbare
+Simulation des Kampfes. Abweichungen dürfen nicht stillschweigend übernommen
+werden.
+
+Der Phase-0-Vertrag lautet:
+
+- XP-Kosten: `55 × Level^0,95`
+- Evolution: Waffenstufe 5 + zugehöriges Passiv Stufe 3
+- Zielzüge für 3 / 8 / 15 / 20 Minuten: 5 / 21 / 39 / 50
+- erster Zug: Zielwert 35 Sekunden; akzeptierter Mittelwert der festen
+  Seed-Suite 25–45 Sekunden
+- acht feste Seeds; ±10 % XP-Kosten dürfen die mittlere Zahl der Kartenzüge
+  nicht um mehr als Faktor 1,75 auseinanderziehen
+
+Änderungen an diesen Regeln müssen Spielcode, GDD und Testplan gemeinsam
+aktualisieren und `npm test` bestehen.
+
+## D-007 – Kostenleitplanken bis zum Phase-0-Gate
+
+**Status:** beschlossen
+
+Bis echte Spieler den Kernloop bestätigt haben, gibt es keinen Engine-Wechsel,
+kein Backend und keine bezahlte Produktions-Pipeline. Tests laufen ohne
+Projektabhängigkeiten lokal und in GitHub Actions. KI-Agenten werden nur für
+klar abgegrenzte Parallelprüfungen eingesetzt; Integration und technische
+Entscheidungen bleiben zentral.

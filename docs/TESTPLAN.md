@@ -17,21 +17,35 @@ Server, keine Installation. Läuft auf Desktop und Handy.
 | **T** | **Live-Tuning** — Dichte, Schaden, HP, XP-Kurve. Wirkt sofort, auch mitten im Run. |
 | **D** | Entwickler-Anzeige — FPS, Entities, Pick-Zeiten gegen die Spezifikation |
 
-## Was gemessen wurde (automatisierter Bot, 8 Läufe je Wert)
+## Automatisierter Balance-Vertrag
 
-| Größe | Ist | GDD-Soll |
-|---|---|---|
-| Erster Kartenzug | 31,3 s | 35 s |
-| Kartenzüge in 8 Min | 18,8 | 21 |
-| Rhythmus pro Minute | 1,8 · 1,4 · 1,6 · 1,9 · 1,8 · 2,4 · 2,9 · 5,1 | 1 · 2 · 2 · 2 · 3 · 3 · 4 · 4 |
-| Kills pro Run | 7.900 | — |
-| Spitze Gegner auf dem Schirm | 1.039 | ≤ 1.500 |
-| FPS Desktop / Handy | 58 / 58 | ≥ 55 |
-| Überlebenszeit (Bot) | Median 377 s | — |
+`npm test` lädt den echten Headless-Spielpfad ohne zusätzliche
+Projektabhängigkeiten. GitHub Actions führt denselben Test bei relevanten
+Änderungen automatisch aus.
 
-Der Rhythmus trifft die **Form** (dünn früh, dicht spät), nicht jede
-Einzelzahl. Die Streuung zwischen Läufen ist hoch, weil unterschiedliche
-Builds unterschiedlich schnell hochlaufen — das ist genretypisch.
+Getestet werden acht feste Seeds: 1701, 1709, 1721, 1733, 1741, 1753, 1777
+und 1789. Der aktuelle Stand:
+
+| Größe | Ist | Vertrag |
+|---|---:|---:|
+| Erster Kartenzug, Mittelwert | 25,4 s | 25–45 s; Zielwert 35 s |
+| Kartenzüge in 8 Min, Mittelwert | 22,25 | 21 ± 3 |
+| Rhythmus pro Minute | 1,75 · 2,13 · 2,63 · 2,13 · 2,13 · 2,50 · 3,13 · 5,88 | 1 · 2 · 2 · 2 · 3 · 3 · 4 · 4 |
+| Kartenzüge bei −10 % XP-Kosten | 21,5 | — |
+| Kartenzüge bei +10 % XP-Kosten | 17,0 | — |
+| Verhältnis der beiden Varianten | 1,265 | ≤ 1,75 |
+
+Ein Wiederholungslauf mit demselben Seed muss bitgenau dasselbe Ergebnis
+liefern. Der Test endet mit Fehlercode, sobald ein Korridor oder diese
+Reproduzierbarkeit verletzt wird.
+
+Die Einzelruns streuen derzeit stark: erster Zug 17,5–40,5 Sekunden und
+16–42 Kartenzüge. Der Vertrag bewertet deshalb vorerst den Seed-Mittelwert;
+die Streuung bleibt ein Tuningthema vor dem externen Spieltest.
+
+Letzte manuelle Browserreferenz vor Einführung der festen Seeds: 1.039 Gegner
+in der Spitze, 58 FPS auf Desktop und Handy, Bot-Überlebenszeit im Median
+377 Sekunden. Diese Werte sind keine automatischen Rendering-Regressionstests.
 
 ## Was der Prototyp bereits enthält
 
@@ -41,22 +55,23 @@ Builds unterschiedlich schnell hochlaufen — das ist genretypisch.
   Schatzflut bei 7:00, Extraktion bei 8:00 mit Overtime-Angebot
 - Ember-Stoß mit 0,35 s Unverwundbarkeit
 - Lichtradius, der mit der Buildstärke wächst
-- Vier Run-Längen (3 / 8 / 15 / 20 Min)
+- Balanceziele für vier Run-Längen (3 / 8 / 15 / 20 Min); die Phase-0-UI bietet
+  bewusst nur 3 und 8 Minuten an
 - Regel 1 umgesetzt: Tod kostet nur den Overtime-Bonus, nie die Basis
 
 ## Bekannte Abweichungen
 
-1. **Erster Kartenzug bei 31 s statt 35 s**, 18,8 statt 21 Kartenzüge.
-   Über den T-Regler „XP-Kosten" justierbar.
-2. **Die Schleife ist bistabil.** Ein starker Build schneeballt: 10 % Änderung
-   an den XP-Kosten halbiert oder verdoppelt die Kartenzüge. Gedämpft über
-   `HP_PER_LVL` (Gegner-HP wächst mit der Spielerstufe), aber nicht beseitigt.
-   Für Phase 1 relevant.
-3. **Evolution verlangt Waffe 5 + Passiv 3**, nicht 5 + 5 wie im GDD.
-   Gemessen: bei 5 + 5 kam in 8 Läufen keine einzige Evolution zustande.
-4. **Der Test-Bot beendet den Run selten.** Er plant 0,45 s voraus und wählt
+1. **Der erste Zug liegt am frühen Rand des Korridors.** 25,4 Sekunden im
+   Mittel sind akzeptiert, aber noch nicht das Designzentrum von 35 Sekunden.
+2. **Die Build-Streuung ist hoch.** Ein starker Build schneeballt weiterhin.
+   Die ±10-%-Prüfung kippt die mittlere Kartenzahl nicht mehr um Faktor zwei,
+   einzelne Seeds liegen aber weit auseinander.
+3. **Der Test-Bot beendet den Run selten.** Er plant 0,45 s voraus und wählt
    aus 16 Richtungen — ein Mensch ist deutlich besser. Die Zahl sagt wenig
    über die tatsächliche Schwierigkeit; dafür brauchst du echte Spieler.
+4. **15- und 20-Minuten-Runs sind noch nicht über die Start-UI erreichbar.**
+   Ihre Zielwerte sind bereits definiert, sie sind aber nicht Teil des
+   Phase-0-Spieltests.
 5. Kein Ton. Bewusst — Phase 0 testet Bewegung und Rhythmus.
 
 ## Der Fehler, der am meisten Zeit gekostet hat

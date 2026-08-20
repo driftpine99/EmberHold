@@ -1,0 +1,32 @@
+name: Balance contract
+
+on:
+  push:
+    paths:
+      - "prototype/web/index.html"
+      - "tools/run-balance-suite.mjs"
+      - "package.json"
+      - ".github/workflows/balance.yml"
+  pull_request:
+    paths:
+      - "prototype/web/index.html"
+      - "tools/run-balance-suite.mjs"
+      - "package.json"
+      - ".github/workflows/balance.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  balance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run deterministic balance suite
+        run: npm test

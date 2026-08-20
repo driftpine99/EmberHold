@@ -34,6 +34,17 @@ Die einzige Produktfrage der Phase 0 lautet:
 Der Prototyp ist eigenständig und benötigt für den lokalen Test keine
 Installation und keinen Server.
 
+## Automatischer Balance-Test
+
+Mit installiertem Node.js 20 oder neuer:
+
+```text
+npm test
+```
+
+Der Test benötigt keine Projektabhängigkeiten. GitHub Actions führt ihn bei
+relevanten Änderungen automatisch mit acht festen Zufalls-Seeds aus.
+
 ## Repository-Struktur
 
 ```text
@@ -47,6 +58,9 @@ docs/
 prototype/
   web/
     index.html            Spielbarer Phase-0-Prototyp
+tools/
+  run-balance-suite.mjs   Abhängigkeitsfreier Balance-Test
+package.json              Lokale Testbefehle
 CHANGELOG.md              Nachvollziehbare Änderungen
 ROADMAP.md                Aktueller Entwicklungsplan
 ```
@@ -59,8 +73,8 @@ ROADMAP.md                Aktueller Entwicklungsplan
 - Keine neue Engine, bevor der Phase-0-Test bestanden ist.
 - Kleine Änderungen mit klaren Abnahmekriterien.
 - `main` enthält nur startbare und geprüfte Versionen.
-- Balancingwerte sollen langfristig aus einer gemeinsamen Datenquelle stammen,
-  die Spiel und Simulation verwenden.
+- Für Phase 0 ist der ausführbare Laufzeitvertrag die Balancequelle; ein
+  gemeinsamer Datenexport folgt erst nach bestandenem Spieltest-Gate.
 
 ## Nächster Meilenstein
 

@@ -1,0 +1,14 @@
+{
+  "name": "emberhold-phase-0",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Zero-dependency tooling for the Emberhold Phase-0 prototype",
+  "type": "module",
+  "scripts": {
+    "test": "npm run test:balance",
+    "test:balance": "node tools/run-balance-suite.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

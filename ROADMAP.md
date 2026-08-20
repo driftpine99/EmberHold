@@ -15,13 +15,13 @@ automatischen Angriffen, Kartenwahl und Eskalation trägt.
 
 ### P0.1 – Eine Quelle für Laufzeit-Balancing
 
-- [ ] Laufzeitwerte des Prototyps dokumentieren
-- [ ] Abweichungen zwischen GDD, Workbook und Spielcode auflisten
-- [ ] Fehlende externe Simulationsskripte rekonstruieren oder durch die
+- [x] Laufzeitwerte des Prototyps dokumentieren
+- [x] Abweichungen zwischen GDD, Workbook und Spielcode auflisten
+- [x] Fehlende externe Simulationsskripte rekonstruieren oder durch die
   integrierten Headless-Tests ersetzen
-- [ ] XP-Kurve und Evolutionsbedingungen verbindlich entscheiden
-- [ ] Automatischen Pacing-Test reproduzierbar machen
-- [ ] Test bei jeder relevanten Balanceänderung ausführen
+- [x] XP-Kurve und Evolutionsbedingungen verbindlich entscheiden
+- [x] Automatischen Pacing-Test reproduzierbar machen
+- [x] Test bei jeder relevanten Balanceänderung ausführen
 
 Abnahme:
 

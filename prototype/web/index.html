@@ -246,14 +246,15 @@ button.b.danger{background:#c9402e;color:#fff}
 // ===========================================================================
 //  EMBERHOLD — Prototyp Phase 0
 //  Ein Held, ein Territorium, 8 Minuten. Keine Meta, kein Hold, kein Backend.
-//  Alle Balancing-Konstanten spiegeln das Workbook (Blatt "Stellschrauben").
+//  Verbindliche Phase-0-Werte stehen hier; siehe docs/DECISIONS.md (D-006).
 // ===========================================================================
 
 const CFG = {
   // --- Run-Struktur (GDD Kap. 5.4) ---
   RUN_LEN:        480,      // Sekunden bis zur Extraktion
   FIRST_PICK_S:   35,       // Zielwert erster Kartenzug
-  TARGET_PICKS:   21,       // Zielwert Kartenzüge in 8 Minuten
+  FIRST_PICK_RANGE:[25,45], // akzeptierter Seed-Suite-Korridor
+  PICK_TARGETS:   { 180:5, 480:21, 900:39, 1200:50 },
   XP_C:            55,      // xp_bedarf(L) = XP_C * L^XP_K
   XP_K:          0.95,      // beide am laufenden Spielcode kalibriert,
                             // nicht aus einem Modell abgeleitet
@@ -303,6 +304,28 @@ const CFG = {
   CELL:           64,
   NCELLS:         4096,
 };
+
+// Gameplay-Zufall ist vom Rendering getrennt. Dadurch erzeugt derselbe Seed
+// dieselbe Simulation – unabhängig von FPS und gezeichneten Effekten.
+let rngState = 0x9e3779b9;
+function createSeed(){
+  const seed = (Date.now() ^ Math.floor(Math.random()*0xffffffff)) >>> 0;
+  return seed || 0x9e3779b9;
+}
+function seedRandom(seed){
+  const numeric = Number(seed);
+  rngState = Number.isFinite(numeric) ? numeric >>> 0 : createSeed();
+  if (!rngState) rngState = 0x9e3779b9;
+  return rngState;
+}
+function rand(){
+  rngState = (rngState + 0x6d2b79f5) >>> 0;
+  let t = rngState;
+  t = Math.imul(t ^ (t >>> 15), t | 1);
+  t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+}
+function targetPicks(runLen){ return CFG.PICK_TARGETS[runLen] ?? null; }
 
 // --------------------------------------------------------------------- Farben
 const COL = {
@@ -521,7 +544,8 @@ const EVO_PASSIVE_LV = 3;   // gemessen: bei 5 kam in 8 Läufen keine
 // ===========================================================================
 let S = null;
 let HEADLESS = false;
-function newRun(runLen){
+function newRun(runLen, seed){
+  const runSeed = seedRandom(seed);
   S = {
     t:0, running:false, phase:'run',        // run | cards | extract | over
     runLen: runLen,
@@ -536,7 +560,7 @@ function newRun(runLen){
     events:{elite:0, boss:false, surge:false},
     bladeAng:0, ot:0, otActive:false,
     reward:0, baseReward:0,
-    cool:{}, seed:(Math.random()*1e9)|0,
+    cool:{}, seed:runSeed,
     fps:60, worstFps:999, peakEnemies:0,
   };
   S.W['bogen']=1; S.cool['bogen']=0;
@@ -580,7 +604,7 @@ function targetEnemies(t){
 }
 /** Familienverteilung verschiebt sich über den Run — neue Muster, nicht nur mehr HP. */
 function pickFam(t){
-  const r = Math.random(), f = Math.min(t/CFG.RUN_LEN, 1);
+  const r = rand(), f = Math.min(t/CFG.RUN_LEN, 1);
   const w = [ 1.00 - 0.45*f,        // Schwärmer
               0.10 + 0.30*f,        // Stürmer
               0.02 + 0.22*f,        // Speier
@@ -604,13 +628,13 @@ function spawnEnemy(t, fam, kind, atx, aty){
     const back = Math.atan2(-S.aimy, -S.aimx);
     let a;
     for (let tries=0; tries<4; tries++){
-      a = Math.random()*6.2832;
+      a = rand()*6.2832;
       let dd = Math.abs(((a-back+9.4248)%6.2832)-3.1416);   // 0 = hinten, PI = vorn
-      if (Math.random() > dd/3.1416*0.45) break;            // vorn seltener annehmen
+      if (rand() > dd/3.1416*0.45) break;                   // vorn seltener annehmen
     }
     // knapp ausserhalb der Bildschirmecke — ein weiter Ring wuerde Gegner
     // zaehlen, die der Spieler nie zu sehen bekommt
-    const rad = VIEW_DIAG*0.96 + Math.random()*60;
+    const rad = VIEW_DIAG*0.96 + rand()*60;
     atx = S.x + Math.cos(a)*rad; aty = S.y + Math.sin(a)*rad;
   }
   // Gegner-HP waechst mit der Zeit UND mit der Spielerstufe. Ohne den zweiten
@@ -627,7 +651,7 @@ function spawnEnemy(t, fam, kind, atx, aty){
 function spawnGem(x,y,val){
   const i = alloc(G, CFG.CAP_GEM); if (i<0) return;
   G.x[i]=x; G.y[i]=y; G.val[i]=val; G.alive[i]=1;
-  const a=Math.random()*6.2832, s=18+Math.random()*30;
+  const a=rand()*6.2832, s=18+rand()*30;
   G.vx[i]=Math.cos(a)*s; G.vy[i]=Math.sin(a)*s;
 }
 
@@ -791,16 +815,16 @@ function killEnemy(i){
   freeSlot(E,i); S.kills++;
   if (kind===2){                                   // Boss
     fx(x,y,150,0.7,COL.boss,1);
-    for(let k=0;k<30;k++) spawnGem(x+(Math.random()-.5)*260, y+(Math.random()-.5)*260, 5);
+    for(let k=0;k<30;k++) spawnGem(x+(rand()-.5)*260, y+(rand()-.5)*260, 5);
     toast('Mittelboss gefallen');
   } else if (kind===1){                            // Elite
     fx(x,y,80,0.5,COL.elite,1);
-    for(let k=0;k<14;k++) spawnGem(x+(Math.random()-.5)*60, y+(Math.random()-.5)*60, 6);
+    for(let k=0;k<14;k++) spawnGem(x+(rand()-.5)*60, y+(rand()-.5)*60, 6);
   } else {
     spawnGem(x,y,FAM_GEM[fam]);
     if (fam===3){                                  // Teiler zerfällt
       for(let k=0;k<2;k++){
-        const j=spawnEnemy(S.t,0,0,x+(Math.random()-.5)*26,y+(Math.random()-.5)*26);
+        const j=spawnEnemy(S.t,0,0,x+(rand()-.5)*26,y+(rand()-.5)*26);
         if(j>=0){ E.hp[j]*=0.5; E.max[j]*=0.5; }
       }
     }
@@ -834,7 +858,7 @@ function updateEnemies(dt){
         if (E.tm[i]<=0){ E.st[i]=2; E.tm[i]=0.55;
           E.vx[i]=dx*sp*7.5; E.vy[i]=dy*sp*7.5; }
       } else {                                      // Sprint
-        if (E.tm[i]<=0){ E.st[i]=0; E.tm[i]=1.6+Math.random(); }
+        if (E.tm[i]<=0){ E.st[i]=0; E.tm[i]=1.6+rand(); }
       }
     } else if (fam===2 && kind===0){                // Speier: hält Abstand, schießt
       const want=250;
@@ -842,7 +866,7 @@ function updateEnemies(dt){
       E.vx[i]=dx*sp*k; E.vy[i]=dy*sp*k;
       E.tm[i]-=dt;
       if (E.tm[i]<=0 && d<420){
-        E.tm[i]=2.2+Math.random()*1.2;
+        E.tm[i]=2.2+rand()*1.2;
         const j=alloc(Q,CFG.CAP_EPROJ);
         if (j>=0){ Q.x[j]=E.x[i];Q.y[j]=E.y[i];Q.vx[j]=dx*180;Q.vy[j]=dy*180;
           Q.life[j]=3.4;Q.dmg[j]=10*scale;Q.alive[j]=1; }
@@ -878,11 +902,11 @@ function bossAI(i,dt,dx,dy,d,sp,scale){
   E.tm[i]-=dt;
   if (E.st[i]===0){                                  // langsam folgen
     E.vx[i]=dx*sp; E.vy[i]=dy*sp;
-    if (E.tm[i]<=0){ E.st[i]=1+((Math.random()*2)|0); E.tm[i]=1.0; fx(E.x[i],E.y[i],46,0.9,COL.boss,2); }
+    if (E.tm[i]<=0){ E.st[i]=1+((rand()*2)|0); E.tm[i]=1.0; fx(E.x[i],E.y[i],46,0.9,COL.boss,2); }
   } else if (E.st[i]===1){                           // Muster A: Ringsalve mit Lücke
     E.vx[i]*=0.9; E.vy[i]*=0.9;
     if (E.tm[i]<=0){
-      const gap=Math.random()*6.2832;
+      const gap=rand()*6.2832;
       for(let k=0;k<22;k++){
         const a=k/22*6.2832;
         if (Math.abs(((a-gap+9.42)%6.2832)-3.1416) > 2.75) continue;
@@ -1040,7 +1064,7 @@ function buildOffer(){
   const out=[];
   for (let k=0;k<3 && pool.length;k++){
     let tot=0; for(const o of pool) tot+=o.weight;
-    let a=Math.random()*tot, idx=0;
+    let a=rand()*tot, idx=0;
     for (let i=0;i<pool.length;i++){ a-=pool[i].weight; if(a<=0){idx=i;break;} }
     out.push(pool.splice(idx,1)[0]);
   }
@@ -1128,7 +1152,7 @@ function updateEvents(){
   if (!S.events.surge && S.t >= CFG.SURGE_AT){
     S.events.surge = true;
     for (let k=0;k<70;k++){
-      const a=Math.random()*6.2832, r=90+Math.random()*330;
+      const a=rand()*6.2832, r=90+rand()*330;
       spawnGem(S.x+Math.cos(a)*r, S.y+Math.sin(a)*r, 5);
     }
     // Magnetpuls — der ganze Bildschirm fliegt dir entgegen
@@ -1159,7 +1183,7 @@ function step(dt){
   if (S.dashT>0){
     S.dashT-=dt;
     S.x += S.dashVx*dt; S.y += S.dashVy*dt;
-    if (Math.random()<0.6) fx(S.x,S.y,13,0.3,'#e07a3f',0);
+    if (rand()<0.6) fx(S.x,S.y,13,0.3,'#e07a3f',0);
   } else {
     S.x += mx*CFG.SPEED*st.speed*dt;
     S.y += my*CFG.SPEED*st.speed*dt;
@@ -1503,9 +1527,12 @@ function pacingReport(){
   const target=[1,2,2,2,3,3,4,4];
   let h = `<b>PACING-ABGLEICH</b><hr>`;
   h += `Erster Pick: <b>${p.length?p[0].toFixed(0):'–'}s</b> `+
-       `<span class="${p.length&&Math.abs(p[0]-35)<9?'ok':'bad'}">(Soll 35s)</span><br>`;
-  h += `Picks in ${S.runLen/60} Min: <b>${p.filter(x=>x<=S.runLen).length}</b> `+
-       `<span class="${Math.abs(p.filter(x=>x<=S.runLen).length-CFG.TARGET_PICKS)<=3?'ok':'bad'}">(Soll ${CFG.TARGET_PICKS})</span><hr>`;
+       `<span class="${p.length&&p[0]>=CFG.FIRST_PICK_RANGE[0]&&p[0]<=CFG.FIRST_PICK_RANGE[1]?'ok':'bad'}">`+
+       `(Soll ${CFG.FIRST_PICK_RANGE[0]}–${CFG.FIRST_PICK_RANGE[1]}s; Ziel ${CFG.FIRST_PICK_S}s)</span><br>`;
+  const pickTarget = targetPicks(S.runLen);
+  const pickCount = p.filter(x=>x<=S.runLen).length;
+  h += `Picks in ${S.runLen/60} Min: <b>${pickCount}</b> `+
+       `<span class="${pickTarget===null||Math.abs(pickCount-pickTarget)<=3?'ok':'bad'}">(Soll ${pickTarget??'–'})</span><hr>`;
   h += `Min &nbsp;Ist&nbsp; Soll<br>`;
   perMin.forEach((v,m)=>{
     const t=target[m]!==undefined?target[m]:'–';
@@ -1749,16 +1776,18 @@ function pickSmart(offer){
  *  dauert so unter zwei Sekunden. Basis der Balancing-Kalibrierung. */
 function headlessRun(runLen, opts){
   opts = opts || {};
-  const oldC = CFG.XP_C, oldK = CFG.XP_K;
-  if (opts.xpC) CFG.XP_C = opts.xpC;
-  if (opts.xpK) CFG.XP_K = opts.xpK;
+  const oldC = CFG.XP_C, oldK = CFG.XP_K, oldHeadless = HEADLESS;
+  const oldInputX = input.x, oldInputY = input.y;
+  if (Number.isFinite(opts.xpC)) CFG.XP_C = opts.xpC;
+  if (Number.isFinite(opts.xpK)) CFG.XP_K = opts.xpK;
   HEADLESS = true;
-  newRun(runLen);
-  S.running = true; S.phase = 'run';
-  const DT = CFG.TICK, N = Math.ceil(runLen/DT);
-  let a = 0, died = -1, botX = 1, botY = 0;
-  const hpTrace = [];
-  for (let i=0;i<N;i++){
+  try {
+    newRun(runLen, opts.seed);
+    S.running = true; S.phase = 'run';
+    const DT = CFG.TICK, N = Math.ceil(runLen/DT);
+    let a = 0, died = -1, botX = 1, botY = 0;
+    const hpTrace = [];
+    for (let i=0;i<N;i++){
     // --- Bot-Strategie: vom lokalen Gegner-Schwerpunkt wegdriften (echtes Kiten) ---
     // --- Bot v5: den Schwarm auf Distanz halten, aber IN Waffenreichweite ----
     // Das ist das eigentliche Koennen des Genres. Ein Bot, der nur flieht,
@@ -1799,7 +1828,7 @@ function headlessRun(runLen, opts){
       botX = bx; botY = by;
     }
     input.x = botX; input.y = botY;
-    if (S.dashCd<=0 && Math.random()<0.006) tryDash();
+      if (S.dashCd<=0 && rand()<0.006) tryDash();
     if (S.hp <= 0){
       if (died<0) died = S.t;
       if (opts.immortal!==false){ S.hp = S.maxhp; S.phase='run'; }
@@ -1809,26 +1838,63 @@ function headlessRun(runLen, opts){
     while (pendingPicks>0){
       currentOffer = buildOffer();
       applyOffer(opts.smart ? pickSmart(currentOffer)
-                            : currentOffer[(Math.random()*currentOffer.length)|0]);
+                            : currentOffer[(rand()*currentOffer.length)|0]);
       pendingPicks--;
     }
     if (i % 300 === 0) hpTrace.push(Math.round(S.hp));
+    }
+    const perMin=[]; for(let m=0;m<Math.ceil(runLen/60);m++)
+      perMin.push(S.pickTimes.filter(x=>x>=m*60&&x<(m+1)*60).length);
+    let live=0; for(let i=0;i<E.n;i++) if(E.alive[i]) live++;
+    return { seed:S.seed, first:S.pickTimes[0]||null, total:S.pickTimes.length, perMin,
+             picks:S.pickTimes.slice(), kills:S.kills, peak:S.peakEnemies,
+             live, onScreen:S.onScreen, level:S.level, died, hpTrace,
+             W:Object.assign({},S.W), Pa:Object.assign({},S.Pa),
+             evo:Object.keys(S.evo), dps:S.dmgDealt/runLen, xpTotal:S.xpTotal };
+  } finally {
+    CFG.XP_C = oldC; CFG.XP_K = oldK; HEADLESS = oldHeadless;
+    input.x = oldInputX; input.y = oldInputY;
   }
-  const perMin=[]; for(let m=0;m<Math.ceil(runLen/60);m++)
-    perMin.push(S.pickTimes.filter(x=>x>=m*60&&x<(m+1)*60).length);
-  let live=0; for(let i=0;i<E.n;i++) if(E.alive[i]) live++;
-  const out = { first:S.pickTimes[0]||null, total:S.pickTimes.length, perMin,
-                picks:S.pickTimes.slice(), kills:S.kills, peak:S.peakEnemies,
-                live, onScreen:S.onScreen, level:S.level, died, hpTrace,
-                W:Object.assign({},S.W), Pa:Object.assign({},S.Pa),
-                evo:Object.keys(S.evo), dps:S.dmgDealt/runLen, xpTotal:S.xpTotal };
-  CFG.XP_C = oldC; CFG.XP_K = oldK; HEADLESS = false;
-  input.x = input.y = 0;
-  return out;
+}
+
+const BALANCE_SEEDS = Object.freeze([1701, 1709, 1721, 1733, 1741, 1753, 1777, 1789]);
+function average(rows, key){ return rows.reduce((sum,row)=>sum+(row[key]||0),0)/rows.length; }
+function runBalanceSuite(opts){
+  opts = opts || {};
+  const runLen = opts.runLen || CFG.RUN_LEN;
+  const seeds = opts.seeds || BALANCE_SEEDS;
+  const runBatch = (xpC)=>seeds.map(seed=>headlessRun(runLen, {
+    seed, xpC, xpK:CFG.XP_K, smart:true, immortal:true,
+  }));
+  const baseline = runBatch(CFG.XP_C);
+  const lowCost = runBatch(CFG.XP_C*0.9);
+  const highCost = runBatch(CFG.XP_C*1.1);
+  const firstAvg = average(baseline,'first');
+  const totalAvg = average(baseline,'total');
+  const lowAvg = average(lowCost,'total'), highAvg = average(highCost,'total');
+  const perMinAvg = baseline[0].perMin.map((_,minute)=>
+    baseline.reduce((sum,run)=>sum+(run.perMin[minute]||0),0)/baseline.length);
+  const sensitivityRatio = Math.max(lowAvg,highAvg)/Math.max(1,Math.min(lowAvg,highAvg));
+  const pickTarget = targetPicks(runLen);
+  const checks = {
+    firstPick: firstAvg>=CFG.FIRST_PICK_RANGE[0] && firstAvg<=CFG.FIRST_PICK_RANGE[1],
+    totalPicks: pickTarget===null || Math.abs(totalAvg-pickTarget)<=3,
+    sensitivity: sensitivityRatio<=1.75,
+  };
+  return {
+    pass:Object.values(checks).every(Boolean), checks, runLen, seeds:[...seeds],
+    targets:{first:CFG.FIRST_PICK_S,total:pickTarget},
+    summary:{
+      firstAvg, firstRange:[Math.min(...baseline.map(run=>run.first)),Math.max(...baseline.map(run=>run.first))],
+      totalAvg, totalRange:[Math.min(...baseline.map(run=>run.total)),Math.max(...baseline.map(run=>run.total))],
+      perMinAvg, lowCostTotalAvg:lowAvg, highCostTotalAvg:highAvg, sensitivityRatio,
+    },
+    runs:{baseline,lowCost,highCost},
+  };
 }
 
 // Für automatisierte Tests
-window.__EH = { get S(){return S;}, CFG, begin, input, pacingReport, headlessRun, nearEnemies,
+window.__EH = { get S(){return S;}, CFG, begin, input, pacingReport, headlessRun, runBalanceSuite, nearEnemies,
                 tick:(d)=>{HEADLESS=true; step(d); while(pendingPicks>0){currentOffer=buildOffer(); applyOffer(currentOffer[0]); pendingPicks--;} HEADLESS=false;},
                 targetEnemies,
                 counts:()=>{let e=0,p=0,g=0;
