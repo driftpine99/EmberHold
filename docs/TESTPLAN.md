@@ -85,6 +85,12 @@ ist und ein Langbogenschuss den rein visuellen Release-Zustand auslöst.
    detaillierteren Sprite klar lesbar.
 6. Falls Bilder nicht laden, müssen prozedurale Figuren erscheinen und der Run
    weiterhin spielbar bleiben.
+7. Auf einem Monitor über 60 Hz müssen Atem-, Lauf- und Bogenübergänge auch
+   zwischen zwei Gameplay-Ticks weiterlaufen; die Visual Clock hängt am
+   Browser-Frame, nicht am festen Kampftick.
+8. Schnelle Richtungswechsel dürfen Aelric nicht sofort um 90 oder 180 Grad
+   springen lassen. Gegner dürfen höchstens in kleinen 22,5-Grad-Schritten
+   nachdrehen.
 
 Die Einzelruns streuen derzeit stark: erster Zug 17,5–40,5 Sekunden und
 16–40 Kartenzüge. Der Vertrag bewertet deshalb vorerst den Seed-Mittelwert;

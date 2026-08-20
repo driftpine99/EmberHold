@@ -125,11 +125,12 @@ Boss. Damit soll der Test nicht mehr durch abstrakte Kreis- und Rautenfiguren
 verfälscht werden. Es entsteht weiterhin keine bezahlte Produktionspipeline.
 
 Die Atlanten werden beim Laden einmal in kleine Sprites, vier Lichtstufen und
-acht Blickrichtungen umgerechnet. Der Frame-Pfad bleibt bei einem gecachten
+sechzehn Blickrichtungen umgerechnet. Der Frame-Pfad bleibt bei einem gecachten
 `drawImage` je Gegner. Prozedurale Platzhalter bleiben als Fehler-Fallback
-erhalten. Animationen ändern keine Trefferflächen, Werte, Zufallsfolgen oder
-Spawnlogik. Pfeile, Treffer-, Licht- und Bosswarn-Effekte bleiben bewusst
-prozedural.
+erhalten. Aelrics wenige Schlüsselposen werden zeitbasiert überblendet; eine
+separate Visual Clock hält diese Übergänge auch auf Displays über 60 Hz weich.
+Animationen ändern keine Trefferflächen, Werte, Zufallsfolgen oder Spawnlogik.
+Pfeile, Treffer-, Licht- und Bosswarn-Effekte bleiben bewusst prozedural.
 
 Die Bilder gelten als Prototyp-Assets, nicht als automatisch freigegebene
 Store-Assets. Vor einer Veröffentlichung werden Herkunft, Nutzungsrechte,

@@ -44,6 +44,9 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 - Run-Beute wird einmalig in Eisenerz umgerechnet und im Hold eingelagert
 - Prozedurale Figurenplatzhalter durch lokale Raster-Art mit schnellem Fallback ersetzt
 - Bogenangriff zeigt jetzt Spannungs-, Release- und Rückstoßphase
+- Harte Flipbook-Wechsel durch zeitbasierte Crossfades zwischen Idle, Lauf, Bogen und Dash ersetzt
+- Aelrics Drehung und Bewegungsstart/-stopp mit framerateunabhängigem Easing geglättet
+- Gegnerausrichtung von 8 auf 16 vorgerenderte Richtungen erweitert und weich nachgeführt
 
 ### Known issues
 

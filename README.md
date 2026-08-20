@@ -20,8 +20,10 @@ Extraktion und Overtime. Hinzu kommt ein bewusst kleiner Kraterhold mit
 Tiefmine, Emberschmiede, lokaler Speicherung, Offline-Produktion und einer
 ersten dauerhaften Bogenverbesserung. Aelric und die Gegner nutzen inzwischen
 handgemalt wirkende Raster-Atlanten mit Lauf-, Bogen-, Dash- und
-Blickrichtungsanimationen. Backend, Ton und Monetarisierung bleiben weiterhin
-außerhalb des Scopes.
+Blickrichtungsanimationen. Zeitbasierte Pose-Überblendung und eine vom
+Kampftick getrennte Visual Clock glätten die Bewegung auch auf schnellen
+Displays. Backend, Ton und Monetarisierung bleiben weiterhin außerhalb des
+Scopes.
 
 Die einzige Produktfrage der Phase 0 lautet:
 

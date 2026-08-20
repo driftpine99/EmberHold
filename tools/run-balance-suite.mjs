@@ -111,7 +111,8 @@ engine.begin(180);
 engine.tick(engine.CFG.TICK);
 const visualState = engine.S.bowKick > 0 &&
   Number.isFinite(engine.S.shotAimx) && Number.isFinite(engine.S.shotAimy) &&
-  html.includes("loadRasterArt()") && html.includes("enemyDirection(i)");
+  html.includes("loadRasterArt()") && html.includes("updateVisualState(dt)") &&
+  html.includes("const ENEMY_DIRECTIONS = 16") && html.includes("smooth01(v)");
 let uxFlow = false;
 let uxError = "";
 try {
