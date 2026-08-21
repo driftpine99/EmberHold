@@ -88,14 +88,18 @@ ist und ein Langbogenschuss den rein visuellen Release-Zustand auslöst.
    unterscheidbar sein.
 4. Gegner drehen sich in acht Richtungen, ohne bei Richtungswechseln sichtbar
    aus ihrer Position zu springen.
-5. Stürmer-Telegraphie, Elite-Lebensbalken und Bosswarnungen bleiben vor dem
-   detaillierteren Sprite klar lesbar.
-6. Falls Bilder nicht laden, müssen prozedurale Figuren erscheinen und der Run
+5. Beim Stürmer muss die rote Laufbahn exakt dem folgenden Sprint entsprechen;
+   beim Speier muss die violette Ziellinie vor dem Projektil sichtbar sein.
+6. Teiler (grüne Teilungsbögen), Wahrer (goldener Zielrahmen) und Elite
+   (orangefarbener Prioritätsrahmen) bleiben auch im Gegnerpulk erkennbar.
+7. Beim Mittelboss erscheinen eine kurze Regelwarnung, rote Angriffsflächen,
+   die goldene sichere Lücke und eine dauerhafte Warden-Lebensanzeige.
+8. Falls Bilder nicht laden, müssen prozedurale Figuren erscheinen und der Run
    weiterhin spielbar bleiben.
-7. Auf einem Monitor über 60 Hz müssen Atem-, Lauf- und Bogenübergänge auch
+9. Auf einem Monitor über 60 Hz müssen Atem-, Lauf- und Bogenübergänge auch
    zwischen zwei Gameplay-Ticks weiterlaufen; die Visual Clock hängt am
    Browser-Frame, nicht am festen Kampftick.
-8. Schnelle Richtungswechsel dürfen Aelric nicht sofort um 90 oder 180 Grad
+10. Schnelle Richtungswechsel dürfen Aelric nicht sofort um 90 oder 180 Grad
    springen lassen. Gegner dürfen höchstens in kleinen 22,5-Grad-Schritten
    nachdrehen.
 

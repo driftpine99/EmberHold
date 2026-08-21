@@ -115,6 +115,12 @@ const visualState = engine.S.bowKick > 0 &&
   Number.isFinite(engine.S.shotAimx) && Number.isFinite(engine.S.shotAimy) &&
   html.includes("loadRasterArt()") && html.includes("updateVisualState(dt)") &&
   html.includes("const ENEMY_DIRECTIONS = 16") && html.includes("smooth01(v)");
+const combatReadability =
+  html.includes("function drawEnemyTelegraphs(vx0,vx1,vy0,vy1)") &&
+  html.includes("E.ang[i]=Math.atan2(dy,dx)") &&
+  html.includes("E.vx[i]=Math.cos(E.ang[i])*sp*7.5") &&
+  html.includes("Goldene Lücke suchen · roten Korridor meiden") &&
+  html.includes('id="bossbar"') && html.includes('id="bossfill"');
 let uxFlow = false;
 let uxError = "";
 try {
@@ -194,8 +200,8 @@ try {
   holdError = error instanceof Error ? error.message : String(error);
 }
 const output = {
-  pass: report.pass && evolutionReachable && reproducible && artAssets && visualState && uxFlow && holdFlow,
-  checks: { ...report.checks, evolutionReachable, reproducible, artAssets, visualState, uxFlow, holdFlow },
+  pass: report.pass && evolutionReachable && reproducible && artAssets && visualState && combatReadability && uxFlow && holdFlow,
+  checks: { ...report.checks, evolutionReachable, reproducible, artAssets, visualState, combatReadability, uxFlow, holdFlow },
   targets: report.targets,
   seeds: report.seeds,
   summary: { ...report.summary, evolutionRuns, evolutionSeeds: report.seeds.length },

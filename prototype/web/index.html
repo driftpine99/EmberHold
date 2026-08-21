@@ -260,6 +260,18 @@ button.b.danger{background:#c9402e;color:#fff}
 #bossalert.on{opacity:1;transform:translate(-50%,0)}
 #bossalert b{display:block;color:#ff765e;font-size:17px;letter-spacing:.18em}
 #bossalert span{display:block;color:#b9a29c;font-size:12px;margin-top:2px}
+#bossbar{position:absolute;left:50%;top:63px;transform:translate(-50%,-8px);
+  width:min(360px,calc(100% - 170px));padding:7px 11px 9px;border:1px solid rgba(217,55,39,.34);
+  border-radius:8px;background:linear-gradient(180deg,rgba(24,11,14,.88),rgba(13,13,19,.78));
+  box-shadow:0 5px 25px rgba(0,0,0,.26);opacity:0;transition:opacity .2s ease,transform .2s ease;
+  pointer-events:none;z-index:9}
+#bossbar.on{opacity:1;transform:translate(-50%,0)}
+#bossbarhead{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+#bossbarhead span{font-size:8px;letter-spacing:.2em;color:#ff765e;text-transform:uppercase}
+#bossbarhead b{font-size:11px;color:#e8e4dc;letter-spacing:.04em;font-weight:650}
+#bosshp{height:3px;margin-top:5px;background:#29202a;border-radius:2px;overflow:hidden}
+#bossfill{display:block;height:100%;width:100%;background:linear-gradient(90deg,#9c2f29,#ef684b);
+  box-shadow:0 0 8px rgba(238,79,56,.45);transition:width .1s linear}
 
 .copyline{margin-top:13px;background:none;border:0;color:#8b8577;font:inherit;
   font-size:12px;text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:7px 10px}
@@ -272,6 +284,7 @@ button.b.danger{background:#c9402e;color:#fff}
   #coach.on{transform:translateY(0)}
   .help{gap:6px}.help div{font-size:12.5px}
   .evopath{width:185px;padding:6px 8px}.evoreq{font-size:9px}
+  #bossbar{top:67px;width:min(280px,calc(100% - 32px))}
 }
 </style>
 </head>
@@ -302,6 +315,7 @@ button.b.danger{background:#c9402e;color:#fff}
     <span id="coachstep">1 / 3</span><div id="coachcopy"><b id="coachtitle">Bewegen</b><span id="coachtext"></span></div>
   </div>
   <div id="bossalert" role="alert" aria-live="assertive" aria-hidden="true"><b id="bossalerttitle"></b><span id="bossalerttext"></span></div>
+  <div id="bossbar" aria-hidden="true"><div id="bossbarhead"><span>Warden</span><b>Aschenhüter</b></div><div id="bosshp"><span id="bossfill"></span></div></div>
   <div id="toast" role="status" aria-live="polite"></div>
 
   <!-- Kartenzug -->
@@ -852,7 +866,7 @@ function newRun(runLen, seed){
     W:{}, Pa:{}, evo:{},                    // Waffen-/Passivstufen, Evolutionen
     rerolls:1,
     pickTimes:[],                           // für den Pacing-Bericht
-    events:{elite:0, boss:false, surge:false},
+    events:{elite:0, boss:false, surge:false}, bossIndex:-1,
     bladeAng:0, ot:0, otActive:false,
     reward:0, baseReward:0,
     rewardGranted:false, holdOre:0,
@@ -1129,6 +1143,7 @@ function killEnemy(i){
   const kind=E.kind[i], fam=E.fam[i], x=E.x[i], y=E.y[i];
   freeSlot(E,i); S.kills++;
   if (kind===2){                                   // Boss
+    S.bossIndex=-1;
     fx(x,y,150,0.7,COL.boss,1);
     for(let k=0;k<30;k++) spawnGem(x+(rand()-.5)*260, y+(rand()-.5)*260, 5);
     toast('Mittelboss gefallen');
@@ -1167,23 +1182,32 @@ function updateEnemies(dt){
       E.tm[i]-=dt;
       if (E.st[i]===0){                             // annähern
         E.vx[i]=dx*sp; E.vy[i]=dy*sp;
-        if (d<230 && E.tm[i]<=0){ E.st[i]=1; E.tm[i]=0.8; }
+        if (d<230 && E.tm[i]<=0){
+          E.st[i]=1; E.tm[i]=0.8;
+          // Warnbahn und Sprint benutzen denselben, jetzt festgelegten Winkel.
+          E.ang[i]=Math.atan2(dy,dx);
+        }
       } else if (E.st[i]===1){                      // Telegrafie — steht still
         E.vx[i]*=0.82; E.vy[i]*=0.82;
         if (E.tm[i]<=0){ E.st[i]=2; E.tm[i]=0.55;
-          E.vx[i]=dx*sp*7.5; E.vy[i]=dy*sp*7.5; }
+          E.vx[i]=Math.cos(E.ang[i])*sp*7.5; E.vy[i]=Math.sin(E.ang[i])*sp*7.5; }
       } else {                                      // Sprint
         if (E.tm[i]<=0){ E.st[i]=0; E.tm[i]=1.6+rand(); }
       }
-    } else if (fam===2 && kind===0){                // Speier: hält Abstand, schießt
+    } else if (fam===2 && kind===0){                // Speier: hält Abstand, zielt, schießt
       const want=250;
       const k = d>want+40 ? 1 : (d<want-40 ? -1 : 0);
       E.vx[i]=dx*sp*k; E.vy[i]=dy*sp*k;
       E.tm[i]-=dt;
-      if (E.tm[i]<=0 && d<420){
-        E.tm[i]=2.2+rand()*1.2;
+      if (E.st[i]===0 && E.tm[i]<=0 && d<420){
+        E.st[i]=1; E.tm[i]=0.55; E.ang[i]=Math.atan2(dy,dx);
+      } else if(E.st[i]===1){
+        E.vx[i]*=0.78; E.vy[i]*=0.78;
+      }
+      if (E.st[i]===1 && E.tm[i]<=0){
+        E.st[i]=0; E.tm[i]=2.2+rand()*1.2;
         const j=alloc(Q,CFG.CAP_EPROJ);
-        if (j>=0){ Q.x[j]=E.x[i];Q.y[j]=E.y[i];Q.vx[j]=dx*180;Q.vy[j]=dy*180;
+        if (j>=0){ Q.x[j]=E.x[i];Q.y[j]=E.y[i];Q.vx[j]=Math.cos(E.ang[i])*180;Q.vy[j]=Math.sin(E.ang[i])*180;
           Q.life[j]=3.4;Q.dmg[j]=10*scale;Q.alive[j]=1; }
       }
     } else if (fam===4 && kind===0){                // Wahrer: langsam, greift nicht an
@@ -1514,8 +1538,8 @@ function updateEvents(){
   if (!S.events.boss && S.t >= CFG.BOSS_AT){
     S.events.boss = true;
     const i = spawnEnemy(S.t, 4, 2);
-    if (i>=0){ E.tm[i]=1.4; }
-    bossAlert('WARDEN ERWACHT','Rote Runen zeigen den nächsten Angriff');
+    if (i>=0){ E.tm[i]=1.4; S.bossIndex=i; }
+    bossAlert('WARDEN ERWACHT','Goldene Lücke suchen · roten Korridor meiden');
   }
   if (!S.events.surge && S.t >= CFG.SURGE_AT){
     S.events.surge = true;
@@ -1751,6 +1775,56 @@ function drawBossTelegraphs(vx0,vx1,vy0,vy1){
   }
 }
 
+/**
+ * Familien-Signale werden unter den Figuren gezeichnet. Sie erklären Verhalten:
+ * Rot = eine festgelegte Laufbahn, Violett = ein festgelegter Schuss,
+ * Grün/Gold/Orange = Teiler, wertvolles Ziel und Elite-Priorität.
+ */
+function drawEnemyTelegraphs(vx0,vx1,vy0,vy1){
+  const pulse=.5+.5*Math.sin(S.visualT*7.5);
+  for(let i=0;i<E.n;i++){
+    if(!E.alive[i]||E.kind[i]===2) continue;
+    const x=E.x[i], y=E.y[i], fam=E.fam[i], kind=E.kind[i];
+    if(x<vx0-260||x>vx1+260||y<vy0-260||y>vy1+260) continue;
+
+    if(kind===1){
+      const r=24+pulse*2;
+      ctx.save();ctx.translate(x,y);ctx.rotate(.7854);
+      ctx.strokeStyle='rgba(236,137,57,'+(.48+pulse*.18).toFixed(3)+')';ctx.lineWidth=2.2/SCALE;
+      ctx.strokeRect(-r,-r,r*2,r*2);ctx.restore();
+    }
+
+    if(fam===1&&kind===0&&E.st[i]===1){
+      const charge=Math.max(0,Math.min(1,1-E.tm[i]/.8)), len=205;
+      ctx.save();ctx.translate(x,y);ctx.rotate(E.ang[i]);
+      ctx.fillStyle='rgba(224,58,39,'+(.08+charge*.12+pulse*.025).toFixed(3)+')';
+      ctx.beginPath();ctx.moveTo(13,-10);ctx.lineTo(len,-20);ctx.lineTo(len,20);ctx.lineTo(13,10);ctx.closePath();ctx.fill();
+      ctx.strokeStyle='rgba(245,92,64,'+(.46+charge*.32).toFixed(3)+')';ctx.lineWidth=2/SCALE;
+      ctx.beginPath();ctx.moveTo(13,-10);ctx.lineTo(len,-20);ctx.moveTo(13,10);ctx.lineTo(len,20);ctx.stroke();
+      for(let p=68;p<len;p+=55){ctx.beginPath();ctx.moveTo(p-11,-7);ctx.lineTo(p,0);ctx.lineTo(p-11,7);ctx.stroke();}
+      ctx.restore();
+    } else if(fam===2&&kind===0&&E.st[i]===1){
+      const charge=Math.max(0,Math.min(1,1-E.tm[i]/.55)), len=420;
+      ctx.save();ctx.translate(x,y);ctx.rotate(E.ang[i]);
+      ctx.setLineDash([7,7]);ctx.strokeStyle='rgba(190,125,224,'+(.5+charge*.34).toFixed(3)+')';ctx.lineWidth=(1.5+charge)/SCALE;
+      ctx.beginPath();ctx.moveTo(13,0);ctx.lineTo(len,0);ctx.stroke();ctx.setLineDash([]);
+      ctx.fillStyle='rgba(190,125,224,'+(.12+charge*.14).toFixed(3)+')';
+      ctx.beginPath();ctx.moveTo(16,-6);ctx.lineTo(len,0);ctx.lineTo(16,6);ctx.closePath();ctx.fill();ctx.restore();
+      ctx.strokeStyle='rgba(215,166,239,'+(.5+pulse*.22).toFixed(3)+')';ctx.lineWidth=2/SCALE;
+      ctx.beginPath();ctx.arc(x,y,15+charge*5,-1.5708,-1.5708+charge*6.2832);ctx.stroke();
+    } else if(fam===3&&kind===0){
+      const r=17+pulse;
+      ctx.strokeStyle='rgba(128,180,108,'+(.28+pulse*.1).toFixed(3)+')';ctx.lineWidth=2/SCALE;
+      ctx.beginPath();ctx.arc(x,y,r,.28,2.86);ctx.moveTo(x+r*Math.cos(3.42),y+r*Math.sin(3.42));ctx.arc(x,y,r,3.42,6.0);ctx.stroke();
+    } else if(fam===4&&kind===0){
+      const r=20+pulse*2;
+      ctx.save();ctx.translate(x,y);ctx.rotate(S.visualT*.35+i*.27);
+      ctx.strokeStyle='rgba(240,191,102,'+(.38+pulse*.15).toFixed(3)+')';ctx.lineWidth=1.8/SCALE;
+      ctx.strokeRect(-r*.7,-r*.7,r*1.4,r*1.4);ctx.restore();
+    }
+  }
+}
+
 function enemyDirection(i){
   return ((E.face[i]+.5)|0)&(ENEMY_DIRECTIONS-1);
 }
@@ -1872,6 +1946,9 @@ function render(){
     ctx.fillStyle='rgba(255,106,58,'+(0.13*a).toFixed(3)+')';
     ctx.beginPath(); ctx.arc(GROUND.x[i],GROUND.y[i],GROUND.r[i],0,6.2832); ctx.fill();
   }
+
+  // Familien-Signale bleiben unter Beute und Figuren, aber über Gefahrenzonen.
+  drawEnemyTelegraphs(vx0,vx1,vy0,vy1);
 
   // --- Splitter (viele, deshalb als einfache Rechtecke gebündelt) --------
   ctx.fillStyle=COL.gem;
@@ -2169,6 +2246,10 @@ function updateHUD(){
   el('kills').textContent=S.kills.toLocaleString('de-DE')+' Kills';
   el('xpbar').style.width=Math.min(S.xp/S.need*100,100)+'%';
   el('hpbar').style.width=Math.max(S.hp/S.maxhp*100,0)+'%';
+  const bi=S.bossIndex, bossAlive=bi>=0&&E.alive[bi]&&E.kind[bi]===2;
+  const bb=el('bossbar'); bb.classList.toggle('on',bossAlive);
+  bb.setAttribute('aria-hidden',bossAlive?'false':'true');
+  if(bossAlive) el('bossfill').style.width=Math.max(0,E.hp[bi]/E.max[bi]*100)+'%';
   const d=el('dash'), ready=S.dashCd<=0;
   d.classList.toggle('ready', ready);
   const dc=el('dashfill').getContext('2d');

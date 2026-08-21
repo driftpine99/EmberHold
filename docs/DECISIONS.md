@@ -154,3 +154,21 @@ aufschaukelt.
 Der CI-Vertrag verlangt mindestens zwei evolvierte Builds unter acht festen,
 fokussiert gespielten 8-Minuten-Seeds. Gleichzeitig bleiben 21 ± 3 Kartenzüge
 und der bestehende Sensitivitätskorridor verbindlich.
+
+## D-013 – Verhalten vor Detail: verbindliche Gefahrensprache
+
+**Status:** beschlossen
+
+Spezialgegner werden nicht durch zusätzliche Sprite-Details erklärt, sondern
+durch wenige prozedurale Signale mit fester Bedeutung. Rot markiert die
+festgelegte Sprintbahn eines Stürmers, Violett die festgelegte Schussrichtung
+eines Speiers. Grün kennzeichnet Teilung, Gold ein wertvolles Ziel und Orange
+eine Elite-Priorität. Diese Geometrie bleibt unabhängig von den Raster-Assets
+und funktioniert deshalb auch im Grafik-Fallback.
+
+Eine gezeigte Angriffsrichtung ist verbindlich: Stürmer und Speier speichern
+den Winkel zu Beginn ihrer Warnphase und verwenden exakt diesen Winkel für den
+folgenden Angriff. Der Speier erhält dafür eine 0,55 Sekunden lange Zielphase.
+Der Mittelboss ergänzt seine Bodenwarnungen um eine kurze Regelerklärung und
+eine dauerhafte Lebensanzeige. Neue VFX-Assets oder Sound sind dafür nicht
+erforderlich.
