@@ -205,3 +205,26 @@ Familie×Lichtstufe-Scans auf einen sichtbaren Durchlauf reduziert. Gegner in
 tiefer Dunkelheit verwenden kleine Silhouetten; passive Familienmarker werden
 nur im nahen Lichtbereich gezeichnet. Der Feldtest-Seed `2474367456` ist Teil
 der reproduzierbaren Suite.
+
+## D-015 – Gemalte Low-Res-Figuren mit getrenntem Bewegungs- und Posentakt
+
+**Status:** beschlossen
+
+Die mittlere Stilrichtung des Grafikvergleichs wird verbindlich: moderne,
+gemalte Low-Res-Sprites mit vereinfachten Formen, Graphitrüstung, kühler
+Aschekante und wenigen Glutakzenten. Der Arenaboden liegt eine klar hellere
+Wertestufe unter den Figuren, bleibt entsättigt und wird unter dem Kampf
+detailarm gehalten. Aelric ist zusätzlich durch eine weiche, nicht als UI
+lesbare Ascheaufhellung verankert.
+
+D-015 ersetzt für Aelric den Überblendungsanteil aus D-011. Der neue 4×3-Atlas
+enthält je vier Idle-, Lauf- und Bogenphasen. Die Weltposition wird weiter pro
+Browser-Frame geglättet; die Rasterposen wechseln bewusst mit ungefähr zehn
+Bildern pro Sekunde und werden nicht miteinander überblendet. Dadurch bleiben
+Silhouette und Rüstung in jedem Moment deckend. Der Phase-0-Atlas blickt nach
+rechts und wird ausschließlich horizontal gespiegelt; echte Vorder- und
+Rückansichten bleiben ein späterer, eigener Produktionsschritt.
+
+Animation, Bodenfarbe und Aschelicht verändern weder Trefferflächen noch
+Kampfwerte, Zufallsfolgen oder Spawnlogik. Erst wenn Aelric im Spieltest trägt,
+werden Gegnerfamilien nach demselben Verfahren neu produziert.

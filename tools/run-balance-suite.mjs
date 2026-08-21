@@ -83,7 +83,7 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const prototypePath = path.resolve(here, "../prototype/web/index.html");
 const html = fs.readFileSync(prototypePath, "utf8");
 const artPaths = [
-  path.resolve(here, "../prototype/web/assets/aelric-atlas-v1.png"),
+  path.resolve(here, "../prototype/web/assets/aelric-atlas-v2.png"),
   path.resolve(here, "../prototype/web/assets/enemy-atlas-v1.png"),
 ];
 const artAssets = artPaths.every((assetPath) => {
@@ -119,7 +119,8 @@ engine.tick(engine.CFG.TICK);
 const visualState = engine.S.bowKick > 0 &&
   Number.isFinite(engine.S.shotAimx) && Number.isFinite(engine.S.shotAimy) &&
   html.includes("loadRasterArt()") && html.includes("updateVisualState(dt)") &&
-  html.includes("const ENEMY_DIRECTIONS = 16") && html.includes("smooth01(v)");
+  html.includes("const ENEMY_DIRECTIONS = 16") &&
+  html.includes("HERO_ANIM.WALK") && html.includes("HERO_ANIM.SHOT");
 const directionBlock = html.match(/function directionalSprites\(base\)\{([\s\S]*?)\n\}/)?.[1] || "";
 const uprightCharacters = html.includes("ctx.scale(S.heroFacing,1)") &&
   html.includes("const faceRight=Math.cos") && !directionBlock.includes(".rotate(");

@@ -491,7 +491,7 @@ function targetPicks(runLen){ return CFG.PICK_TARGETS[runLen] ?? null; }
 
 // --------------------------------------------------------------------- Farben
 const COL = {
-  bg:'#0d0d13', grid:'#15151d',
+  bg:'#1b1e25', grid:'#2b2e36',
   player:'#ffc48a', playerCore:'#e07a3f',
   gem:'#6bb8d4', gemBig:'#a8e0f0',
   // Gegnerfamilien: eine Akzentfarbe kodiert die Familie
@@ -548,6 +548,11 @@ const SPR = { enemy:[], elite:null, boss:null, gem:null, gemBig:null,
               floorTile:null, emberVent:null, wardPillar:null };
 const ART = { hero:[], enemy:[], elite:null, boss:null,
               heroReady:false, enemyReady:false };
+const HERO_ANIM = Object.freeze({
+  COLS:4, ROWS:3, FRAMES:4,
+  IDLE:0, WALK:4, SHOT:8,
+  SHOT_SEC:.28,
+});
 
 /** Deterministischer Hash nur fuer Weltdeko. Veraendert niemals den Spiel-RNG. */
 function visualHash(x,y,salt){
@@ -559,16 +564,16 @@ function visualHash(x,y,salt){
 /** Basalt, Glutofen und Pfeiler werden einmal gebaut und danach nur kopiert. */
 function buildArenaSprites(){
   const T=320, tile=mkCanvas(T), g=tile.getContext('2d');
-  g.fillStyle='#111319'; g.fillRect(0,0,T,T);
+  g.fillStyle='#252830'; g.fillRect(0,0,T,T);
   const bw=64, bh=40;
   for(let row=0;row<T/bh;row++){
     const off=(row&1)*-bw/2;
     for(let col=-1;col<=T/bw;col++){
       const x=off+col*bw, y=row*bh, h=visualHash(col,row,11);
-      const shade=18+((h*10)|0);
-      g.fillStyle='rgb('+shade+','+(shade+1)+','+(shade+5)+')';
+      const shade=37+((h*8)|0);
+      g.fillStyle='rgb('+shade+','+(shade+2)+','+(shade+7)+')';
       g.fillRect(x+1,y+1,bw-2,bh-2);
-      g.strokeStyle='rgba(67,69,77,'+(0.28+h*0.16).toFixed(3)+')';
+      g.strokeStyle='rgba(93,96,106,'+(0.16+h*0.10).toFixed(3)+')';
       g.lineWidth=1; g.strokeRect(x+1.5,y+1.5,bw-3,bh-3);
     }
   }
@@ -576,7 +581,7 @@ function buildArenaSprites(){
   for(let i=0;i<26;i++){
     const x=visualHash(i,3,21)*T, y=visualHash(i,9,22)*T;
     const len=16+visualHash(i,5,23)*34, a=visualHash(i,7,24)*6.2832;
-    g.strokeStyle=i%7===0?'rgba(191,68,34,.34)':'rgba(5,6,9,.66)';
+    g.strokeStyle=i%7===0?'rgba(191,68,34,.18)':'rgba(12,14,18,.42)';
     g.lineWidth=i%7===0?1.2:1;
     g.beginPath(); g.moveTo(x,y);
     g.lineTo(x+Math.cos(a)*len*.5,y+Math.sin(a)*len*.5);
@@ -697,7 +702,9 @@ function directionalSprites(base){
 
 function buildHeroArt(image){
   ART.hero.length=0;
-  for(let frame=0;frame<6;frame++) ART.hero[frame]=atlasCell(image,frame,3,2,84,0,'rgba(224,122,63,.28)',false);
+  for(let frame=0;frame<HERO_ANIM.COLS*HERO_ANIM.ROWS;frame++){
+    ART.hero[frame]=atlasCell(image,frame,HERO_ANIM.COLS,HERO_ANIM.ROWS,88,0,null,false);
+  }
   ART.heroReady=true;
 }
 
@@ -722,7 +729,7 @@ function loadRasterArt(){
   const hero=new Image(); hero.decoding='async';
   hero.onload=()=>buildHeroArt(hero);
   hero.onerror=()=>console.warn('Aelric-Atlas nicht geladen; nutze Grafik-Fallback.');
-  hero.src='assets/aelric-atlas-v1.png';
+  hero.src='assets/aelric-atlas-v2.png';
   const enemy=new Image(); enemy.decoding='async';
   enemy.onload=()=>buildEnemyArt(enemy);
   enemy.onerror=()=>console.warn('Gegner-Atlas nicht geladen; nutze Grafik-Fallback.');
@@ -1049,7 +1056,8 @@ function fireWeapons(dt){
       let dx=S.aimx, dy=S.aimy;
       if (tgt>=0){ dx=E.x[tgt]-S.x; dy=E.y[tgt]-S.y; }
       const aimLen=Math.hypot(dx,dy)||1;
-      S.shotAimx=dx/aimLen; S.shotAimy=dy/aimLen; S.shotTarget=tgt; S.bowKick=.16;
+      S.shotAimx=dx/aimLen; S.shotAimy=dy/aimLen; S.shotTarget=tgt;
+      S.bowKick=HERO_ANIM.SHOT_SEC;
       const bossShot=tgt>=0&&E.kind[tgt]===2;
       const dmg = (12 + 5*L) * st.dmg * (L>=5?1.5:1) * (L>=2?1.4:1) * (evo?1.6:1);
       // Ein sichtbarer Boss-Fokus darf nicht an der Add-Wand verpuffen.
@@ -1601,7 +1609,10 @@ function updateVisualState(dt){
   const moveTarget=ml>.08?1:0, dashTarget=S.dashT>0?1:0;
   S.moveBlend+=(moveTarget-S.moveBlend)*(1-Math.exp(-dt*11));
   S.dashBlend+=(dashTarget-S.dashBlend)*(1-Math.exp(-dt*(dashTarget?24:14)));
-  S.walkPhase=(S.walkPhase+dt*(5.2+1.6*stat().speed)*S.moveBlend)%1;
+  // Eine Laufperiode besteht aus vier klaren Kontaktphasen. Die Weltposition
+  // bleibt bei Display-FPS fluessig; nur die gemalten Posen laufen mit rund
+  // 10 Bildern/s. Das vermeidet Ghosting und hektisches Bildflackern.
+  S.walkPhase=(S.walkPhase+dt*(2.15+.45*stat().speed)*S.moveBlend)%1;
 
   let faceX=S.aimx, faceY=S.aimy;
   if(moveTarget){ faceX=mx; faceY=my; }
@@ -1703,22 +1714,22 @@ const ARENA_STEP=1500, ARENA_RADIUS=690;
 /** Zeichnet einen der grossen, in die Festung eingelassenen Warden-Kreise. */
 function drawWardenSeal(cx,cy,rot){
   ctx.save(); ctx.translate(cx,cy); ctx.rotate(rot);
-  ctx.fillStyle='rgba(5,6,10,.16)';
+  ctx.fillStyle='rgba(8,10,14,.10)';
   ctx.beginPath(); ctx.arc(0,0,ARENA_RADIUS,0,6.2832); ctx.fill();
 
   const rings=[118,255,405,555,676];
   for(let i=0;i<rings.length;i++){
     const r=rings[i];
-    ctx.strokeStyle='rgba(4,5,8,.76)'; ctx.lineWidth=(i===4?18:13)/SCALE;
+    ctx.strokeStyle='rgba(8,10,14,.48)'; ctx.lineWidth=(i===4?18:13)/SCALE;
     ctx.beginPath(); ctx.arc(0,0,r,0,6.2832); ctx.stroke();
-    ctx.strokeStyle=i===4?'rgba(92,62,54,.52)':'rgba(69,71,79,.46)';
+    ctx.strokeStyle=i===4?'rgba(103,76,66,.38)':'rgba(91,94,103,.34)';
     ctx.lineWidth=2/SCALE; ctx.beginPath(); ctx.arc(0,0,r,0,6.2832); ctx.stroke();
     ctx.strokeStyle='rgba(176,57,34,'+(i===0?'.20':'.10')+')';
     ctx.lineWidth=1.2/SCALE; ctx.beginPath(); ctx.arc(0,0,r-6,0,6.2832); ctx.stroke();
   }
 
   // Radiale Plattenfugen machen den Boden zur Arena statt zu einem Raster.
-  ctx.strokeStyle='rgba(72,73,81,.34)'; ctx.lineWidth=1.3/SCALE;
+  ctx.strokeStyle='rgba(94,97,106,.24)'; ctx.lineWidth=1.3/SCALE;
   for(let k=0;k<24;k++){
     const a=k/24*6.2832, inner=(k&1)?118:255;
     ctx.beginPath();
@@ -1736,7 +1747,7 @@ function drawWardenSeal(cx,cy,rot){
 
 function drawArenaFloor(vx0,vx1,vy0,vy1){
   const tile=SPR.floorTile, T=tile.width;
-  ctx.globalAlpha=.94;
+  ctx.globalAlpha=.98;
   for(let y=Math.floor(vy0/T)*T;y<vy1;y+=T)
     for(let x=Math.floor(vx0/T)*T;x<vx1;x+=T) ctx.drawImage(tile,x,y);
   ctx.globalAlpha=1;
@@ -1871,69 +1882,51 @@ function smooth01(v){
 function drawAelric(){
   const blink=S.iframe>0&&((S.visualT*22)|0)%2===0;
 
-  // Kontakt-Schatten und Glutkern verankern die detailreiche Figur im Raum.
-  ctx.fillStyle='rgba(3,4,7,.58)';
-  ctx.beginPath(); ctx.ellipse(S.x,S.y+12,20,8,0,0,6.2832); ctx.fill();
-  const aura=ctx.createRadialGradient(S.x,S.y,1,S.x,S.y,31);
-  aura.addColorStop(0,'rgba(238,132,66,.24)'); aura.addColorStop(1,'rgba(238,132,66,0)');
-  ctx.fillStyle=aura; ctx.beginPath(); ctx.arc(S.x,S.y,31,0,6.2832); ctx.fill();
+  // Ein kuehler Aschefleck und ein kleiner Kontaktschatten trennen die dunkle
+  // Ruestung vom Basalt. Die Markierung bleibt Teil der Beleuchtung, nicht UI.
+  const aura=ctx.createRadialGradient(S.x,S.y+7,2,S.x,S.y+7,38);
+  aura.addColorStop(0,'rgba(151,161,172,.16)'); aura.addColorStop(1,'rgba(151,161,172,0)');
+  ctx.fillStyle=aura; ctx.beginPath(); ctx.arc(S.x,S.y+7,38,0,6.2832); ctx.fill();
+  ctx.fillStyle='rgba(3,4,7,.48)';
+  ctx.beginPath(); ctx.ellipse(S.x,S.y+16,19,7,0,0,6.2832); ctx.fill();
   if(blink) return;
 
   if(ART.heroReady){
     const angle=S.heroAngle;
-    const walk=S.walkPhase;
-    let runA=1, runB=0;
-    // Die KI-Bilder unterscheiden sich zu stark für ein permanentes
-    // Doppelbild. Klare Posen mit kurzen Übergängen lesen sich als Laufzyklus.
-    if(walk<.42){ runA=1; runB=0; }
-    else if(walk<.50){ runB=smooth01((walk-.42)/.08); runA=1-runB; }
-    else if(walk<.92){ runA=0; runB=1; }
-    else { runA=smooth01((walk-.92)/.08); runB=1-runA; }
-    const bob=(.5-.5*Math.cos(S.walkPhase*12.5664))*1.35*S.moveBlend*(1-S.dashBlend);
-    const sway=Math.sin(S.walkPhase*6.2832)*.7*S.moveBlend*(1-S.dashBlend);
-    const chargeBase=S.W.bogen&&S.bowKick<=0?smooth01((.36-S.cool.bogen)/.36):0;
-    const releaseP=S.bowKick>0?Math.max(0,Math.min(1,1-S.bowKick/.16)):1;
-    const releaseMix=S.bowKick>0?Math.sin(releaseP*3.1416):0;
-    const releasePrep=S.bowKick>0?smooth01(1-releaseP*3.2):0;
-
-    let rest=1;
-    const dashW=rest*S.dashBlend; rest-=dashW;
-    const releaseW=rest*releaseMix; rest-=releaseW;
-    const drawW=rest*Math.max(chargeBase,releasePrep); rest-=drawW;
-    const idleW=rest*(1-S.moveBlend);
-    const runW=rest*S.moveBlend;
-
-    ctx.save(); ctx.translate(S.x,S.y-5-bob); ctx.scale(S.heroFacing,1); ctx.translate(0,sway);
-    const layer=(frame,alpha,ox,oy,sx,sy)=>{
-      if(alpha<.008) return;
-      const spr=ART.hero[frame];
-      // Equal-Power-Fade hält den Körper während der Überblendung deckend.
-      ctx.save(); ctx.globalAlpha=Math.sin(Math.min(1,alpha)*1.5708);
-      ctx.translate(ox||0,oy||0); ctx.scale(sx||1,sy||1);
-      ctx.drawImage(spr,-spr.width/2,-spr.height/2); ctx.restore();
-    };
-    layer(0,idleW,0,Math.sin(S.visualT*2.2)*.45,1,1+Math.sin(S.visualT*2.2)*.012);
-    layer(1,runW*runA,-1,0,1,1);
-    layer(2,runW*runB,1,0,1,1);
-    layer(3,drawW,0,0,1,1);
-    layer(4,releaseW,releaseP*2,0,1+releaseMix*.012,1-releaseMix*.012);
-    if(dashW>.01){
-      layer(5,dashW*.07,-28,1,1,1);
-      layer(5,dashW*.14,-15,1,1,1);
+    const bowCool=S.cool.bogen??1;
+    const charge=S.W.bogen&&S.bowKick<=0?Math.max(0,Math.min(1,(.30-bowCool)/.30)):0;
+    const releaseP=S.bowKick>0?Math.max(0,Math.min(1,1-S.bowKick/HERO_ANIM.SHOT_SEC)):0;
+    let frame;
+    if(S.bowKick>0){
+      frame=HERO_ANIM.SHOT+(releaseP<.38?2:3);
+    } else if(charge>0){
+      frame=HERO_ANIM.SHOT+(charge<.52?0:1);
+    } else if(S.moveBlend>.24){
+      frame=HERO_ANIM.WALK+Math.min(HERO_ANIM.FRAMES-1,(S.walkPhase*HERO_ANIM.FRAMES)|0);
+    } else {
+      frame=HERO_ANIM.IDLE+(((S.visualT*3)|0)%HERO_ANIM.FRAMES);
     }
-    layer(5,dashW,0,1,1+dashW*.025,1-dashW*.025);
+
+    const bob=Math.sin(S.walkPhase*6.2832)*.45*S.moveBlend*(1-S.dashBlend);
+    const spr=ART.hero[frame];
+    ctx.save(); ctx.translate(S.x,S.y-20-bob); ctx.scale(S.heroFacing,1);
+    if(S.dashBlend>.04){
+      ctx.save(); ctx.globalAlpha=.08*S.dashBlend; ctx.drawImage(spr,-spr.width/2-22,-spr.height/2+1); ctx.restore();
+      ctx.save(); ctx.globalAlpha=.14*S.dashBlend; ctx.drawImage(spr,-spr.width/2-11,-spr.height/2+1); ctx.restore();
+    }
+    ctx.drawImage(spr,-spr.width/2,-spr.height/2);
     ctx.restore();
 
-    // Spannung und Release folgen denselben weichen Phasen wie die Figurenpose.
-    const lineMix=Math.max(chargeBase,releaseMix);
-    if(lineMix>.02){
+    // Ein kurzer Release-Strich verbindet die gezeichnete Bogenphase mit dem
+    // Projektil, ohne eine zweite halbtransparente Figur darueberzulegen.
+    const releaseMix=S.bowKick>0?Math.sin(releaseP*3.1416):0;
+    if(releaseMix>.02){
       const aimx=Math.cos(angle), aimy=Math.sin(angle);
-      const pull=.35+.65*Math.max(chargeBase,releasePrep);
-      ctx.globalAlpha=.35+.65*lineMix;
-      ctx.strokeStyle=S.bowKick>0?'rgba(255,226,169,.94)':'rgba(224,122,63,.68)';
+      ctx.globalAlpha=.32+.58*releaseMix;
+      ctx.strokeStyle='rgba(255,226,169,.88)';
       ctx.lineWidth=1.25+releaseMix*1.5; ctx.lineCap='round';
       ctx.beginPath();
-      ctx.moveTo(S.x+aimx*(15+pull*5),S.y+aimy*(15+pull*5));
+      ctx.moveTo(S.x+aimx*18,S.y+aimy*18);
       ctx.lineTo(S.x+aimx*(28+releaseMix*18),S.y+aimy*(28+releaseMix*18));
       ctx.stroke(); ctx.globalAlpha=1;
     }
@@ -2094,7 +2087,7 @@ function render(){
   // --- Vignette: außerhalb des Lichts ist die Welt entfärbt ---------------
   const vg = ctx.createRadialGradient(cxs,cys,lr*SCALE*0.7,cxs,cys,Math.max(W,H)*0.78);
   vg.addColorStop(0,'rgba(13,13,19,0)');
-  vg.addColorStop(1,'rgba(13,13,19,0.72)');
+  vg.addColorStop(1,'rgba(11,13,18,0.46)');
   ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
 }
 

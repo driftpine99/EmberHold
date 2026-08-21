@@ -18,12 +18,13 @@ Der aktuelle Build enthält einen Helden, ein Territorium, mehrere Waffen und
 Passive, fünf Gegnerfamilien, Eliten, einen Mittelboss, Evolutionen,
 Extraktion und Overtime. Hinzu kommt ein bewusst kleiner Kraterhold mit
 Tiefmine, Emberschmiede, lokaler Speicherung, Offline-Produktion und einer
-ersten dauerhaften Bogenverbesserung. Aelric und die Gegner nutzen inzwischen
-handgemalt wirkende Raster-Atlanten mit Lauf-, Bogen-, Dash- und
-Blickrichtungsanimationen. Zeitbasierte Pose-Überblendung und eine vom
-Kampftick getrennte Visual Clock glätten die Bewegung auch auf schnellen
-Displays. Backend, Ton und Monetarisierung bleiben weiterhin außerhalb des
-Scopes.
+ersten dauerhaften Bogenverbesserung. Aelric nutzt inzwischen einen konsistenten
+4×3-Raster-Atlas mit Idle-, Lauf- und Bogenphasen; Gegner besitzen eigene
+Silhouetten und Blickrichtungen. Die Weltposition bleibt an den Browser-Frame
+gekoppelt, während klar getaktete Einzelposen Doppelbilder vermeiden. Ein
+hellerer, ruhiger Basaltboden und eine dezente Ascheaufhellung trennen dunkle
+Figuren vom Untergrund. Backend, Ton und Monetarisierung bleiben weiterhin
+außerhalb des Scopes.
 
 Die einzige Produktfrage der Phase 0 lautet:
 

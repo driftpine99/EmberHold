@@ -74,13 +74,13 @@ lokale Speicherung, die einmalige Auszahlung einer Run-Belohnung, Rückkehr in
 den Hold und die Übernahme des +10-%-Schadensbonus in den nächsten Run. Die
 Kampf-Balance-Suite läuft immer ohne Hold-Bonus.
 
-Der Visual-Smoke-Check stellt zusätzlich sicher, dass beide lokalen
+Der Visual-Smoke-Check stellt zusätzlich sicher, dass die beiden aktiven
 Sprite-Atlanten als echte RGBA-PNGs vorhanden sind, der Bildlader eingebunden
 ist und ein Langbogenschuss den rein visuellen Release-Zustand auslöst.
 
 ## Manueller Grafikcheck
 
-1. Aelric muss beim Laufen zwischen zwei Schritten wechseln, immer aufrecht
+1. Aelric muss beim Laufen alle vier Kontaktphasen zeigen, immer aufrecht
    bleiben und bei einem horizontalen Richtungswechsel sauber spiegeln.
 2. Kurz vor einem Langbogenschuss ist die gespannte Pose sichtbar; beim Schuss
    folgen Release-Linie, Rückstoßpose und Pfeil.
@@ -96,14 +96,17 @@ ist und ein Langbogenschuss den rein visuellen Release-Zustand auslöst.
    die goldene sichere Lücke und eine dauerhafte Warden-Lebensanzeige.
 8. Falls Bilder nicht laden, müssen prozedurale Figuren erscheinen und der Run
    weiterhin spielbar bleiben.
-9. Auf einem Monitor über 60 Hz müssen Atem-, Lauf- und Bogenübergänge auch
-   zwischen zwei Gameplay-Ticks weiterlaufen; die Visual Clock hängt am
-   Browser-Frame, nicht am festen Kampftick.
-10. Schnelle Richtungswechsel dürfen Aelric nicht um 90 oder 180 Grad kippen
+9. Auf einem Monitor über 60 Hz muss die Weltbewegung auch zwischen zwei
+   Gameplay-Ticks weiterlaufen; die Visual Clock hängt am Browser-Frame.
+   Die Rasterposen selbst dürfen bewusst mit etwa 10 Bildern/s wechseln und
+   dabei keine halbtransparenten Doppelkonturen erzeugen.
+10. Aelrics dunkle Rüstung und normale Gegner müssen auf dem mittelgrauen
+    Basalt auch außerhalb des warmen Lichtkerns als Silhouette lesbar bleiben.
+11. Schnelle Richtungswechsel dürfen Aelric nicht um 90 oder 180 Grad kippen
    lassen. Nur Zielhilfen und Projektile dürfen frei rotieren.
-11. Sobald der Boss in Waffenreichweite ist, zielt der nächste Langbogenpfeil
+12. Sobald der Boss in Waffenreichweite ist, zielt der nächste Langbogenpfeil
    auf ihn und erreicht ihn auch durch normale Gegner hindurch.
-12. Dauerhaftes Stehen im Gegnerpulk muss deutlich riskanter sein als Kiten;
+13. Dauerhaftes Stehen im Gegnerpulk muss deutlich riskanter sein als Kiten;
    Fernkampf darf keinen Nahkampf-Build voraussetzen, um den Boss zu besiegen.
 
 Die Einzelruns streuen derzeit stark: erster Zug 21,0–30,7 Sekunden und

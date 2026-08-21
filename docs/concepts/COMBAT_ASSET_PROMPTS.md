@@ -1,22 +1,24 @@
-# Kampf-Asset-Prompts v1
+# Kampf-Asset-Prompts v2
 
-Die beiden Prototyp-Atlanten wurden mit
+Die Prototyp-Atlanten wurden mit
 `docs/concepts/combat-look-concepts-v1.png` als reine Stil-, Material-,
-Paletten- und Kamerareferenz erzeugt. Der rechte Warden-Arena-Entwurf bleibt
-die Zielrichtung. Die Generierung verlangte jeweils echte Transparenz; da die
+Paletten- und Kamerareferenz erzeugt. Für Aelric gilt anschließend die
+freigegebene moderne, gemalte Low-Res-Richtung. Die Generierung verlangte
+jeweils echte Transparenz; da die
 Ausgabe das Vorschau-Schachbrett dennoch als Pixel enthielt, entfernt
 `tools/extract-atlas-alpha.cjs` dieses deterministisch und speichert RGBA-PNGs.
 
 ## Aelric
 
-> Production game character sprite atlas: Aelric, Emberhold's lone Warden
-> archer, as six consistent full-body top-down three-quarter gameplay sprites.
-> Lean charcoal leather-and-light-plate ranger, ember-orange scarf and cloak,
-> recurved amber-rune bow and practical quiver. Exact 3×2 grid: idle, left run,
-> right run, fully drawn bow, release/recoil, forward dash. Same identity,
-> scale, foot anchor, camera and lighting in every cell; faces upper right.
-> Genuine transparent background; no floor, shadow, haze, boxes, labels,
-> scenery, duplicate limbs or watermark; full character and bow inside cells.
+> Production-ready transparent 2D animation sheet for Aelric, Emberhold's lone
+> Warden archer, in modern painterly low-resolution style. Exact 4×3 grid,
+> facing screen-right in a consistent top-down three-quarter camera: row one
+> four-frame idle loop, row two four-frame run loop with alternating contacts,
+> row three ready/full-draw/release/recovery bow shot. Medium graphite armor,
+> cool ash material rim, burnt-orange scarf and restrained amber rune bow.
+> Identical identity, proportions, scale, foot anchor, camera and lighting in
+> every cell; generous transparent padding; no ground, cast shadow, aura,
+> checkerboard, labels, ghost frames, motion blur, scenery or watermark.
 
 ## Gegner
 

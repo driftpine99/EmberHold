@@ -24,11 +24,11 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 - Lokaler Hold-Speicherstand mit deterministischer Offline-Produktion
 - Dauerhafte Wächterbogen-Verbesserung für die nächste Sortie
 - Hold-Flow-Prüfung für Produktion, Persistenz und einmalige Run-Auszahlung
-- Sechsphasiger Aelric-Atlas mit Idle-, Lauf-, Bogen- und Dash-Posen
+- Konsistenter 4×3-Aelric-Atlas mit je vier Idle-, Lauf- und Bogenphasen
 - Eigenständige Designs für fünf Gegnerfamilien, Elite und Warden-Boss
 - Acht vorgerenderte Blickrichtungen und vier Lichtstufen pro Gegnerfamilie
 - Reproduzierbare Alpha-Aufbereitung für KI-generierte Sprite-Atlanten
-- Automatische Prüfung der lokalen RGBA-Assets und des Bogen-Animationszustands
+- Automatische Prüfung der aktiven lokalen RGBA-Assets und des Bogen-Animationszustands
 
 ### Changed
 
@@ -44,8 +44,9 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 - Run-Beute wird einmalig in Eisenerz umgerechnet und im Hold eingelagert
 - Prozedurale Figurenplatzhalter durch lokale Raster-Art mit schnellem Fallback ersetzt
 - Bogenangriff zeigt jetzt Spannungs-, Release- und Rückstoßphase
-- Harte Flipbook-Wechsel durch zeitbasierte Crossfades zwischen Idle, Lauf, Bogen und Dash ersetzt
+- Doppelbild-Crossfades durch klar getaktete Einzelposen bei flüssiger Weltbewegung ersetzt
 - Aelrics Drehung und Bewegungsstart/-stopp mit framerateunabhängigem Easing geglättet
+- Basaltboden aufgehellt, Bodendetail beruhigt und Aelric mit kühler Ascheaufhellung abgesetzt
 - Gegnerausrichtung von 8 auf 16 vorgerenderte Richtungen erweitert und weich nachgeführt
 - Evolutionspfade im Kampf-HUD und auf relevanten Karten sichtbar gemacht
 - Späten optionalen Fokus-Schutz für fast fertige Evolutionspfade ergänzt
