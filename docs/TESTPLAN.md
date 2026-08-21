@@ -63,6 +63,55 @@ normalen 8-Minuten-Sortie eine Evolution abschließen. Ab 7:30 hält das Angebot
 einen bereits begonnenen Evolutionspfad als eine von drei optionalen Karten
 sichtbar; die Voraussetzungen bleiben Waffenstufe 5 plus Passivstufe 3.
 
+Seit D-017 führt der Test `resize()` tatsächlich aus und prüft fünf
+Querformate mit demselben Seed:
+
+| Fenster | SCALE | Kampfausschnitt | Safe-Area je Seite | Zieldichte 8:00 |
+|---|---:|---|---:|---:|
+| 1000×700 (Referenz) | 1,000 | 1000 × 700 | 0 px | 301 |
+| 1280×720 | 1,280 | 1000 × 563 | 0 px | 301 |
+| 1536×864 | 1,536 | 1000 × 563 | 0 px | 301 |
+| 844×390 | 0,693 | 1000 × 563 | 75 px | 301 |
+| 2560×1080 (21:9) | 1,920 | 1000 × 563 | 320 px | 301 |
+
+Vier Prüfungen hängen daran:
+
+- `aspectIndependent` — bitgenau identische Laufergebnisse über alle Formate.
+- `minCombatHeight` — mindestens 562 sichtbare Welteinheiten Höhe. Ohne die
+  Deckelung bei 16:9 fiel 844×390 auf 462 und 21:9 auf 422.
+- `bossInsideCombat` — der Warden-Einstieg (280 Welteinheiten) liegt innerhalb
+  des Kampfausschnitts. **Achtung:** Die Reserve beträgt ab 16:9 nur 1,25
+  Einheiten; siehe den offenen Vorbehalt in D-017.
+- `telemetrySeparated` — die Rendertelemetrie erreicht die Simulation nicht.
+- `visibleCountsCulling` — `render()` wird im Shim wirklich ausgeführt: Ein
+  Gegner außerhalb des Kampfausschnitts, aber innerhalb des Simulationskreises,
+  erscheint nur in `nearbyEnemies`. Der Lauf deckt beide Renderpfade ab, mit
+  und ohne seitliche Safe-Area.
+
+Hochformat ist laut D-017 kein unterstützter Kampfmodus und wird bewusst nicht
+geprüft; der geplante „Gerät drehen"-Hinweis steht unter P0.3.
+
+**Simulations- und Rendertelemetrie sind zwei verschiedene Zahlen.** Wer sie
+verwechselt, misst das Falsche:
+
+| Größe | Bedeutung | Hängt am Fenster? | Darf in die Balance? |
+|---|---|---|---|
+| `nearbyEnemies` | Gegner im festen Kreis `SIM_DIAG*1.15`, steuert das Nachspawnen | nein | **ja, ausschließlich diese** |
+| `peakNearbyEnemies` | Spitzenwert davon über den Run | nein | ja |
+| `visibleEnemies` | Gegner, die das Render-Culling wirklich durchlässt | ja | nein |
+| `peakVisibleEnemies` | Spitzenwert davon über den Run | ja | nein |
+
+Entwickleranzeige (`F3`), Performancebericht und Run-Bericht weisen Gesamtzahl,
+Simulationsradius und sichtbare Gegner getrennt aus. Im Node-Test bleiben die
+Renderwerte zwangsläufig auf 0, weil nicht gerendert wird — genau das prüft
+`telemetrySeparated`. Ein realer Wert für `peakVisibleEnemies` entsteht erst im
+manuellen Run.
+
+Der Check `configStable` verlangt zusätzlich, dass die gesamte
+Balancekonfiguration nach `runBalanceSuite()` exakt dem Ausgangszustand
+entspricht. Die Suite verstellt `XP_C` für ihre Sensitivitätsläufe bewusst; ein
+nicht zurückgesetzter Wert würde jede spätere Messung still entwerten (D-018).
+
 Zusätzlich prüft derselbe abhängigkeitfreie Test den UX-Fluss: Ein
 3-Minuten-Scharmützel muss im gleichen Modus neu starten, der kopierbare
 Run-Bericht muss seine Pflichtfelder enthalten und `D` darf nicht erneut mit
@@ -84,6 +133,23 @@ Der letzte technische Browser-Smoke mit dem animierten Schwärmer erreichte
 vorläufig mindestens 59 FPS bei 53 sichtbaren Gegnern nach ungefähr 30
 Sekunden. Diese frühe Messung ist weder der vollständige 8-Minuten-Stresstest
 noch die P0.3-Abnahme auf echten Referenzgeräten.
+
+**Einordnung dieser Zahl (gemessen am 21.08.2026, aktualisiert nach D-017).**
+53 Gegner ist nicht irgendein Zwischenwert, sondern praktisch das *Minimum* des
+gesamten Runs. Seit der Entkopplung nach D-017 ist die Zieldichte auf allen
+Querformaten identisch:
+
+| Zeitpunkt | Zieldichte | Spitze im Feld | max. gezählt |
+|---|---:|---:|---:|
+| 0:30 | 42 | — | — |
+| 8:00 | 301 | 382 | 355 |
+
+Der alte Smoke-Wert von 53 Gegnern stammt aus einem 16:9-Fenster vor der
+Entkopplung und ist damit doppelt überholt. Entscheidend bleibt: Die Dichte
+steigt über den Run um etwa das Siebenfache, der Schwärmer stellt ab etwa 3:00
+die Mehrheit dieser Figuren. Die FPS-Abnahme muss deshalb ausdrücklich das
+Fenster **6:00–8:00** abdecken; eine Messung bei 0:30 ist für P0.3 ohne
+Aussagekraft.
 
 ## Manueller Grafikcheck
 
@@ -129,6 +195,17 @@ noch die P0.3-Abnahme auf echten Referenzgeräten.
 Die Einzelruns streuen derzeit stark: erster Zug 21,0–30,7 Sekunden und
 10–35 Kartenzüge. Der Vertrag bewertet deshalb vorerst den Seed-Mittelwert;
 die Streuung bleibt ein Tuningthema vor dem externen Spieltest.
+
+Nach D-017 sind im manuellen Grafikcheck zusätzlich drei Sichtfragen zu
+beantworten, die keine Messung ersetzen kann:
+
+1. Wirkt der Kampfausschnitt auf 16:9 (1000 × 563 statt 1000 × 700
+   Welteinheiten) zu eng? Fällt das Urteil negativ aus, ist Pillarboxing bis zur
+   vollen Referenzhöhe der dokumentierte Gegenentwurf.
+2. Sieht die seitliche Safe-Area auf Formaten breiter als 16:9 ruhig und
+   gerahmt aus — oder wirkt sie wie ein abgeschnittenes Bild?
+3. Ist der Warden beim Einstieg vollständig sichtbar? Bei senkrechtem Einstieg
+   ist ein Anschnitt zu erwarten (Reserve nur 1,25 Welteinheiten).
 
 Die alte manuelle Browserreferenz mit 1.039 Gegnern ist nach D-014 ungültig.
 FPS und tatsächliche Spitzenzahl müssen mit dem reduzierten Entity-Budget neu

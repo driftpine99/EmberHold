@@ -492,6 +492,8 @@ function targetPicks(runLen){ return CFG.PICK_TARGETS[runLen] ?? null; }
 // --------------------------------------------------------------------- Farben
 const COL = {
   bg:'#1b1e25', grid:'#2b2e36',
+  // Ruhige Flaeche neben dem Kampfausschnitt auf Formaten breiter als 16:9.
+  safe:'#15171c',
   player:'#ffc48a', playerCore:'#e07a3f',
   gem:'#6bb8d4', gemBig:'#a8e0f0',
   // Gegnerfamilien: eine Akzentfarbe kodiert die Familie
@@ -894,7 +896,13 @@ function newRun(runLen, seed){
     hp:CFG.HP, maxhp:CFG.HP, iframe:0,
     dashCd:0, dashT:0, dashIf:0, dashVx:0, dashVy:0,
     level:1, xp:0, need:xpNeed(1),
-    kills:0, gemsTaken:0, dmgDealt:0, onScreen:0, xpTotal:0,
+    kills:0, gemsTaken:0, dmgDealt:0, xpTotal:0,
+    // Simulationstelemetrie: Gegner im festen Kreis SIM_DIAG*1.15. Steuert das
+    // Nachspawnen und ist die EINZIGE Groesse, die die Balance benutzen darf.
+    nearbyEnemies:0, peakNearbyEnemies:0,
+    // Rendertelemetrie: Gegner, die tatsaechlich gezeichnet wurden. Haengt am
+    // Fenster und darf deshalb nie in die Simulation zurueckwirken.
+    visibleEnemies:0, peakVisibleEnemies:0,
     W:{}, Pa:{}, evo:{},                    // Waffen-/Passivstufen, Evolutionen
     rerolls:1,
     pickTimes:[],                           // für den Pacing-Bericht
@@ -904,7 +912,7 @@ function newRun(runLen, seed){
     rewardGranted:false, holdOre:0,
     holdDmg:HEADLESS?1:(1+0.10*(META?.bowUpgrade||0)),
     cool:{}, seed:runSeed,
-    fps:60, worstFps:999, peakEnemies:0,
+    fps:60, worstFps:999,
   };
   S.W['bogen']=1; S.cool['bogen']=0;
   E.n=0;E.free.length=0;E.alive.fill(0);
@@ -937,13 +945,28 @@ function buildPower(){                       // Summe aller Stufen — treibt da
 // ===========================================================================
 //  SPAWNING
 // ===========================================================================
-let VIEW_W=1000, VIEW_H=700, AREA_F=1, VIEW_DIAG=610;
+// --- Feste Balance-Referenz (D-017) ---------------------------------------
+// Die Simulation rechnet IMMER in diesem Fenster. Zieldichte, Spawnring,
+// Zaehlradius und Despawnrand haengen dadurch nicht mehr vom echten Fenster
+// oder seinem Seitenverhaeltnis ab. Vorher lieferte derselbe Seed auf 16:9
+// rund 20 % weniger Kartenzuege als im CI-Shim.
+const SIM_W=1000, SIM_H=700, SIM_DIAG=Math.hypot(SIM_W,SIM_H)/2;
+// Breiter als 16:9 wird nicht mehr als Kampfraum ausgegeben. Ueberschuessige
+// Breite ist ruhige Safe-Area, kein zusaetzliches Sichtfeld. Dadurch sinkt die
+// sichtbare Hoehe auf keinem unterstuetzten Querformat unter COMBAT_H_MIN.
+const ASPECT_MAX=16/9, COMBAT_H_MIN=SIM_W/ASPECT_MAX;      // 562,5
+// Boss-Einstieg: fest, damit er auf jedem Format im Kampfausschnitt liegt.
+const BOSS_ENTRY=Math.min(300, SIM_H*0.40);                // 280
+// Nur Darstellung und Render-Culling. Niemals in der Simulation verwenden.
+let VIEW_W=SIM_W, VIEW_H=SIM_H;
+// Pixelrechteck des zentralen Kampfausschnitts auf der Leinwand.
+let CLIP_X=0, CLIP_Y=0, CLIP_W=SIM_W, CLIP_H=SIM_H;
 /** Gegnerzahl: startet klein, waechst stark, saettigt — die Saettigung ist
  *  zugleich das Entity-Budget. Technik und Design ziehen in dieselbe Richtung. */
 function targetEnemies(t){
   const p = Math.pow(t/CFG.SPAWN_HALF, CFG.SPAWN_EXP);
   const n = CFG.SPAWN_START + CFG.SPAWN_SPAN * p/(p+1);
-  return Math.min(n * AREA_F, CFG.CAP_ENEMY);
+  return Math.min(n, CFG.CAP_ENEMY);
 }
 /** Familienverteilung verschiebt sich über den Run — neue Muster, nicht nur mehr HP. */
 function pickFam(t){
@@ -991,7 +1014,7 @@ function spawnEnemy(t, fam, kind, atx, aty){
     }
     // knapp ausserhalb der Bildschirmecke — ein weiter Ring wuerde Gegner
     // zaehlen, die der Spieler nie zu sehen bekommt
-    const rad = VIEW_DIAG*0.96 + rand()*60;
+    const rad = SIM_DIAG*0.96 + rand()*60;
     atx = S.x + Math.cos(a)*rad; aty = S.y + Math.sin(a)*rad;
   }
   // Gegner-HP waechst mit der Zeit UND mit der Spielerstufe. Ohne den zweiten
@@ -1289,10 +1312,10 @@ function updateEnemies(dt){
     }
     // Zu weit weg? Recyceln statt löschen.
     const fx2=E.x[i]-S.x, fy2=E.y[i]-S.y;
-    const lim = VIEW_DIAG*1.55;
+    const lim = SIM_DIAG*1.55;
     if (fx2*fx2+fy2*fy2 > lim*lim && kind===0) freeSlot(E,i);
   }
-  if (S.onScreen>S.peakEnemies) S.peakEnemies=S.onScreen;
+  if (S.nearbyEnemies>S.peakNearbyEnemies) S.peakNearbyEnemies=S.nearbyEnemies;
   return alive;
 }
 
@@ -1586,8 +1609,7 @@ function updateEvents(){
   if (!S.events.boss && S.t >= CFG.BOSS_AT){
     S.events.boss = true;
     // Innerhalb des sichtbaren Kampfraums statt auf dem normalen Spawnring.
-    const br=Math.min(300,VIEW_H*.40);
-    const i = spawnEnemy(S.t, 4, 2,S.x+S.aimx*br,S.y+S.aimy*br);
+    const i = spawnEnemy(S.t, 4, 2,S.x+S.aimx*BOSS_ENTRY,S.y+S.aimy*BOSS_ENTRY);
     if (i>=0){ E.tm[i]=1.4; S.bossIndex=i; }
     bossAlert('WARDEN ERWACHT','Goldene Lücke suchen · roten Korridor meiden');
   }
@@ -1665,20 +1687,22 @@ function step(dt){
   rebuildGrid();
 
   // Nachspawnen bis zur Zieldichte
-  // Nur Gegner im Sichtbereich zaehlen — die Zieldichte ist eine Aussage
-  // darueber, was auf dem Bildschirm passiert, nicht ueber die Weltbevoelkerung.
+  // Gezaehlt wird ein FESTER Kreis um den Spieler, nicht das echte Fenster.
+  // Das ist Simulationstelemetrie: Sie steuert das Nachspawnen und muss auf
+  // jedem Format identisch sein. Wie viele Gegner wirklich gezeichnet werden,
+  // steht getrennt davon in S.visibleEnemies.
   const want = targetEnemies(S.t);
-  const cr = VIEW_DIAG*1.15, cr2 = cr*cr;
-  let onScreen=0;
+  const cr = SIM_DIAG*1.15, cr2 = cr*cr;
+  let nearby=0;
   for(let i=0;i<E.n;i++){
     if(!E.alive[i]) continue;
     const dx=E.x[i]-S.x, dy=E.y[i]-S.y;
-    if (dx*dx+dy*dy < cr2) onScreen++;
+    if (dx*dx+dy*dy < cr2) nearby++;
   }
-  S.onScreen = onScreen;
+  S.nearbyEnemies = nearby;
   // Deckel pro Tick: ohne ihn steht nach zwei Sekunden eine Wand aus
   // 42 Gegnern statt eines Stroms, der sich aufbaut.
-  let toSpawn = Math.min(Math.ceil((want-onScreen)*0.16), 9);
+  let toSpawn = Math.min(Math.ceil((want-nearby)*0.16), 9);
   for (let k=0;k<toSpawn;k++) spawnEnemy(S.t, pickFam(S.t), 0);
 
   fireWeapons(dt);
@@ -1711,10 +1735,22 @@ function resize(){
   DPR = Math.min(window.devicePixelRatio||1, 2);
   W = cv.clientWidth; H = cv.clientHeight;
   cv.width = Math.round(W*DPR); cv.height = Math.round(H*DPR);
-  SCALE = Math.min(W,H)/700;
-  VIEW_W = W/SCALE; VIEW_H = H/SCALE;
-  AREA_F = Math.min((VIEW_W*VIEW_H)/(1000*700), 2.2);
-  VIEW_DIAG = Math.hypot(VIEW_W,VIEW_H)/2;
+  // "Cover", aber bei 16:9 gedeckelt. Zwischen Referenz (10:7) und 16:9 wird
+  // die ganze Leinwand bespielt. Ist das Fenster breiter, bleibt der zentrale
+  // Kampfausschnitt bei 1000 x 562,5 Welteinheiten; die ueberschuessige Breite
+  // wird ruhige Safe-Area statt zusaetzlicher Kampfraum. So sinkt die sichtbare
+  // Hoehe nie unter COMBAT_H_MIN und der feste Spawnring bleibt ausserhalb des
+  // Bildes. resize() beruehrt weiterhin nur Darstellung und Culling.
+  if (W>0 && H>0){
+    if (W/H > ASPECT_MAX){
+      VIEW_W = SIM_W; VIEW_H = COMBAT_H_MIN; SCALE = H/COMBAT_H_MIN;
+    } else {
+      SCALE = Math.max(W/SIM_W, H/SIM_H);
+      VIEW_W = W/SCALE; VIEW_H = H/SCALE;
+    }
+  }
+  CLIP_W = VIEW_W*SCALE; CLIP_H = VIEW_H*SCALE;
+  CLIP_X = (W-CLIP_W)/2;  CLIP_Y = (H-CLIP_H)/2;
 }
 window.addEventListener('resize', resize);
 
@@ -1962,6 +1998,9 @@ function render(){
 
   const cxs = W/2, cys = H/2;
   ctx.save();
+  // Welt, Gegner und Telegrafien enden am Kampfausschnitt. Auf Formaten
+  // breiter als 16:9 darf seitlich nichts vom Kampf hinauslaufen.
+  ctx.beginPath(); ctx.rect(CLIP_X,CLIP_Y,CLIP_W,CLIP_H); ctx.clip();
   ctx.translate(cxs,cys); ctx.scale(SCALE,SCALE); ctx.translate(-S.x,-S.y);
 
   const lr = lightRadius();
@@ -2006,10 +2045,14 @@ function render(){
   }
 
   // --- Gegner: ein Durchlauf statt 20 Familie×Lichtstufe-Scans -----------
+  // drawnEnemies zaehlt, was das Culling wirklich durchlaesst — die einzige
+  // ehrliche Grundlage fuer eine Aussage ueber die Renderlast.
+  let drawnEnemies=0;
   for (let i=0;i<E.n;i++){
     if (!E.alive[i]) continue;
     const x=E.x[i], y=E.y[i];
     if (x<vx0||x>vx1||y<vy0||y>vy1){ E.lit[i]=255; continue; }
+    drawnEnemies++;
     const tier=E.fam[i]===1&&E.st[i]===1?ENEMY_TELEGRAPH_TIER:ENEMY_NORMAL_TIER;
     E.lit[i]=tier;
     const dir=enemyDirection(i);
@@ -2036,6 +2079,9 @@ function render(){
     ctx.fillStyle=E.kind[i]===2?COL.boss:COL.elite;
     ctx.fillRect(x-w/2,yy,w*Math.max(E.hp[i]/E.max[i],0),h);
   }
+
+  S.visibleEnemies = drawnEnemies;
+  if (drawnEnemies > S.peakVisibleEnemies) S.peakVisibleEnemies = drawnEnemies;
 
   // --- Gegnerprojektile ---------------------------------------------------
   for (let i=0;i<Q.n;i++){
@@ -2096,6 +2142,18 @@ function render(){
   // --- Spieler: gerenderter Warden mit Bewegung, Bogen und Dash ---------
   drawAelric();
   ctx.restore();
+
+  // --- Seitliche Safe-Area auf Formaten breiter als 16:9 -----------------
+  // Bewusst flach und ohne Verlauf: das ist keine Randvignette (D-014),
+  // sondern eine sichtbare Rahmung des Kampfausschnitts.
+  if (CLIP_X > 0.5){
+    ctx.fillStyle = COL.safe;
+    ctx.fillRect(0,0,CLIP_X,H);
+    ctx.fillRect(CLIP_X+CLIP_W,0,W-CLIP_X-CLIP_W,H);
+    ctx.fillStyle = 'rgba(224,122,63,0.10)';
+    ctx.fillRect(CLIP_X-1,0,1,H);
+    ctx.fillRect(CLIP_X+CLIP_W,0,1,H);
+  }
 }
 
 // ===========================================================================
@@ -2458,6 +2516,9 @@ function runReportText(){
     'Eisenerz für Hold: '+(S.holdOre||0),
     'Build: '+buildText(),
     'Evolutionen: '+evos,
+    'Spitze im SIM-Radius: '+S.peakNearbyEnemies,
+    'Spitze sichtbar gezeichnet: '+S.peakVisibleEnemies,
+    'Kampfausschnitt: '+(VIEW_W|0)+'×'+(VIEW_H|0)+' Welteinheiten',
     'Schlechteste FPS: '+fps,
   ].join('\n');
 }
@@ -2509,7 +2570,9 @@ function pacingReport(){
     const ok = t==='–' || Math.abs(v-t)<=1;
     h += `${m}–${m+1} &nbsp;<b>${v}</b>&nbsp; <span class="${ok?'ok':'bad'}">${t}</span><br>`;
   });
-  h += `<hr>Spitze Gegner: <b>${S.peakEnemies}</b> / ${CFG.CAP_ENEMY}<br>`;
+  h += `<hr>Spitze im SIM-Radius: <b>${S.peakNearbyEnemies}</b> / ${CFG.CAP_ENEMY}<br>`;
+  h += `Spitze sichtbar gezeichnet: <b>${S.peakVisibleEnemies}</b><br>`;
+  h += `Kampfausschnitt: <b>${VIEW_W|0}×${VIEW_H|0}</b> Welteinheiten<br>`;
   h += `Schlechteste FPS: <b class="${S.worstFps>=50?'ok':'bad'}">${S.worstFps|0}</b>`;
   return h;
 }
@@ -2607,10 +2670,12 @@ function updateDev(dt, counts){
   const p=S.pickTimes;
   el('dev').innerHTML =
     `<b>${S.fps|0} FPS</b> &nbsp; min ${S.worstFps|0}<hr>`+
-    `Gegner &nbsp;<b>${counts.e}</b> / ${CFG.CAP_ENEMY}<br>`+
+    `Gegner gesamt <b>${counts.e}</b> / ${CFG.CAP_ENEMY}<br>`+
     `Projektile <b>${counts.p}</b> / ${CFG.CAP_PROJ}<br>`+
-    `Splitter &nbsp;<b>${counts.g}</b> / ${CFG.CAP_GEM}<br>`+
-    `auf dem Schirm <b>${S.onScreen}</b> / Ziel <b>${targetEnemies(S.t)|0}</b><hr>`+
+    `Splitter &nbsp;<b>${counts.g}</b> / ${CFG.CAP_GEM}<hr>`+
+    `SIM-Radius <b>${S.nearbyEnemies}</b> / Ziel <b>${targetEnemies(S.t)|0}</b><br>`+
+    `SICHTBAR &nbsp;<b>${S.visibleEnemies}</b> (Spitze ${S.peakVisibleEnemies})<br>`+
+    `Ausschnitt <b>${VIEW_W|0}×${VIEW_H|0}</b> @ ${SCALE.toFixed(2)}<hr>`+
     `Picks <b>${p.length}</b> &nbsp; erster <b>${p.length?p[0].toFixed(0)+'s':'–'}</b><br>`+
     `Buildmacht <b>${buildPower()}</b> &nbsp; Licht <b>${lightRadius()|0}</b><br>`+
     `DPS ~<b>${(S.dmgDealt/Math.max(S.t,1))|0}</b>`;
@@ -2846,8 +2911,8 @@ function headlessRun(runLen, opts){
       perMin.push(S.pickTimes.filter(x=>x>=m*60&&x<(m+1)*60).length);
     let live=0; for(let i=0;i<E.n;i++) if(E.alive[i]) live++;
     return { seed:S.seed, first:S.pickTimes[0]||null, total:S.pickTimes.length, perMin,
-             picks:S.pickTimes.slice(), kills:S.kills, peak:S.peakEnemies,
-             live, onScreen:S.onScreen, level:S.level, died, hpTrace,
+             picks:S.pickTimes.slice(), kills:S.kills, peak:S.peakNearbyEnemies,
+             live, nearby:S.nearbyEnemies, level:S.level, died, hpTrace,
              W:Object.assign({},S.W), Pa:Object.assign({},S.Pa),
              evo:Object.keys(S.evo), dps:S.dmgDealt/runLen, xpTotal:S.xpTotal };
   } finally {
@@ -2860,6 +2925,10 @@ const BALANCE_SEEDS = Object.freeze([1701, 1709, 1721, 1733, 1741, 1753, 1777, 1
 function average(rows, key){ return rows.reduce((sum,row)=>sum+(row[key]||0),0)/rows.length; }
 function runBalanceSuite(opts){
   opts = opts || {};
+  // D-018: Die Suite verstellt XP_C und XP_K bewusst fuer die Sensitivitaets-
+  // laeufe. Ein einziger nicht zurueckgesetzter Wert entwertet jede spaetere
+  // Messung still. Deshalb wird die gesamte Balancekonfiguration verglichen.
+  const configBefore = JSON.stringify(CFG);
   const runLen = opts.runLen || CFG.RUN_LEN;
   const seeds = opts.seeds || BALANCE_SEEDS;
   const runBatch = (xpC)=>seeds.map(seed=>headlessRun(runLen, {
@@ -2879,6 +2948,7 @@ function runBalanceSuite(opts){
     firstPick: firstAvg>=CFG.FIRST_PICK_RANGE[0] && firstAvg<=CFG.FIRST_PICK_RANGE[1],
     totalPicks: pickTarget===null || Math.abs(totalAvg-pickTarget)<=3,
     sensitivity: sensitivityRatio<=1.75,
+    configStable: JSON.stringify(CFG)===configBefore,
   };
   return {
     pass:Object.values(checks).every(Boolean), checks, runLen, seeds:[...seeds],
@@ -2899,7 +2969,10 @@ window.__EH = { get S(){return S;}, get H(){return META;}, CFG, HOLD_CFG, begin,
                 enemyHp:(i)=>E.hp[i], enemyMax:(i)=>E.max[i],
                 advanceHold, saveHold, loadHold, depositRunReward, showHold:showStartMenu,
                 tick:(d)=>{HEADLESS=true; step(d); while(pendingPicks>0){currentOffer=buildOffer(); applyOffer(currentOffer[0]); pendingPicks--;} HEADLESS=false;},
-                targetEnemies,
+                targetEnemies, resize, render,
+                viewport:()=>({W,H,SCALE,VIEW_W,VIEW_H,SIM_W,SIM_H,SIM_DIAG,
+                               CLIP_X,CLIP_Y,CLIP_W,CLIP_H,ASPECT_MAX,
+                               COMBAT_H_MIN,BOSS_ENTRY}),
                 counts:()=>{let e=0,p=0,g=0;
                   for(let i=0;i<E.n;i++) if(E.alive[i])e++;
                   for(let i=0;i<P.n;i++) if(P.alive[i])p++;

@@ -6,6 +6,26 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 
 ### Added
 
+- Getrennte Telemetrie: `nearbyEnemies`/`peakNearbyEnemies` für den festen
+  Simulationskreis, `visibleEnemies`/`peakVisibleEnemies` für die tatsächlich
+  gezeichneten Gegner. Entwickleranzeige, Performancebericht und Run-Bericht
+  weisen Gesamtzahl, Simulationsradius und sichtbare Gegner getrennt aus
+- Zentraler Kampfausschnitt mit seitlicher Safe-Area auf Formaten breiter als
+  16:9; Welt, Gegner und Telegrafien werden darauf geclippt
+- Vier weitere Prüfungen in `npm test`: `minCombatHeight` (mindestens 562
+  sichtbare Welteinheiten Höhe), `bossInsideCombat` (Warden-Einstieg im
+  Kampfausschnitt) und `telemetrySeparated` (Rendertelemetrie erreicht die
+  Simulation nicht) sowie `visibleCountsCulling`, das `render()` im Node-Shim
+  tatsächlich ausführt und beide Renderpfade abdeckt
+- Feste Balance-Referenz `SIM_W`/`SIM_H`/`SIM_DIAG` (1000×700): Zieldichte,
+  Spawnring, Zählradius, Despawnrand und Boss-Einstiegsabstand rechnen
+  unabhängig von Fenstergröße und Seitenverhältnis (D-017)
+- Viewport-Paritätstest in `npm test`: `resize()` wird über den Node-Shim
+  tatsächlich ausgeführt und 1000×700, 1280×720, 1536×864 sowie 844×390 müssen
+  bitgenau identische Laufergebnisse liefern (`aspectIndependent`)
+- Invariante `configStable`: die gesamte Balancekonfiguration muss nach
+  `runBalanceSuite()` exakt dem Ausgangszustand entsprechen (D-018)
+- `resize` und `viewport()` als Testeinstiegspunkte in `window.__EH`
 - Projektweite `CLAUDE.md` mit Scope, Grafikregeln, Prüfkommandos und klarem
   Übergabepunkt für Claude Code
 - Priorisierte Grafikreihenfolge mit manuellem 8-Minuten-Gate zwischen den
@@ -38,6 +58,13 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 
 ### Changed
 
+- `resize()` beeinflusst nur noch Darstellung, Canvas-Skalierung und
+  Render-Culling. `AREA_F` und `VIEW_DIAG` sind ersatzlos entfallen
+- Canvas-Skalierung auf „Cover" umgestellt und bei 16:9 gedeckelt, damit der
+  feste Spawnring außerhalb des Bildes bleibt, ohne dass breite Formate an
+  sichtbarer Höhe verlieren (844×390 und 21:9 blieben zwischenzeitlich bei 462
+  bzw. 422 Welteinheiten stehen; jetzt durchgehend 563)
+
 - Visual-Testplan auf alle drei aktiven RGBA-Raster-Assets und den vorläufigen
   Schwärmer-Performance-Smoke aktualisiert
 - Konzept auf reines Solo-PvE ohne PvP, Koop, Gilden oder Ranglisten festgelegt
@@ -66,3 +93,18 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 - Das Workbook enthält noch das analytische Langfristmodell. Für Phase 0 ist
   gemäß D-006 ausschließlich der ausführbare Laufzeitvertrag verbindlich.
 - Der derzeitige Arbeitstitel ist im Spielemarkt bereits belegt.
+- Die Einzelursache des einmalig beobachteten XP-Werts von 81,18 (D-018) ist
+  weiterhin unbekannt. Die Fehlerklasse ist durch `configStable` abgesichert,
+  aber nicht erklärt.
+- Der sichtbare Weltausschnitt ist auf breiten Fenstern kleiner als bisher
+  (1000 × 563 statt 1000 × 700 Welteinheiten auf 16:9). Ob das im Spiel zu eng
+  wirkt, muss der manuelle 8-Minuten-Run zeigen; Pillarboxing ist der
+  dokumentierte Gegenentwurf.
+- Der manuelle 8-Minuten-Run zur Abnahme des Schwärmers steht weiterhin aus.
+  Solange er fehlt, gibt es keine gemessene FPS-Zahl und keinen realen Wert für
+  `peakVisibleEnemies`; beide entstehen erst beim echten Rendern.
+- Der Warden betritt den Kampfausschnitt bei 280 Welteinheiten. Auf 16:9 und
+  breiter beträgt die halbe sichtbare Höhe 281,25 — die Reserve ist also nur
+  1,25 Einheiten, und ein vertikaler Einstieg dürfte den Warden sichtbar
+  anschneiden. Der Wert ist ein Gegnerwert und wurde bewusst nicht ohne
+  Entscheidung geändert.

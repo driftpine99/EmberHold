@@ -256,16 +256,154 @@ try {
 } catch (error) {
   holdError = error instanceof Error ? error.message : String(error);
 }
+// --- D-017: Simulation muss unabhaengig vom Seitenverhaeltnis sein ---------
+// Der Shim fuehrt resize() jetzt wirklich aus, statt es wie frueher ueber
+// addEventListener = noop zu verschlucken. Alle vier Formate sind Querformat.
+// Hochformat ist laut D-017 kein unterstuetzter Kampfmodus und wird deshalb
+// bewusst nicht geprueft.
+const LANDSCAPE_VIEWPORTS = [
+  { label: "1000x700 (Referenz)", w: 1000, h: 700 },
+  { label: "1280x720", w: 1280, h: 720 },
+  { label: "1536x864", w: 1536, h: 864 },
+  { label: "844x390", w: 844, h: 390 },
+  { label: "2560x1080 (21:9)", w: 2560, h: 1080 },
+];
+// Unter diese sichtbare Welthoehe darf kein unterstuetztes Querformat fallen.
+const MIN_COMBAT_H = 562;
+const canvasElement = globalThis.document.getElementById("c");
+let aspectIndependent = false;
+let minCombatHeight = false;
+let bossInsideCombat = false;
+let aspectError = "";
+let viewportRows = [];
+try {
+  const measured = LANDSCAPE_VIEWPORTS.map(({ label, w, h }) => {
+    canvasElement.clientWidth = w;
+    canvasElement.clientHeight = h;
+    engine.resize();
+    const view = engine.viewport();
+    const run = engine.headlessRun(report.runLen, {
+      seed: report.seeds[0], xpC: engine.CFG.XP_C, xpK: engine.CFG.XP_K,
+      smart: true, immortal: true,
+    });
+    return {
+      label,
+      scale: Number(view.SCALE.toFixed(4)),
+      kampfausschnitt: [Math.round(view.VIEW_W), Math.round(view.VIEW_H)],
+      safeAreaPx: Math.round(view.CLIP_X),
+      dichte: { t30: Math.round(engine.targetEnemies(30)), t480: Math.round(engine.targetEnemies(480)) },
+      picks: run.total, kills: run.kills, simSpitze: run.peak, simRadius: run.nearby,
+      bossAbstand: Math.round(view.BOSS_ENTRY),
+      bossReserve: Number((Math.min(view.VIEW_W, view.VIEW_H) / 2 - view.BOSS_ENTRY).toFixed(2)),
+      fingerprint: JSON.stringify(run),
+    };
+  });
+  const referenceFingerprint = measured[0].fingerprint;
+  aspectIndependent = measured.every((row) => row.fingerprint === referenceFingerprint);
+  minCombatHeight = measured.every((row) => row.kampfausschnitt[1] >= MIN_COMBAT_H);
+  bossInsideCombat = measured.every((row) => row.bossReserve >= 0);
+  viewportRows = measured.map(({ fingerprint, ...rest }) => rest);
+  canvasElement.clientWidth = 1000;
+  canvasElement.clientHeight = 700;
+  engine.resize();
+} catch (error) {
+  aspectError = error instanceof Error ? error.message : String(error);
+}
+
+// --- Simulations- und Rendertelemetrie muessen getrennt bleiben -----------
+// Node rendert nicht. Genau deshalb ist das ein scharfer Test: nach einem
+// vollstaendigen Headless-Run muss der Simulationsradius gefuellt und die
+// Rendertelemetrie leer sein. Waere beides dieselbe Groesse, faellt das hier auf.
+let telemetrySeparated = false;
+let telemetryError = "";
+try {
+  const probe = engine.headlessRun(120, {
+    seed: report.seeds[0], xpC: engine.CFG.XP_C, xpK: engine.CFG.XP_K,
+    smart: true, immortal: true,
+  });
+  const laufzeitGetrennt =
+    engine.S.nearbyEnemies > 0 &&
+    engine.S.peakNearbyEnemies > 0 &&
+    engine.S.visibleEnemies === 0 &&
+    engine.S.peakVisibleEnemies === 0;
+  const berichtOhneRenderwerte =
+    typeof probe.nearby === "number" && probe.onScreen === undefined;
+  const quelltextGetrennt =
+    html.includes("S.nearbyEnemies = nearby") &&
+    html.includes("S.visibleEnemies = drawnEnemies") &&
+    html.includes("if (drawnEnemies > S.peakVisibleEnemies)") &&
+    html.includes("Math.ceil((want-nearby)*0.16)") &&
+    !html.includes("S.onScreen") &&
+    !html.includes("S.peakEnemies");
+  telemetrySeparated = laufzeitGetrennt && berichtOhneRenderwerte && quelltextGetrennt;
+} catch (error) {
+  telemetryError = error instanceof Error ? error.message : String(error);
+}
+
+// --- visibleEnemies muss wirklich das Render-Culling zaehlen --------------
+// Der Kontextstub des Shims verschluckt alle Zeichenbefehle, die Zaehlschleife
+// laeuft aber echt. Damit laesst sich pruefen, dass visibleEnemies tatsaechlich
+// aus dem Culling stammt und nicht aus dem Simulationskreis: Ein Gegner weit
+// ausserhalb des Kampfausschnitts, aber innerhalb des Simulationsradius, darf
+// nur in nearbyEnemies auftauchen.
+let visibleCountsCulling = false;
+let visibleError = "";
+try {
+  canvasElement.clientWidth = 1280;
+  canvasElement.clientHeight = 720;
+  engine.resize();
+  const view = engine.viewport();
+  engine.begin(180);
+  engine.S.x = 0; engine.S.y = 0;
+  const innen = engine.spawnEnemy(0, 0, 0, 40, 0);
+  // Knapp unterhalb des Kampfausschnitts (halbe Hoehe 281,25 plus 60 Rand),
+  // aber gut innerhalb des Simulationskreises (SIM_DIAG*1.15 = 702).
+  const aussen = engine.spawnEnemy(0, 0, 0, 0, view.VIEW_H / 2 + 120);
+  engine.rebuildGrid();
+  engine.render();
+  const sichtbarNachRender = engine.S.visibleEnemies;
+
+  // Zweiter Durchlauf auf 21:9, noch VOR dem Tick: dort greift zusaetzlich der
+  // Safe-Area-Zweig samt Clipping. Er darf weder werfen noch die Zaehlung
+  // veraendern. Nach einem Tick waere der Vergleich wertlos, weil step() bis
+  // zur Zieldichte nachspawnt.
+  canvasElement.clientWidth = 2560;
+  canvasElement.clientHeight = 1080;
+  engine.resize();
+  const breit = engine.viewport();
+  engine.render();
+  const safeAreaGezeichnet = breit.CLIP_X > 0.5 && engine.S.visibleEnemies === 1;
+
+  engine.tick(engine.CFG.TICK);
+  const nahNachTick = engine.S.nearbyEnemies;
+
+  visibleCountsCulling =
+    innen >= 0 && aussen >= 0 &&
+    sichtbarNachRender === 1 &&      // nur der Gegner im Kampfausschnitt
+    nahNachTick >= 2 &&              // beide liegen im Simulationskreis
+    engine.S.peakVisibleEnemies >= 1 &&
+    safeAreaGezeichnet;
+} catch (error) {
+  visibleError = error instanceof Error ? error.message : String(error);
+}
+canvasElement.clientWidth = 1000;
+canvasElement.clientHeight = 700;
+engine.resize();
+
 const output = {
-  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow,
-  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow },
+  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling,
+  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling },
   targets: report.targets,
   seeds: report.seeds,
   summary: { ...report.summary, evolutionRuns, evolutionSeeds: report.seeds.length,
     stationaryDeath: stationaryRun.died,
     feedbackSeed: feedbackRun ? { kills: feedbackRun.kills, picks: feedbackRun.total,
-      peak: feedbackRun.peak, onScreen: feedbackRun.onScreen, evo: feedbackRun.evo } : null },
+      simSpitze: feedbackRun.peak, simRadius: feedbackRun.nearby, evo: feedbackRun.evo } : null,
+    viewports: viewportRows },
 };
+if (aspectError) output.aspectError = aspectError;
+if (telemetryError) output.telemetryError = telemetryError;
+if (visibleError) output.visibleError = visibleError;
 if (uxError) output.uxError = uxError;
 if (holdError) output.holdError = holdError;
 

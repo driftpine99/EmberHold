@@ -19,6 +19,50 @@ Nicht mehrere Grafikfamilien gleichzeitig beginnen:
    Richtungsatlas mit 6–8 Lauf- und Bogenphasen erhält. Dies ist ein späterer
    Qualitäts- und kein aktueller Phase-0-Pflichtschritt.
 
+**Stand 21.08.2026 zu Punkt 1.** Der Punkt bleibt offen. Der gerenderte
+8-Minuten-Run konnte nicht durchgeführt werden: In der Claude-Code-Umgebung wird
+die Browser-Pane nicht angezeigt, dadurch komponiert die Seite keine Frames,
+`requestAnimationFrame` feuert null Mal und die Rundenuhr bleibt bei 0:00 stehen.
+Eine echte FPS-Messung setzt ein sichtbares Fenster voraus und muss deshalb vom
+Besitzer oder bei geöffneter Pane gefahren werden.
+
+Vorbereitend gemessen und dokumentiert wurde:
+
+- `npm test` ist grün (24/24 Checks, Exitcode 0). Die Änderungen zu D-017 und
+  D-018 sind noch nicht committet.
+- Der Schwärmer-Renderpfad hält D-014, D-015 und D-016 vollständig ein:
+  deterministischer Phasenversatz, vorgerenderter Kontaktschatten, ein
+  Zeichendurchlauf, keine Rotation an Rasterfiguren, allokationsfreie
+  Schwarmschleife. Dort ist nichts zu reparieren.
+- Die Zieldichte ist seit D-017 auf allen Querformaten identisch: 42 Gegner bei
+  0:30, 301 bei 8:00, Spitze 338 im Simulationsradius. Der alte Smoke-Wert von
+  53 Gegnern bei 0:30 stammt aus einem 16:9-Fenster vor der Entkopplung und ist
+  doppelt überholt. Details in `docs/TESTPLAN.md`.
+- Wie viele Gegner davon tatsächlich gezeichnet werden, steht seit der
+  Telemetrietrennung getrennt als `visibleEnemies`/`peakVisibleEnemies` in der
+  Entwickleranzeige und im Run-Bericht. Diese Zahl kann erst der manuelle Run
+  liefern, weil sie nur beim echten Rendern entsteht.
+
+- [x] D-017 entschieden und umgesetzt: Die Simulation ist vom Seitenverhältnis
+  entkoppelt, 1000×700 ist die feste Balance-Referenz. `npm test` führt
+  `resize()` jetzt wirklich aus und verlangt über 1000×700, 1280×720, 1536×864
+  und 844×390 bitgenau identische Ergebnisse (`aspectIndependent`). Die
+  Referenzmessung blieb unverändert.
+- [x] D-018 abgesichert: `configStable` vergleicht die gesamte
+  Balancekonfiguration vor und nach `runBalanceSuite()`.
+- [x] Simulations- und Rendertelemetrie getrennt: `nearbyEnemies` steuert das
+  Nachspawnen, `visibleEnemies`/`peakVisibleEnemies` zählen die tatsächlich
+  gezeichneten Gegner. Die Balance nutzt ausschließlich `nearbyEnemies`.
+- [x] Cover auf 16:9 gedeckelt. Breitere Formate behalten einen zentralen
+  Kampfausschnitt von 1000 × 563 Welteinheiten; überschüssige Breite wird
+  seitliche Safe-Area, und Welt, Gegner und Telegrafien werden darauf geclippt.
+- [ ] **Offen:** Den 8-Minuten-Run bei sichtbarem Fenster fahren und dabei
+  ausdrücklich das Fenster 6:00–8:00 protokollieren, nicht nur den Start.
+  Mitzuprüfen sind drei Dinge, die keine Messung beantworten kann:
+  ob der Kampfausschnitt von 1000 × 563 auf 16:9 zu eng wirkt, ob die seitliche
+  Safe-Area auf breiten Formaten ruhig statt abgeschnitten aussieht, und ob der
+  Warden beim Einstieg vollständig sichtbar ist (siehe Vorbehalt in D-017).
+
 Ton bleibt auf Wunsch ausdrücklich zurückgestellt. Die offenen Mobile-,
 Performance- und externen Spieltests weiter unten bleiben vor Phase 1
 verbindlich.
@@ -76,6 +120,11 @@ Abnahme:
 - [ ] Querformat, sichere Bildschirmbereiche und Touch-Ziele prüfen
 - [ ] FPS und Entity-Spitzen protokollieren
 - [ ] Verhalten bei Tab-Wechsel und Bildschirmunterbrechung prüfen
+- [ ] „Gerät drehen"-Hinweis für Hochformat ergänzen. Laut D-017 ist Hochformat
+  kein unterstützter Kampfmodus: Die Simulation garantiert identische
+  Ergebnisse ausschließlich im Querformat. Statt den Kampf im Hochformat
+  anzubieten, soll ein ruhiger Overlay-Hinweis zum Drehen auffordern; der Run
+  pausiert dabei, statt abzubrechen.
 
 Abnahme:
 

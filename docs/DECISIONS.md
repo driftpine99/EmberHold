@@ -250,3 +250,138 @@ dadurch entstehen im Schwarm keine zusätzlichen Schattenpfade pro Frame. Erst
 nach positivem Sicht- und FPS-Test wird dieselbe Pipeline auf Stürmer, Speier,
 Teiler und Wahrer übertragen. Die Animation verändert keine Trefferfläche,
 Geschwindigkeit oder Gegnerlogik.
+
+## D-017 – Seitenverhältnis verändert das Balancing; die CI prüft eine Größe, die niemand spielt
+
+**Status:** beschlossen, technisch umgesetzt und automatisch abgesichert
+(21.08.2026). **Die visuelle Abnahme steht aus** und erfolgt im manuellen
+8-Minuten-Run: Kampfausschnitt, seitliche Safe-Area und Warden-Einstieg sind
+Sichtfragen, die keine Messung beantwortet.
+
+Bei der Vorbereitung der 8-Minuten-Abnahme des Schwärmers (ROADMAP-Punkt 1) hat
+sich gezeigt, dass derselbe Spielcode je nach Fenstergröße ein anderes Balancing
+liefert. `npm test` meldet `pass`, während ein normales Desktopfenster den
+Vertrag verletzt.
+
+**Mechanismus.** `resize()` in `prototype/web/index.html` (ca. Zeile 1710)
+normiert `SCALE` auf die *kleinere* Fensterkante und leitet daraus drei Werte
+ab: `AREA_F` skaliert die Zielgegnerzahl in `targetEnemies()`, `VIEW_DIAG`
+bestimmt den Spawnradius (`VIEW_DIAG*0.96`), den Despawn-Rand
+(`VIEW_DIAG*1.55`) und die Sichtprüfung (`VIEW_DIAG*1.15`). Weil `SCALE` auf die
+kürzere Kante normiert, hängt das Ergebnis am **Seitenverhältnis**, nicht an der
+Auflösung: 1280×720 und 1536×864 liefern identische Werte.
+
+Der Node-Shim in `tools/run-balance-suite.mjs` setzt `clientWidth 1000`,
+`clientHeight 700` und `addEventListener = noop`. Dadurch läuft `resize()` in der
+CI nie, und `VIEW_W/VIEW_H/AREA_F/VIEW_DIAG` behalten ihre Startwerte
+`1000 / 700 / 1 / 610`. Die CI prüft damit ein Seitenverhältnis von 10:7, das
+auf keinem realen Gerät vorkommt.
+
+**Messung** (neun Vertragsseeds, `smart`+`immortal`, `XP_C` vor jeder Messung
+explizit auf 82 gesetzt, Wiederholung bitgenau identisch):
+
+| Fenster | Dichte 0:30 | Dichte 8:00 | Spitze Gegner | max. sichtbar | Kartenzüge Ø | Evolutionen | Vertrag 21±3 |
+|---|---:|---:|---:|---:|---:|---:|---|
+| 1000×700 (CI/Node) | 42 | 301 | 382 | 355 | 21,78 | 5/9 | erfüllt |
+| 1280×720 (16:9) | 53 | 375 | 451 | 409 | 17,44 | 3/9 | **verletzt** |
+| 1536×864 (16:9) | 53 | 375 | 451 | 409 | 17,44 | 3/9 | **verletzt** |
+| 390×844 (Handy hoch) | 64 | 457 | 551 | 485 | 21,11 | 4/9 | erfüllt |
+
+**Zwei getrennte Folgen.**
+
+1. *Balancing.* Auf 16:9 fallen die Kartenzüge um 20 % (21,78 → 17,44) und die
+   Evolutionsquote von 5/9 auf 3/9. Ursache ist der größere Spawnradius: Gegner
+   erscheinen weiter weg, erreichen den Spieler später, es gibt weniger frühe
+   Kills und damit weniger XP. Ein größerer Bildschirm macht das Spiel also
+   *langsamer*, nicht großzügiger.
+2. *Renderlast.* `AREA_F` erhöht die Gegnerzahl mit der sichtbaren Fläche und ist
+   bei 2,2 gedeckelt; `VIEW_DIAG` ist **nicht** gedeckelt. Auf einem hochkant
+   gehaltenen Handy stehen am Ende 457 statt 301 Gegner auf dem Feld (+52 %) —
+   also die höchste Last ausgerechnet auf der schwächsten Hardware. Das
+   gefährdet direkt das P0.3-Ziel von mindestens 55 FPS.
+
+**Entscheidung.** Die Simulation wird vom Seitenverhältnis entkoppelt. 1000×700
+ist die feste Balance-Referenz. Umgesetzt am 21.08.2026:
+
+- Neue Konstanten `SIM_W = 1000`, `SIM_H = 700`,
+  `SIM_DIAG = hypot(SIM_W, SIM_H)/2`. Zieldichte (`targetEnemies`), Spawnring,
+  Zählradius für `onScreen`, Despawnrand und der Boss-Einstiegsabstand rechnen
+  ausschließlich mit diesen Werten.
+- `AREA_F` und `VIEW_DIAG` sind ersatzlos entfallen. `VIEW_W` und `VIEW_H`
+  existieren weiterhin, werden aber nur noch für das Render-Culling benutzt.
+- `resize()` beeinflusst nur noch Darstellung, Canvas-Skalierung und Culling.
+- XP-Werte, Gegnerwerte, Spawnkurven und Waffenwerte blieben unverändert. Die
+  Referenzmessung ist bitgenau erhalten: erster Kartenzug 26,477777777777558 s,
+  21,77777777777778 Kartenzüge, Sensitivität 1,1691176470588236, 5/9
+  Evolutionen — vor wie nach der Änderung identisch.
+
+**Darstellung: „Cover", bei 16:9 gedeckelt.** Weil der Spawnring fest ist,
+würden auf breiten Fenstern Gegner sichtbar innerhalb des Bildes erscheinen.
+Deshalb gilt `SCALE = max(W/SIM_W, H/SIM_H)` — allerdings nur bis 16:9. Ein
+reines Cover ließ die sichtbare Höhe auf breiten Formaten immer weiter
+schrumpfen (844×390 auf 462, 21:9 auf 422 Welteinheiten); das war zu wenig
+vertikale Vorwarnung. Ab 16:9 bleibt der zentrale **Kampfausschnitt** deshalb
+bei 1000 × 562,5 Welteinheiten stehen, und die überschüssige Breite wird ruhige
+seitliche Safe-Area statt zusätzlicher Kampfraum. Welt, Gegner und Telegrafien
+werden auf diesen Ausschnitt geclippt.
+
+| Fenster | Seitenverhältnis | SCALE | Kampfausschnitt | Safe-Area je Seite |
+|---|---:|---:|---|---:|
+| 1024×768 (4:3) | 1,333 | 1,097 | 933 × 700 | 0 px |
+| 1000×700 (Referenz) | 1,429 | 1,000 | 1000 × 700 | 0 px |
+| 1280×720 · 1536×864 (16:9) | 1,778 | 1,280 / 1,536 | 1000 × 563 | 0 px |
+| 844×390 (Handy quer) | 2,164 | 0,693 | 1000 × 563 | 75 px |
+| 2560×1080 (21:9) | 2,370 | 1,920 | 1000 × 563 | 320 px |
+
+Zwischen 10:7 und 16:9 wird die ganze Leinwand bespielt. Erst darüber entsteht
+die Safe-Area. Die Alternative wäre Pillarboxing bis zur vollen Referenzhöhe
+gewesen; sie hielte 1000 × 700 überall, kostet aber auf 16:9 spürbar Bildfläche.
+Falls der Ausschnitt im Spieltest zu eng wirkt, ist das der Gegenentwurf.
+
+**Offener Vorbehalt zum Warden-Einstieg.** `BOSS_ENTRY` beträgt 280
+Welteinheiten, die halbe sichtbare Höhe ab 16:9 aber nur 281,25. Die Reserve
+von 1,25 Einheiten genügt der Prüfung `bossInsideCombat`, ist aber praktisch
+keine: Betritt der Warden den Ausschnitt senkrecht, wird er sichtbar
+angeschnitten. Eine Absenkung auf etwa 190 Einheiten wäre die naheliegende
+Korrektur, ändert aber einen Gegnerwert und braucht deshalb eine eigene
+Entscheidung.
+
+**Telemetrietrennung.** `nearbyEnemies` zählt den festen Simulationskreis
+(`SIM_DIAG*1.15`) und steuert das Nachspawnen; `visibleEnemies` zählt, was das
+Render-Culling wirklich durchlässt. Nur `nearbyEnemies` darf in die Balance
+einfließen — `headlessRun` gibt konsequent keine Rendertelemetrie mehr zurück,
+und die Prüfung `telemetrySeparated` erzwingt das.
+
+**Hochformat ist kein unterstützter Kampfmodus.** Geprüft und garantiert werden
+ausschließlich Querformate. Ein „Gerät drehen"-Hinweis für Hochformat ist unter
+P0.3 in der Roadmap vermerkt.
+
+**Absicherung.** `npm test` führt `resize()` jetzt wirklich aus und prüft
+1000×700, 1280×720, 1536×864, 844×390 und 2560×1080 mit demselben Seed:
+
+- `aspectIndependent` — bitgenau identische Laufergebnisse über alle Formate
+- `minCombatHeight` — mindestens 562 sichtbare Welteinheiten Höhe
+- `bossInsideCombat` — Warden-Einstieg innerhalb des Kampfausschnitts
+- `telemetrySeparated` — Rendertelemetrie erreicht die Simulation nicht
+- `visibleCountsCulling` — `visibleEnemies` stammt wirklich aus dem Culling
+
+Hochformat ist kein unterstützter Kampfmodus und wird bewusst nicht geprüft.
+
+## D-018 – Beobachtung: verschobener XP-Wert nach mehreren Suite-Läufen
+
+**Status:** Ursache offen, Absicherung umgesetzt (21.08.2026)
+
+Nach mehreren aufeinanderfolgenden `runBalanceSuite()`-Aufrufen und Direktläufen
+in derselben Seite stand `CFG.XP_C` auf **81,18 statt 82** — exakt
+`82 × 0,9 × 1,1`, also das Produkt der beiden Varianten-Faktoren. Ein sauberer
+Kontrollversuch (`XP_C` auf 82 setzen, Suite laufen lassen, erneut lesen) zeigte
+**kein** Leck, und es gibt im Code nur zwei Zuweisungen an `CFG.XP_C`
+(Zeile 2779 setzen, Zeile 2854 im `finally` zurücksetzen), die korrekt gepaart
+sind.
+
+Die Ursache bleibt offen. Weil ein stillschweigend verschobener Balancewert jede
+folgende Messung entwertet, ist die Absicherung trotzdem umgesetzt:
+`runBalanceSuite()` nimmt beim Eintritt einen Schnappschuss der **gesamten**
+Balancekonfiguration `CFG` und vergleicht ihn am Ende. Abweichungen lassen den
+Check `configStable` und damit `npm test` rot werden. Damit ist die
+Fehlerklasse dauerhaft sichtbar, unabhängig davon, welche Einzelursache sie hat.
