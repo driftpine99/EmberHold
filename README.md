@@ -54,11 +54,12 @@ npm test
 ```
 
 Der Test benötigt keine Projektabhängigkeiten. GitHub Actions führt ihn bei
-relevanten Änderungen automatisch mit acht festen Zufalls-Seeds aus.
+relevanten Änderungen automatisch mit neun festen Zufalls-Seeds aus.
 
 ## Repository-Struktur
 
 ```text
+CLAUDE.md                Projektübergabe und Arbeitsregeln für Claude Code
 .github/                 Issue- und Pull-Request-Vorlagen
 docs/
   GAME_DESIGN.md         Vollständiges Game Design Document
@@ -71,6 +72,7 @@ prototype/
     index.html            Spielbarer Phase-0-Prototyp
     assets/               Lokale Figuren- und Gegneratlanten
 tools/
+  crop-horizontal-atlas.cjs Zuschnitt horizontaler Animationsstreifen
   extract-atlas-alpha.cjs Reproduzierbare Transparenzaufbereitung
   run-balance-suite.mjs   Abhängigkeitsfreier Balance-Test
 package.json              Lokale Testbefehle

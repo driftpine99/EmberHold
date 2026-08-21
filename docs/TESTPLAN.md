@@ -74,9 +74,16 @@ lokale Speicherung, die einmalige Auszahlung einer Run-Belohnung, Rückkehr in
 den Hold und die Übernahme des +10-%-Schadensbonus in den nächsten Run. Die
 Kampf-Balance-Suite läuft immer ohne Hold-Bonus.
 
-Der Visual-Smoke-Check stellt zusätzlich sicher, dass die beiden aktiven
-Sprite-Atlanten als echte RGBA-PNGs vorhanden sind, der Bildlader eingebunden
-ist und ein Langbogenschuss den rein visuellen Release-Zustand auslöst.
+Der Visual-Smoke-Check stellt zusätzlich sicher, dass die drei aktiven
+Raster-Assets (`aelric-atlas-v2.png`, `enemy-atlas-v1.png` und
+`enemy-swarmer-atlas-v2.png`) als echte RGBA-PNGs vorhanden sind, der
+Bildlader eingebunden ist und ein Langbogenschuss den rein visuellen
+Release-Zustand auslöst.
+
+Der letzte technische Browser-Smoke mit dem animierten Schwärmer erreichte
+vorläufig mindestens 59 FPS bei 53 sichtbaren Gegnern nach ungefähr 30
+Sekunden. Diese frühe Messung ist weder der vollständige 8-Minuten-Stresstest
+noch die P0.3-Abnahme auf echten Referenzgeräten.
 
 ## Manueller Grafikcheck
 
@@ -111,6 +118,13 @@ ist und ein Langbogenschuss den rein visuellen Release-Zustand auslöst.
    auf ihn und erreicht ihn auch durch normale Gegner hindurch.
 13. Dauerhaftes Stehen im Gegnerpulk muss deutlich riskanter sein als Kiten;
    Fernkampf darf keinen Nahkampf-Build voraussetzen, um den Boss zu besiegen.
+14. Vor der Animation der nächsten Gegnerfamilie einen vollständigen
+    8-Minuten-Run spielen. Run-Bericht und schlechteste FPS kopieren und
+    zusätzlich notieren, ob Schwärmer bei hoher Dichte ruhig, geerdet und ohne
+    synchrones Marschieren wirken.
+15. Erst wenn dieser Lauf keine neue Rotations-, Sichtbarkeits- oder deutliche
+    Performance-Regression zeigt, darf der Stürmer als nächste Familie
+    animiert werden.
 
 Die Einzelruns streuen derzeit stark: erster Zug 21,0–30,7 Sekunden und
 10–35 Kartenzüge. Der Vertrag bewertet deshalb vorerst den Seed-Mittelwert;

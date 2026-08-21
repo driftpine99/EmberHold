@@ -1,5 +1,28 @@
 # Roadmap
 
+## Aktueller Arbeitsfokus
+
+Diese Reihenfolge ist die verbindliche Übergabe für den nächsten Entwickler.
+Nicht mehrere Grafikfamilien gleichzeitig beginnen:
+
+1. [ ] Einen vollständigen 8-Minuten-Run mit dem animierten Schwärmer spielen.
+   Run-Bericht, schlechteste FPS sowie Auffälligkeiten bei Lesbarkeit,
+   Bodenkontakt und Bewegungsruhe festhalten. Der bisherige Browser-Smoke von
+   mindestens 59 FPS bei 53 sichtbaren Gegnern nach etwa 30 Sekunden ist nur
+   ein vorläufiger Technikcheck.
+2. [ ] Nur nach Freigabe des Schwärmers den Stürmer mit eigenem, geerdetem
+   Bewegungszyklus animieren. Rote Sprintbahn und tatsächlicher Sprint müssen
+   weiterhin exakt übereinstimmen; Kampfwerte bleiben unverändert.
+3. [ ] Danach Speier, Teiler und Wahrer einzeln animieren und jede Familie vor
+   der nächsten im echten Run abnehmen.
+4. [ ] Erst nach diesem Gegnerpass entscheiden, ob Aelric einen aufwendigeren
+   Richtungsatlas mit 6–8 Lauf- und Bogenphasen erhält. Dies ist ein späterer
+   Qualitäts- und kein aktueller Phase-0-Pflichtschritt.
+
+Ton bleibt auf Wunsch ausdrücklich zurückgestellt. Die offenen Mobile-,
+Performance- und externen Spieltests weiter unten bleiben vor Phase 1
+verbindlich.
+
 ## Phase 0 – Kampfprototyp
 
 Ziel: Mit externen Testpersonen prüfen, ob der aktive Kern aus Bewegung,
@@ -38,7 +61,8 @@ Abnahme:
 - [x] Testbericht am Run-Ende kopierbar machen
 - [x] Kampf über Button und Tastatur vollständig pausierbar machen
 - [x] Aelric mit konsistentem Lauf- und Bogenzyklus sowie lesbarem Bodenkontrast ausstatten
-- [x] Animationspipeline an der häufigsten Gegnerfamilie im echten Schwarm validieren
+- [x] Technischen Animationspfad an der häufigsten Gegnerfamilie im frühen Schwarm validieren
+- [ ] Animierten Schwärmer in einem vollständigen 8-Minuten-Run abnehmen
 
 Abnahme:
 

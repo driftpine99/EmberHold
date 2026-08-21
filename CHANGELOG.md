@@ -6,6 +6,10 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 
 ### Added
 
+- Projektweite `CLAUDE.md` mit Scope, Grafikregeln, Prüfkommandos und klarem
+  Übergabepunkt für Claude Code
+- Priorisierte Grafikreihenfolge mit manuellem 8-Minuten-Gate zwischen den
+  einzelnen Gegnerfamilien
 - Repository-Grundstruktur für Dokumentation und Webprototyp
 - README mit Projektstatus und Startanleitung
 - Phase-0-Roadmap mit messbaren Gates
@@ -34,6 +38,8 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 
 ### Changed
 
+- Visual-Testplan auf alle drei aktiven RGBA-Raster-Assets und den vorläufigen
+  Schwärmer-Performance-Smoke aktualisiert
 - Konzept auf reines Solo-PvE ohne PvP, Koop, Gilden oder Ranglisten festgelegt
 - Cloud-Save und Backend als optionale spätere Infrastruktur definiert
 - Vorhandener Browserprototyp als kanonischer Phase-0-Build einsortiert
