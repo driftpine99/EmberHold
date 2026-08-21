@@ -47,6 +47,7 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 - Doppelbild-Crossfades durch klar getaktete Einzelposen bei flüssiger Weltbewegung ersetzt
 - Aelrics Drehung und Bewegungsstart/-stopp mit framerateunabhängigem Easing geglättet
 - Basaltboden aufgehellt, Bodendetail beruhigt und Aelric mit kühler Ascheaufhellung abgesetzt
+- Entfernungsabhängige Kreis- und Schattenplatzhalter entfernt; sichtbare Gegner verwenden immer ihre vollständige Rasterfigur
 - Gegnerausrichtung von 8 auf 16 vorgerenderte Richtungen erweitert und weich nachgeführt
 - Evolutionspfade im Kampf-HUD und auf relevanten Karten sichtbar gemacht
 - Späten optionalen Fokus-Schutz für fast fertige Evolutionspfade ergänzt

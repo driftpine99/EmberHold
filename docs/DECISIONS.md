@@ -201,10 +201,15 @@ Kontaktfaktor steigt auf 1,10. Weniger, lesbarere Gegner bleiben dadurch
 gefährlicher als eine reine, folgenlose Sprite-Wand.
 
 Nach einem echten Run mit 28 FPS wird die Gegnerdarstellung von zwanzig
-Familie×Lichtstufe-Scans auf einen sichtbaren Durchlauf reduziert. Gegner in
-tiefer Dunkelheit verwenden kleine Silhouetten; passive Familienmarker werden
-nur im nahen Lichtbereich gezeichnet. Der Feldtest-Seed `2474367456` ist Teil
-der reproduzierbaren Suite.
+Familie×Lichtstufe-Scans auf einen sichtbaren Durchlauf reduziert. Nach der
+Aufhellung des Arenabodens entfällt auch der entfernungsabhängige Kreis- und
+Schatten-Fallback: Jeder sichtbare Gegner verwendet seine vollständige
+Rasterfigur. Nur eine echte Angriffsphase darf eine alternative Variante
+anzeigen. Dafür werden pro Familie nur noch Normal- und Warnvariante
+vorgerendert. Passive Familienmarker bleiben auf den nahen Kampfbereich
+begrenzt. Die nachträgliche Bildschirmrand-Vignette entfällt ebenfalls; der
+warme Lichtkreis bleibt ein reiner Bodeneffekt. Der Feldtest-Seed `2474367456`
+ist Teil der reproduzierbaren Suite.
 
 ## D-015 – Gemalte Low-Res-Figuren mit getrenntem Bewegungs- und Posentakt
 

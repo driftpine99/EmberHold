@@ -88,6 +88,8 @@ ist und ein Langbogenschuss den rein visuellen Release-Zustand auslöst.
    unterscheidbar sein.
 4. Gegner bleiben ebenfalls aufrecht und spiegeln horizontal, ohne bei einem
    Richtungswechsel sichtbar aus ihrer Position zu springen.
+   Entfernung und Lichtkreis dürfen sie niemals durch Kreise oder abstrakte
+   Silhouetten ersetzen oder am Bildschirmrand nachträglich abdunkeln.
 5. Beim Stürmer muss die rote Laufbahn exakt dem folgenden Sprint entsprechen;
    beim Speier muss die violette Ziellinie vor dem Projektil sichtbar sein.
 6. Teiler (grüne Teilungsbögen), Wahrer (goldener Zielrahmen) und Elite

@@ -125,8 +125,11 @@ const directionBlock = html.match(/function directionalSprites\(base\)\{([\s\S]*
 const uprightCharacters = html.includes("ctx.scale(S.heroFacing,1)") &&
   html.includes("const faceRight=Math.cos") && !directionBlock.includes(".rotate(");
 const renderEnemyBlock = html.slice(html.indexOf("// --- Gegner: ein Durchlauf"), html.indexOf("// --- Gegnerprojektile"));
-const singlePassRendering = renderEnemyBlock.includes("spr=tier===0?SPR.enemy") &&
-  !renderEnemyBlock.includes("for (let f=0; f<5; f++)");
+const singlePassRendering = renderEnemyBlock.includes("spr=artSet?artSet[dir]:SPR.enemy[f][tier]") &&
+  renderEnemyBlock.includes("ENEMY_NORMAL_TIER") &&
+  !renderEnemyBlock.includes("tier===0") &&
+  !renderEnemyBlock.includes("for (let f=0; f<5; f++)") &&
+  !html.includes("Vignette: außerhalb des Lichts");
 const combatReadability =
   html.includes("function drawEnemyTelegraphs(vx0,vx1,vy0,vy1)") &&
   html.includes("E.ang[i]=Math.atan2(dy,dx)") &&
