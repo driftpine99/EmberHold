@@ -454,3 +454,28 @@ Optionen, alle vier Effekte und exakt zwei Entscheidungen in jedem der neun
 Baseline-Runs. Die zusätzliche Kartenbreite verändert den Seed-Mittelwert auf
 20,56 Kartenzüge und 3/9 Runs mit mindestens einer Evolution; beide Werte
 bleiben im bestehenden Vertrag.
+
+## D-022 – Hold-Vorbereitung statt weiterer Rohschaden
+
+**Status:** beschlossen und umgesetzt (21.08.2026)
+
+Arkanum und Übungshof werden als drittes und viertes funktionsfähiges Gebäude
+vorgezogen. Das Arkanum kostet 15 Eisenerz, produziert alle 45 Sekunden Essenz
+bis zur Lagerkappe 6 und erlaubt für je 2 Essenz einen zusätzlichen Reroll für
+den nächsten Run. Maximal zwei können vorbereitet werden und werden beim Start
+atomar aus dem Hold-Spielstand in den Run übertragen.
+
+Der Übungshof kostet 3 Barren und produziert alle 60 Sekunden eine
+Trainingsmarke bis zur Lagerkappe 4. Marken verbessern drei Utility-Pfade auf
+höchstens Stufe 2: Pfadkunde (+5 % Lauftempo), Reichgriff (+10 %
+Aufsammelradius) und Stoßschule (−8 % Stoß-Abklingzeit), jeweils pro Stufe.
+Die Kosten steigen von einer auf zwei Marken. Direkter Schaden bleibt bewusst
+beim bestehenden Wächterbogen, damit der Hold nicht jede Kampfentscheidung
+durch passiven Powercreep ersetzt.
+
+Der lokale Save-Key bleibt kompatibel, das Schema migriert auf Version 3.
+`holdExpansion` prüft v2→v3-Migration, beide Offline-Produktionen,
+Zeitstempel-Idempotenz, Vorbereitungslimit, Meisterschaftskosten, Verbrauch
+beim Run-Start und vollständige Isolation der Meta-Boni aus der Headless-
+Balance-Referenz. Im Browser passt der Desktop-Hold bei 1440×1000 nahezu ohne
+Scroll; 844×390 bleibt ohne horizontalen Überlauf vertikal bedienbar.

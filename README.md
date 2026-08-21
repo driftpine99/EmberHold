@@ -18,8 +18,9 @@ Der aktuelle Build enthält einen Helden, ein Territorium, sechs Waffen mit
 vollständigen Evolutionspfaden, acht Passive, fünf Gegnerfamilien, Eliten,
 einen Mittelboss,
 Extraktion und Overtime. Hinzu kommt ein bewusst kleiner Kraterhold mit
-Tiefmine, Emberschmiede, lokaler Speicherung, Offline-Produktion und einer
-ersten dauerhaften Bogenverbesserung. Aelric nutzt inzwischen einen konsistenten
+Tiefmine, Emberschmiede, Arkanum, Übungshof, lokaler Speicherung,
+Offline-Produktion, herstellbaren Rerolls und drei Utility-Meisterschaften.
+Aelric nutzt inzwischen einen konsistenten
 4×3-Raster-Atlas mit Idle-, Lauf- und Bogenphasen; Gegner besitzen eigene
 Silhouetten und Blickrichtungen. Die Weltposition bleibt an den Browser-Frame
 gekoppelt, während klar getaktete Einzelposen Doppelbilder vermeiden. Ein

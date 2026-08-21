@@ -6,6 +6,12 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 
 ### Added
 
+- Arkanum mit Essenzproduktion, Lagerkappe und bis zu zwei herstellbaren
+  zusätzlichen Rerolls für den nächsten Run
+- Übungshof mit Trainingsmarken und je zwei Stufen Pfadkunde, Reichgriff und
+  Stoßschule als dauerhafte Utility-Meisterschaften
+- Save-v3-Migration und `holdExpansion`-Test für Offline-Produktion, Kappen,
+  Kosten, Run-Verbrauch und Headless-Isolation
 - Vier neue Waffen-Evolutionen: Pfeilregen, Sturmherz, Klingenzyklon und
   Ewiger Winter; damit besitzen alle sechs Waffen einen vollständigen Pfad
 - Amulett für Abklingtempo und Umhang für Schadensschutz als neue Passive

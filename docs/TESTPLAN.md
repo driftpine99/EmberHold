@@ -29,7 +29,13 @@ Server, keine Installation. Läuft auf Desktop und Handy.
    Barren und benötigt dafür 30 Sekunden.
 5. Zwei Barren einsammeln und den Wächterbogen verstärken.
 6. Im nächsten Run muss links `Wächterbogen +10 %` erscheinen.
-7. Seite neu laden: Ressourcen, Gebäude und Verbesserung müssen erhalten sein.
+7. Arkanum für 15 Erz reparieren, Essenz sammeln und für 2 Essenz einen
+   zusätzlichen Reroll vorbereiten. Der nächste Run startet dann mit 2 statt 1.
+8. Übungshof für 3 Barren reparieren, Trainingsmarken sammeln und einen der
+   drei Utility-Pfade lernen. Die Meisterschaft muss im nächsten Run links
+   sichtbar sein und den angegebenen Wert verändern.
+9. Seite neu laden: Ressourcen, Gebäude, Vorbereitung und Meisterschaften
+   müssen erhalten sein.
 
 Die kurzen Timer dienen nur dazu, den vollständigen Loop innerhalb weniger
 Minuten zu testen. Die langfristigen GDD-Zeiten sind noch nicht aktiv.
@@ -91,6 +97,11 @@ Vier Prüfungen hängen daran:
   Gegner außerhalb des Kampfausschnitts, aber innerhalb des Simulationskreises,
   erscheint nur in `nearbyEnemies`. Der Lauf deckt beide Renderpfade ab, mit
   und ohne seitliche Safe-Area.
+
+`holdExpansion` prüft zusätzlich die Save-v2→v3-Migration, deterministische
+Offline-Produktion des Arkanums und Übungshofs, deren Lagerkappen, maximal zwei
+vorbereitete Rerolls, steigende Meisterschaftskosten und die Isolation aller
+Hold-Boni aus der Seed-Baseline.
 
 Hochformat ist laut D-017 kein unterstützter Kampfmodus und wird bewusst nicht
 geprüft; der geplante „Gerät drehen"-Hinweis steht unter P0.3.
@@ -240,9 +251,10 @@ auf Desktop und echten Mobilgeräten gemessen werden.
 - Lichtradius, der mit der Buildstärke wächst
 - Nicht blockierendes First-Run-Onboarding und deutliche Warden-Ankündigung
 - Klarer Extraktions-/Neustartfluss mit kopierbarem Run-Bericht
-- Kraterhold mit Tiefmine, Emberschmiede und zwei sichtbar gesperrten Slots
+- Kraterhold mit Tiefmine, Emberschmiede, Arkanum und Übungshof
 - Lokale Offline-Produktion mit 24-Stunden-Kappe
 - Erste dauerhafte Hold→Run-Verbesserung über den Wächterbogen
+- Herstellbare zusätzliche Rerolls und drei kleine Utility-Meisterschaften
 - Balanceziele für vier Run-Längen (3 / 8 / 15 / 20 Min); die Phase-0-UI bietet
   bewusst nur 3 und 8 Minuten an
 - Regel 1 umgesetzt: Tod kostet nur den Overtime-Bonus, nie die Basis

@@ -178,6 +178,15 @@ button.b.danger{background:#c9402e;color:#fff}
 .holdlower{display:grid;grid-template-columns:1.35fr .65fr;gap:10px;margin-top:10px}
 .holdupgrade{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .holdupgrade.done{border-color:#7d9463}.holdupgrade b{font-size:13px}
+.masterybox{margin-top:10px;background:rgba(16,16,24,.92);border:1px solid #292936;
+  border-radius:11px;padding:11px 13px;text-align:left}.masterybox.locked{opacity:.48}
+.masteryhead{display:flex;justify-content:space-between;gap:12px;align-items:baseline;margin-bottom:8px}
+.masteryhead b{font-size:12.5px}.masteryhead span{font-size:9px;color:#777164;
+  letter-spacing:.1em;text-transform:uppercase}.masterygrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.masterytile{display:flex;align-items:center;justify-content:space-between;gap:8px;
+  background:#1b1b26;border:1px solid #2d2d3a;border-radius:8px;padding:8px 9px;min-width:0}
+.masterytile b{display:block;color:#d8d3c9;font-size:10.5px}.masterytile span{display:block;
+  color:#777164;font-size:9px;line-height:1.3;margin-top:2px}.masterytile .smallaction{padding:6px 8px}
 .lockedslots{display:grid;grid-template-columns:1fr 1fr;gap:7px}
 .lockedslot{display:grid;place-items:center;background:rgba(13,13,19,.82);border:1px dashed #30303b;
   border-radius:9px;color:#5d5a53;font-size:10px;text-align:center;padding:9px}
@@ -204,7 +213,7 @@ button.b.danger{background:#c9402e;color:#fff}
   .holdresources{justify-content:flex-start}.holdres{min-width:82px;padding:5px 9px}
   .holdstage{padding-top:160px}.crater{width:330px;height:165px}.embercore{top:43px}
   .holdstatus{top:126px}.holdgrid,.holdlower{grid-template-columns:1fr}.holdbuilding{padding:11px 12px}
-  .holdupgrade{align-items:flex-start}.holdsortie button.b{padding:11px 18px}
+  .holdupgrade{align-items:flex-start}.masterygrid{grid-template-columns:1fr}.holdsortie button.b{padding:11px 18px}
   .contractgrid{grid-template-columns:1fr}.contractcard{padding:9px 10px}
 }
 
@@ -351,6 +360,8 @@ button.b.danger{background:#c9402e;color:#fff}
       <div class="holdresources" aria-label="Ressourcen">
         <div class="holdres"><b id="holdore">0</b><span>Eisenerz</span></div>
         <div class="holdres"><b id="holdbars">0</b><span>Barren</span></div>
+        <div class="holdres"><b id="holdessence">0</b><span>Essenz</span></div>
+        <div class="holdres"><b id="holdmarks">0</b><span>Trainingsmarken</span></div>
         <div class="holdres"><b id="holdruns">0</b><span>Sortien</span></div>
       </div>
     </div>
@@ -370,11 +381,31 @@ button.b.danger{background:#c9402e;color:#fff}
           <div class="prodbar"><i id="forgebar"></i></div>
           <div class="buildingfoot"><span class="buildingstate" id="forgestate">Benötigt 10 Eisenerz</span><button class="smallaction" id="btnForge">Reparieren · 10</button></div>
         </section>
+        <section class="holdbuilding" id="arcanumcard">
+          <div class="buildingtop"><b>Arkanum</b><span id="arcanumlevel">Ruine</span></div>
+          <p>Verdichtet alle 45 Sekunden 1 Essenz. Lagerkapazität: 6.</p>
+          <div class="prodbar"><i id="arcanumbar"></i></div>
+          <div class="buildingfoot"><span class="buildingstate" id="arcanumstate">Benötigt 15 Eisenerz</span><button class="smallaction" id="btnArcanum">Reparieren · 15</button></div>
+        </section>
+        <section class="holdbuilding" id="yardcard">
+          <div class="buildingtop"><b>Übungshof</b><span id="yardlevel">Ruine</span></div>
+          <p>Erzeugt alle 60 Sekunden 1 Trainingsmarke. Lagerkapazität: 4.</p>
+          <div class="prodbar"><i id="yardbar"></i></div>
+          <div class="buildingfoot"><span class="buildingstate" id="yardstate">Benötigt 3 Barren</span><button class="smallaction" id="btnYard">Reparieren · 3</button></div>
+        </section>
       </div>
       <div class="holdlower">
         <section class="holdupgrade" id="bowupgrade"><div><b>Wächterbogen verstärken</b><p>2 Barren · dauerhaft +10 % Schaden in Sortien</p></div><button class="smallaction" id="btnBowUpgrade">Verstärken</button></section>
-        <div class="lockedslots"><div class="lockedslot">Arkanum<br>äußerer Ring</div><div class="lockedslot">Übungshof<br>äußerer Ring</div></div>
+        <section class="holdupgrade" id="rerollprep"><div><b>Schicksal neu deuten</b><p>2 Essenz · +1 Reroll im nächsten Run · maximal 2</p></div><button class="smallaction" id="btnPrepareReroll">Vorbereiten</button></section>
       </div>
+      <section class="masterybox" id="masterybox">
+        <div class="masteryhead"><b>Aelrics Übungspfad</b><span>Utility · maximal Stufe 2</span></div>
+        <div class="masterygrid">
+          <div class="masterytile"><div><b>Pfadkunde <em id="masterypath">0/2</em></b><span>+5 % Lauftempo je Stufe</span></div><button class="smallaction" id="btnMasteryPath">Lernen</button></div>
+          <div class="masterytile"><div><b>Reichgriff <em id="masteryreach">0/2</em></b><span>+10 % Aufsammelradius je Stufe</span></div><button class="smallaction" id="btnMasteryReach">Lernen</button></div>
+          <div class="masterytile"><div><b>Stoßschule <em id="masterydash">0/2</em></b><span>−8 % Stoß-Abklingzeit je Stufe</span></div><button class="smallaction" id="btnMasteryDash">Lernen</button></div>
+        </div>
+      </section>
     </div>
     <div class="holdsortie">
       <div class="contractboard">
@@ -382,7 +413,7 @@ button.b.danger{background:#c9402e;color:#fff}
         <div class="contractgrid" id="contractgrid"></div>
       </div>
       <div class="btnrow"><button class="b" id="btnStart">Sortie · 8 Min</button><button class="b ghost" id="btnStart3">Scharmützel · 3 Min</button></div>
-      <p class="holdnote">Lokaler Prototyp · Offline-Produktion bis maximal 24 Stunden · weitere Ringe gesperrt</p>
+      <p class="holdnote">Lokaler Prototyp · Offline-Produktion bis maximal 24 Stunden · Ton und weitere Ringe folgen später</p>
     </div>
   </div>
 
@@ -430,7 +461,7 @@ button.b.danger{background:#c9402e;color:#fff}
 "use strict";
 // ===========================================================================
 //  EMBERHOLD — Kampfprototyp + kleiner Hold-Validierungsslice
-//  Ein Held, ein Territorium, zwei Hold-Gebäude. Kein Backend.
+//  Ein Held, ein Territorium, vier Hold-Gebäude. Kein Backend.
 //  Verbindliche Kampfwerte stehen in D-006, Hold-Scope und Testzeiten in D-010.
 // ===========================================================================
 
@@ -969,6 +1000,10 @@ function newRun(runLen, seed, contractId){
     reward:0, baseReward:0,
     rewardGranted:false, holdOre:0,
     holdDmg:HEADLESS?1:(1+0.10*(META?.bowUpgrade||0)),
+    holdUtility:HEADLESS?{path:0,reach:0,dash:0}:{
+      path:META?.masteries?.path||0,reach:META?.masteries?.reach||0,dash:META?.masteries?.dash||0,
+    },
+    preparedRerollsUsed:0,
     cool:{}, seed:runSeed,
     fps:60, worstFps:999,
   };
@@ -994,8 +1029,10 @@ function stat(){
     aspd:  1 + 0.12*(p.sehne||0),
     area:  1 + 0.18*(p.linse||0),
     proj:  (p.koecher||0),
-    speed: (1 + 0.08*(p.federung||0))*(1+0.12*(S.boons?.stride||0)),
-    magnet:(1 + 0.40*(p.magnet||0))*(1+0.25*(S.boons?.harvest||0)),
+    speed: (1 + 0.08*(p.federung||0))*(1+0.12*(S.boons?.stride||0))*
+           (1+0.05*(S.holdUtility?.path||0)),
+    magnet:(1 + 0.40*(p.magnet||0))*(1+0.25*(S.boons?.harvest||0))*
+           (1+0.10*(S.holdUtility?.reach||0)),
     cdr:   1 + 0.10*(p.amulett||0),
     armor: Math.min(0.48,0.08*(p.umhang||0)+0.08*(S.boons?.guard||0)),
   };
@@ -2286,19 +2323,34 @@ const HOLD_CFG=Object.freeze({
   OFFLINE_CAP:86400, MINE_SEC:15, MINE_CAP:20,
   FORGE_COST:10, FORGE_INPUT:5, FORGE_SEC:30, FORGE_CAP:4,
   BOW_COST:2,
+  ARCANUM_COST:15, ARCANUM_SEC:45, ARCANUM_CAP:6, REROLL_COST:2, REROLL_CAP:2,
+  YARD_COST:3, YARD_SEC:60, YARD_CAP:4, MASTERY_MAX:2,
 });
 function freshHold(now){
-  return {version:2,ore:0,bars:0,runs:0,mineLevel:0,mineStored:0,
+  return {version:3,ore:0,bars:0,essence:0,marks:0,runs:0,mineLevel:0,mineStored:0,
     forgeLevel:0,forgeStored:0,forgeWorking:false,forgeProgress:0,
+    arcanumLevel:0,arcanumStored:0,yardLevel:0,yardStored:0,
+    preparedRerolls:0,masteries:{path:0,reach:0,dash:0},
     bowUpgrade:0,selectedContract:'ring',lastAt:Number.isFinite(now)?now:Date.now()};
 }
 function cleanHold(raw,now){
   const h=freshHold(now), src=raw&&typeof raw==='object'?raw:{};
   const num=(key,min,max)=>Math.min(max,Math.max(min,Number.isFinite(+src[key])?+src[key]:h[key]));
-  h.ore=num('ore',0,1e9); h.bars=num('bars',0,1e9); h.runs=num('runs',0,1e7)|0;
+  h.ore=num('ore',0,1e9); h.bars=num('bars',0,1e9);
+  h.essence=num('essence',0,1e9); h.marks=num('marks',0,1e9); h.runs=num('runs',0,1e7)|0;
   h.mineLevel=num('mineLevel',0,1)|0; h.mineStored=num('mineStored',0,HOLD_CFG.MINE_CAP);
   h.forgeLevel=num('forgeLevel',0,1)|0; h.forgeStored=num('forgeStored',0,HOLD_CFG.FORGE_CAP)|0;
   h.forgeWorking=!!src.forgeWorking; h.forgeProgress=num('forgeProgress',0,HOLD_CFG.FORGE_SEC);
+  h.arcanumLevel=num('arcanumLevel',0,1)|0;
+  h.arcanumStored=num('arcanumStored',0,HOLD_CFG.ARCANUM_CAP);
+  h.yardLevel=num('yardLevel',0,1)|0;
+  h.yardStored=num('yardStored',0,HOLD_CFG.YARD_CAP);
+  h.preparedRerolls=num('preparedRerolls',0,HOLD_CFG.REROLL_CAP)|0;
+  const masterySrc=src.masteries&&typeof src.masteries==='object'?src.masteries:{};
+  for(const id of ['path','reach','dash']){
+    const value=Number.isFinite(+masterySrc[id])?+masterySrc[id]:0;
+    h.masteries[id]=Math.min(HOLD_CFG.MASTERY_MAX,Math.max(0,value))|0;
+  }
   h.bowUpgrade=num('bowUpgrade',0,1)|0;
   h.selectedContract=contractById(src.selectedContract).id;
   h.lastAt=Number.isFinite(+src.lastAt)?+src.lastAt:h.lastAt;
@@ -2317,11 +2369,16 @@ function loadHold(now){
 }
 function advanceHold(now){
   now=Number.isFinite(now)?now:Date.now();
-  if(now<META.lastAt){ META.lastAt=now; return {seconds:0,mine:0,bars:0}; }
+  if(now<META.lastAt){ META.lastAt=now; return {seconds:0,mine:0,bars:0,essence:0,marks:0}; }
   const seconds=Math.min((now-META.lastAt)/1000,HOLD_CFG.OFFLINE_CAP);
   META.lastAt=now;
   const mineBefore=META.mineStored, barsBefore=META.forgeStored;
+  const essenceBefore=META.arcanumStored, marksBefore=META.yardStored;
   if(META.mineLevel) META.mineStored=Math.min(HOLD_CFG.MINE_CAP,META.mineStored+seconds/HOLD_CFG.MINE_SEC);
+  if(META.arcanumLevel) META.arcanumStored=Math.min(HOLD_CFG.ARCANUM_CAP,
+    META.arcanumStored+seconds/HOLD_CFG.ARCANUM_SEC);
+  if(META.yardLevel) META.yardStored=Math.min(HOLD_CFG.YARD_CAP,
+    META.yardStored+seconds/HOLD_CFG.YARD_SEC);
 
   let left=seconds, guard=0;
   while(META.forgeLevel&&left>0&&META.forgeStored<HOLD_CFG.FORGE_CAP&&guard++<12){
@@ -2338,7 +2395,8 @@ function advanceHold(now){
   if(META.forgeLevel&&!META.forgeWorking&&META.forgeStored<HOLD_CFG.FORGE_CAP&&META.ore>=HOLD_CFG.FORGE_INPUT){
     META.ore-=HOLD_CFG.FORGE_INPUT; META.forgeWorking=true; META.forgeProgress=0;
   }
-  return {seconds,mine:META.mineStored-mineBefore,bars:META.forgeStored-barsBefore};
+  return {seconds,mine:META.mineStored-mineBefore,bars:META.forgeStored-barsBefore,
+    essence:META.arcanumStored-essenceBefore,marks:META.yardStored-marksBefore};
 }
 function rewardOre(reward){ return Math.max(3,Math.round(Math.log2(Math.max(0,reward)+1))); }
 function depositRunReward(){
@@ -2354,7 +2412,10 @@ function holdMessage(){
   if(!META.mineLevel) return 'Der innere Ring wartet auf die Reparatur der Tiefmine.';
   if(!META.forgeLevel) return 'Sammle 10 Eisenerz, um die Emberschmiede zu reparieren.';
   if(!META.bowUpgrade) return 'Erz wird zu Barren. Der Wächterbogen wartet auf Verstärkung.';
-  return 'Der innere Ring arbeitet. Wähle an der Sortietafel den nächsten Auftrag.';
+  if(!META.arcanumLevel) return 'Das Arkanum kann Essenz für zusätzliche Kartenzüge vorbereiten.';
+  if(!META.yardLevel) return 'Der Übungshof schaltet kleine, dauerhafte Utility-Meisterschaften frei.';
+  if(META.preparedRerolls) return META.preparedRerolls+' zusätzliche Rerolls warten auf die nächste Sortie.';
+  return 'Der innere Ring arbeitet. Produktion, Vorbereitung und Training sind bereit.';
 }
 let contractSig='';
 function selectContract(id){
@@ -2383,6 +2444,8 @@ function renderHold(message){
   if(message){ holdNotice=message; holdNoticeUntil=Date.now()+3200; }
   el('holdore').textContent=Math.floor(META.ore).toLocaleString('de-DE');
   el('holdbars').textContent=Math.floor(META.bars).toLocaleString('de-DE');
+  el('holdessence').textContent=Math.floor(META.essence).toLocaleString('de-DE');
+  el('holdmarks').textContent=Math.floor(META.marks).toLocaleString('de-DE');
   el('holdruns').textContent=META.runs.toLocaleString('de-DE');
   el('holdstatus').textContent=Date.now()<holdNoticeUntil?holdNotice:holdMessage();
   renderContracts();
@@ -2408,9 +2471,50 @@ function renderHold(message){
   }
   el('forgecard').classList.toggle('ready',forgeN>0);
 
+  const arcN=Math.floor(META.arcanumStored), arcOn=META.arcanumLevel>0, ab=el('btnArcanum');
+  el('arcanumlevel').textContent=arcOn?'Stufe 1':'Ruine';
+  el('arcanumbar').style.width=(arcOn?META.arcanumStored/HOLD_CFG.ARCANUM_CAP*100:0)+'%';
+  if(!arcOn){
+    el('arcanumstate').textContent=META.forgeLevel?'Benötigt '+HOLD_CFG.ARCANUM_COST+' Eisenerz':'Zuerst die Emberschmiede reparieren';
+    ab.textContent='Reparieren · '+HOLD_CFG.ARCANUM_COST;
+    ab.disabled=!META.forgeLevel||META.ore<HOLD_CFG.ARCANUM_COST;
+  } else {
+    el('arcanumstate').textContent=arcN?(arcN+' / '+HOLD_CFG.ARCANUM_CAP+' Essenz bereit'):'Verdichtet Essenz…';
+    ab.textContent=arcN?'Einsammeln · '+arcN:'Produziert…'; ab.disabled=!arcN;
+  }
+  el('arcanumcard').classList.toggle('ready',arcN>0);
+
+  const yardN=Math.floor(META.yardStored), yardOn=META.yardLevel>0, yb=el('btnYard');
+  el('yardlevel').textContent=yardOn?'Stufe 1':'Ruine';
+  el('yardbar').style.width=(yardOn?META.yardStored/HOLD_CFG.YARD_CAP*100:0)+'%';
+  if(!yardOn){
+    el('yardstate').textContent=META.forgeLevel?'Benötigt '+HOLD_CFG.YARD_COST+' Barren':'Zuerst die Emberschmiede reparieren';
+    yb.textContent='Reparieren · '+HOLD_CFG.YARD_COST;
+    yb.disabled=!META.forgeLevel||META.bars<HOLD_CFG.YARD_COST;
+  } else {
+    el('yardstate').textContent=yardN?(yardN+' / '+HOLD_CFG.YARD_CAP+' Marken bereit'):'Trainiert Rekruten…';
+    yb.textContent=yardN?'Einsammeln · '+yardN:'Produziert…'; yb.disabled=!yardN;
+  }
+  el('yardcard').classList.toggle('ready',yardN>0);
+
   const up=el('btnBowUpgrade'), done=META.bowUpgrade>0;
   up.textContent=done?'Verstärkt':'Verstärken · '+HOLD_CFG.BOW_COST; up.disabled=done||META.bars<HOLD_CFG.BOW_COST;
   el('bowupgrade').classList.toggle('done',done);
+
+  const prep=el('btnPrepareReroll'), prepFull=META.preparedRerolls>=HOLD_CFG.REROLL_CAP;
+  prep.textContent=prepFull?'Vorbereitet · '+META.preparedRerolls+'/'+HOLD_CFG.REROLL_CAP:
+    'Vorbereiten · '+HOLD_CFG.REROLL_COST;
+  prep.disabled=!META.arcanumLevel||prepFull||META.essence<HOLD_CFG.REROLL_COST;
+  el('rerollprep').classList.toggle('done',META.preparedRerolls>0);
+
+  const masteryNames={path:'Path',reach:'Reach',dash:'Dash'};
+  for(const id of Object.keys(masteryNames)){
+    const lv=META.masteries[id], cost=lv+1, btn=el('btnMastery'+masteryNames[id]);
+    el('mastery'+id).textContent=lv+'/'+HOLD_CFG.MASTERY_MAX;
+    btn.textContent=lv>=HOLD_CFG.MASTERY_MAX?'Gemeistert':'Lernen · '+cost;
+    btn.disabled=!yardOn||lv>=HOLD_CFG.MASTERY_MAX||META.marks<cost;
+  }
+  el('masterybox').classList.toggle('locked',!yardOn);
 }
 function mineAction(){
   advanceHold(Date.now());
@@ -2434,11 +2538,49 @@ function upgradeBow(){
   META.bars-=HOLD_CFG.BOW_COST; META.bowUpgrade=1; saveHold();
   renderHold('Wächterbogen verstärkt: dauerhaft +10 % Schaden.');
 }
+function arcanumAction(){
+  advanceHold(Date.now());
+  if(!META.arcanumLevel){
+    if(!META.forgeLevel||META.ore<HOLD_CFG.ARCANUM_COST) return;
+    META.ore-=HOLD_CFG.ARCANUM_COST; META.arcanumLevel=1; META.lastAt=Date.now();
+    saveHold(); renderHold('Das Arkanum bündelt wieder Essenz.'); return;
+  }
+  const n=Math.floor(META.arcanumStored); if(!n) return;
+  META.arcanumStored-=n; META.essence+=n; saveHold(); renderHold(n+' Essenz eingesammelt.');
+}
+function yardAction(){
+  advanceHold(Date.now());
+  if(!META.yardLevel){
+    if(!META.forgeLevel||META.bars<HOLD_CFG.YARD_COST) return;
+    META.bars-=HOLD_CFG.YARD_COST; META.yardLevel=1; META.lastAt=Date.now();
+    saveHold(); renderHold('Der Übungshof ist wieder besetzt.'); return;
+  }
+  const n=Math.floor(META.yardStored); if(!n) return;
+  META.yardStored-=n; META.marks+=n; saveHold(); renderHold(n+' Trainingsmarken eingesammelt.');
+}
+function prepareReroll(){
+  advanceHold(Date.now());
+  if(!META.arcanumLevel||META.preparedRerolls>=HOLD_CFG.REROLL_CAP||META.essence<HOLD_CFG.REROLL_COST) return;
+  META.essence-=HOLD_CFG.REROLL_COST; META.preparedRerolls++; saveHold();
+  renderHold('Ein zusätzlicher Reroll wartet auf die nächste Sortie.');
+}
+function trainMastery(id){
+  if(!META.yardLevel||!Object.hasOwn(META.masteries,id)) return;
+  const lv=META.masteries[id], cost=lv+1;
+  if(lv>=HOLD_CFG.MASTERY_MAX||META.marks<cost) return;
+  META.marks-=cost; META.masteries[id]++; saveHold();
+  renderHold('Aelric hat '+({path:'Pfadkunde',reach:'Reichgriff',dash:'Stoßschule'}[id])+' trainiert.');
+}
 
 let slotSig='';
 function renderSlots(){
   const parts=[], paths=[];
   if(S.holdDmg>1) parts.push({c:'#e07a3f',n:'Wächterbogen',l:'+10%',e:true});
+  const utilityLabels={path:'Pfadkunde',reach:'Reichgriff',dash:'Stoßschule'};
+  for(const id of Object.keys(utilityLabels)){
+    const lv=S.holdUtility?.[id]||0;
+    if(lv) parts.push({c:'#8fa879',n:utilityLabels[id],l:lv,e:true});
+  }
   for(const boon of BOONS){
     const n=S.boons?.[boon.id]||0;
     if(n) parts.push({c:boon.col,n:boon.name,l:n>1?'×'+n:'Relikt',e:true});
@@ -2674,6 +2816,8 @@ function runReportText(){
     'Build: '+buildText(),
     'Evolutionen: '+evos,
     'Elite-Relikte: '+boonText(),
+    'Hold-Vorbereitung: '+(S.preparedRerollsUsed?('+'+S.preparedRerollsUsed+' Rerolls'):'keine')+
+      ' · Training '+Object.values(S.holdUtility||{}).join('/'),
     'Spitze im SIM-Radius: '+S.peakNearbyEnemies,
     'Spitze sichtbar gezeichnet: '+S.peakVisibleEnemies,
     'Kampfausschnitt: '+(VIEW_W|0)+'×'+(VIEW_H|0)+' Welteinheiten',
@@ -2773,7 +2917,8 @@ function tryDash(){
   S.dashVx=dx*CFG.DASH_SPEED; S.dashVy=dy*CFG.DASH_SPEED;
   fx(S.x,S.y,40,0.35,'#e07a3f',1);
 }
-function dashCooldown(){ return CFG.DASH_CD*(1-0.10*(S?.boons?.stride||0)); }
+function dashCooldown(){ return CFG.DASH_CD*(1-0.10*(S?.boons?.stride||0))*
+  (1-0.08*(S?.holdUtility?.dash||0)); }
 
 // --- Touch: schwebender Joystick links, Ember-Stoß rechts ------------------
 let touchId=-1, joyX=0, joyY=0, touchActive=false;
@@ -2896,6 +3041,10 @@ function frame(ts){
 // ===========================================================================
 function begin(len,contractId){
   newRun(len,undefined,contractId);
+  const prepared=HEADLESS?0:Math.min(HOLD_CFG.REROLL_CAP,META.preparedRerolls||0);
+  if(prepared){
+    S.rerolls+=prepared; S.preparedRerollsUsed=prepared; META.preparedRerolls-=prepared;
+  }
   holdOpen=false; saveHold();
   slotSig=''; renderSlots();
   document.querySelectorAll('.sheet').forEach(s=>{ s.classList.remove('on'); s.setAttribute('aria-hidden','true'); });
@@ -2919,6 +3068,12 @@ el('reroll').onclick     = doReroll;
 el('btnMine').onclick    = mineAction;
 el('btnForge').onclick   = forgeAction;
 el('btnBowUpgrade').onclick = upgradeBow;
+el('btnArcanum').onclick = arcanumAction;
+el('btnYard').onclick = yardAction;
+el('btnPrepareReroll').onclick = prepareReroll;
+el('btnMasteryPath').onclick = ()=>trainMastery('path');
+el('btnMasteryReach').onclick = ()=>trainMastery('reach');
+el('btnMasteryDash').onclick = ()=>trainMastery('dash');
 
 
 // ===========================================================================
@@ -3145,6 +3300,7 @@ window.__EH = { get S(){return S;}, get H(){return META;}, CFG, HOLD_CFG, CONTRA
                 stats:stat, dashCooldown,
                 enemyHp:(i)=>E.hp[i], enemyMax:(i)=>E.max[i],
                 advanceHold, saveHold, loadHold, depositRunReward, selectContract,
+                arcanumAction, yardAction, prepareReroll, trainMastery,
                 contractById, showHold:showStartMenu,
                 tick:(d)=>{HEADLESS=true; step(d);
                   while(pendingPicks>0){currentOffer=buildOffer(); applyOffer(currentOffer[0]); pendingPicks--;}

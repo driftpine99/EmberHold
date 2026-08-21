@@ -171,10 +171,10 @@ zu öffnen.
 
 ### P0.5.3 – Hold mit Wirkung auf den nächsten Run
 
-- [ ] Arkanum als dritte Produktionsstätte umsetzen
-- [ ] Übungshof mit kleinen Aelric-Utility-Meisterschaften umsetzen
-- [ ] Herstellbare Run-Vorbereitung mindestens über zusätzliche Rerolls anbinden
-- [ ] Offline-Produktion, Lagerkappen und Save-Migration deterministisch testen
+- [x] Arkanum als dritte Produktionsstätte umsetzen
+- [x] Übungshof mit kleinen Aelric-Utility-Meisterschaften umsetzen
+- [x] Herstellbare Run-Vorbereitung mindestens über zusätzliche Rerolls anbinden
+- [x] Offline-Produktion, Lagerkappen und Save-Migration deterministisch testen
 
 ### P0.5.4 – Kompakter Ausrüstungsloop
 

@@ -307,6 +307,58 @@ try {
   contractError = error instanceof Error ? error.message : String(error);
 }
 
+// --- P0.5.3: Arkanum, Uebungshof, Vorbereitung und Save-v3-Migration -----
+let holdExpansion = false;
+let holdExpansionError = "";
+try {
+  localStorage.setItem("emberhold:hold:v1", JSON.stringify({
+    version: 2, ore: 21, bars: 5, runs: 4, mineLevel: 1, forgeLevel: 1,
+    bowUpgrade: 1, selectedContract: "hollow", lastAt: 1000,
+  }));
+  engine.loadHold(1000);
+  const migrated = engine.H.version === 3 && engine.H.essence === 0 &&
+    engine.H.marks === 0 && engine.H.preparedRerolls === 0 &&
+    engine.H.masteries.path === 0 && engine.H.selectedContract === "hollow";
+
+  engine.H.arcanumLevel = 1; engine.H.arcanumStored = 0;
+  engine.H.yardLevel = 1; engine.H.yardStored = 0; engine.H.lastAt = 1000;
+  const production = engine.advanceHold(181000);
+  const produced = Math.abs(engine.H.arcanumStored - 4) < 1e-9 &&
+    Math.abs(engine.H.yardStored - 3) < 1e-9 &&
+    Math.abs(production.essence - 4) < 1e-9 && Math.abs(production.marks - 3) < 1e-9;
+  const beforeRepeat = JSON.stringify(engine.H);
+  engine.advanceHold(181000);
+  const timestampIdempotentV3 = JSON.stringify(engine.H) === beforeRepeat;
+
+  engine.H.essence = 4; engine.H.preparedRerolls = 0;
+  engine.prepareReroll(); engine.prepareReroll(); engine.prepareReroll();
+  const preparedAtCap = engine.H.essence === 0 && engine.H.preparedRerolls === 2;
+
+  engine.H.marks = 3; engine.H.masteries.path = 0;
+  engine.trainMastery("path"); engine.trainMastery("path"); engine.trainMastery("path");
+  engine.H.masteries.reach = 1; engine.H.masteries.dash = 2;
+  const masteryCosts = engine.H.masteries.path === 2 && engine.H.marks === 0;
+
+  engine.begin(180, "ring");
+  const preparedConsumed = engine.S.rerolls === 3 && engine.S.preparedRerollsUsed === 2 &&
+    engine.H.preparedRerolls === 0;
+  const st = engine.stats();
+  const utilitiesApplied = Math.abs(st.speed - 1.10) < 1e-9 &&
+    Math.abs(st.magnet - 1.10) < 1e-9 &&
+    Math.abs(engine.dashCooldown() - engine.CFG.DASH_CD * 0.84) < 1e-9;
+
+  engine.H.bowUpgrade = 1; engine.H.masteries = { path: 2, reach: 2, dash: 2 };
+  engine.H.preparedRerolls = 2;
+  engine.headlessRun(60, { seed: 1701, smart: true, immortal: true, contractId: "ring" });
+  const baselineIsolated = engine.S.holdDmg === 1 && engine.S.rerolls === 1 &&
+    Object.values(engine.S.holdUtility).every(value => value === 0);
+
+  holdExpansion = migrated && produced && timestampIdempotentV3 && preparedAtCap &&
+    masteryCosts && preparedConsumed && utilitiesApplied && baselineIsolated;
+} catch (error) {
+  holdExpansionError = error instanceof Error ? error.message : String(error);
+}
+
 // --- P0.5.2: alle vorhandenen Waffen besitzen ein verifiziertes Endziel ---
 let evolutionCatalog = false;
 let evolutionError = "";
@@ -527,8 +579,8 @@ canvasElement.clientHeight = 700;
 engine.resize();
 
 const output = {
-  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && contractFlow && evolutionCatalog && eliteChoices && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling,
-  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, contractFlow, evolutionCatalog, eliteChoices, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling },
+  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && contractFlow && holdExpansion && evolutionCatalog && eliteChoices && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling,
+  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, contractFlow, holdExpansion, evolutionCatalog, eliteChoices, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling },
   targets: report.targets,
   seeds: report.seeds,
   summary: { ...report.summary, evolutionRuns, evolutionSeeds: report.seeds.length,
@@ -544,6 +596,7 @@ if (visibleError) output.visibleError = visibleError;
 if (uxError) output.uxError = uxError;
 if (holdError) output.holdError = holdError;
 if (contractError) output.contractError = contractError;
+if (holdExpansionError) output.holdExpansionError = holdExpansionError;
 if (evolutionError) output.evolutionError = evolutionError;
 if (eliteChoiceError) output.eliteChoiceError = eliteChoiceError;
 
