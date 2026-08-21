@@ -25,9 +25,11 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 - Dauerhafte Wächterbogen-Verbesserung für die nächste Sortie
 - Hold-Flow-Prüfung für Produktion, Persistenz und einmalige Run-Auszahlung
 - Konsistenter 4×3-Aelric-Atlas mit je vier Idle-, Lauf- und Bogenphasen
+- Vierphasiger, geerdeter Laufzyklus für die häufige Schwärmer-Familie
 - Eigenständige Designs für fünf Gegnerfamilien, Elite und Warden-Boss
 - Acht vorgerenderte Blickrichtungen und vier Lichtstufen pro Gegnerfamilie
 - Reproduzierbare Alpha-Aufbereitung für KI-generierte Sprite-Atlanten
+- Wiederverwendbarer Zuschnitt horizontaler Animationsstreifen auf quadratische Zellen
 - Automatische Prüfung der aktiven lokalen RGBA-Assets und des Bogen-Animationszustands
 
 ### Changed

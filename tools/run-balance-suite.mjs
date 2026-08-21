@@ -85,6 +85,7 @@ const html = fs.readFileSync(prototypePath, "utf8");
 const artPaths = [
   path.resolve(here, "../prototype/web/assets/aelric-atlas-v2.png"),
   path.resolve(here, "../prototype/web/assets/enemy-atlas-v1.png"),
+  path.resolve(here, "../prototype/web/assets/enemy-swarmer-atlas-v2.png"),
 ];
 const artAssets = artPaths.every((assetPath) => {
   if (!fs.existsSync(assetPath)) return false;
@@ -120,7 +121,8 @@ const visualState = engine.S.bowKick > 0 &&
   Number.isFinite(engine.S.shotAimx) && Number.isFinite(engine.S.shotAimy) &&
   html.includes("loadRasterArt()") && html.includes("updateVisualState(dt)") &&
   html.includes("const ENEMY_DIRECTIONS = 16") &&
-  html.includes("HERO_ANIM.WALK") && html.includes("HERO_ANIM.SHOT");
+  html.includes("HERO_ANIM.WALK") && html.includes("HERO_ANIM.SHOT") &&
+  html.includes("ART.swarmer[frame][dir]");
 const directionBlock = html.match(/function directionalSprites\(base\)\{([\s\S]*?)\n\}/)?.[1] || "";
 const uprightCharacters = html.includes("ctx.scale(S.heroFacing,1)") &&
   html.includes("const faceRight=Math.cos") && !directionBlock.includes(".rotate(");

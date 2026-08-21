@@ -539,13 +539,14 @@ const ENEMY_NORMAL_TIER=2, ENEMY_TELEGRAPH_TIER=3;
 const SPR = { enemy:[], elite:null, boss:null, gem:null, gemBig:null,
               arrow:[], orb:null, blade:null, frost:null, eproj:null,
               floorTile:null, emberVent:null, wardPillar:null };
-const ART = { hero:[], enemy:[], elite:null, boss:null,
-              heroReady:false, enemyReady:false };
+const ART = { hero:[], enemy:[], swarmer:[], elite:null, boss:null,
+              heroReady:false, enemyReady:false, swarmerReady:false };
 const HERO_ANIM = Object.freeze({
   COLS:4, ROWS:3, FRAMES:4,
   IDLE:0, WALK:4, SHOT:8,
   SHOT_SEC:.28,
 });
+const SWARMER_ANIM = Object.freeze({COLS:4, FRAMES:4, FPS:9});
 
 /** Deterministischer Hash nur fuer Weltdeko. Veraendert niemals den Spiel-RNG. */
 function visualHash(x,y,salt){
@@ -714,6 +715,22 @@ function buildEnemyArt(image){
   ART.enemyReady=true;
 }
 
+function buildSwarmerArt(image){
+  ART.swarmer.length=0;
+  const size=62;
+  for(let frame=0;frame<SWARMER_ANIM.FRAMES;frame++){
+    const raw=atlasCell(image,frame,SWARMER_ANIM.COLS,1,size,0,null,false);
+    const base=mkCanvas(size), g=base.getContext('2d');
+    // Der Schatten wird einmal in das Laufzeit-Sprite gebacken. So bleibt der
+    // Schwarm geerdet, ohne hunderte Ellipsen pro Browser-Frame zu zeichnen.
+    g.save(); g.filter='blur(2px)'; g.fillStyle='rgba(3,4,7,.42)';
+    g.beginPath(); g.ellipse(size*.5,size*.74,size*.28,size*.075,0,0,6.2832); g.fill(); g.restore();
+    g.drawImage(raw,0,0);
+    ART.swarmer[frame]=directionalSprites(base);
+  }
+  ART.swarmerReady=true;
+}
+
 function loadRasterArt(){
   if(typeof Image==='undefined') return; // Node-Balancing hat absichtlich keinen Bildlader
   const hero=new Image(); hero.decoding='async';
@@ -724,6 +741,10 @@ function loadRasterArt(){
   enemy.onload=()=>buildEnemyArt(enemy);
   enemy.onerror=()=>console.warn('Gegner-Atlas nicht geladen; nutze Grafik-Fallback.');
   enemy.src='assets/enemy-atlas-v1.png';
+  const swarmer=new Image(); swarmer.decoding='async';
+  swarmer.onload=()=>buildSwarmerArt(swarmer);
+  swarmer.onerror=()=>console.warn('Schwärmer-Animation nicht geladen; nutze statische Figur.');
+  swarmer.src='assets/enemy-swarmer-atlas-v2.png';
 }
 
 // ===========================================================================
@@ -1997,8 +2018,13 @@ function render(){
       const f=E.fam[i], artSet=ART.enemyReady?ART.enemy[f][tier]:null;
       // Sichtbare Gegner bleiben immer vollstaendige Figuren. Nur die kurze
       // Stuermer-Warnphase darf eine alternative Darstellung verwenden.
-      spr=artSet?artSet[dir]:SPR.enemy[f][tier];
-      if(artSet){ const phase=(S.visualT*(f===1?112:71))|0; bob=ENEMY_BOB[(phase+i*8)&63]; }
+      if(f===0&&ART.swarmerReady){
+        const frame=((S.visualT*SWARMER_ANIM.FPS+i*.73)|0)%SWARMER_ANIM.FRAMES;
+        spr=ART.swarmer[frame][dir];
+      } else {
+        spr=artSet?artSet[dir]:SPR.enemy[f][tier];
+        if(artSet){ const phase=(S.visualT*(f===1?112:71))|0; bob=ENEMY_BOB[(phase+i*8)&63]; }
+      }
     } else if(ART.enemyReady) spr=E.kind[i]===2?ART.boss[dir]:ART.elite[dir];
     else spr=E.kind[i]===2?SPR.boss:SPR.elite;
     const hw=spr.width/2;

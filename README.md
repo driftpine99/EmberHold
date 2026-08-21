@@ -23,8 +23,10 @@ ersten dauerhaften Bogenverbesserung. Aelric nutzt inzwischen einen konsistenten
 Silhouetten und Blickrichtungen. Die Weltposition bleibt an den Browser-Frame
 gekoppelt, während klar getaktete Einzelposen Doppelbilder vermeiden. Ein
 hellerer, ruhiger Basaltboden und eine dezente Ascheaufhellung trennen dunkle
-Figuren vom Untergrund. Backend, Ton und Monetarisierung bleiben weiterhin
-außerhalb des Scopes.
+Figuren vom Untergrund. Der häufige Schwärmer besitzt als erster Gegnertyp
+einen echten Vier-Phasen-Laufzyklus; weitere Familien folgen erst nach seinem
+Spieltest. Backend, Ton und Monetarisierung bleiben weiterhin außerhalb des
+Scopes.
 
 Die einzige Produktfrage der Phase 0 lautet:
 

@@ -233,3 +233,20 @@ Rückansichten bleiben ein späterer, eigener Produktionsschritt.
 Animation, Bodenfarbe und Aschelicht verändern weder Trefferflächen noch
 Kampfwerte, Zufallsfolgen oder Spawnlogik. Erst wenn Aelric im Spieltest trägt,
 werden Gegnerfamilien nach demselben Verfahren neu produziert.
+
+## D-016 – Gegneranimation familienweise statt als großer Sammelatlas
+
+**Status:** beschlossen
+
+Gegneranimationen werden kosteneffizient Familie für Familie validiert. Der
+Schwärmer beginnt, weil er am häufigsten sichtbar ist und Laufzeitprobleme in
+großen Gruppen zuerst offenlegt. Sein 4×1-Atlas enthält vier geerdete
+Beinkontaktphasen, läuft mit neun Posen pro Sekunde und erhält pro Gegner einen
+deterministischen Phasenversatz. Die Weltbewegung bleibt davon unabhängig und
+weiterhin flüssig.
+
+Der Kontaktschatten wird einmal in jedes kleine Laufzeit-Sprite vorgerendert;
+dadurch entstehen im Schwarm keine zusätzlichen Schattenpfade pro Frame. Erst
+nach positivem Sicht- und FPS-Test wird dieselbe Pipeline auf Stürmer, Speier,
+Teiler und Wahrer übertragen. Die Animation verändert keine Trefferfläche,
+Geschwindigkeit oder Gegnerlogik.

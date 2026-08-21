@@ -38,6 +38,7 @@ Abnahme:
 - [x] Testbericht am Run-Ende kopierbar machen
 - [x] Kampf über Button und Tastatur vollständig pausierbar machen
 - [x] Aelric mit konsistentem Lauf- und Bogenzyklus sowie lesbarem Bodenkontrast ausstatten
+- [x] Animationspipeline an der häufigsten Gegnerfamilie im echten Schwarm validieren
 
 Abnahme:
 

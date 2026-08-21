@@ -22,6 +22,19 @@ Ausgabe das Vorschau-Schachbrett dennoch als Pixel enthielt, entfernt
 
 ## Gegner
 
+### Schwärmer-Laufzyklus
+
+> Production-ready transparent 2D enemy walk-cycle strip for Emberhold in the
+> approved modern painterly low-resolution style. Exact 4×1 grid showing the
+> same compact six-legged graphite iron beetle-hound facing screen-left:
+> alternating front/rear contact, passing pose, opposite contact, opposite
+> passing pose. Stable body center and ground anchor; only legs, head and
+> subtle shell compression move. Cool ash material rim and minimal deep-orange
+> eyes; genuine transparent background; no floor, shadow, labels, dividers,
+> ghost frames, rotation, scenery or watermark.
+
+### Familienatlas
+
 > Production game enemy sprite atlas in polished hand-painted 2.5D
 > dark-fantasy action-RPG style, exact 4×2 grid, top-down three-quarter camera,
 > transparent background and one centered enemy per cell. Cell order:

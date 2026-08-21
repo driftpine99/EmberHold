@@ -85,7 +85,8 @@ ist und ein Langbogenschuss den rein visuellen Release-Zustand auslöst.
 2. Kurz vor einem Langbogenschuss ist die gespannte Pose sichtbar; beim Schuss
    folgen Release-Linie, Rückstoßpose und Pfeil.
 3. Die fünf Gegnerfamilien müssen auch ohne Farblegende an ihrer Silhouette
-   unterscheidbar sein.
+   unterscheidbar sein. Schwärmer müssen zusätzlich vier klar verschiedene,
+   asynchron laufende Beinkontaktphasen zeigen.
 4. Gegner bleiben ebenfalls aufrecht und spiegeln horizontal, ohne bei einem
    Richtungswechsel sichtbar aus ihrer Position zu springen.
    Entfernung und Lichtkreis dürfen sie niemals durch Kreise oder abstrakte
