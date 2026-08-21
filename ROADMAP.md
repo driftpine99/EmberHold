@@ -163,10 +163,10 @@ zu öffnen.
 
 ### P0.5.2 – Mehr Build- und Run-Entscheidungen
 
-- [ ] Für alle sechs vorhandenen Waffen einen Evolutionspfad umsetzen
-- [ ] Fehlende Passive für diese Pfade ergänzen
-- [ ] Elite-Kills mit einer kleinen, echten Belohnungsentscheidung verbinden
-- [ ] Mindestens eine weitere erkennbare Entscheidung zwischen Boss und
+- [x] Für alle sechs vorhandenen Waffen einen Evolutionspfad umsetzen
+- [x] Fehlende Passive für diese Pfade ergänzen
+- [x] Elite-Kills mit einer kleinen, echten Belohnungsentscheidung verbinden
+- [x] Mindestens eine weitere erkennbare Entscheidung zwischen Boss und
   Extraktion ergänzen, ohne die Gegnerzahl weiter zu erhöhen
 
 ### P0.5.3 – Hold mit Wirkung auf den nächsten Run

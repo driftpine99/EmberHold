@@ -306,6 +306,92 @@ try {
 } catch (error) {
   contractError = error instanceof Error ? error.message : String(error);
 }
+
+// --- P0.5.2: alle vorhandenen Waffen besitzen ein verifiziertes Endziel ---
+let evolutionCatalog = false;
+let evolutionError = "";
+try {
+  const expected = ["bogen", "splitter", "kugel", "blitz", "klinge", "frost"];
+  const offerable = expected.every((id) => {
+    engine.begin(180, "ring");
+    const weapon=engine.WEAPONS.find(w=>w.id===id);
+    if(!weapon?.evo) return false;
+    engine.S.W = { [id]: 5 };
+    const need=weapon.evo.need;
+    engine.S.Pa = { [need]: 3 };
+    engine.S.evo = {};
+    const offer = engine.buildOffer();
+    if (offer.length !== 1 || offer[0].type !== "evo" || offer[0].w.id !== id) return false;
+    engine.applyOffer(offer[0]);
+    return engine.S.evo[id] === 1;
+  });
+
+  engine.begin(180, "ring");
+  engine.S.W={splitter:5}; engine.S.Pa={koecher:3}; engine.S.evo={splitter:1};
+  engine.S.cool={splitter:0};
+  engine.spawnEnemy(0,0,1,120,0); engine.rebuildGrid(); engine.fireWeapons(.1);
+  const arrowRain = engine.counts().p >= 11;
+
+  engine.begin(180, "ring");
+  engine.S.W={blitz:5}; engine.S.Pa={amulett:3}; engine.S.evo={blitz:1};
+  engine.S.cool={blitz:0};
+  for(let i=0;i<8;i++) engine.spawnEnemy(0,0,1,70+i*22,(i%2)*25);
+  engine.rebuildGrid(); engine.fireWeapons(.1);
+  const stormHeart = engine.boltCount() >= 8;
+
+  engine.begin(180, "ring");
+  engine.S.W={klinge:5}; engine.S.Pa={federung:3}; engine.S.evo={klinge:1};
+  engine.S.cool={}; engine.input.x=0; engine.input.y=0; engine.S.bladeAng=0;
+  engine.fireWeapons(.1); const stillAngle=engine.S.bladeAng;
+  engine.S.bladeAng=0; engine.input.x=1; engine.fireWeapons(.1);
+  const bladeCyclone=engine.S.bladeAng>stillAngle*1.8;
+  engine.input.x=0;
+
+  engine.begin(180, "ring");
+  engine.S.W={frost:5}; engine.S.Pa={umhang:3}; engine.S.evo={frost:1};
+  engine.S.cool={frost:0};
+  const elite=engine.spawnEnemy(0,4,1,25,0);
+  engine.spawnEnemy(0,0,0,45,0);
+  engine.rebuildGrid(); const before=engine.enemyHp(elite); engine.fireWeapons(.1);
+  const eternalWinter=before-engine.enemyHp(elite)>115;
+
+  evolutionCatalog = offerable && arrowRain && stormHeart && bladeCyclone && eternalWinter;
+} catch (error) {
+  evolutionError = error instanceof Error ? error.message : String(error);
+}
+
+// --- P0.5.2: Elite-Kills erzwingen zwei echte Run-Entscheidungen ----------
+let eliteChoices = false;
+let eliteChoiceError = "";
+let eliteChoiceDiagnostics = {};
+try {
+  engine.begin(180, "ring");
+  const elite = engine.spawnEnemy(0, 4, 1, 16, 0);
+  engine.rebuildGrid();
+  engine.shoot(0, 0, 1, 0, 1000, 1e9, 1, 0, 15);
+  engine.updateProjectiles(0.02);
+  const rewardQueued = engine.enemyHp(elite) <= 0 && engine.S.pendingEliteRewards === 1;
+  const offer = engine.buildEliteOffer();
+  const uniqueOffer = offer.length === 3 &&
+    new Set(offer.map(o => o.boon?.id)).size === 3 &&
+    offer.every(o => o.type === "boon");
+
+  const oldHp = engine.S.maxhp, oldStats=engine.stats(), oldDash=engine.dashCooldown();
+  for (const boon of engine.BOONS) engine.applyBoon(boon);
+  const st = engine.stats();
+  const effectsWork = engine.S.maxhp === oldHp + 25 &&
+    Math.abs(st.dmg / oldStats.dmg - 1.18) < 1e-9 &&
+    Math.abs(st.speed / oldStats.speed - 1.12) < 1e-9 &&
+    Math.abs(st.magnet / oldStats.magnet - 1.25) < 1e-9 &&
+    Math.abs(st.armor - oldStats.armor - 0.08) < 1e-9 &&
+    Math.abs(engine.dashCooldown() / oldDash - 0.9) < 1e-9;
+  const bothTimelineChoices = report.runs.baseline.every(run => run.eliteChoices === 2);
+  eliteChoiceDiagnostics = { rewardQueued, uniqueOffer, effectsWork, bothTimelineChoices,
+    baselineChoices: report.runs.baseline.map(run => run.eliteChoices) };
+  eliteChoices = rewardQueued && uniqueOffer && effectsWork && bothTimelineChoices;
+} catch (error) {
+  eliteChoiceError = error instanceof Error ? error.message : String(error);
+}
 // --- D-017: Simulation muss unabhaengig vom Seitenverhaeltnis sein ---------
 // Der Shim fuehrt resize() jetzt wirklich aus, statt es wie frueher ueber
 // addEventListener = noop zu verschlucken. Alle vier Formate sind Querformat.
@@ -441,14 +527,15 @@ canvasElement.clientHeight = 700;
 engine.resize();
 
 const output = {
-  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && contractFlow && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling,
-  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, contractFlow, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling },
+  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && contractFlow && evolutionCatalog && eliteChoices && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling,
+  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, contractFlow, evolutionCatalog, eliteChoices, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling },
   targets: report.targets,
   seeds: report.seeds,
   summary: { ...report.summary, evolutionRuns, evolutionSeeds: report.seeds.length,
     stationaryDeath: stationaryRun.died,
     feedbackSeed: feedbackRun ? { kills: feedbackRun.kills, picks: feedbackRun.total,
       simSpitze: feedbackRun.peak, simRadius: feedbackRun.nearby, evo: feedbackRun.evo } : null,
+    eliteChoiceDiagnostics,
     viewports: viewportRows },
 };
 if (aspectError) output.aspectError = aspectError;
@@ -457,6 +544,8 @@ if (visibleError) output.visibleError = visibleError;
 if (uxError) output.uxError = uxError;
 if (holdError) output.holdError = holdError;
 if (contractError) output.contractError = contractError;
+if (evolutionError) output.evolutionError = evolutionError;
+if (eliteChoiceError) output.eliteChoiceError = eliteChoiceError;
 
 console.log(JSON.stringify(output, null, 2));
 if (!output.pass) process.exitCode = 1;

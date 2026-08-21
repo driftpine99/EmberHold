@@ -14,8 +14,9 @@ Territorien, welche die Festung versorgen.
 Das Projekt befindet sich im Übergang vom **Kampfprototyp zum kleinen
 Hold-Validierungsslice**.
 
-Der aktuelle Build enthält einen Helden, ein Territorium, mehrere Waffen und
-Passive, fünf Gegnerfamilien, Eliten, einen Mittelboss, Evolutionen,
+Der aktuelle Build enthält einen Helden, ein Territorium, sechs Waffen mit
+vollständigen Evolutionspfaden, acht Passive, fünf Gegnerfamilien, Eliten,
+einen Mittelboss,
 Extraktion und Overtime. Hinzu kommt ein bewusst kleiner Kraterhold mit
 Tiefmine, Emberschmiede, lokaler Speicherung, Offline-Produktion und einer
 ersten dauerhaften Bogenverbesserung. Aelric nutzt inzwischen einen konsistenten
@@ -32,6 +33,9 @@ Die Sortietafel bietet inzwischen drei Verträge: den unveränderten
 Wächterring, den schnellen Sturmbruch und die robuste Aschengruft. Auswahl,
 Gegnergewichtung, Risikomodifikator und Erzbonus bleiben über den lokalen
 Spielstand erhalten und werden im Run-HUD sowie Bericht ausgewiesen.
+Elite-Kills öffnen bei 2:00 und 6:00 eine eigene Auswahl aus drei Run-Relikten;
+die zweite Wahl schafft bewusst eine neue Buildentscheidung zwischen Warden
+und Extraktion.
 
 Die einzige Produktfrage der Phase 0 lautet:
 

@@ -6,6 +6,14 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 
 ### Added
 
+- Vier neue Waffen-Evolutionen: Pfeilregen, Sturmherz, Klingenzyklon und
+  Ewiger Winter; damit besitzen alle sechs Waffen einen vollständigen Pfad
+- Amulett für Abklingtempo und Umhang für Schadensschutz als neue Passive
+- Zwei pausierende Elite-Reliktwahlen pro vollständigem Run mit Glutkern,
+  Schrittzeichen, Sammlerauge und Aschenhaut; Relikte erscheinen in Buildleiste
+  und Run-Bericht
+- Automatische Verträge `evolutionCatalog` für alle sechs Endmechaniken und
+  `eliteChoices` für Queue, Auswahl, Effekte und beide Zeitachsen-Entscheidungen
 - Sortietafel mit Wächterring, Sturmbruch und Aschengruft; jeder Vertrag zeigt
   Gegnerfokus, Risiko und Erzbonus und bleibt im lokalen Spielstand gewählt
 - Vertragsname im Kampf-HUD und Run-Bericht sowie dezente eigene Bodenstimmung

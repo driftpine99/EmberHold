@@ -46,12 +46,13 @@ Getestet werden neun feste Seeds: 1701, 1709, 1721, 1733, 1741, 1753, 1777,
 | Größe | Ist | Vertrag |
 |---|---:|---:|
 | Erster Kartenzug, Mittelwert | 26,5 s | 25–45 s; Zielwert 35 s |
-| Kartenzüge in 8 Min, Mittelwert | 21,78 | 21 ± 3 |
-| Rhythmus pro Minute | 1,78 · 2,22 · 2,22 · 2,22 · 2,56 · 2,22 · 3,11 · 5,44 | 1 · 2 · 2 · 2 · 3 · 3 · 4 · 4 |
-| Kartenzüge bei −10 % XP-Kosten | 17,67 | — |
-| Kartenzüge bei +10 % XP-Kosten | 15,11 | — |
-| Verhältnis der beiden Varianten | 1,169 | ≤ 1,75 |
-| Runs mit Evolution | 5 / 9 | mindestens 2 / 9 |
+| Kartenzüge in 8 Min, Mittelwert | 20,56 | 21 ± 3 |
+| Rhythmus pro Minute | 1,56 · 2,00 · 2,22 · 1,89 · 2,44 · 2,44 · 3,00 · 5,00 | 1 · 2 · 2 · 2 · 3 · 3 · 4 · 4 |
+| Kartenzüge bei −10 % XP-Kosten | 28,44 | — |
+| Kartenzüge bei +10 % XP-Kosten | 18,44 | — |
+| Verhältnis der beiden Varianten | 1,542 | ≤ 1,75 |
+| Runs mit Evolution | 3 / 9 | mindestens 2 / 9 |
+| Elite-Reliktwahlen | 2 in 9 / 9 Runs | exakt 2 pro vollständigem Run |
 
 Ein Wiederholungslauf mit demselben Seed muss bitgenau dasselbe Ergebnis
 liefern. Der Test endet mit Fehlercode, sobald ein Korridor oder diese
@@ -62,6 +63,9 @@ allwissenden Kartenstrategie gespielt. Mindestens zwei davon müssen in einer
 normalen 8-Minuten-Sortie eine Evolution abschließen. Ab 7:30 hält das Angebot
 einen bereits begonnenen Evolutionspfad als eine von drei optionalen Karten
 sichtbar; die Voraussetzungen bleiben Waffenstufe 5 plus Passivstufe 3.
+`evolutionCatalog` erzwingt außerdem ein Angebot und die Kernmechanik jedes
+der sechs Pfade. `eliteChoices` prüft den Weg vom Elite-Kill zur einmaligen
+3er-Auswahl, alle vier Relikteffekte und die zweite Entscheidung nach dem Boss.
 
 Seit D-017 führt der Test `resize()` tatsächlich aus und prüft fünf
 Querformate mit demselben Seed:
@@ -227,9 +231,10 @@ auf Desktop und echten Mobilgeräten gemessen werden.
 
 ## Was der Prototyp bereits enthält
 
-- 6 Waffen, 6 Passive, 2 Evolutionen (Windriss, Höllenschlund)
+- 6 Waffen, 8 Passive und 6 unterschiedliche Evolutionen
 - 5 Gegnerfamilien mit **unterschiedlichen Bewegungsmustern**, nicht nur Werten
-- Elite bei 2:00 und 6:00, Mittelboss mit ausweichbaren Mustern bei 4:10,
+- Elite mit eigener 3er-Reliktwahl bei 2:00 und 6:00, Mittelboss mit
+  ausweichbaren Mustern bei 4:10,
   Schatzflut bei 7:00, Extraktion bei 8:00 mit Overtime-Angebot
 - Ember-Stoß mit 0,35 s Unverwundbarkeit
 - Lichtradius, der mit der Buildstärke wächst

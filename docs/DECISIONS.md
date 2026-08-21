@@ -427,3 +427,30 @@ Gegnerfamilien, Risiko und Hold-Ertrag verändern, aber weder XP-Kurve noch
 Kartenrhythmus des Wächterrings still überschreiben. `contractFlow` prüft
 Migration, Persistenz, deterministische Unterschiede, einmalige Belohnung und
 die Isolation der Baseline.
+
+## D-021 – Vollständige Buildpfade und Elite-Relikte
+
+**Status:** beschlossen und umgesetzt (21.08.2026)
+
+Alle sechs Waffen besitzen nun ein eigenes Endziel. Splitterköcher wird mit
+Köcher zu **Pfeilregen**, Kettenblitz mit dem neuen Amulett zu **Sturmherz**,
+Rundenklinge mit Federung zu **Klingenzyklon** und Frostnova mit dem neuen
+Umhang zu **Ewiger Winter**. Die bisherigen Pfade Windriss und Höllenschlund
+bleiben unverändert. Amulett liefert Abklingtempo, Umhang Schadensschutz; damit
+ist jede Evolution weiterhin an Waffenstufe 5 plus Passivstufe 3 gebunden.
+
+Jede der zwei Eliten erzeugt statt bloß zusätzlicher Gegnerdichte eine eigene,
+pausierende 3er-Auswahl aus vier Run-Relikten. Glutkern, Schrittzeichen,
+Sammlerauge und Aschenhaut verändern Schaden, Bewegung, Aufsammeln oder
+Überleben nur für den laufenden Einsatz. Die zweite Elite erscheint bei 6:00
+und setzt damit eine erkennbare Entscheidung nach dem Warden und vor der
+Extraktion. Relikte dürfen gestapelt werden, belegen keinen Waffen- oder
+Passivslot und besitzen bewusst keinen Reroll, damit sie sich von normalen
+Levelkarten unterscheiden.
+
+`evolutionCatalog` prüft Angebot und charakteristische Mechanik aller sechs
+Evolutionen. `eliteChoices` prüft Kill→Belohnungs-Queue, drei verschiedene
+Optionen, alle vier Effekte und exakt zwei Entscheidungen in jedem der neun
+Baseline-Runs. Die zusätzliche Kartenbreite verändert den Seed-Mittelwert auf
+20,56 Kartenzüge und 3/9 Runs mit mindestens einer Evolution; beide Werte
+bleiben im bestehenden Vertrag.
