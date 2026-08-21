@@ -98,10 +98,16 @@ Vier Prüfungen hängen daran:
   erscheint nur in `nearbyEnemies`. Der Lauf deckt beide Renderpfade ab, mit
   und ohne seitliche Safe-Area.
 
-`holdExpansion` prüft zusätzlich die Save-v2→v3-Migration, deterministische
+`holdExpansion` prüft zusätzlich die Save-Migration, deterministische
 Offline-Produktion des Arkanums und Übungshofs, deren Lagerkappen, maximal zwei
 vorbereitete Rerolls, steigende Meisterschaftskosten und die Isolation aller
 Hold-Boni aus der Seed-Baseline.
+
+`equipmentFlow` fährt den gesamten Rüstkammerpfad: Save-v3→v4, neuer Fund,
+sofortige Staubgutschrift bei einem Duplikat, gezielte Rangaufwertung, Anlegen,
+Zerlegen und einmalige Run-Auszahlung. Die seltene Runenfibel muss Runenfunke
+garantiert in ein Kartenangebot säen; nach der Wahl steigen Projektilzahl und
+Angriffstempo. In der Headless-Baseline bleiben alle Ausrüstungswerte null.
 
 Hochformat ist laut D-017 kein unterstützter Kampfmodus und wird bewusst nicht
 geprüft; der geplante „Gerät drehen"-Hinweis steht unter P0.3.
@@ -151,6 +157,12 @@ Der Check `contractFlow` prüft zusätzlich die Sortietafel aus P0.5.1:
 Manuell müssen die drei Vertragskarten im Hold auf Desktop und Mobil lesbar
 sein. Im Run müssen Vertragsname und leicht veränderte Bodenstimmung erkennbar
 bleiben, ohne Gegner- oder Telegrafiefarben zu überdecken.
+
+Nach einer Sortie muss im Endbildschirm genau ein Ausrüstungsfund oder dessen
+automatische Staubverwertung stehen. In der Rüstkammer sind fehlende, besessene
+und angelegte Teile unterscheidbar; Aufwerten ist nur mit genügend Staub aktiv.
+Die Sortietafel und beide Startknöpfe bleiben auf einem normalen Desktop ohne
+Scrollen sichtbar, auch wenn die Rüstkammer weiter unten liegt.
 
 Der Visual-Smoke-Check stellt zusätzlich sicher, dass die drei aktiven
 Raster-Assets (`aelric-atlas-v2.png`, `enemy-atlas-v1.png` und
@@ -255,6 +267,9 @@ auf Desktop und echten Mobilgeräten gemessen werden.
 - Lokale Offline-Produktion mit 24-Stunden-Kappe
 - Erste dauerhafte Hold→Run-Verbesserung über den Wächterbogen
 - Herstellbare zusätzliche Rerolls und drei kleine Utility-Meisterschaften
+- Rüstkammer mit sechs Teilen, drei Slots, direkter Duplikatverwertung und
+  gezielter Rangaufwertung
+- Seltene Runenfibel, die Runenfunke in den Kartenpool des Runs sät
 - Balanceziele für vier Run-Längen (3 / 8 / 15 / 20 Min); die Phase-0-UI bietet
   bewusst nur 3 und 8 Minuten an
 - Regel 1 umgesetzt: Tod kostet nur den Overtime-Bonus, nie die Basis

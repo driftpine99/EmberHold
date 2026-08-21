@@ -307,7 +307,7 @@ try {
   contractError = error instanceof Error ? error.message : String(error);
 }
 
-// --- P0.5.3: Arkanum, Uebungshof, Vorbereitung und Save-v3-Migration -----
+// --- P0.5.3: Arkanum, Uebungshof, Vorbereitung und Save-Migration --------
 let holdExpansion = false;
 let holdExpansionError = "";
 try {
@@ -316,7 +316,7 @@ try {
     bowUpgrade: 1, selectedContract: "hollow", lastAt: 1000,
   }));
   engine.loadHold(1000);
-  const migrated = engine.H.version === 3 && engine.H.essence === 0 &&
+  const migrated = engine.H.version === 4 && engine.H.essence === 0 &&
     engine.H.marks === 0 && engine.H.preparedRerolls === 0 &&
     engine.H.masteries.path === 0 && engine.H.selectedContract === "hollow";
 
@@ -357,6 +357,64 @@ try {
     masteryCosts && preparedConsumed && utilitiesApplied && baselineIsolated;
 } catch (error) {
   holdExpansionError = error instanceof Error ? error.message : String(error);
+}
+
+// --- P0.5.4: Fund, Duplikatverwertung, Aufwertung und seltene Kartensaat --
+let equipmentFlow = false;
+let equipmentError = "";
+try {
+  localStorage.setItem("emberhold:hold:v1", JSON.stringify({
+    version: 3, ore: 0, bars: 0, essence: 0, marks: 0, runs: 0,
+    masteries: { path: 0, reach: 0, dash: 0 }, selectedContract: "ring", lastAt: 1000,
+  }));
+  engine.loadHold(1000);
+  const migrated = engine.H.version === 4 && engine.H.dust === 0 &&
+    Object.keys(engine.H.gearOwned).length === 0 && engine.H.gearEquipped.charm === null;
+
+  const first = engine.grantGear("runenfibel");
+  const duplicate = engine.grantGear("runenfibel");
+  const duplicateSalvaged = !first.duplicate && duplicate.duplicate && duplicate.dust === 10 &&
+    engine.H.dust === 10 && engine.H.gearOwned.runenfibel === 1;
+
+  engine.equipGear("runenfibel"); engine.H.dust = 30;
+  const upgradeCost = engine.gearUpgradeCost(engine.GEAR.find(item=>item.id==="runenfibel"), 1);
+  const upgraded = engine.upgradeGear("runenfibel") &&
+    engine.H.gearOwned.runenfibel === 2 && engine.H.dust === 30-upgradeCost;
+
+  engine.H.preparedRerolls = 0;
+  engine.begin(180, "ring");
+  const seededOffer = engine.buildOffer();
+  const seededCard = seededOffer.find(o=>o.type==="gearcard");
+  const beforeCard = engine.stats();
+  engine.applyOffer(seededCard);
+  const afterCard = engine.stats();
+  const cardConnected = seededCard?.card?.id === "runenfunke" && engine.S.gearCardActive &&
+    afterCard.proj === beforeCard.proj+1 && Math.abs(afterCard.aspd/beforeCard.aspd-1.2)<1e-9;
+
+  const salvaged = engine.salvageGear("runenfibel") === 10 &&
+    !engine.H.gearOwned.runenfibel && engine.H.gearEquipped.charm === null;
+  engine.grantGear("glutsehne"); engine.H.gearOwned.glutsehne = 2;
+  engine.equipGear("glutsehne"); engine.begin(180, "ring");
+  const equippedEffect = Math.abs(engine.stats().aspd-1.08)<1e-9;
+
+  engine.H.gearOwned.runenfibel=3; engine.H.gearEquipped.charm="runenfibel";
+  engine.headlessRun(60,{seed:1701,smart:true,immortal:true,contractId:"ring"});
+  const baselineIsolated = engine.S.gearSeed === null &&
+    Object.entries(engine.S.gearBonus).every(([key,value])=>key==="seed"?value===null:value===0);
+
+  engine.begin(180,"ring"); engine.S.reward=500; engine.S.rewardGranted=false;
+  const beforeOwned=Object.keys(engine.H.gearOwned).length, beforeDust=engine.H.dust;
+  engine.depositRunReward();
+  const afterFirstDeposit=JSON.stringify({owned:engine.H.gearOwned,dust:engine.H.dust,runs:engine.H.runs});
+  engine.depositRunReward();
+  const rewardedOnce=!!engine.S.lootGear &&
+    (Object.keys(engine.H.gearOwned).length>beforeOwned||engine.H.dust>beforeDust) &&
+    JSON.stringify({owned:engine.H.gearOwned,dust:engine.H.dust,runs:engine.H.runs})===afterFirstDeposit;
+
+  equipmentFlow = migrated && duplicateSalvaged && upgraded && cardConnected && salvaged &&
+    equippedEffect && baselineIsolated && rewardedOnce;
+} catch (error) {
+  equipmentError = error instanceof Error ? error.message : String(error);
 }
 
 // --- P0.5.2: alle vorhandenen Waffen besitzen ein verifiziertes Endziel ---
@@ -579,8 +637,8 @@ canvasElement.clientHeight = 700;
 engine.resize();
 
 const output = {
-  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && contractFlow && holdExpansion && evolutionCatalog && eliteChoices && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling,
-  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, contractFlow, holdExpansion, evolutionCatalog, eliteChoices, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling },
+  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && contractFlow && holdExpansion && equipmentFlow && evolutionCatalog && eliteChoices && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling,
+  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, contractFlow, holdExpansion, equipmentFlow, evolutionCatalog, eliteChoices, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling },
   targets: report.targets,
   seeds: report.seeds,
   summary: { ...report.summary, evolutionRuns, evolutionSeeds: report.seeds.length,
@@ -597,6 +655,7 @@ if (uxError) output.uxError = uxError;
 if (holdError) output.holdError = holdError;
 if (contractError) output.contractError = contractError;
 if (holdExpansionError) output.holdExpansionError = holdExpansionError;
+if (equipmentError) output.equipmentError = equipmentError;
 if (evolutionError) output.evolutionError = evolutionError;
 if (eliteChoiceError) output.eliteChoiceError = eliteChoiceError;
 

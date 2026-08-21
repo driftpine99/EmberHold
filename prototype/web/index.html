@@ -139,14 +139,14 @@ button.b.danger{background:#c9402e;color:#fff}
 #start.holdsheet{justify-content:flex-start;background:
   radial-gradient(circle at 50% 39%,rgba(100,35,20,.28),transparent 24%),
   linear-gradient(rgba(8,8,12,.91),rgba(8,8,12,.97));padding:18px 20px 28px}
-.holdhead{width:min(920px,100%);display:flex;align-items:flex-end;justify-content:space-between;
+.holdhead{order:0;width:min(1100px,100%);display:flex;align-items:flex-end;justify-content:space-between;
   gap:16px;text-align:left}.holdhead .kick{margin:0}.holdhead h1{font-size:clamp(25px,5vw,42px)}
 .holdresources{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
 .holdres{background:rgba(23,23,33,.9);border:1px solid #2b2b38;border-radius:8px;
   padding:6px 11px;min-width:92px}.holdres b{display:block;color:#e8e4dc;font-size:17px;
   font-variant-numeric:tabular-nums}.holdres span{display:block;color:#777164;font-size:9px;
   letter-spacing:.12em;text-transform:uppercase}
-.holdstage{position:relative;width:min(820px,100%);margin:12px auto 0;padding-top:185px}
+.holdstage{order:2;position:relative;width:min(820px,100%);margin:12px auto 0;padding-top:185px}
 .crater{position:absolute;left:50%;top:0;width:420px;height:210px;transform:translateX(-50%);
   border-radius:50%;background:radial-gradient(ellipse,#221710 0 8%,#352119 9% 12%,#17171e 13% 27%,
   #343039 28% 30%,#12131a 31% 46%,#292a32 47% 50%,#0b0c11 51% 68%,#24252d 69% 72%,transparent 73%);
@@ -187,10 +187,20 @@ button.b.danger{background:#c9402e;color:#fff}
   background:#1b1b26;border:1px solid #2d2d3a;border-radius:8px;padding:8px 9px;min-width:0}
 .masterytile b{display:block;color:#d8d3c9;font-size:10.5px}.masterytile span{display:block;
   color:#777164;font-size:9px;line-height:1.3;margin-top:2px}.masterytile .smallaction{padding:6px 8px}
+.armorybox{margin-top:10px;background:rgba(16,16,24,.94);border:1px solid #2b2b38;
+  border-radius:11px;padding:11px 13px;text-align:left}.geargrid{display:grid;
+  grid-template-columns:repeat(3,1fr);gap:7px}.gearcard{border:1px solid #292936;
+  background:#191923;border-radius:8px;padding:8px 9px;min-width:0}.gearcard.owned{border-color:#484052}
+.gearcard.equipped{border-color:var(--c,#e07a3f);box-shadow:inset 0 0 18px rgba(224,122,63,.06)}
+.geartop{display:flex;align-items:baseline;justify-content:space-between;gap:8px}.geartop b{font-size:10.5px}
+.geartop em{font-style:normal;color:var(--c,#e07a3f);font-size:8px;letter-spacing:.09em;text-transform:uppercase}
+.gearcard p{font-size:9px;color:#777164;line-height:1.35;margin:4px 0 7px;min-height:25px}
+.gearstate{font-size:8.5px;color:#9b9589;margin-bottom:6px}.gearactions{display:flex;gap:5px;flex-wrap:wrap}
+.gearactions .smallaction{font-size:9px;padding:5px 7px}.gearcard.missing{opacity:.52}
 .lockedslots{display:grid;grid-template-columns:1fr 1fr;gap:7px}
 .lockedslot{display:grid;place-items:center;background:rgba(13,13,19,.82);border:1px dashed #30303b;
   border-radius:9px;color:#5d5a53;font-size:10px;text-align:center;padding:9px}
-.holdsortie{margin-top:14px}.holdsortie .btnrow{margin-top:0}
+.holdsortie{order:1;margin-top:14px}.holdsortie .btnrow{margin-top:0}
 .holdnote{color:#5f5b53;font-size:10px;margin-top:7px}
 .contractboard{width:min(920px,100%);margin:0 auto 12px;text-align:left}
 .contractboard>div:first-child{display:flex;justify-content:space-between;align-items:baseline;
@@ -213,7 +223,7 @@ button.b.danger{background:#c9402e;color:#fff}
   .holdresources{justify-content:flex-start}.holdres{min-width:82px;padding:5px 9px}
   .holdstage{padding-top:160px}.crater{width:330px;height:165px}.embercore{top:43px}
   .holdstatus{top:126px}.holdgrid,.holdlower{grid-template-columns:1fr}.holdbuilding{padding:11px 12px}
-  .holdupgrade{align-items:flex-start}.masterygrid{grid-template-columns:1fr}.holdsortie button.b{padding:11px 18px}
+  .holdupgrade{align-items:flex-start}.masterygrid,.geargrid{grid-template-columns:1fr}.holdsortie button.b{padding:11px 18px}
   .contractgrid{grid-template-columns:1fr}.contractcard{padding:9px 10px}
 }
 
@@ -362,6 +372,7 @@ button.b.danger{background:#c9402e;color:#fff}
         <div class="holdres"><b id="holdbars">0</b><span>Barren</span></div>
         <div class="holdres"><b id="holdessence">0</b><span>Essenz</span></div>
         <div class="holdres"><b id="holdmarks">0</b><span>Trainingsmarken</span></div>
+        <div class="holdres"><b id="holddust">0</b><span>Runenstaub</span></div>
         <div class="holdres"><b id="holdruns">0</b><span>Sortien</span></div>
       </div>
     </div>
@@ -405,6 +416,10 @@ button.b.danger{background:#c9402e;color:#fff}
           <div class="masterytile"><div><b>Reichgriff <em id="masteryreach">0/2</em></b><span>+10 % Aufsammelradius je Stufe</span></div><button class="smallaction" id="btnMasteryReach">Lernen</button></div>
           <div class="masterytile"><div><b>Stoßschule <em id="masterydash">0/2</em></b><span>−8 % Stoß-Abklingzeit je Stufe</span></div><button class="smallaction" id="btnMasteryDash">Lernen</button></div>
         </div>
+      </section>
+      <section class="armorybox">
+        <div class="masteryhead"><b>Rüstkammer</b><span>3 Slots · Duplikate werden Staub</span></div>
+        <div class="geargrid" id="geargrid"></div>
       </section>
     </div>
     <div class="holdsortie">
@@ -960,6 +975,34 @@ const PASSIVES = [
   { id:'amulett',name:'Amulett',     col:'#b58fd1', desc:'+10 % Abklingtempo je Stufe.' },
   { id:'umhang', name:'Umhang',      col:'#7893a5', desc:'−8 % erlittener Schaden je Stufe.' },
 ];
+const GEAR=Object.freeze([
+  {id:'glutsehne',slot:'weapon',slotName:'Waffe',name:'Glutsehne',rarity:'Gewöhnlich',
+   col:'#d58a55',salvage:4,effect:'aspd',per:.04,desc:'+4 % Angriffstempo je Rang.'},
+  {id:'kraehenbogen',slot:'weapon',slotName:'Waffe',name:'Krähenbogen',rarity:'Gewöhnlich',
+   col:'#a96c56',salvage:4,effect:'dmg',per:.035,desc:'+3,5 % Schaden je Rang.'},
+  {id:'sammlersiegel',slot:'charm',slotName:'Talisman',name:'Sammlersiegel',rarity:'Gewöhnlich',
+   col:'#6bb8d4',salvage:4,effect:'magnet',per:.08,desc:'+8 % Aufsammelradius je Rang.'},
+  {id:'runenfibel',slot:'charm',slotName:'Talisman',name:'Runenfibel',rarity:'Selten',
+   col:'#b997dd',salvage:10,seed:'runenfunke',desc:'Sät Runenfunke als garantierte Run-Karte.'},
+  {id:'pfadstiefel',slot:'mantle',slotName:'Gewand',name:'Pfadstiefel',rarity:'Gewöhnlich',
+   col:'#8fa879',salvage:4,effect:'speed',per:.03,desc:'+3 % Lauftempo je Rang.'},
+  {id:'russmantel',slot:'mantle',slotName:'Gewand',name:'Rußmantel',rarity:'Gewöhnlich',
+   col:'#9296a5',salvage:4,effect:'armor',per:.03,desc:'+3 % Schadensschutz je Rang.'},
+]);
+const GEAR_BY_ID=Object.freeze(Object.fromEntries(GEAR.map(item=>[item.id,item])));
+const GEAR_CARD=Object.freeze({id:'runenfunke',name:'Runenfunke',col:'#c8a7e8',
+  desc:'+1 Projektil für Mehrfachschuss-Waffen und +20 % Angriffstempo für diesen Run.'});
+function equippedGearBonuses(meta){
+  const out={dmg:0,aspd:0,magnet:0,speed:0,armor:0,seed:null};
+  if(!meta) return out;
+  for(const slot of ['weapon','charm','mantle']){
+    const id=meta.gearEquipped?.[slot], item=GEAR_BY_ID[id], rank=meta.gearOwned?.[id]||0;
+    if(!item||item.slot!==slot||!rank) continue;
+    if(item.effect) out[item.effect]+=item.per*rank;
+    if(item.seed) out.seed=item.seed;
+  }
+  return out;
+}
 const MAXLV = 5, MAX_W = 6, MAX_P = 6;
 const EVO_PASSIVE_LV = 3;   // gemessen: bei 5 kam in 8 Läufen keine
                             // einzige Evolution zustande
@@ -973,6 +1016,7 @@ let HEADLESS = false;
 function newRun(runLen, seed, contractId){
   const runSeed = seedRandom(seed);
   const contract=contractById(contractId||(HEADLESS?'ring':META?.selectedContract));
+  const gear=HEADLESS?equippedGearBonuses(null):equippedGearBonuses(META);
   S = {
     t:0, running:false, phase:'run',        // run | pause | cards | extract | over
     runLen: runLen,
@@ -1003,6 +1047,9 @@ function newRun(runLen, seed, contractId){
     holdUtility:HEADLESS?{path:0,reach:0,dash:0}:{
       path:META?.masteries?.path||0,reach:META?.masteries?.reach||0,dash:META?.masteries?.dash||0,
     },
+    gearBonus:gear,gearSeed:gear.seed,gearEquipped:HEADLESS?{}:Object.assign({},META?.gearEquipped),
+    gearRanks:HEADLESS?{}:Object.assign({},META?.gearOwned),
+    gearCardTaken:false,gearCardActive:false,lootGear:null,
     preparedRerollsUsed:0,
     cool:{}, seed:runSeed,
     fps:60, worstFps:999,
@@ -1025,16 +1072,17 @@ function stat(){
   const p = S.Pa;
   return {
     dmg:   (1 + 0.15*(p.wetz||0)) * CFG.DMG_GLOBAL * (S.holdDmg||1) *
-           (1+0.18*(S.boons?.fury||0)),
-    aspd:  1 + 0.12*(p.sehne||0),
+           (1+0.18*(S.boons?.fury||0))*(1+(S.gearBonus?.dmg||0)),
+    aspd:  (1 + 0.12*(p.sehne||0))*(1+(S.gearBonus?.aspd||0))*
+           (S.gearCardActive?1.20:1),
     area:  1 + 0.18*(p.linse||0),
-    proj:  (p.koecher||0),
+    proj:  (p.koecher||0)+(S.gearCardActive?1:0),
     speed: (1 + 0.08*(p.federung||0))*(1+0.12*(S.boons?.stride||0))*
-           (1+0.05*(S.holdUtility?.path||0)),
+           (1+0.05*(S.holdUtility?.path||0))*(1+(S.gearBonus?.speed||0)),
     magnet:(1 + 0.40*(p.magnet||0))*(1+0.25*(S.boons?.harvest||0))*
-           (1+0.10*(S.holdUtility?.reach||0)),
+           (1+0.10*(S.holdUtility?.reach||0))*(1+(S.gearBonus?.magnet||0)),
     cdr:   1 + 0.10*(p.amulett||0),
-    armor: Math.min(0.48,0.08*(p.umhang||0)+0.08*(S.boons?.guard||0)),
+    armor: Math.min(0.48,0.08*(p.umhang||0)+0.08*(S.boons?.guard||0)+(S.gearBonus?.armor||0)),
   };
 }
 function buildPower(){                       // Summe aller Stufen — treibt das Licht
@@ -1604,7 +1652,7 @@ function buildOffer(){
     if (lv>0 && lv<MAXLV) pool.push({type:'p', p, lv, weight:0.95});
     else if (lv===0 && nP<MAX_P) pool.push({type:'p', p, lv:0, weight:1.1});
   }
-  if (!pool.length) return [{type:'heal'}];
+  if (!pool.length) return injectGearCard([{type:'heal'}]);
   // Bei niedriger HP wandert ein Glutherz mit ins Angebot — eine Option,
   // kein Geschenk: es kostet den Kartenzug, den man sonst in Macht steckt.
   if (S.hp < S.maxhp*0.45) pool.push({type:'heal', weight:1.4});
@@ -1634,6 +1682,12 @@ function buildOffer(){
       }
     }
   }
+  return injectGearCard(out);
+}
+function injectGearCard(out){
+  if(S.gearSeed!==GEAR_CARD.id||S.gearCardTaken||out.some(o=>o.type==='gearcard')) return out;
+  const card={type:'gearcard',card:GEAR_CARD};
+  if(out.length<3) out.push(card); else out[out.length-1]=card;
   return out;
 }
 function openCards(){ pendingPicks++; }
@@ -1671,7 +1725,10 @@ function showCards(mode){
     el.className='card'+(o.type==='evo'?' evocard':'')+(path?' pathcard':'');
     el.setAttribute('role','button'); el.setAttribute('tabindex','0');
     let kind,name,lvtxt,desc,col;
-    if (o.type==='boon'){
+    if(o.type==='gearcard'){
+      col=o.card.col; kind='Ausrüstungssaat'; name=o.card.name;
+      lvtxt='Runenfibel'; desc=o.card.desc;
+    } else if (o.type==='boon'){
       col=o.boon.col; kind='Elite-Relikt'; name=o.boon.name;
       lvtxt='Nur dieser Run'; desc=o.boon.desc;
     } else if (o.type==='evo'){
@@ -1716,7 +1773,10 @@ function applyBoon(boon){
 }
 function applyOffer(o){
   if (!o) return;
-  if (o.type==='boon'){
+  if(o.type==='gearcard'){
+    S.gearCardTaken=true; S.gearCardActive=true;
+    if(!HEADLESS) toast(o.card.name+' entfacht');
+  } else if (o.type==='boon'){
     applyBoon(o.boon);
   } else if (o.type==='evo'){
     S.evo[o.w.id]=1; if(!HEADLESS) toast(o.w.evo.name+'!');
@@ -2327,17 +2387,19 @@ const HOLD_CFG=Object.freeze({
   YARD_COST:3, YARD_SEC:60, YARD_CAP:4, MASTERY_MAX:2,
 });
 function freshHold(now){
-  return {version:3,ore:0,bars:0,essence:0,marks:0,runs:0,mineLevel:0,mineStored:0,
+  return {version:4,ore:0,bars:0,essence:0,marks:0,dust:0,runs:0,mineLevel:0,mineStored:0,
     forgeLevel:0,forgeStored:0,forgeWorking:false,forgeProgress:0,
     arcanumLevel:0,arcanumStored:0,yardLevel:0,yardStored:0,
     preparedRerolls:0,masteries:{path:0,reach:0,dash:0},
+    gearOwned:{},gearEquipped:{weapon:null,charm:null,mantle:null},
     bowUpgrade:0,selectedContract:'ring',lastAt:Number.isFinite(now)?now:Date.now()};
 }
 function cleanHold(raw,now){
   const h=freshHold(now), src=raw&&typeof raw==='object'?raw:{};
   const num=(key,min,max)=>Math.min(max,Math.max(min,Number.isFinite(+src[key])?+src[key]:h[key]));
   h.ore=num('ore',0,1e9); h.bars=num('bars',0,1e9);
-  h.essence=num('essence',0,1e9); h.marks=num('marks',0,1e9); h.runs=num('runs',0,1e7)|0;
+  h.essence=num('essence',0,1e9); h.marks=num('marks',0,1e9);
+  h.dust=num('dust',0,1e9)|0; h.runs=num('runs',0,1e7)|0;
   h.mineLevel=num('mineLevel',0,1)|0; h.mineStored=num('mineStored',0,HOLD_CFG.MINE_CAP);
   h.forgeLevel=num('forgeLevel',0,1)|0; h.forgeStored=num('forgeStored',0,HOLD_CFG.FORGE_CAP)|0;
   h.forgeWorking=!!src.forgeWorking; h.forgeProgress=num('forgeProgress',0,HOLD_CFG.FORGE_SEC);
@@ -2350,6 +2412,16 @@ function cleanHold(raw,now){
   for(const id of ['path','reach','dash']){
     const value=Number.isFinite(+masterySrc[id])?+masterySrc[id]:0;
     h.masteries[id]=Math.min(HOLD_CFG.MASTERY_MAX,Math.max(0,value))|0;
+  }
+  const ownedSrc=src.gearOwned&&typeof src.gearOwned==='object'?src.gearOwned:{};
+  for(const item of GEAR){
+    const rank=Number.isFinite(+ownedSrc[item.id])?+ownedSrc[item.id]:0;
+    if(rank>=1) h.gearOwned[item.id]=Math.min(3,rank)|0;
+  }
+  const equippedSrc=src.gearEquipped&&typeof src.gearEquipped==='object'?src.gearEquipped:{};
+  for(const slot of ['weapon','charm','mantle']){
+    const id=equippedSrc[slot], item=GEAR_BY_ID[id];
+    h.gearEquipped[slot]=item&&item.slot===slot&&h.gearOwned[id]?id:null;
   }
   h.bowUpgrade=num('bowUpgrade',0,1)|0;
   h.selectedContract=contractById(src.selectedContract).id;
@@ -2399,6 +2471,27 @@ function advanceHold(now){
     essence:META.arcanumStored-essenceBefore,marks:META.yardStored-marksBefore};
 }
 function rewardOre(reward){ return Math.max(3,Math.round(Math.log2(Math.max(0,reward)+1))); }
+function gearUpgradeCost(item,rank){ return rank*(item.rarity==='Selten'?12:6); }
+function grantGear(forcedId){
+  let item=GEAR_BY_ID[forcedId];
+  if(!item){
+    if(!S) return null;
+    const mixed=(Math.imul((S.seed>>>0)^Math.imul(META.runs+1,0x9e3779b1),0x85ebca6b)>>>0);
+    item=GEAR[mixed%GEAR.length];
+  }
+  const rank=META.gearOwned[item.id]||0;
+  if(rank){
+    META.dust+=item.salvage;
+    return {id:item.id,name:item.name,duplicate:true,dust:item.salvage};
+  }
+  META.gearOwned[item.id]=1;
+  return {id:item.id,name:item.name,duplicate:false,dust:0};
+}
+function gearLootText(loot){
+  loot=loot||S?.lootGear;
+  if(!loot) return 'kein Fund';
+  return loot.duplicate?loot.name+' → +'+loot.dust+' Staub':loot.name+' · neu';
+}
 function depositRunReward(){
   if(HEADLESS||!S||S.rewardGranted) return 0;
   // Erst die Zeit waehrend der Sortie abrechnen; ihre Beute existiert erst jetzt.
@@ -2406,6 +2499,7 @@ function depositRunReward(){
   const baseOre=rewardOre(S.reward), mul=S.contract?.reward||1;
   const ore=Math.max(baseOre,Math.round(baseOre*mul));
   META.ore+=ore; META.runs++; S.holdOre=ore; S.holdOreBase=baseOre; S.rewardGranted=true;
+  S.lootGear=grantGear();
   saveHold(); return ore;
 }
 function holdMessage(){
@@ -2446,6 +2540,7 @@ function renderHold(message){
   el('holdbars').textContent=Math.floor(META.bars).toLocaleString('de-DE');
   el('holdessence').textContent=Math.floor(META.essence).toLocaleString('de-DE');
   el('holdmarks').textContent=Math.floor(META.marks).toLocaleString('de-DE');
+  el('holddust').textContent=META.dust.toLocaleString('de-DE');
   el('holdruns').textContent=META.runs.toLocaleString('de-DE');
   el('holdstatus').textContent=Date.now()<holdNoticeUntil?holdNotice:holdMessage();
   renderContracts();
@@ -2515,6 +2610,49 @@ function renderHold(message){
     btn.disabled=!yardOn||lv>=HOLD_CFG.MASTERY_MAX||META.marks<cost;
   }
   el('masterybox').classList.toggle('locked',!yardOn);
+  renderGear();
+}
+let gearSig='';
+function renderGear(){
+  const sig=META.dust+'|'+JSON.stringify(META.gearOwned)+'|'+JSON.stringify(META.gearEquipped);
+  if(sig===gearSig) return; gearSig=sig;
+  el('geargrid').innerHTML=GEAR.map(item=>{
+    const rank=META.gearOwned[item.id]||0, equipped=META.gearEquipped[item.slot]===item.id;
+    const cost=rank&&rank<3?gearUpgradeCost(item,rank):0;
+    const actions=!rank?'<div class="gearstate">Noch nicht geborgen</div>':
+      `<div class="gearstate">${item.slotName} · Rang ${rank}/3${equipped?' · angelegt':''}</div>`+
+      `<div class="gearactions"><button class="smallaction" data-gear="equip" data-id="${item.id}" ${equipped?'disabled':''}>${equipped?'Angelegt':'Anlegen'}</button>`+
+      `<button class="smallaction" data-gear="upgrade" data-id="${item.id}" ${rank>=3||META.dust<cost?'disabled':''}>${rank>=3?'Max':'Aufwerten · '+cost}</button>`+
+      `<button class="smallaction" data-gear="salvage" data-id="${item.id}">Zerlegen · +${item.salvage}</button></div>`;
+    return `<article class="gearcard ${rank?'owned':'missing'}${equipped?' equipped':''}" style="--c:${item.col}">`+
+      `<div class="geartop"><b>${item.name}</b><em>${item.rarity}</em></div><p>${item.desc}</p>${actions}</article>`;
+  }).join('');
+  document.querySelectorAll('[data-gear]').forEach(btn=>{
+    btn.onclick=()=>{
+      if(btn.dataset.gear==='equip') equipGear(btn.dataset.id);
+      else if(btn.dataset.gear==='upgrade') upgradeGear(btn.dataset.id);
+      else salvageGear(btn.dataset.id);
+    };
+  });
+}
+function equipGear(id){
+  const item=GEAR_BY_ID[id];
+  if(!item||!META.gearOwned[id]) return false;
+  META.gearEquipped[item.slot]=id; gearSig=''; saveHold(); renderHold(item.name+' angelegt.'); return true;
+}
+function upgradeGear(id){
+  const item=GEAR_BY_ID[id], rank=META.gearOwned[id]||0;
+  if(!item||!rank||rank>=3) return false;
+  const cost=gearUpgradeCost(item,rank); if(META.dust<cost) return false;
+  META.dust-=cost; META.gearOwned[id]=rank+1; gearSig=''; saveHold();
+  renderHold(item.name+' auf Rang '+(rank+1)+' aufgewertet.'); return true;
+}
+function salvageGear(id){
+  const item=GEAR_BY_ID[id];
+  if(!item||!META.gearOwned[id]) return 0;
+  if(META.gearEquipped[item.slot]===id) META.gearEquipped[item.slot]=null;
+  delete META.gearOwned[id]; META.dust+=item.salvage; gearSig=''; saveHold();
+  renderHold(item.name+' zerlegt: +'+item.salvage+' Runenstaub.'); return item.salvage;
 }
 function mineAction(){
   advanceHold(Date.now());
@@ -2576,6 +2714,10 @@ let slotSig='';
 function renderSlots(){
   const parts=[], paths=[];
   if(S.holdDmg>1) parts.push({c:'#e07a3f',n:'Wächterbogen',l:'+10%',e:true});
+  for(const slot of ['weapon','charm','mantle']){
+    const id=S.gearEquipped?.[slot],item=GEAR_BY_ID[id];
+    if(item) parts.push({c:item.col,n:item.name,l:'R'+(S.gearRanks[id]||1),e:true});
+  }
   const utilityLabels={path:'Pfadkunde',reach:'Reichgriff',dash:'Stoßschule'};
   for(const id of Object.keys(utilityLabels)){
     const lv=S.holdUtility?.[id]||0;
@@ -2776,6 +2918,7 @@ function endRun(survived){
     statTile(fmtTime(S.otActive?S.runLen+S.ot:S.t),'Zeit') +
     statTile(S.pickTimes.length,'Kartenzüge') +
     statTile(S.eliteChoices,'Elite-Relikte') +
+    statTile(gearLootText(),'Ausrüstungsfund') +
     statTile(S.reward.toLocaleString('de-DE'),'Beute gesamt') +
     statTile('+'+S.holdOre,'Eisenerz · '+S.contract.name);
   const mode=S.runLen===180?'3-Minuten-Scharmützel':Math.round(S.runLen/60)+'-Minuten-Run';
@@ -2791,6 +2934,14 @@ function buildText(){
 function boonText(){
   const out=BOONS.filter(b=>S.boons?.[b.id]).map(b=>
     b.name+((S.boons[b.id]||0)>1?' ×'+S.boons[b.id]:''));
+  return out.join(', ')||'keine';
+}
+function equippedGearText(){
+  const out=[];
+  for(const slot of ['weapon','charm','mantle']){
+    const item=GEAR_BY_ID[S.gearEquipped?.[slot]];
+    if(item) out.push(item.name+' R'+(S.gearRanks[item.id]||1));
+  }
   return out.join(', ')||'keine';
 }
 function runReportText(){
@@ -2816,6 +2967,8 @@ function runReportText(){
     'Build: '+buildText(),
     'Evolutionen: '+evos,
     'Elite-Relikte: '+boonText(),
+    'Ausrüstung: '+equippedGearText(),
+    'Ausrüstungsfund: '+gearLootText(),
     'Hold-Vorbereitung: '+(S.preparedRerollsUsed?('+'+S.preparedRerollsUsed+' Rerolls'):'keine')+
       ' · Training '+Object.values(S.holdUtility||{}).join('/'),
     'Spitze im SIM-Radius: '+S.peakNearbyEnemies,
@@ -3131,7 +3284,8 @@ function pickSmart(offer){
   let best=offer[0], bestScore=-1e9;
   for (const o of offer){
     let sc=0;
-    if(o.type==='boon'){
+    if(o.type==='gearcard') sc=500;
+    else if(o.type==='boon'){
       sc={fury:95,harvest:80,stride:68,guard:55}[o.boon.id]||50;
       if(o.boon.id==='guard'&&S.hp<S.maxhp*.55) sc+=70;
     }
@@ -3243,7 +3397,9 @@ function headlessRun(runLen, opts){
              contract:S.contractId, famSpawns:S.famSpawns.slice(),
              W:Object.assign({},S.W), Pa:Object.assign({},S.Pa),
              evo:Object.keys(S.evo), boons:Object.assign({},S.boons),
-             eliteChoices:S.eliteChoices, dps:S.dmgDealt/runLen, xpTotal:S.xpTotal };
+             eliteChoices:S.eliteChoices, gearSeed:S.gearSeed,
+             gearBonus:Object.assign({},S.gearBonus),
+             dps:S.dmgDealt/runLen, xpTotal:S.xpTotal };
   } finally {
     CFG.XP_C = oldC; CFG.XP_K = oldK; HEADLESS = oldHeadless;
     input.x = oldInputX; input.y = oldInputY;
@@ -3293,7 +3449,7 @@ function runBalanceSuite(opts){
 
 // Für automatisierte Tests
 window.__EH = { get S(){return S;}, get H(){return META;}, CFG, HOLD_CFG, CONTRACTS,
-                WEAPONS, PASSIVES, BOONS, begin, input,
+                WEAPONS, PASSIVES, BOONS, GEAR, GEAR_CARD, begin, input,
                 pacingReport, runReportText, headlessRun, runBalanceSuite, nearEnemies,
                 priorityEnemy, spawnEnemy, rebuildGrid, shoot, updateProjectiles,
                 buildOffer, buildEliteOffer, applyOffer, applyBoon, fireWeapons,
@@ -3301,6 +3457,7 @@ window.__EH = { get S(){return S;}, get H(){return META;}, CFG, HOLD_CFG, CONTRA
                 enemyHp:(i)=>E.hp[i], enemyMax:(i)=>E.max[i],
                 advanceHold, saveHold, loadHold, depositRunReward, selectContract,
                 arcanumAction, yardAction, prepareReroll, trainMastery,
+                grantGear, equipGear, upgradeGear, salvageGear, gearUpgradeCost,
                 contractById, showHold:showStartMenu,
                 tick:(d)=>{HEADLESS=true; step(d);
                   while(pendingPicks>0){currentOffer=buildOffer(); applyOffer(currentOffer[0]); pendingPicks--;}

@@ -6,11 +6,19 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 
 ### Added
 
+- Rüstkammer mit sechs festen Ausrüstungsteilen für Waffe, Talisman und Gewand;
+  jede Sortie vergibt genau einen Fund
+- Direkte Duplikatverwertung zu Runenstaub, manuelles Zerlegen und gezielte
+  Rangaufwertung bis Rang 3 ohne Fusionssystem
+- Seltene Runenfibel als Kartensaat: Runenfunke erscheint garantiert im
+  Run-Angebot und verstärkt Angriffstempo sowie Mehrfachprojektile
+- Save-v4-Migration und automatischer `equipmentFlow` vom Fund bis zur
+  Run-Kartenwirkung bei isolierter Balance-Baseline
 - Arkanum mit Essenzproduktion, Lagerkappe und bis zu zwei herstellbaren
   zusätzlichen Rerolls für den nächsten Run
 - Übungshof mit Trainingsmarken und je zwei Stufen Pfadkunde, Reichgriff und
   Stoßschule als dauerhafte Utility-Meisterschaften
-- Save-v3-Migration und `holdExpansion`-Test für Offline-Produktion, Kappen,
+- Save-Migration und `holdExpansion`-Test für Offline-Produktion, Kappen,
   Kosten, Run-Verbrauch und Headless-Isolation
 - Vier neue Waffen-Evolutionen: Pfeilregen, Sturmherz, Klingenzyklon und
   Ewiger Winter; damit besitzen alle sechs Waffen einen vollständigen Pfad

@@ -10,7 +10,7 @@ Nicht mehrere Grafikfamilien gleichzeitig beginnen:
    Bodenkontakt und Bewegungsruhe festhalten. Der bisherige Browser-Smoke von
    mindestens 59 FPS bei 53 sichtbaren Gegnern nach etwa 30 Sekunden ist nur
    ein vorläufiger Technikcheck.
-2. [ ] Danach Phase 0.5 als Content- und Rückkehr-Slice umsetzen: zuerst drei
+2. [x] Danach Phase 0.5 als Content- und Rückkehr-Slice umsetzen: zuerst drei
    Sortieverträge, dann vollständige Buildpfade, anschließend Hold-Ausbau und
    Ausrüstung. Die Pakete stehen weiter unten und werden einzeln geprüft.
 3. [ ] Gegneranimationen erst nach dem Content-Slice fortsetzen. Stürmer,
@@ -178,10 +178,10 @@ zu öffnen.
 
 ### P0.5.4 – Kompakter Ausrüstungsloop
 
-- [ ] Ausrüstung als Run-Belohnung vergeben
-- [ ] Anlegen, Zerlegen und gezieltes Aufwerten ermöglichen
-- [ ] Kein Fusionssystem und keine wertlosen Duplikate einführen
-- [ ] Mindestens eine Kartensaat von seltener Ausrüstung bis in den Run-Pool
+- [x] Ausrüstung als Run-Belohnung vergeben
+- [x] Anlegen, Zerlegen und gezieltes Aufwerten ermöglichen
+- [x] Kein Fusionssystem und keine wertlosen Duplikate einführen
+- [x] Mindestens eine Kartensaat von seltener Ausrüstung bis in den Run-Pool
   durchgängig testen
 
 Abnahme:

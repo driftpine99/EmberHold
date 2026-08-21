@@ -473,9 +473,41 @@ Die Kosten steigen von einer auf zwei Marken. Direkter Schaden bleibt bewusst
 beim bestehenden Wächterbogen, damit der Hold nicht jede Kampfentscheidung
 durch passiven Powercreep ersetzt.
 
-Der lokale Save-Key bleibt kompatibel, das Schema migriert auf Version 3.
-`holdExpansion` prüft v2→v3-Migration, beide Offline-Produktionen,
+Der lokale Save-Key bleibt kompatibel; dieser Schritt führte das Schema
+zunächst auf Version 3. D-023 erweitert es verlustfrei auf Version 4.
+`holdExpansion` prüft die Migration, beide Offline-Produktionen,
 Zeitstempel-Idempotenz, Vorbereitungslimit, Meisterschaftskosten, Verbrauch
 beim Run-Start und vollständige Isolation der Meta-Boni aus der Headless-
 Balance-Referenz. Im Browser passt der Desktop-Hold bei 1440×1000 nahezu ohne
 Scroll; 844×390 bleibt ohne horizontalen Überlauf vertikal bedienbar.
+
+## D-023 – Drei Ausrüstungsslots ohne Fusionssystem
+
+**Status:** beschlossen und umgesetzt (21.08.2026)
+
+Jede abgeschlossene oder verlorene Sortie vergibt genau ein Ausrüstungsteil
+zusätzlich zum Erz. Die Rüstkammer kennt sechs feste Einzelstücke in drei
+Slots: Waffe, Talisman und Gewand. Ein bisher unbekanntes Teil wird auf Rang 1
+freigeschaltet; ein bereits bekanntes Duplikat wird sofort in Runenstaub
+umgewandelt. Es gibt deshalb weder Inventarkapazität noch wertlose Kopien oder
+ein Fusionssystem. Nicht mehr gewünschte Teile lassen sich ebenfalls direkt
+zerlegen.
+
+Runenstaub wertet ein gezielt gewähltes Teil bis Rang 3 auf. Gewöhnliche Teile
+kosten 6 beziehungsweise 12 Staub, die seltene Runenfibel 12 beziehungsweise
+24. Angelegte Werte werden erst beim Start in den Run kopiert und verändern
+Angriffstempo, Schaden, Aufsammelradius, Bewegung oder Schadensschutz. Die
+Runenfibel ist absichtlich anders: Sie garantiert **Runenfunke** als eine von
+drei Karten, bis der Spieler sie wählt. Runenfunke gibt für diesen Run +1
+Mehrfachprojektil und +20 % Angriffstempo.
+
+Der Save migriert unter demselben Key auf Version 4 und validiert Besitz,
+Ränge und Slotzuordnung gegen den festen Katalog. `equipmentFlow` prüft den
+kompletten Pfad von v3-Migration über Fund, direkte Duplikatverwertung,
+Aufwertung, Anlegen und Zerlegen bis zur seltenen Kartenwirkung. Außerdem
+beweist der Test, dass Ausrüstung und Kartensaat aus der Headless-Baseline
+isoliert bleiben und die Run-Belohnung nur einmal gebucht wird.
+
+Da der vollständige Hold jetzt höher als ein Desktop-Viewport ist, steht die
+Sortietafel visuell direkt unter dem Kopfbereich. Vertrag und Run-Start bleiben
+ohne Scrollen erreichbar; Produktion, Training und Rüstkammer folgen darunter.
