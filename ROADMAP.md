@@ -156,10 +156,10 @@ zu öffnen.
 
 ### P0.5.1 – Sortietafel als Brücke
 
-- [ ] Drei klar unterschiedliche Sortieverträge im Hold anbieten
-- [ ] Gegnergewichtung, Risiko und Belohnung je Vertrag sichtbar erklären
-- [ ] Auswahl speichern und im HUD sowie Run-Bericht ausweisen
-- [ ] Standardvertrag als unveränderte Balance-Referenz behalten
+- [x] Drei klar unterschiedliche Sortieverträge im Hold anbieten
+- [x] Gegnergewichtung, Risiko und Belohnung je Vertrag sichtbar erklären
+- [x] Auswahl speichern und im HUD sowie Run-Bericht ausweisen
+- [x] Standardvertrag als unveränderte Balance-Referenz behalten
 
 ### P0.5.2 – Mehr Build- und Run-Entscheidungen
 

@@ -256,6 +256,56 @@ try {
 } catch (error) {
   holdError = error instanceof Error ? error.message : String(error);
 }
+
+// --- D-019 / P0.5.1: Sortietafel, Migration und Baseline-Isolation -------
+let contractFlow = false;
+let contractError = "";
+try {
+  localStorage.setItem("emberhold:hold:v1", JSON.stringify({
+    version: 1, ore: 9, bars: 2, runs: 3, bowUpgrade: 1, lastAt: 1000,
+  }));
+  engine.loadHold(1000);
+  const legacyMigrated = engine.H.ore === 9 && engine.H.bars === 2 &&
+    engine.H.selectedContract === "ring";
+
+  engine.selectContract("breach");
+  engine.saveHold();
+  engine.loadHold(1000);
+  const selectionPersisted = engine.H.selectedContract === "breach";
+
+  engine.begin(180);
+  const selectedApplied = engine.S.contractId === "breach";
+  engine.S.reward = 1023;
+  engine.S.rewardGranted = false;
+  const boostedOre = engine.depositRunReward();
+  const rewardApplied = boostedOre === 14; // Basis 10 × 1,35, gerundet
+
+  const ring = engine.headlessRun(180, {
+    seed: 1701, xpC: engine.CFG.XP_C, xpK: engine.CFG.XP_K,
+    smart: true, immortal: true, contractId: "ring",
+  });
+  const breachA = engine.headlessRun(180, {
+    seed: 1701, xpC: engine.CFG.XP_C, xpK: engine.CFG.XP_K,
+    smart: true, immortal: true, contractId: "breach",
+  });
+  const breachB = engine.headlessRun(180, {
+    seed: 1701, xpC: engine.CFG.XP_C, xpK: engine.CFG.XP_K,
+    smart: true, immortal: true, contractId: "breach",
+  });
+  const baseline = engine.headlessRun(180, {
+    seed: 1701, xpC: engine.CFG.XP_C, xpK: engine.CFG.XP_K,
+    smart: true, immortal: true,
+  });
+  const variantsDistinct = JSON.stringify(ring.famSpawns) !== JSON.stringify(breachA.famSpawns);
+  const deterministic = JSON.stringify(breachA) === JSON.stringify(breachB);
+  const baselineIsolated = baseline.contract === "ring" &&
+    JSON.stringify(baseline) === JSON.stringify(ring);
+  contractFlow = engine.CONTRACTS.length === 3 && legacyMigrated &&
+    selectionPersisted && selectedApplied && rewardApplied && variantsDistinct &&
+    deterministic && baselineIsolated;
+} catch (error) {
+  contractError = error instanceof Error ? error.message : String(error);
+}
 // --- D-017: Simulation muss unabhaengig vom Seitenverhaeltnis sein ---------
 // Der Shim fuehrt resize() jetzt wirklich aus, statt es wie frueher ueber
 // addEventListener = noop zu verschlucken. Alle vier Formate sind Querformat.
@@ -391,8 +441,8 @@ canvasElement.clientHeight = 700;
 engine.resize();
 
 const output = {
-  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling,
-  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling },
+  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && contractFlow && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling,
+  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, contractFlow, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling },
   targets: report.targets,
   seeds: report.seeds,
   summary: { ...report.summary, evolutionRuns, evolutionSeeds: report.seeds.length,
@@ -406,6 +456,7 @@ if (telemetryError) output.telemetryError = telemetryError;
 if (visibleError) output.visibleError = visibleError;
 if (uxError) output.uxError = uxError;
 if (holdError) output.holdError = holdError;
+if (contractError) output.contractError = contractError;
 
 console.log(JSON.stringify(output, null, 2));
 if (!output.pass) process.exitCode = 1;

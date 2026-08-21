@@ -24,6 +24,8 @@ canvas{display:block;position:absolute;inset:0;width:100%;height:100%}
 #clock.ot{color:#e05038}
 #lvl{font-size:12px;color:#8b8577;letter-spacing:.1em;text-transform:uppercase}
 #lvl b{color:#e07a3f;font-size:15px}
+#contracthud{font-size:10px;color:#b9a18a;border-left:1px solid #34333a;padding-left:12px;
+  letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
 #kills{margin-left:auto;font-size:12px;color:#8b8577;font-variant-numeric:tabular-nums;
   white-space:nowrap}
 #xpwrap{height:4px;background:#1e1e28;border-radius:2px;margin-top:8px;overflow:hidden;
@@ -181,6 +183,21 @@ button.b.danger{background:#c9402e;color:#fff}
   border-radius:9px;color:#5d5a53;font-size:10px;text-align:center;padding:9px}
 .holdsortie{margin-top:14px}.holdsortie .btnrow{margin-top:0}
 .holdnote{color:#5f5b53;font-size:10px;margin-top:7px}
+.contractboard{width:min(920px,100%);margin:0 auto 12px;text-align:left}
+.contractboard>div:first-child{display:flex;justify-content:space-between;align-items:baseline;
+  gap:10px;margin-bottom:7px}.contractboard h2{font-size:13px;color:#d8d3c9}
+.contractboard>div:first-child span{font-size:9px;color:#6f6a61;letter-spacing:.12em;text-transform:uppercase}
+.contractgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.contractcard{pointer-events:auto;border:1px solid #31313d;background:rgba(18,18,26,.94);
+  color:#a8a396;border-radius:10px;padding:10px 11px;text-align:left;cursor:pointer;font:inherit;
+  min-width:0;transition:border-color .15s ease,background .15s ease}
+.contractcard:hover{border-color:#82604d}.contractcard.selected{border-color:var(--c,#e07a3f);
+  background:linear-gradient(135deg,rgba(224,122,63,.10),rgba(18,18,26,.96))}
+.contractcard b{display:block;color:#e8e4dc;font-size:12.5px}.contractcard em{display:block;
+  color:var(--c,#e07a3f);font-style:normal;font-size:9px;text-transform:uppercase;
+  letter-spacing:.11em;margin:2px 0 5px}.contractcard span{display:block;color:#888277;
+  font-size:10px;line-height:1.35}.contractcard small{display:block;color:#b9a18a;
+  font-size:9.5px;margin-top:6px}
 
 @media (max-width:620px){
   #start.holdsheet{padding:14px 12px 24px}.holdhead{align-items:flex-start;flex-direction:column}
@@ -188,6 +205,7 @@ button.b.danger{background:#c9402e;color:#fff}
   .holdstage{padding-top:160px}.crater{width:330px;height:165px}.embercore{top:43px}
   .holdstatus{top:126px}.holdgrid,.holdlower{grid-template-columns:1fr}.holdbuilding{padding:11px 12px}
   .holdupgrade{align-items:flex-start}.holdsortie button.b{padding:11px 18px}
+  .contractgrid{grid-template-columns:1fr}.contractcard{padding:9px 10px}
 }
 
 /* ---------- Dev-Overlay ---------- */
@@ -296,6 +314,7 @@ button.b.danger{background:#c9402e;color:#fff}
     <div id="topbar">
       <div id="clock">0:00</div>
       <div id="lvl">Stufe <b>1</b></div>
+      <div id="contracthud">Wächterring</div>
       <div id="kills">0 Kills</div>
     </div>
     <div id="xpwrap"><div id="xpbar"></div></div>
@@ -358,6 +377,10 @@ button.b.danger{background:#c9402e;color:#fff}
       </div>
     </div>
     <div class="holdsortie">
+      <div class="contractboard">
+        <div><h2>Sortietafel</h2><span>Wähle Risiko und Ertrag</span></div>
+        <div class="contractgrid" id="contractgrid"></div>
+      </div>
       <div class="btnrow"><button class="b" id="btnStart">Sortie · 8 Min</button><button class="b ghost" id="btnStart3">Scharmützel · 3 Min</button></div>
       <p class="holdnote">Lokaler Prototyp · Offline-Produktion bis maximal 24 Stunden · weitere Ringe gesperrt</p>
     </div>
@@ -843,6 +866,20 @@ function nearEnemies(x,y,r,cb){
 // ===========================================================================
 //  WAFFEN & PASSIVE
 // ===========================================================================
+const CONTRACTS = Object.freeze([
+  {id:'ring',name:'Wächterring',tag:'Ausgewogen',col:'#e07a3f',
+   desc:'Die bekannte Warden-Sortie ohne zusätzliche Modifikatoren.',
+   reward:1,hp:1,speed:1,bias:[1,1,1,1,1],tint:'rgba(224,122,63,.018)'},
+  {id:'breach',name:'Sturmbruch',tag:'Schnell und offensiv',col:'#c85e49',
+   desc:'Mehr Stürmer und Speier. Gegner bewegen sich 8 % schneller.',
+   reward:1.35,hp:1.08,speed:1.08,bias:[.65,2.3,1.55,.75,.8],tint:'rgba(172,55,48,.045)'},
+  {id:'hollow',name:'Aschengruft',tag:'Zäh und wertvoll',col:'#9b7fb8',
+   desc:'Mehr Teiler und Wahrer. Gegner besitzen 18 % mehr Leben.',
+   reward:1.55,hp:1.18,speed:1.03,bias:[1.15,.7,.75,1.9,2.2],tint:'rgba(108,76,145,.045)'},
+]);
+const CONTRACT_BY_ID=Object.freeze(Object.fromEntries(CONTRACTS.map(c=>[c.id,c])));
+function contractById(id){ return CONTRACT_BY_ID[id]||CONTRACTS[0]; }
+
 const WEAPONS = [
   { id:'bogen', name:'Langbogen', col:'#e07a3f',
     desc:'Priorisiert <b>Boss und Elite</b>, sonst das nächste Ziel. Durchbohrt.',
@@ -885,8 +922,9 @@ const EVO_FOCUS_AT = 450;   // letzte 30 Sekunden: fast fertigen Pfad sichtbar h
 // ===========================================================================
 let S = null;
 let HEADLESS = false;
-function newRun(runLen, seed){
+function newRun(runLen, seed, contractId){
   const runSeed = seedRandom(seed);
+  const contract=contractById(contractId||(HEADLESS?'ring':META?.selectedContract));
   S = {
     t:0, running:false, phase:'run',        // run | pause | cards | extract | over
     runLen: runLen,
@@ -897,6 +935,7 @@ function newRun(runLen, seed){
     dashCd:0, dashT:0, dashIf:0, dashVx:0, dashVy:0,
     level:1, xp:0, need:xpNeed(1),
     kills:0, gemsTaken:0, dmgDealt:0, xpTotal:0,
+    contractId:contract.id, contract, famSpawns:[0,0,0,0,0],
     // Simulationstelemetrie: Gegner im festen Kreis SIM_DIAG*1.15. Steuert das
     // Nachspawnen und ist die EINZIGE Groesse, die die Balance benutzen darf.
     nearbyEnemies:0, peakNearbyEnemies:0,
@@ -976,6 +1015,8 @@ function pickFam(t){
               0.02 + 0.22*f,        // Speier
               0.04 + 0.20*f,        // Teiler
               0.00 + 0.13*f ];      // Wahrer
+  const bias=S?.contract?.bias||CONTRACTS[0].bias;
+  for(let i=0;i<w.length;i++) w[i]*=bias[i];
   let s=0; for(const v of w) s+=v;
   let a=r*s; for(let i=0;i<5;i++){ a-=w[i]; if(a<=0) return i; }
   return 0;
@@ -1025,8 +1066,10 @@ function spawnEnemy(t, fam, kind, atx, aty){
   E.fam[i]=fam; E.kind[i]=kind||0; E.st[i]=0; E.tm[i]=0; E.slow[i]=0; E.ang[i]=0;
   E.face[i]=direction16(S.x-atx,S.y-aty);
   let hp = FAM_HP[fam]*scale;
+  hp*=S?.contract?.hp||1;
   if (kind===1) hp*=26; if (kind===2) hp*=120;
   E.hp[i]=hp; E.max[i]=hp; E.alive[i]=1; E.lit[i]=0;
+  if(S?.famSpawns) S.famSpawns[fam]++;
   return i;
 }
 function spawnGem(x,y,val){
@@ -1244,7 +1287,7 @@ function updateEnemies(dt){
     let dx=S.x-E.x[i], dy=S.y-E.y[i];
     const d=Math.hypot(dx,dy)||1;
     dx/=d; dy/=d;
-    let sp = FAM_SPEED[fam]*scale;
+    let sp = FAM_SPEED[fam]*scale*(S.contract?.speed||1);
     if (kind===1) sp*=1.15; if (kind===2) sp*=0.8;
     if (E.slow[i]>0){ E.slow[i]-=dt; sp*=0.35; }
 
@@ -2009,6 +2052,10 @@ function render(){
 
   // --- Boden: Basaltplatten und konzentrische Warden-Arenen --------------
   drawArenaFloor(vx0,vx1,vy0,vy1);
+  if(S.contract?.tint){
+    ctx.fillStyle=S.contract.tint;
+    ctx.fillRect(vx0,vy0,vx1-vx0,vy1-vy0);
+  }
 
   // --- Lichtkreis: die Farbe kehrt mit deiner Macht zurück ---------------
   const grd = ctx.createRadialGradient(S.x,S.y,0,S.x,S.y,lr);
@@ -2171,9 +2218,9 @@ const HOLD_CFG=Object.freeze({
   BOW_COST:2,
 });
 function freshHold(now){
-  return {version:1,ore:0,bars:0,runs:0,mineLevel:0,mineStored:0,
+  return {version:2,ore:0,bars:0,runs:0,mineLevel:0,mineStored:0,
     forgeLevel:0,forgeStored:0,forgeWorking:false,forgeProgress:0,
-    bowUpgrade:0,lastAt:Number.isFinite(now)?now:Date.now()};
+    bowUpgrade:0,selectedContract:'ring',lastAt:Number.isFinite(now)?now:Date.now()};
 }
 function cleanHold(raw,now){
   const h=freshHold(now), src=raw&&typeof raw==='object'?raw:{};
@@ -2183,6 +2230,7 @@ function cleanHold(raw,now){
   h.forgeLevel=num('forgeLevel',0,1)|0; h.forgeStored=num('forgeStored',0,HOLD_CFG.FORGE_CAP)|0;
   h.forgeWorking=!!src.forgeWorking; h.forgeProgress=num('forgeProgress',0,HOLD_CFG.FORGE_SEC);
   h.bowUpgrade=num('bowUpgrade',0,1)|0;
+  h.selectedContract=contractById(src.selectedContract).id;
   h.lastAt=Number.isFinite(+src.lastAt)?+src.lastAt:h.lastAt;
   if(!h.forgeLevel||h.forgeStored>=HOLD_CFG.FORGE_CAP){ h.forgeWorking=false; h.forgeProgress=0; }
   return h;
@@ -2227,14 +2275,39 @@ function depositRunReward(){
   if(HEADLESS||!S||S.rewardGranted) return 0;
   // Erst die Zeit waehrend der Sortie abrechnen; ihre Beute existiert erst jetzt.
   advanceHold(Date.now());
-  const ore=rewardOre(S.reward); META.ore+=ore; META.runs++; S.holdOre=ore; S.rewardGranted=true;
+  const baseOre=rewardOre(S.reward), mul=S.contract?.reward||1;
+  const ore=Math.max(baseOre,Math.round(baseOre*mul));
+  META.ore+=ore; META.runs++; S.holdOre=ore; S.holdOreBase=baseOre; S.rewardGranted=true;
   saveHold(); return ore;
 }
 function holdMessage(){
   if(!META.mineLevel) return 'Der innere Ring wartet auf die Reparatur der Tiefmine.';
   if(!META.forgeLevel) return 'Sammle 10 Eisenerz, um die Emberschmiede zu reparieren.';
   if(!META.bowUpgrade) return 'Erz wird zu Barren. Der Wächterbogen wartet auf Verstärkung.';
-  return 'Der innere Ring arbeitet. Weitere Kraterringe bleiben gesperrt.';
+  return 'Der innere Ring arbeitet. Wähle an der Sortietafel den nächsten Auftrag.';
+}
+let contractSig='';
+function selectContract(id){
+  const next=contractById(id);
+  if(META.selectedContract===next.id) return next.id;
+  META.selectedContract=next.id; saveHold(); contractSig='';
+  renderHold(next.name+' ist für die nächste Sortie vorbereitet.');
+  return next.id;
+}
+function renderContracts(){
+  const selected=contractById(META.selectedContract);
+  if(contractSig===selected.id) return;
+  contractSig=selected.id;
+  el('contractgrid').innerHTML=CONTRACTS.map(c=>
+    `<button class="contractcard${c.id===selected.id?' selected':''}" data-contract="${c.id}" `+
+    `style="--c:${c.col}" aria-pressed="${c.id===selected.id}"><b>${c.name}</b>`+
+    `<em>${c.tag}</em><span>${c.desc}</span><small>Erz ×${c.reward.toFixed(2)}</small></button>`
+  ).join('');
+  document.querySelectorAll('[data-contract]').forEach(btn=>{
+    btn.onclick=()=>selectContract(btn.dataset.contract);
+  });
+  el('btnStart').textContent=selected.name+' · 8 Min';
+  el('btnStart3').textContent=selected.name+' · 3 Min';
 }
 function renderHold(message){
   if(message){ holdNotice=message; holdNoticeUntil=Date.now()+3200; }
@@ -2242,6 +2315,7 @@ function renderHold(message){
   el('holdbars').textContent=Math.floor(META.bars).toLocaleString('de-DE');
   el('holdruns').textContent=META.runs.toLocaleString('de-DE');
   el('holdstatus').textContent=Date.now()<holdNoticeUntil?holdNotice:holdMessage();
+  renderContracts();
 
   const mineN=Math.floor(META.mineStored), mineOn=META.mineLevel>0, mb=el('btnMine');
   el('minelevel').textContent=mineOn?'Stufe 1':'Ruine';
@@ -2332,6 +2406,7 @@ function updateHUD(){
   else { c.textContent=fmtTime(Math.min(S.t,S.runLen)); c.classList.remove('ot'); }
   el('lvl').innerHTML='Stufe <b>'+S.level+'</b>';
   el('kills').textContent=S.kills.toLocaleString('de-DE')+' Kills';
+  el('contracthud').textContent=S.contract?.name||'Wächterring';
   el('xpbar').style.width=Math.min(S.xp/S.need*100,100)+'%';
   el('hpbar').style.width=Math.max(S.hp/S.maxhp*100,0)+'%';
   const bi=S.bossIndex, bossAlive=bi>=0&&E.alive[bi]&&E.kind[bi]===2;
@@ -2484,7 +2559,7 @@ function endRun(survived){
     statTile(fmtTime(S.otActive?S.runLen+S.ot:S.t),'Zeit') +
     statTile(S.pickTimes.length,'Kartenzüge') +
     statTile(S.reward.toLocaleString('de-DE'),'Beute gesamt') +
-    statTile('+'+S.holdOre,'Eisenerz für Hold');
+    statTile('+'+S.holdOre,'Eisenerz · '+S.contract.name);
   const mode=S.runLen===180?'3-Minuten-Scharmützel':Math.round(S.runLen/60)+'-Minuten-Run';
   el('btnAgain').textContent=mode+' wiederholen';
   setSheet('over',true,'btnMenu');
@@ -2513,6 +2588,7 @@ function runReportText(){
     'Erster Kartenzug: '+(S.pickTimes.length?S.pickTimes[0].toFixed(1)+' s':'–'),
     'Basis-Beute: '+S.baseReward,
     'Overtime-Bonus: '+bonus,
+    'Sortievertrag: '+S.contract.name+' · Erz ×'+S.contract.reward.toFixed(2),
     'Eisenerz für Hold: '+(S.holdOre||0),
     'Build: '+buildText(),
     'Evolutionen: '+evos,
@@ -2734,8 +2810,8 @@ function frame(ts){
 // ===========================================================================
 //  START
 // ===========================================================================
-function begin(len){
-  newRun(len);
+function begin(len,contractId){
+  newRun(len,undefined,contractId);
   holdOpen=false; saveHold();
   slotSig=''; renderSlots();
   document.querySelectorAll('.sheet').forEach(s=>{ s.classList.remove('on'); s.setAttribute('aria-hidden','true'); });
@@ -2744,6 +2820,7 @@ function begin(len){
   S.running=true; S.phase='run';
   last=0; acc=0;
   startOnboarding();
+  toast(S.contract.name);
 }
 el('btnStart').onclick   = ()=>begin(480);
 el('btnStart3').onclick  = ()=>begin(180);
@@ -2751,7 +2828,7 @@ el('btnLeave').onclick   = ()=>endRun(true);
 el('btnOT').onclick      = startOvertime;
 el('pausebtn').onclick   = togglePause;
 el('btnResume').onclick  = togglePause;
-el('btnAgain').onclick   = ()=>begin(S&&S.runLen?S.runLen:480);
+el('btnAgain').onclick   = ()=>begin(S&&S.runLen?S.runLen:480,S?.contractId);
 el('btnMenu').onclick    = showStartMenu;
 el('btnCopy').onclick    = copyRunReport;
 el('reroll').onclick     = doReroll;
@@ -2845,7 +2922,7 @@ function headlessRun(runLen, opts){
   if (Number.isFinite(opts.xpK)) CFG.XP_K = opts.xpK;
   HEADLESS = true;
   try {
-    newRun(runLen, opts.seed);
+    newRun(runLen, opts.seed, opts.contractId||'ring');
     S.running = true; S.phase = 'run';
     const DT = CFG.TICK, N = Math.ceil(runLen/DT);
     let a = 0, died = -1, botX = 1, botY = 0;
@@ -2913,6 +2990,7 @@ function headlessRun(runLen, opts){
     return { seed:S.seed, first:S.pickTimes[0]||null, total:S.pickTimes.length, perMin,
              picks:S.pickTimes.slice(), kills:S.kills, peak:S.peakNearbyEnemies,
              live, nearby:S.nearbyEnemies, level:S.level, died, hpTrace,
+             contract:S.contractId, famSpawns:S.famSpawns.slice(),
              W:Object.assign({},S.W), Pa:Object.assign({},S.Pa),
              evo:Object.keys(S.evo), dps:S.dmgDealt/runLen, xpTotal:S.xpTotal };
   } finally {
@@ -2963,11 +3041,12 @@ function runBalanceSuite(opts){
 }
 
 // Für automatisierte Tests
-window.__EH = { get S(){return S;}, get H(){return META;}, CFG, HOLD_CFG, begin, input,
+window.__EH = { get S(){return S;}, get H(){return META;}, CFG, HOLD_CFG, CONTRACTS, begin, input,
                 pacingReport, runReportText, headlessRun, runBalanceSuite, nearEnemies,
                 priorityEnemy, spawnEnemy, rebuildGrid, shoot, updateProjectiles,
                 enemyHp:(i)=>E.hp[i], enemyMax:(i)=>E.max[i],
-                advanceHold, saveHold, loadHold, depositRunReward, showHold:showStartMenu,
+                advanceHold, saveHold, loadHold, depositRunReward, selectContract,
+                contractById, showHold:showStartMenu,
                 tick:(d)=>{HEADLESS=true; step(d); while(pendingPicks>0){currentOffer=buildOffer(); applyOffer(currentOffer[0]); pendingPicks--;} HEADLESS=false;},
                 targetEnemies, resize, render,
                 viewport:()=>({W,H,SCALE,VIEW_W,VIEW_H,SIM_W,SIM_H,SIM_DIAG,

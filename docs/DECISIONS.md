@@ -409,3 +409,21 @@ bleiben gesperrt. Gegneranimationen nach dem Schwärmer werden zurückgestellt,
 bis der Content-Slice spielbar abgenommen ist. Der Standardvertrag bleibt die
 unveränderte Balance-Referenz; Meta-Boni werden in der Seed-Suite weiterhin
 explizit deaktiviert.
+
+## D-020 – Drei Verträge, eine unveränderte Balance-Referenz
+
+**Status:** beschlossen und umgesetzt (21.08.2026)
+
+Die erste Phase-0.5-Erweiterung ist eine Sortietafel mit drei jederzeit
+wählbaren Verträgen. **Wächterring** ist der bisherige Run ohne Modifikator und
+bleibt die einzige verbindliche Seed-Baseline. **Sturmbruch** gewichtet Stürmer
+und Speier stärker, gibt Gegnern 8 % mehr Tempo und Leben und zahlt ×1,35 Erz.
+**Aschengruft** gewichtet Teiler und Wahrer stärker, gibt 18 % mehr Leben sowie
+3 % Tempo und zahlt ×1,55 Erz.
+
+Die Auswahl wird im bestehenden Hold-Spielstand als Save-Version 2 migriert,
+im Hold erklärt und in HUD sowie Run-Bericht sichtbar gehalten. Verträge dürfen
+Gegnerfamilien, Risiko und Hold-Ertrag verändern, aber weder XP-Kurve noch
+Kartenrhythmus des Wächterrings still überschreiben. `contractFlow` prüft
+Migration, Persistenz, deterministische Unterschiede, einmalige Belohnung und
+die Isolation der Baseline.

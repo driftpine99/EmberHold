@@ -28,6 +28,11 @@ einen echten Vier-Phasen-Laufzyklus; weitere Familien folgen erst nach seinem
 Spieltest. Backend, Ton und Monetarisierung bleiben weiterhin außerhalb des
 Scopes.
 
+Die Sortietafel bietet inzwischen drei Verträge: den unveränderten
+Wächterring, den schnellen Sturmbruch und die robuste Aschengruft. Auswahl,
+Gegnergewichtung, Risikomodifikator und Erzbonus bleiben über den lokalen
+Spielstand erhalten und werden im Run-HUD sowie Bericht ausgewiesen.
+
 Die einzige Produktfrage der Phase 0 lautet:
 
 > Macht ein Run genug Spaß, dass Testpersonen freiwillig sofort einen zweiten

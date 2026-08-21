@@ -123,6 +123,20 @@ lokale Speicherung, die einmalige Auszahlung einer Run-Belohnung, Rückkehr in
 den Hold und die Übernahme des +10-%-Schadensbonus in den nächsten Run. Die
 Kampf-Balance-Suite läuft immer ohne Hold-Bonus.
 
+Der Check `contractFlow` prüft zusätzlich die Sortietafel aus P0.5.1:
+
+- Ein alter Hold-Spielstand ohne Vertragsfeld migriert verlustfrei auf
+  Save-Version 2 und wählt den Wächterring als sicheren Standard.
+- Die Auswahl eines Vertrags bleibt nach Speichern und Laden erhalten.
+- Sturmbruch verändert bei identischem Seed reproduzierbar die Verteilung der
+  Gegnerfamilien und zahlt den ausgewiesenen Erzbonus genau einmal aus.
+- Ein Headless-Lauf ohne expliziten Vertrag verwendet immer den Wächterring und
+  bleibt bitgenau mit der bisherigen Balance-Referenz identisch.
+
+Manuell müssen die drei Vertragskarten im Hold auf Desktop und Mobil lesbar
+sein. Im Run müssen Vertragsname und leicht veränderte Bodenstimmung erkennbar
+bleiben, ohne Gegner- oder Telegrafiefarben zu überdecken.
+
 Der Visual-Smoke-Check stellt zusätzlich sicher, dass die drei aktiven
 Raster-Assets (`aelric-atlas-v2.png`, `enemy-atlas-v1.png` und
 `enemy-swarmer-atlas-v2.png`) als echte RGBA-PNGs vorhanden sind, der

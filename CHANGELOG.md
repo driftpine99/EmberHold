@@ -6,6 +6,11 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 
 ### Added
 
+- Sortietafel mit Wächterring, Sturmbruch und Aschengruft; jeder Vertrag zeigt
+  Gegnerfokus, Risiko und Erzbonus und bleibt im lokalen Spielstand gewählt
+- Vertragsname im Kampf-HUD und Run-Bericht sowie dezente eigene Bodenstimmung
+- Automatischer `contractFlow` für Save-v1→v2-Migration, Persistenz,
+  deterministische Gegnergewichtung, Belohnung und Baseline-Isolation
 - Begrenzte Phase 0.5 für Sortieverträge, vollständige Buildpfade, Hold-Ausbau
   und einen kompakten Ausrüstungsloop vor dem externen Spieltest (D-019)
 - Getrennte Telemetrie: `nearbyEnemies`/`peakNearbyEnemies` für den festen
