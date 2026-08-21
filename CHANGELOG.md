@@ -6,6 +6,8 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 
 ### Added
 
+- Begrenzte Phase 0.5 für Sortieverträge, vollständige Buildpfade, Hold-Ausbau
+  und einen kompakten Ausrüstungsloop vor dem externen Spieltest (D-019)
 - Getrennte Telemetrie: `nearbyEnemies`/`peakNearbyEnemies` für den festen
   Simulationskreis, `visibleEnemies`/`peakVisibleEnemies` für die tatsächlich
   gezeichneten Gegner. Entwickleranzeige, Performancebericht und Run-Bericht

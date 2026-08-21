@@ -54,10 +54,16 @@ Der technische Kurztest des Schwärmers ergab vorläufig mindestens 59 FPS bei
 Stresstest. Vor der nächsten Gegnerfamilie braucht es einen manuellen
 8-Minuten-Run und das Feedback des Besitzers gemäß `docs/TESTPLAN.md`.
 
-Wenn der Schwärmer freigegeben ist, ist der **Stürmer** die nächste
-Animationsfamilie. Danach folgen Speier, Teiler und Wahrer – jeweils einzeln
-mit Spieltest dazwischen. Kampfwerte oder Spawnmengen dabei nicht nebenbei
-ändern.
+Nach der visuellen Freigabe folgt gemäß D-019 zunächst Phase 0.5. Die
+verbindliche Reihenfolge lautet: Sortieverträge, Build-/Run-Entscheidungen,
+Arkanum und Übungshof, danach Ausrüstung und Zerlegung. Jeder Abschnitt bleibt
+ein eigener spielbarer Commit mit Tests. Die Animationen von Stürmer, Speier,
+Teiler und Wahrer sind bis danach zurückgestellt.
+
+Der Standardvertrag muss die bestehende Balance-Referenz bitgenau oder innerhalb
+der dokumentierten Korridore erhalten. Neue Hold-Boni und Vertragsmodifikatoren
+dürfen nicht unbemerkt in die Baseline-Seed-Suite gelangen. Bestehende lokale
+Spielstände immer migrieren; niemals durch eine neue Save-Version still löschen.
 
 ## Prüfen und dokumentieren
 

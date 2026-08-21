@@ -385,3 +385,27 @@ folgende Messung entwertet, ist die Absicherung trotzdem umgesetzt:
 Balancekonfiguration `CFG` und vergleicht ihn am Ende. Abweichungen lassen den
 Check `configStable` und damit `npm test` rot werden. Damit ist die
 Fehlerklasse dauerhaft sichtbar, unabhängig davon, welche Einzelursache sie hat.
+
+## D-019 – Content- und Rückkehr-Slice vor dem externen Spieltest
+
+**Status:** beschlossen (21.08.2026)
+
+Der technische Kampfprototyp ist stabil genug für weitere Arbeit, aber der
+interne Test zeigt zwei bereits bekannte Produktprobleme: Der achtminütige Run
+variiert noch zu wenig, und der Zwei-Gebäude-Hold bietet nach der ersten
+Bogenverbesserung fast keine Entscheidung mehr. Ein externer Test in diesem
+Zustand würde vor allem diesen fehlenden Umfang bestätigen und die eigentliche
+Frage nach Kampf- und Rückkehrmotivation verzerren.
+
+Vor P0.4 wird deshalb eine begrenzte Phase 0.5 eingeschoben. Sie enthält drei
+Sortieverträge, vollständige Evolutionspfade für die vorhandenen Waffen, eine
+Elite-Belohnungsentscheidung, Arkanum und Übungshof sowie einen kompakten
+Ausrüstungs-/Zerlegungsloop. Jedes Paket muss die Verbindung `Hold → Run → Hold`
+sichtbar stärken und erhält einen eigenen Test- und Commitpunkt.
+
+Dies ist keine Freigabe für den vollständigen Phase-1-Scope. Zweiter Held,
+weitere Biome, acht Gebäude, Runen, Aufstieg, Backend, Ton und Monetarisierung
+bleiben gesperrt. Gegneranimationen nach dem Schwärmer werden zurückgestellt,
+bis der Content-Slice spielbar abgenommen ist. Der Standardvertrag bleibt die
+unveränderte Balance-Referenz; Meta-Boni werden in der Seed-Suite weiterhin
+explizit deaktiviert.
