@@ -101,6 +101,7 @@ if (!engine?.runBalanceSuite) throw new Error("Balance suite is not exposed as w
 const report = engine.runBalanceSuite();
 const evolutionRuns = report.runs.baseline.filter((run) => run.evo.length > 0).length;
 const evolutionReachable = evolutionRuns >= 2;
+const feedbackRun = report.runs.baseline.find((run) => run.seed === 2474367456);
 const repeat = engine.headlessRun(report.runLen, {
   seed: report.seeds[0],
   xpC: engine.CFG.XP_C,
@@ -122,21 +123,54 @@ const visualState = engine.S.bowKick > 0 &&
 const directionBlock = html.match(/function directionalSprites\(base\)\{([\s\S]*?)\n\}/)?.[1] || "";
 const uprightCharacters = html.includes("ctx.scale(S.heroFacing,1)") &&
   html.includes("const faceRight=Math.cos") && !directionBlock.includes(".rotate(");
+const renderEnemyBlock = html.slice(html.indexOf("// --- Gegner: ein Durchlauf"), html.indexOf("// --- Gegnerprojektile"));
+const singlePassRendering = renderEnemyBlock.includes("spr=tier===0?SPR.enemy") &&
+  !renderEnemyBlock.includes("for (let f=0; f<5; f++)");
 const combatReadability =
   html.includes("function drawEnemyTelegraphs(vx0,vx1,vy0,vy1)") &&
   html.includes("E.ang[i]=Math.atan2(dy,dx)") &&
   html.includes("E.vx[i]=Math.cos(E.ang[i])*sp*7.5") &&
   html.includes("Goldene Lücke suchen · roten Korridor meiden") &&
   html.includes('id="bossbar"') && html.includes('id="bossfill"');
+const uniqueChainTargets = html.includes("const CHAIN_HITS = new Int16Array(8)") &&
+  html.includes("CHAIN_HITS[seenN++]=best");
 let bossTargeting = false;
+let bossDurability = false;
 try {
   engine.begin(180);
   engine.spawnEnemy(100, 0, 0, 90, 0);
-  const boss = engine.spawnEnemy(100, 4, 2, 280, 0);
+  const boss = engine.spawnEnemy(250, 4, 2, 280, 0);
   engine.rebuildGrid();
   bossTargeting = engine.priorityEnemy(520) === boss &&
     html.includes("const pierce = (evo||bossShot) ? 999") &&
     !html.includes("const tgt = farthestEnemy(range*1.25)");
+  bossDurability = engine.enemyMax(boss) >= 9000 && !html.includes("bossShot?1.45:1");
+} catch (_) {}
+let singleProjectileHit = false;
+let uniqueSpatialQuery = false;
+let singleExplosion = false;
+try {
+  engine.begin(180);
+  const boss = engine.spawnEnemy(100, 4, 2, 0, 0);
+  engine.rebuildGrid();
+  let visits = 0;
+  engine.nearEnemies(0, 0, 3000, () => { visits++; });
+  uniqueSpatialQuery = visits === 1;
+  const before = engine.enemyHp(boss);
+  engine.shoot(0, 0, 1, 0, 0, 10, 999, 0, 9);
+  for (let i=0; i<5; i++) engine.updateProjectiles(engine.CFG.TICK);
+  singleProjectileHit = Math.abs((before-engine.enemyHp(boss))-10) < 0.001;
+
+  engine.begin(180);
+  const a = engine.spawnEnemy(0, 4, 0, 0, 0);
+  const b = engine.spawnEnemy(0, 4, 0, 3, 0);
+  engine.rebuildGrid();
+  const beforeA=engine.enemyHp(a), beforeB=engine.enemyHp(b);
+  engine.shoot(0, 0, 1, 0, 0, 10, 1, 2, 12);
+  engine.updateProjectiles(engine.CFG.TICK);
+  const expected=10*(1+2*.085);
+  singleExplosion=Math.abs((beforeA-engine.enemyHp(a))-expected)<.001 &&
+    Math.abs((beforeB-engine.enemyHp(b))-expected)<.001;
 } catch (_) {}
 let uxFlow = false;
 let uxError = "";
@@ -217,11 +251,14 @@ try {
   holdError = error instanceof Error ? error.message : String(error);
 }
 const output = {
-  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && combatReadability && bossTargeting && uxFlow && holdFlow,
-  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, combatReadability, bossTargeting, uxFlow, holdFlow },
+  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow,
+  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow },
   targets: report.targets,
   seeds: report.seeds,
-  summary: { ...report.summary, evolutionRuns, evolutionSeeds: report.seeds.length, stationaryDeath: stationaryRun.died },
+  summary: { ...report.summary, evolutionRuns, evolutionSeeds: report.seeds.length,
+    stationaryDeath: stationaryRun.died,
+    feedbackSeed: feedbackRun ? { kills: feedbackRun.kills, picks: feedbackRun.total,
+      peak: feedbackRun.peak, onScreen: feedbackRun.onScreen, evo: feedbackRun.evo } : null },
 };
 if (uxError) output.uxError = uxError;
 if (holdError) output.holdError = holdError;

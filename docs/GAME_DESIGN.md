@@ -507,8 +507,7 @@ Spielgefühl bestimmt. Jede Regel erzwingt ein anderes Bewegungsmuster.
 **Volk:** Menschen · **Freischaltung:** Start
 
 > **Auto-Angriff:** Priorisiert **Boss, dann Elite, dann das nächste Ziel**.
-> Ein auf den Boss gerichteter Pfeil durchschlägt die Add-Wand und verursacht
-> zusätzlichen Boss-Schaden.
+> Ein auf den Boss gerichteter Pfeil durchschlägt die Add-Wand.
 >
 > **Ember-Stoß:** Rückwärts-Sprung mit Salve auf die Ausgangsposition.
 >
@@ -866,7 +865,7 @@ Schatzflut(t)  = 1 + 0,45 × exp(−(t−420)² / (2×55²))
 ```
 
 **Der Grund für die Sättigung ist technisch und wird zum Designvorteil:** Die
-Gegnerdichte kann nicht unbegrenzt wachsen, weil das Entity-Budget bei ~900
+Gegnerdichte kann nicht unbegrenzt wachsen, weil das Entity-Budget bei ~700
 Gegnern liegt. Technik und Design ziehen hier in dieselbe Richtung — die
 Sättigung, die die Engine erzwingt, ist genau die, die lange Runs im Zaum hält.
 
@@ -1098,16 +1097,18 @@ Speicherverbrauch im Mobile-Browser ist für unser Entity-Profil riskant.
 
 ### 15.3 Bullet-Heaven-Performance
 
-**Budget** (Zielgerät: Android-Mittelklasse von 2021, 60 fps):
+**Vorläufiges Phase-0-Budget** (Zielgerät: Android-Mittelklasse, 60 fps):
 
-| | Budget | Spitze bei Min 8 | Auslastung |
-|---|---|---|---|
-| Gegner | 1.500 | 1.135 | 76 % |
-| Projektile | 800 | 684 | 86 % |
-| Aufsammelbares | 3.000 | 2.043 | 68 % |
-| **Gesamt** | **5.300** | **3.862** | **73 %** |
+| | Hartes Budget | Referenzziel bei Min 8 |
+|---|---:|---:|
+| Gegner | 700 | ca. 300 sichtbar |
+| Spielerprojektile | 800 | neu zu messen |
+| Gegnerprojektile | 240 | neu zu messen |
+| Aufsammelbares | 3.000 | neu zu messen |
 
-27 % Reserve für Bosswellen und schwächere Geräte.
+Die früheren Spitzenwerte mit über 1.000 Gegnern sind nach dem realen
+28-FPS-Feldtest verworfen. Reserve und tatsächliche Spitzen werden in P0.3 auf
+Desktop und echten Mobilgeräten neu gemessen.
 
 **Umsetzungsregeln:**
 

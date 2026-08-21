@@ -59,8 +59,9 @@ Der Phase-0-Vertrag lautet:
 - Zielzüge für 3 / 8 / 15 / 20 Minuten: 5 / 21 / 39 / 50
 - erster Zug: Zielwert 35 Sekunden; akzeptierter Mittelwert der festen
   Seed-Suite 25–45 Sekunden
-- acht feste Seeds; ±10 % XP-Kosten dürfen die mittlere Zahl der Kartenzüge
-  nicht um mehr als Faktor 1,75 auseinanderziehen
+- neun feste Seeds einschließlich eines echten Feldtest-Seeds; ±10 %
+  XP-Kosten dürfen die mittlere Zahl der Kartenzüge nicht um mehr als Faktor
+  1,75 auseinanderziehen
 
 Änderungen an diesen Regeln müssen Spielcode, GDD und Testplan gemeinsam
 aktualisieren und `npm test` bestehen.
@@ -151,7 +152,7 @@ vorher bleibt der Build vollständig zufallsgetrieben. Der späte Zeitpunkt
 verhindert, dass eine frühe Evolution die XP-Kurve durch zusätzlichen Schaden
 aufschaukelt.
 
-Der CI-Vertrag verlangt mindestens zwei evolvierte Builds unter acht festen,
+Der CI-Vertrag verlangt mindestens zwei evolvierte Builds unter neun festen,
 fokussiert gespielten 8-Minuten-Seeds. Gleichzeitig bleiben 21 ± 3 Kartenzüge
 und der bestehende Sensitivitätskorridor verbindlich.
 
@@ -185,15 +186,22 @@ gedreht. Echte 4- oder 8-Richtungsanimationen benötigen später einen dafür
 produzierten Atlas und werden nicht durch Rotation vorgetäuscht.
 
 Auto-Angriffe verwenden die lesbare Priorität `Boss → Elite → nächstes Ziel`.
-Ein auf den Boss gerichteter Langbogenpfeil durchschlägt normale Gegner und
-erhält +45 % Boss-Schaden. Der Boss erscheint sichtbar innerhalb der
-Waffenreichweite; sein Prototyp-HP-Multiplikator sinkt von 90 auf 55. Damit
-bleibt Fernkampf eine Bossstrategie, ohne dass der Spieler in den Gegnerpulk
-laufen muss.
+Ein auf den Boss gerichteter Langbogenpfeil durchschlägt normale Gegner. Der
+Boss erscheint sichtbar innerhalb der Waffenreichweite; sein
+Prototyp-HP-Multiplikator steigt nach Feldtest von 90 auf 120. Zusätzlicher
+Boss-Schaden entfällt. Jeder Pfeil kann denselben Gegner exakt einmal treffen;
+eine Feuerkugel explodiert exakt einmal und Kettenblitz besucht jedes Ziel nur
+einmal. Das räumliche Hash-Gitter prüft nach dem Hash auch die echte Zelle.
 
-Die Referenzdichte sinkt von 55 + 1.250 auf 42 + 550 Gegner in der
-Sättigungsformel; das Entity-Limit sinkt von 1.500 auf 900. Im Gegenzug wird
+Die Referenzdichte sinkt von 55 + 1.250 auf 42 + 450 Gegner in der
+Sättigungsformel; das Entity-Limit sinkt von 1.500 auf 700. Im Gegenzug wird
 die XP-Kurve auf `82 × Level^0,70` abgeflacht. Kontakttreffer haben 0,50 statt
 0,70 Sekunden Unverwundbarkeit, Regeneration sinkt auf 0,75 HP/s und der
 Kontaktfaktor steigt auf 1,10. Weniger, lesbarere Gegner bleiben dadurch
 gefährlicher als eine reine, folgenlose Sprite-Wand.
+
+Nach einem echten Run mit 28 FPS wird die Gegnerdarstellung von zwanzig
+Familie×Lichtstufe-Scans auf einen sichtbaren Durchlauf reduziert. Gegner in
+tiefer Dunkelheit verwenden kleine Silhouetten; passive Familienmarker werden
+nur im nahen Lichtbereich gezeichnet. Der Feldtest-Seed `2474367456` ist Teil
+der reproduzierbaren Suite.

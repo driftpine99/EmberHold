@@ -421,12 +421,12 @@ const CFG = {
   XP_K:          0.70,      // danach flacher als die alte, dichtebasierte Kurve
                             // nicht aus einem Modell abgeleitet
 
-  // --- Dichte (sättigt, weil das Entity-Budget bei 900 liegt) ---
+  // --- Dichte (sättigt, weil das Entity-Budget bei 700 liegt) ---
   SPAWN_START:    42,       // lesbarer Einstieg statt sofortiger Sprite-Wand
-  SPAWN_SPAN:     550,      // ca. 140 beim Boss, ca. 370 am Run-Ende
+  SPAWN_SPAN:     450,      // ca. 120 beim Boss, ca. 300 am Run-Ende
   SPAWN_HALF:     430,
   SPAWN_EXP:      2.8,
-  CAP_ENEMY:      900,
+  CAP_ENEMY:      700,
   CAP_PROJ:       800,
   CAP_GEM:        3000,
   CAP_EPROJ:      240,
@@ -743,12 +743,14 @@ const E = {                                   // Gegner
   alive:new Uint8Array(CFG.CAP_ENEMY), lit:new Uint8Array(CFG.CAP_ENEMY),
   n:0, free:[]
 };
+const PROJ_HIT_WORDS=(CFG.CAP_ENEMY+31)>>5;
 const P = {                                   // Spielerprojektile
   x:new Float32Array(CFG.CAP_PROJ), y:new Float32Array(CFG.CAP_PROJ),
   vx:new Float32Array(CFG.CAP_PROJ), vy:new Float32Array(CFG.CAP_PROJ),
   dmg:new Float32Array(CFG.CAP_PROJ), life:new Float32Array(CFG.CAP_PROJ),
   pierce:new Int16Array(CFG.CAP_PROJ), kind:new Uint8Array(CFG.CAP_PROJ),
   r:new Float32Array(CFG.CAP_PROJ), alive:new Uint8Array(CFG.CAP_PROJ),
+  hit:new Uint32Array(CFG.CAP_PROJ*PROJ_HIT_WORDS),
   n:0, free:[]
 };
 const Q = {                                   // Gegnerprojektile
@@ -773,6 +775,7 @@ function fx(x,y,r,life,col,kind){
   FX.col.push(col);FX.kind.push(kind||0);
 }
 const BOLT = {ax:[],ay:[],bx:[],by:[],t:[]};   // Kettenblitz-Segmente
+const CHAIN_HITS = new Int16Array(8);           // ein Ziel nur einmal je Kette
 const GROUND = {x:[],y:[],r:[],t:[],life:[],dmg:[]};  // brennender Boden
 
 // --- Allokationsfreie Slot-Vergabe -----------------------------------------
@@ -790,12 +793,15 @@ const cellHead = new Int32Array(CFG.NCELLS).fill(-1);   // -1 = leere Zelle;
                                                         // ohne fill() zeigt Zelle 0 auf
                                                         // Slot 0 -> Endlosschleife
 const cellNext = new Int32Array(CFG.CAP_ENEMY);
+const cellX = new Int32Array(CFG.CAP_ENEMY), cellY = new Int32Array(CFG.CAP_ENEMY);
 function hashCell(cx,cy){ return ((cx*73856093) ^ (cy*19349663)) & (CFG.NCELLS-1); }
 function rebuildGrid(){
   cellHead.fill(-1);
   for (let i=0;i<E.n;i++){
     if (!E.alive[i]) continue;
-    const h = hashCell(Math.floor(E.x[i]/CFG.CELL), Math.floor(E.y[i]/CFG.CELL));
+    const cx=Math.floor(E.x[i]/CFG.CELL), cy=Math.floor(E.y[i]/CFG.CELL);
+    cellX[i]=cx; cellY[i]=cy;
+    const h = hashCell(cx,cy);
     cellNext[i] = cellHead[h]; cellHead[h] = i;
   }
 }
@@ -805,7 +811,12 @@ function nearEnemies(x,y,r,cb){
   const c0y=Math.floor((y-r)/CFG.CELL), c1y=Math.floor((y+r)/CFG.CELL);
   for (let cy=c0y;cy<=c1y;cy++) for (let cx=c0x;cx<=c1x;cx++){
     let i = cellHead[hashCell(cx,cy)];
-    while (i!==-1){ if (E.alive[i]) cb(i); i = cellNext[i]; }
+    while (i!==-1){
+      // Hash-Kollisionen teilen sich einen Bucket. Ohne echte Zellprüfung
+      // konnte derselbe Gegner in einer Radiusabfrage mehrfach auftauchen.
+      if (E.alive[i]&&cellX[i]===cx&&cellY[i]===cy) cb(i);
+      i = cellNext[i];
+    }
   }
 }
 
@@ -973,7 +984,7 @@ function spawnEnemy(t, fam, kind, atx, aty){
   E.fam[i]=fam; E.kind[i]=kind||0; E.st[i]=0; E.tm[i]=0; E.slow[i]=0; E.ang[i]=0;
   E.face[i]=direction16(S.x-atx,S.y-aty);
   let hp = FAM_HP[fam]*scale;
-  if (kind===1) hp*=26; if (kind===2) hp*=55;
+  if (kind===1) hp*=26; if (kind===2) hp*=120;
   E.hp[i]=hp; E.max[i]=hp; E.alive[i]=1; E.lit[i]=0;
   return i;
 }
@@ -1012,7 +1023,15 @@ function shoot(x,y,dx,dy,speed,dmg,pierce,kind,r){
   const l = Math.hypot(dx,dy)||1;
   P.x[i]=x; P.y[i]=y; P.vx[i]=dx/l*speed; P.vy[i]=dy/l*speed;
   P.dmg[i]=dmg; P.pierce[i]=pierce; P.kind[i]=kind; P.r[i]=r;
+  P.hit.fill(0,i*PROJ_HIT_WORDS,(i+1)*PROJ_HIT_WORDS);
   P.life[i]=1.6; P.alive[i]=1;
+}
+
+/** Ein Projektil darf denselben Gegner unabhängig von dessen Größe nur einmal treffen. */
+function projectileHitOnce(pi,ei){
+  const word=pi*PROJ_HIT_WORDS+(ei>>5), bit=1<<(ei&31);
+  if(P.hit[word]&bit) return false;
+  P.hit[word]|=bit; return true;
 }
 
 function fireWeapons(dt){
@@ -1032,7 +1051,7 @@ function fireWeapons(dt){
       const aimLen=Math.hypot(dx,dy)||1;
       S.shotAimx=dx/aimLen; S.shotAimy=dy/aimLen; S.shotTarget=tgt; S.bowKick=.16;
       const bossShot=tgt>=0&&E.kind[tgt]===2;
-      const dmg = (12 + 5*L) * st.dmg * (L>=5?1.5:1) * (L>=2?1.4:1) * (evo?1.6:1) * (bossShot?1.45:1);
+      const dmg = (12 + 5*L) * st.dmg * (L>=5?1.5:1) * (L>=2?1.4:1) * (evo?1.6:1);
       // Ein sichtbarer Boss-Fokus darf nicht an der Add-Wand verpuffen.
       const pierce = (evo||bossShot) ? 999 : (2 + (L>=1?1:0) + (L>=3?1:0));
       shoot(S.x,S.y,dx,dy, 760, dmg, pierce, evo?1:0, 9);
@@ -1084,19 +1103,20 @@ function fireWeapons(dt){
       C.blitz += 1;
       let jumps = 3 + (L>=1?1:0) + (L>=3?1:0) + (L>=5?2:0);
       const dmg = (14+5*L)*st.dmg*(L>=2?1.4:1);
-      let cx=S.x, cy=S.y, prev=-1;
+      let cx=S.x, cy=S.y, seenN=0;
       for (let j=0;j<jumps;j++){
         let best=-1,bd=1e18;
         nearEnemies(cx,cy,230,(i)=>{
-          if (i===prev) return;
+          for(let s=0;s<seenN;s++) if(CHAIN_HITS[s]===i) return;
           const dx=E.x[i]-cx, dy=E.y[i]-cy, d=dx*dx+dy*dy;
           if (d<bd){bd=d;best=i;}
         });
         if (best<0) break;
+        CHAIN_HITS[seenN++]=best;
         BOLT.ax.push(cx);BOLT.ay.push(cy);BOLT.bx.push(E.x[best]);BOLT.by.push(E.y[best]);
         BOLT.t.push(0.13);
         hurt(best, dmg);
-        prev=best; cx=E.x[best]; cy=E.y[best];
+        cx=E.x[best]; cy=E.y[best];
       }
       if (BOLT.t.length>90){ for(const k in BOLT) BOLT[k].splice(0,BOLT[k].length-90); }
     }
@@ -1317,10 +1337,11 @@ function updateProjectiles(dt){
     const r=P.r[i];
     let hit=false;
     nearEnemies(P.x[i],P.y[i],r+18,(j)=>{
-      if (hit && P.pierce[i]<=0) return;
+      if (hit) return;                              // bereits freigegeben/explodiert
       const dx=E.x[j]-P.x[i], dy=E.y[j]-P.y[i];
       const rr = r + (E.kind[j]===2?30:(E.kind[j]===1?16:9));
       if (dx*dx+dy*dy < rr*rr){
+        if(!projectileHitOnce(i,j)) return;
         if (P.kind[i]===2){                   // Feuerkugel — Explosion
           const rad = 62 * (1+0.18*(S.Pa.linse||0)) * (S.W.kugel>=1?1.3:1) * (S.W.kugel>=4?1.3:1);
           let cnt=0;
@@ -1634,7 +1655,7 @@ function step(dt){
   }
   S.onScreen = onScreen;
   // Deckel pro Tick: ohne ihn steht nach zwei Sekunden eine Wand aus
-  // 55 Gegnern statt eines Stroms, der sich aufbaut.
+  // 42 Gegnern statt eines Stroms, der sich aufbaut.
   let toSpawn = Math.min(Math.ceil((want-onScreen)*0.16), 9);
   for (let k=0;k<toSpawn;k++) spawnEnemy(S.t, pickFam(S.t), 0);
 
@@ -1794,6 +1815,7 @@ function drawBossTelegraphs(vx0,vx1,vy0,vy1){
  */
 function drawEnemyTelegraphs(vx0,vx1,vy0,vy1){
   const pulse=.5+.5*Math.sin(S.visualT*7.5);
+  const markR=Math.min(lightRadius(),340), markR2=markR*markR;
   for(let i=0;i<E.n;i++){
     if(!E.alive[i]||E.kind[i]===2) continue;
     const x=E.x[i], y=E.y[i], fam=E.fam[i], kind=E.kind[i];
@@ -1824,11 +1846,11 @@ function drawEnemyTelegraphs(vx0,vx1,vy0,vy1){
       ctx.beginPath();ctx.moveTo(16,-6);ctx.lineTo(len,0);ctx.lineTo(16,6);ctx.closePath();ctx.fill();ctx.restore();
       ctx.strokeStyle='rgba(215,166,239,'+(.5+pulse*.22).toFixed(3)+')';ctx.lineWidth=2/SCALE;
       ctx.beginPath();ctx.arc(x,y,15+charge*5,-1.5708,-1.5708+charge*6.2832);ctx.stroke();
-    } else if(fam===3&&kind===0){
+    } else if(fam===3&&kind===0&&(x-S.x)*(x-S.x)+(y-S.y)*(y-S.y)<=markR2){
       const r=17+pulse;
       ctx.strokeStyle='rgba(128,180,108,'+(.28+pulse*.1).toFixed(3)+')';ctx.lineWidth=2/SCALE;
       ctx.beginPath();ctx.arc(x,y,r,.28,2.86);ctx.moveTo(x+r*Math.cos(3.42),y+r*Math.sin(3.42));ctx.arc(x,y,r,3.42,6.0);ctx.stroke();
-    } else if(fam===4&&kind===0){
+    } else if(fam===4&&kind===0&&(x-S.x)*(x-S.x)+(y-S.y)*(y-S.y)<=markR2){
       const r=20+pulse*2;
       ctx.save();ctx.translate(x,y);ctx.rotate(S.visualT*.35+i*.27);
       ctx.strokeStyle='rgba(240,191,102,'+(.38+pulse*.15).toFixed(3)+')';ctx.lineWidth=1.8/SCALE;
@@ -1979,7 +2001,7 @@ function render(){
     else ctx.fillRect(x-2.2,y-2.2,4.4,4.4);
   }
 
-  // --- Gegner: eine Beleuchtungsstufe pro Bündel -------------------------
+  // --- Gegner: ein Durchlauf statt 20 Familie×Lichtstufe-Scans -----------
   const lr2=lr*lr;
   for (let i=0;i<E.n;i++){
     if (!E.alive[i]) continue;
@@ -1989,35 +2011,24 @@ function render(){
     let tier = d2 > lr2 ? 0 : (d2 > lr2*0.34 ? 1 : 2);
     if (E.fam[i]===1 && E.st[i]===1) tier=3;          // Stürmer telegrafiert
     E.lit[i]=tier;
-  }
-  for (let f=0; f<5; f++){
-    for (let t=0; t<4; t++){
-      const artSet=ART.enemyReady?ART.enemy[f][t]:null;
-      const bobPhase=(S.visualT*(f===1?112:71))|0;
-      for (let i=0;i<E.n;i++){
-        if (!E.alive[i] || E.kind[i]!==0 || E.fam[i]!==f || E.lit[i]!==t) continue;
-        const spr=artSet?artSet[enemyDirection(i)]:SPR.enemy[f][t], hw=spr.width/2;
-        const bob=artSet?ENEMY_BOB[(bobPhase+i*8)&63]:0;
-        ctx.drawImage(spr,E.x[i]-hw,E.y[i]-hw+bob);
-      }
-    }
-  }
-  // Elite & Boss separat, mit Lebensbalken
-  for (let i=0;i<E.n;i++){
-    if (!E.alive[i] || E.kind[i]===0) continue;
     const dir=enemyDirection(i);
-    let spr;
-    if(ART.enemyReady){
-      if(E.kind[i]===2) spr=ART.boss[dir];
-      else spr=ART.elite[dir];
-    } else spr=E.kind[i]===2?SPR.boss:SPR.elite;
+    let spr, bob=0;
+    if(E.kind[i]===0){
+      const f=E.fam[i], artSet=ART.enemyReady?ART.enemy[f][tier]:null;
+      // In tiefer Dunkelheit reicht die kleine Silhouette; große Rasterbilder
+      // kosten dort Fillrate, liefern aber keine lesbare Zusatzinformation.
+      spr=tier===0?SPR.enemy[f][0]:(artSet?artSet[dir]:SPR.enemy[f][tier]);
+      if(artSet){ const phase=(S.visualT*(f===1?112:71))|0; bob=ENEMY_BOB[(phase+i*8)&63]; }
+    } else if(ART.enemyReady) spr=E.kind[i]===2?ART.boss[dir]:ART.elite[dir];
+    else spr=E.kind[i]===2?SPR.boss:SPR.elite;
     const hw=spr.width/2;
-    ctx.drawImage(spr, E.x[i]-hw, E.y[i]-hw);
+    ctx.drawImage(spr,x-hw,y-hw+bob);
+    if(E.kind[i]===0) continue;
     const w=E.kind[i]===2?90:52, h=E.kind[i]===2?6:4;
-    const yy=E.y[i]-(E.kind[i]===2?(ART.enemyReady?75:46):(ART.enemyReady?43:28));
-    ctx.fillStyle='rgba(0,0,0,.55)'; ctx.fillRect(E.x[i]-w/2,yy,w,h);
+    const yy=y-(E.kind[i]===2?(ART.enemyReady?75:46):(ART.enemyReady?43:28));
+    ctx.fillStyle='rgba(0,0,0,.55)'; ctx.fillRect(x-w/2,yy,w,h);
     ctx.fillStyle=E.kind[i]===2?COL.boss:COL.elite;
-    ctx.fillRect(E.x[i]-w/2,yy,w*Math.max(E.hp[i]/E.max[i],0),h);
+    ctx.fillRect(x-w/2,yy,w*Math.max(E.hp[i]/E.max[i],0),h);
   }
 
   // --- Gegnerprojektile ---------------------------------------------------
@@ -2845,7 +2856,7 @@ function headlessRun(runLen, opts){
   }
 }
 
-const BALANCE_SEEDS = Object.freeze([1701, 1709, 1721, 1733, 1741, 1753, 1777, 1789]);
+const BALANCE_SEEDS = Object.freeze([1701, 1709, 1721, 1733, 1741, 1753, 1777, 1789, 2474367456]);
 function average(rows, key){ return rows.reduce((sum,row)=>sum+(row[key]||0),0)/rows.length; }
 function runBalanceSuite(opts){
   opts = opts || {};
@@ -2884,7 +2895,8 @@ function runBalanceSuite(opts){
 // Für automatisierte Tests
 window.__EH = { get S(){return S;}, get H(){return META;}, CFG, HOLD_CFG, begin, input,
                 pacingReport, runReportText, headlessRun, runBalanceSuite, nearEnemies,
-                priorityEnemy, spawnEnemy, rebuildGrid,
+                priorityEnemy, spawnEnemy, rebuildGrid, shoot, updateProjectiles,
+                enemyHp:(i)=>E.hp[i], enemyMax:(i)=>E.max[i],
                 advanceHold, saveHold, loadHold, depositRunReward, showHold:showStartMenu,
                 tick:(d)=>{HEADLESS=true; step(d); while(pendingPicks>0){currentOffer=buildOffer(); applyOffer(currentOffer[0]); pendingPicks--;} HEADLESS=false;},
                 targetEnemies,

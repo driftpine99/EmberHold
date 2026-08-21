@@ -40,24 +40,24 @@ Minuten zu testen. Die langfristigen GDD-Zeiten sind noch nicht aktiv.
 Projektabhängigkeiten. GitHub Actions führt denselben Test bei relevanten
 Änderungen automatisch aus.
 
-Getestet werden acht feste Seeds: 1701, 1709, 1721, 1733, 1741, 1753, 1777
-und 1789. Der aktuelle Stand:
+Getestet werden neun feste Seeds: 1701, 1709, 1721, 1733, 1741, 1753, 1777,
+1789 und der Feldtest-Seed 2474367456. Der aktuelle Stand:
 
 | Größe | Ist | Vertrag |
 |---|---:|---:|
-| Erster Kartenzug, Mittelwert | 25,4 s | 25–45 s; Zielwert 35 s |
-| Kartenzüge in 8 Min, Mittelwert | 23,50 | 21 ± 3 |
-| Rhythmus pro Minute | 1,75 · 2,13 · 2,63 · 2,13 · 2,13 · 3,00 · 3,88 · 5,88 | 1 · 2 · 2 · 2 · 3 · 3 · 4 · 4 |
-| Kartenzüge bei −10 % XP-Kosten | 18,63 | — |
-| Kartenzüge bei +10 % XP-Kosten | 16,63 | — |
-| Verhältnis der beiden Varianten | 1,120 | ≤ 1,75 |
-| Runs mit Evolution | 3 / 8 | mindestens 2 / 8 |
+| Erster Kartenzug, Mittelwert | 26,5 s | 25–45 s; Zielwert 35 s |
+| Kartenzüge in 8 Min, Mittelwert | 21,78 | 21 ± 3 |
+| Rhythmus pro Minute | 1,78 · 2,22 · 2,22 · 2,22 · 2,56 · 2,22 · 3,11 · 5,44 | 1 · 2 · 2 · 2 · 3 · 3 · 4 · 4 |
+| Kartenzüge bei −10 % XP-Kosten | 17,67 | — |
+| Kartenzüge bei +10 % XP-Kosten | 15,11 | — |
+| Verhältnis der beiden Varianten | 1,169 | ≤ 1,75 |
+| Runs mit Evolution | 5 / 9 | mindestens 2 / 9 |
 
 Ein Wiederholungslauf mit demselben Seed muss bitgenau dasselbe Ergebnis
 liefern. Der Test endet mit Fehlercode, sobald ein Korridor oder diese
 Reproduzierbarkeit verletzt wird.
 
-Die acht Baseline-Runs werden mit einer fokussierten, aber nicht
+Die neun Baseline-Runs werden mit einer fokussierten, aber nicht
 allwissenden Kartenstrategie gespielt. Mindestens zwei davon müssen in einer
 normalen 8-Minuten-Sortie eine Evolution abschließen. Ab 7:30 hält das Angebot
 einen bereits begonnenen Evolutionspfad als eine von drei optionalen Karten
@@ -106,8 +106,8 @@ ist und ein Langbogenschuss den rein visuellen Release-Zustand auslöst.
 12. Dauerhaftes Stehen im Gegnerpulk muss deutlich riskanter sein als Kiten;
    Fernkampf darf keinen Nahkampf-Build voraussetzen, um den Boss zu besiegen.
 
-Die Einzelruns streuen derzeit stark: erster Zug 24,7–31,9 Sekunden und
-10–33 Kartenzüge. Der Vertrag bewertet deshalb vorerst den Seed-Mittelwert;
+Die Einzelruns streuen derzeit stark: erster Zug 21,0–30,7 Sekunden und
+10–35 Kartenzüge. Der Vertrag bewertet deshalb vorerst den Seed-Mittelwert;
 die Streuung bleibt ein Tuningthema vor dem externen Spieltest.
 
 Die alte manuelle Browserreferenz mit 1.039 Gegnern ist nach D-014 ungültig.
