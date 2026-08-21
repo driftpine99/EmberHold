@@ -109,18 +109,35 @@ const repeat = engine.headlessRun(report.runLen, {
   immortal: true,
 });
 const reproducible = JSON.stringify(repeat) === JSON.stringify(report.runs.baseline[0]);
+const stationaryRun = engine.headlessRun(120, {
+  seed: report.seeds[0], smart: true, immortal: false, stationary: true, noPicks: true,
+});
+const stationaryPressure = stationaryRun.died >= 12 && stationaryRun.died <= 90;
 engine.begin(180);
 engine.tick(engine.CFG.TICK);
 const visualState = engine.S.bowKick > 0 &&
   Number.isFinite(engine.S.shotAimx) && Number.isFinite(engine.S.shotAimy) &&
   html.includes("loadRasterArt()") && html.includes("updateVisualState(dt)") &&
   html.includes("const ENEMY_DIRECTIONS = 16") && html.includes("smooth01(v)");
+const directionBlock = html.match(/function directionalSprites\(base\)\{([\s\S]*?)\n\}/)?.[1] || "";
+const uprightCharacters = html.includes("ctx.scale(S.heroFacing,1)") &&
+  html.includes("const faceRight=Math.cos") && !directionBlock.includes(".rotate(");
 const combatReadability =
   html.includes("function drawEnemyTelegraphs(vx0,vx1,vy0,vy1)") &&
   html.includes("E.ang[i]=Math.atan2(dy,dx)") &&
   html.includes("E.vx[i]=Math.cos(E.ang[i])*sp*7.5") &&
   html.includes("Goldene Lücke suchen · roten Korridor meiden") &&
   html.includes('id="bossbar"') && html.includes('id="bossfill"');
+let bossTargeting = false;
+try {
+  engine.begin(180);
+  engine.spawnEnemy(100, 0, 0, 90, 0);
+  const boss = engine.spawnEnemy(100, 4, 2, 280, 0);
+  engine.rebuildGrid();
+  bossTargeting = engine.priorityEnemy(520) === boss &&
+    html.includes("const pierce = (evo||bossShot) ? 999") &&
+    !html.includes("const tgt = farthestEnemy(range*1.25)");
+} catch (_) {}
 let uxFlow = false;
 let uxError = "";
 try {
@@ -200,11 +217,11 @@ try {
   holdError = error instanceof Error ? error.message : String(error);
 }
 const output = {
-  pass: report.pass && evolutionReachable && reproducible && artAssets && visualState && combatReadability && uxFlow && holdFlow,
-  checks: { ...report.checks, evolutionReachable, reproducible, artAssets, visualState, combatReadability, uxFlow, holdFlow },
+  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && combatReadability && bossTargeting && uxFlow && holdFlow,
+  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, combatReadability, bossTargeting, uxFlow, holdFlow },
   targets: report.targets,
   seeds: report.seeds,
-  summary: { ...report.summary, evolutionRuns, evolutionSeeds: report.seeds.length },
+  summary: { ...report.summary, evolutionRuns, evolutionSeeds: report.seeds.length, stationaryDeath: stationaryRun.died },
 };
 if (uxError) output.uxError = uxError;
 if (holdError) output.holdError = holdError;

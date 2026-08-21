@@ -506,8 +506,9 @@ Spielgefühl bestimmt. Jede Regel erzwingt ein anderes Bewegungsmuster.
 ### ⟡ Aelric Fernstreich — *Der Langbogenschütze*
 **Volk:** Menschen · **Freischaltung:** Start
 
-> **Auto-Angriff:** Schießt auf den **entferntesten** Gegner in Sichtlinie.
-> Pfeile durchbohren, mit Schadensabfall pro Ziel.
+> **Auto-Angriff:** Priorisiert **Boss, dann Elite, dann das nächste Ziel**.
+> Ein auf den Boss gerichteter Pfeil durchschlägt die Add-Wand und verursacht
+> zusätzlichen Boss-Schaden.
 >
 > **Ember-Stoß:** Rückwärts-Sprung mit Salve auf die Ausgangsposition.
 >
@@ -847,7 +848,7 @@ abspringen. Das erste Prestige ist unser D7-Instrument.
 ### 11.2 Run-XP
 
 ```
-xp_bedarf(L) = 55 × L^0,95
+xp_bedarf(L) = 82 × L^0,70
 ```
 
 Für Phase 0 ist dies die im ausführbaren Kampfprototyp getestete Kurve. Der
@@ -865,7 +866,7 @@ Schatzflut(t)  = 1 + 0,45 × exp(−(t−420)² / (2×55²))
 ```
 
 **Der Grund für die Sättigung ist technisch und wird zum Designvorteil:** Die
-Gegnerdichte kann nicht unbegrenzt wachsen, weil das Entity-Budget bei ~1.500
+Gegnerdichte kann nicht unbegrenzt wachsen, weil das Entity-Budget bei ~900
 Gegnern liegt. Technik und Design ziehen hier in dieselbe Richtung — die
 Sättigung, die die Engine erzwingt, ist genau die, die lange Runs im Zaum hält.
 

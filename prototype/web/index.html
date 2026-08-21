@@ -417,16 +417,16 @@ const CFG = {
   FIRST_PICK_S:   35,       // Zielwert erster Kartenzug
   FIRST_PICK_RANGE:[25,45], // akzeptierter Seed-Suite-Korridor
   PICK_TARGETS:   { 180:5, 480:21, 900:39, 1200:50 },
-  XP_C:            55,      // xp_bedarf(L) = XP_C * L^XP_K
-  XP_K:          0.95,      // beide am laufenden Spielcode kalibriert,
+  XP_C:            82,      // erster Zug bleibt um 30–35 Sekunden
+  XP_K:          0.70,      // danach flacher als die alte, dichtebasierte Kurve
                             // nicht aus einem Modell abgeleitet
 
-  // --- Dichte (sättigt, weil das Entity-Budget bei 1500 liegt) ---
-  SPAWN_START:    55,       // Gegner auf dem Schirm in Sekunde 0 (Referenzfläche)
-  SPAWN_SPAN:     1250,     // Zuwachs bis zur Sättigung
-  SPAWN_HALF:     455,      // Sekunden bis zur halben Sättigung
-  SPAWN_EXP:      3.0,      // Kurvenschärfe: flacher Start, späte Eskalation
-  CAP_ENEMY:      1500,
+  // --- Dichte (sättigt, weil das Entity-Budget bei 900 liegt) ---
+  SPAWN_START:    42,       // lesbarer Einstieg statt sofortiger Sprite-Wand
+  SPAWN_SPAN:     550,      // ca. 140 beim Boss, ca. 370 am Run-Ende
+  SPAWN_HALF:     430,
+  SPAWN_EXP:      2.8,
+  CAP_ENEMY:      900,
   CAP_PROJ:       800,
   CAP_GEM:        3000,
   CAP_EPROJ:      240,
@@ -434,9 +434,9 @@ const CFG = {
   // --- Spieler ---
   HP:             240,
   SPEED:          215,      // Welteinheiten/Sek
-  IFRAME:         0.70,
-  REGEN:          1.50,     // HP/Sek
-  CONTACT:        0.70,      // Kontaktschaden-Faktor     // HP/Sek — hält Attrition aus, rettet keinen Fehler     // Unverwundbarkeit nach Treffer
+  IFRAME:         0.50,
+  REGEN:          0.75,     // Erholt Fehler, erlaubt aber kein dauerhaftes Tanken
+  CONTACT:        1.10,     // Im Gegnerpulk stehen ist keine Bossstrategie
   DASH_CD:        12,
   DASH_TIME:      0.20,
   DASH_IFRAME:    0.35,
@@ -655,7 +655,6 @@ function buildSprites(){
 //  umgewandelt. Bis zum Laden bleibt das schnelle prozedurale Fallback aktiv.
 // ===========================================================================
 const ENEMY_DIRECTIONS = 16;
-const ENEMY_SOURCE_FACING = 2.62; // Atlasfiguren blicken nach links unten
 const ENEMY_BOB = Float32Array.from({length:64},(_,i)=>Math.sin(i/64*6.2832)*1.05);
 
 function atlasCell(image, index, columns, rows, size, shade, glow, flash){
@@ -685,7 +684,11 @@ function directionalSprites(base){
     const cv=mkCanvas(base.width), g=cv.getContext('2d');
     g.imageSmoothingEnabled=true; g.imageSmoothingQuality='high';
     g.translate(cv.width/2,cv.height/2);
-    g.rotate(d/ENEMY_DIRECTIONS*6.2832-ENEMY_SOURCE_FACING);
+    // Gemalte Figuren bleiben aufrecht. Der Atlas blickt nach links; für
+    // Bewegungen nach rechts wird nur horizontal gespiegelt. Eine freie
+    // 360°-Drehung würde Kopf und Füße auf den Kopf stellen.
+    const faceRight=Math.cos(d/ENEMY_DIRECTIONS*6.2832)>.12;
+    g.scale(faceRight?-1:1,1);
     g.drawImage(base,-base.width/2,-base.height/2);
     out[d]=cv;
   }
@@ -811,7 +814,7 @@ function nearEnemies(x,y,r,cb){
 // ===========================================================================
 const WEAPONS = [
   { id:'bogen', name:'Langbogen', col:'#e07a3f',
-    desc:'Schießt auf den <b>entferntesten</b> Gegner. Durchbohrt.',
+    desc:'Priorisiert <b>Boss und Elite</b>, sonst das nächste Ziel. Durchbohrt.',
     up:['+1 Durchbohrung','+40 % Schaden','+1 Durchbohrung','+35 % Tempo','+50 % Schaden'],
     evo:{need:'sehne', name:'Windriss', col:'#ffb870',
          desc:'Unbegrenzte Durchbohrung. Der Pfeil zieht eine Sogschneise, die Gegner hineinreißt.'} },
@@ -857,8 +860,8 @@ function newRun(runLen, seed){
     t:0, running:false, phase:'run',        // run | pause | cards | extract | over
     runLen: runLen,
     x:0, y:0, vx:0, vy:0, aimx:1, aimy:0,
-    shotAimx:1, shotAimy:0, bowKick:0,
-    heroAngle:0, moveBlend:0, dashBlend:0, walkPhase:0, visualT:0,
+    shotAimx:1, shotAimy:0, shotTarget:-1, bowKick:0,
+    heroAngle:0, heroFacing:1, moveBlend:0, dashBlend:0, walkPhase:0, visualT:0,
     hp:CFG.HP, maxhp:CFG.HP, iframe:0,
     dashCd:0, dashT:0, dashIf:0, dashVx:0, dashVy:0,
     level:1, xp:0, need:xpNeed(1),
@@ -970,7 +973,7 @@ function spawnEnemy(t, fam, kind, atx, aty){
   E.fam[i]=fam; E.kind[i]=kind||0; E.st[i]=0; E.tm[i]=0; E.slow[i]=0; E.ang[i]=0;
   E.face[i]=direction16(S.x-atx,S.y-aty);
   let hp = FAM_HP[fam]*scale;
-  if (kind===1) hp*=26; if (kind===2) hp*=90;
+  if (kind===1) hp*=26; if (kind===2) hp*=55;
   E.hp[i]=hp; E.max[i]=hp; E.alive[i]=1; E.lit[i]=0;
   return i;
 }
@@ -984,15 +987,6 @@ function spawnGem(x,y,val){
 // ===========================================================================
 //  WAFFENLOGIK
 // ===========================================================================
-function farthestEnemy(maxR){
-  let best=-1, bd=-1;
-  const r = maxR;
-  nearEnemies(S.x,S.y,r,(i)=>{
-    const dx=E.x[i]-S.x, dy=E.y[i]-S.y, d=dx*dx+dy*dy;
-    if (d<=r*r && d>bd){ bd=d; best=i; }
-  });
-  return best;
-}
 function nearestEnemy(maxR){
   let best=-1, bd=1e18;
   nearEnemies(S.x,S.y,maxR,(i)=>{
@@ -1000,6 +994,18 @@ function nearestEnemy(maxR){
     if (d<bd){ bd=d; best=i; }
   });
   return best;
+}
+
+/** Verbindliche Auto-Aim-Regel: Boss vor Elite vor naechstem Normalgegner. */
+function priorityEnemy(maxR){
+  let boss=-1, bossD=1e18, elite=-1, eliteD=1e18, normal=-1, normalD=1e18;
+  nearEnemies(S.x,S.y,maxR,(i)=>{
+    const dx=E.x[i]-S.x, dy=E.y[i]-S.y, d=dx*dx+dy*dy;
+    if(E.kind[i]===2){ if(d<bossD){bossD=d;boss=i;} }
+    else if(E.kind[i]===1){ if(d<eliteD){eliteD=d;elite=i;} }
+    else if(d<normalD){normalD=d;normal=i;}
+  });
+  return boss>=0?boss:(elite>=0?elite:normal);
 }
 function shoot(x,y,dx,dy,speed,dmg,pierce,kind,r){
   const i = alloc(P, CFG.CAP_PROJ); if (i<0) return;
@@ -1020,13 +1026,15 @@ function fireWeapons(dt){
     C.bogen -= dt*rate;
     if (C.bogen<=0){
       C.bogen += 1;
-      const tgt = farthestEnemy(range*1.25);
+      const tgt = priorityEnemy(range*1.25);
       let dx=S.aimx, dy=S.aimy;
       if (tgt>=0){ dx=E.x[tgt]-S.x; dy=E.y[tgt]-S.y; }
       const aimLen=Math.hypot(dx,dy)||1;
-      S.shotAimx=dx/aimLen; S.shotAimy=dy/aimLen; S.bowKick=.16;
-      const dmg = (12 + 5*L) * st.dmg * (L>=5?1.5:1) * (L>=2?1.4:1) * (evo?1.6:1);
-      const pierce = evo ? 999 : (2 + (L>=1?1:0) + (L>=3?1:0));
+      S.shotAimx=dx/aimLen; S.shotAimy=dy/aimLen; S.shotTarget=tgt; S.bowKick=.16;
+      const bossShot=tgt>=0&&E.kind[tgt]===2;
+      const dmg = (12 + 5*L) * st.dmg * (L>=5?1.5:1) * (L>=2?1.4:1) * (evo?1.6:1) * (bossShot?1.45:1);
+      // Ein sichtbarer Boss-Fokus darf nicht an der Add-Wand verpuffen.
+      const pierce = (evo||bossShot) ? 999 : (2 + (L>=1?1:0) + (L>=3?1:0));
       shoot(S.x,S.y,dx,dy, 760, dmg, pierce, evo?1:0, 9);
       if(!HEADLESS) fx(S.x+S.shotAimx*25,S.y+S.shotAimy*25,12,.13,'#ffc48a',0);
     }
@@ -1037,7 +1045,7 @@ function fireWeapons(dt){
     C.splitter -= dt * (1.15*st.aspd);
     if (C.splitter<=0){
       C.splitter += 1;
-      const tgt = nearestEnemy(range);
+      const tgt = priorityEnemy(range);
       let dx=S.aimx, dy=S.aimy;
       if (tgt>=0){ dx=E.x[tgt]-S.x; dy=E.y[tgt]-S.y; }
       const base = Math.atan2(dy,dx);
@@ -1057,7 +1065,7 @@ function fireWeapons(dt){
     if (C.kugel<=0){
       C.kugel += 1;
       const n = 1 + (L>=3?1:0) + Math.floor(st.proj/2);
-      const tgt = nearestEnemy(range);
+      const tgt = priorityEnemy(range);
       let dx=S.aimx, dy=S.aimy;
       if (tgt>=0){ dx=E.x[tgt]-S.x; dy=E.y[tgt]-S.y; }
       const base=Math.atan2(dy,dx);
@@ -1537,7 +1545,9 @@ function updateEvents(){
   }
   if (!S.events.boss && S.t >= CFG.BOSS_AT){
     S.events.boss = true;
-    const i = spawnEnemy(S.t, 4, 2);
+    // Innerhalb des sichtbaren Kampfraums statt auf dem normalen Spawnring.
+    const br=Math.min(300,VIEW_H*.40);
+    const i = spawnEnemy(S.t, 4, 2,S.x+S.aimx*br,S.y+S.aimy*br);
     if (i>=0){ E.tm[i]=1.4; S.bossIndex=i; }
     bossAlert('WARDEN ERWACHT','Goldene Lücke suchen · roten Korridor meiden');
   }
@@ -1575,6 +1585,8 @@ function updateVisualState(dt){
   let faceX=S.aimx, faceY=S.aimy;
   if(moveTarget){ faceX=mx; faceY=my; }
   if(S.bowKick>0){ faceX=S.shotAimx; faceY=S.shotAimy; }
+  if(faceX>.14) S.heroFacing=1;
+  else if(faceX<-.14) S.heroFacing=-1;
   const targetAngle=Math.atan2(faceY,faceX);
   let angleDelta=(targetAngle-S.heroAngle+3.1416)%6.2832;
   if(angleDelta<0) angleDelta+=6.2832;
@@ -1847,7 +1859,14 @@ function drawAelric(){
 
   if(ART.heroReady){
     const angle=S.heroAngle;
-    const stride=.5-.5*Math.cos(S.walkPhase*6.2832);
+    const walk=S.walkPhase;
+    let runA=1, runB=0;
+    // Die KI-Bilder unterscheiden sich zu stark für ein permanentes
+    // Doppelbild. Klare Posen mit kurzen Übergängen lesen sich als Laufzyklus.
+    if(walk<.42){ runA=1; runB=0; }
+    else if(walk<.50){ runB=smooth01((walk-.42)/.08); runA=1-runB; }
+    else if(walk<.92){ runA=0; runB=1; }
+    else { runA=smooth01((walk-.92)/.08); runB=1-runA; }
     const bob=(.5-.5*Math.cos(S.walkPhase*12.5664))*1.35*S.moveBlend*(1-S.dashBlend);
     const sway=Math.sin(S.walkPhase*6.2832)*.7*S.moveBlend*(1-S.dashBlend);
     const chargeBase=S.W.bogen&&S.bowKick<=0?smooth01((.36-S.cool.bogen)/.36):0;
@@ -1862,7 +1881,7 @@ function drawAelric(){
     const idleW=rest*(1-S.moveBlend);
     const runW=rest*S.moveBlend;
 
-    ctx.save(); ctx.translate(S.x,S.y-5-bob); ctx.rotate(angle); ctx.translate(0,sway);
+    ctx.save(); ctx.translate(S.x,S.y-5-bob); ctx.scale(S.heroFacing,1); ctx.translate(0,sway);
     const layer=(frame,alpha,ox,oy,sx,sy)=>{
       if(alpha<.008) return;
       const spr=ART.hero[frame];
@@ -1871,9 +1890,9 @@ function drawAelric(){
       ctx.translate(ox||0,oy||0); ctx.scale(sx||1,sy||1);
       ctx.drawImage(spr,-spr.width/2,-spr.height/2); ctx.restore();
     };
-    layer(0,idleW,0,0,1,1+Math.sin(S.visualT*2.5)*.006);
-    layer(1,runW*(1-stride),-1,0,1,1);
-    layer(2,runW*stride,1,0,1,1);
+    layer(0,idleW,0,Math.sin(S.visualT*2.2)*.45,1,1+Math.sin(S.visualT*2.2)*.012);
+    layer(1,runW*runA,-1,0,1,1);
+    layer(2,runW*runB,1,0,1,1);
     layer(3,drawW,0,0,1,1);
     layer(4,releaseW,releaseP*2,0,1+releaseMix*.012,1-releaseMix*.012);
     if(dashW>.01){
@@ -2765,7 +2784,7 @@ function headlessRun(runLen, opts){
     //   2. Eingriff    — moeglichst viele Gegner im Band SAFE..REACH
     //   3. Gier        — Splitter im Umkreis einsammeln
     a += 0.010;
-    if (i % 5 === 0){
+    if (!opts.stationary && i % 5 === 0){
       const LOOK = 0.45, STEP = CFG.SPEED * stat().speed * LOOK;
       const SAFE = 105, REACH = 430;
       let bestScore = -1e18, bx = botX, by = botY;
@@ -2795,7 +2814,7 @@ function headlessRun(runLen, opts){
       }
       botX = bx; botY = by;
     }
-    input.x = botX; input.y = botY;
+    input.x = opts.stationary?0:botX; input.y = opts.stationary?0:botY;
       if (S.dashCd<=0 && rand()<0.006) tryDash();
     if (S.hp <= 0){
       if (died<0) died = S.t;
@@ -2804,6 +2823,7 @@ function headlessRun(runLen, opts){
     }
     step(DT);
     while (pendingPicks>0){
+      if(opts.noPicks){ pendingPicks=0; break; }
       currentOffer = buildOffer();
       applyOffer(opts.smart ? pickSmart(currentOffer)
                             : currentOffer[(rand()*currentOffer.length)|0]);
@@ -2864,6 +2884,7 @@ function runBalanceSuite(opts){
 // Für automatisierte Tests
 window.__EH = { get S(){return S;}, get H(){return META;}, CFG, HOLD_CFG, begin, input,
                 pacingReport, runReportText, headlessRun, runBalanceSuite, nearEnemies,
+                priorityEnemy, spawnEnemy, rebuildGrid,
                 advanceHold, saveHold, loadHold, depositRunReward, showHold:showStartMenu,
                 tick:(d)=>{HEADLESS=true; step(d); while(pendingPicks>0){currentOffer=buildOffer(); applyOffer(currentOffer[0]); pendingPicks--;} HEADLESS=false;},
                 targetEnemies,

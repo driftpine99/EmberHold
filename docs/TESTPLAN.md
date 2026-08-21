@@ -80,14 +80,14 @@ ist und ein Langbogenschuss den rein visuellen Release-Zustand auslöst.
 
 ## Manueller Grafikcheck
 
-1. Aelric muss beim Laufen zwischen zwei Schritten wechseln und sich in die
-   Zielrichtung drehen.
+1. Aelric muss beim Laufen zwischen zwei Schritten wechseln, immer aufrecht
+   bleiben und bei einem horizontalen Richtungswechsel sauber spiegeln.
 2. Kurz vor einem Langbogenschuss ist die gespannte Pose sichtbar; beim Schuss
    folgen Release-Linie, Rückstoßpose und Pfeil.
 3. Die fünf Gegnerfamilien müssen auch ohne Farblegende an ihrer Silhouette
    unterscheidbar sein.
-4. Gegner drehen sich in acht Richtungen, ohne bei Richtungswechseln sichtbar
-   aus ihrer Position zu springen.
+4. Gegner bleiben ebenfalls aufrecht und spiegeln horizontal, ohne bei einem
+   Richtungswechsel sichtbar aus ihrer Position zu springen.
 5. Beim Stürmer muss die rote Laufbahn exakt dem folgenden Sprint entsprechen;
    beim Speier muss die violette Ziellinie vor dem Projektil sichtbar sein.
 6. Teiler (grüne Teilungsbögen), Wahrer (goldener Zielrahmen) und Elite
@@ -99,17 +99,20 @@ ist und ein Langbogenschuss den rein visuellen Release-Zustand auslöst.
 9. Auf einem Monitor über 60 Hz müssen Atem-, Lauf- und Bogenübergänge auch
    zwischen zwei Gameplay-Ticks weiterlaufen; die Visual Clock hängt am
    Browser-Frame, nicht am festen Kampftick.
-10. Schnelle Richtungswechsel dürfen Aelric nicht sofort um 90 oder 180 Grad
-   springen lassen. Gegner dürfen höchstens in kleinen 22,5-Grad-Schritten
-   nachdrehen.
+10. Schnelle Richtungswechsel dürfen Aelric nicht um 90 oder 180 Grad kippen
+   lassen. Nur Zielhilfen und Projektile dürfen frei rotieren.
+11. Sobald der Boss in Waffenreichweite ist, zielt der nächste Langbogenpfeil
+   auf ihn und erreicht ihn auch durch normale Gegner hindurch.
+12. Dauerhaftes Stehen im Gegnerpulk muss deutlich riskanter sein als Kiten;
+   Fernkampf darf keinen Nahkampf-Build voraussetzen, um den Boss zu besiegen.
 
-Die Einzelruns streuen derzeit stark: erster Zug 17,5–40,5 Sekunden und
-16–40 Kartenzüge. Der Vertrag bewertet deshalb vorerst den Seed-Mittelwert;
+Die Einzelruns streuen derzeit stark: erster Zug 24,7–31,9 Sekunden und
+10–33 Kartenzüge. Der Vertrag bewertet deshalb vorerst den Seed-Mittelwert;
 die Streuung bleibt ein Tuningthema vor dem externen Spieltest.
 
-Letzte manuelle Browserreferenz vor Einführung der festen Seeds: 1.039 Gegner
-in der Spitze, 58 FPS auf Desktop und Handy, Bot-Überlebenszeit im Median
-377 Sekunden. Diese Werte sind keine automatischen Rendering-Regressionstests.
+Die alte manuelle Browserreferenz mit 1.039 Gegnern ist nach D-014 ungültig.
+FPS und tatsächliche Spitzenzahl müssen mit dem reduzierten Entity-Budget neu
+auf Desktop und echten Mobilgeräten gemessen werden.
 
 ## Was der Prototyp bereits enthält
 

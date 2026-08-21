@@ -54,7 +54,7 @@ werden.
 
 Der Phase-0-Vertrag lautet:
 
-- XP-Kosten: `55 × Level^0,95`
+- XP-Kosten: `82 × Level^0,70`
 - Evolution: Waffenstufe 5 + zugehöriges Passiv Stufe 3
 - Zielzüge für 3 / 8 / 15 / 20 Minuten: 5 / 21 / 39 / 50
 - erster Zug: Zielwert 35 Sekunden; akzeptierter Mittelwert der festen
@@ -172,3 +172,28 @@ folgenden Angriff. Der Speier erhält dafür eine 0,55 Sekunden lange Zielphase.
 Der Mittelboss ergänzt seine Bodenwarnungen um eine kurze Regelerklärung und
 eine dauerhafte Lebensanzeige. Neue VFX-Assets oder Sound sind dafür nicht
 erforderlich.
+
+## D-014 – Aufrechte Rasterfiguren und Zielpriorität vor Schwarmmasse
+
+**Status:** beschlossen
+
+Die vorhandenen KI-Atlanten sind perspektivische Illustrationen, keine
+Top-down-Richtungsframes. Held und Gegner bleiben deshalb im Bildschirmraum
+aufrecht und werden ausschließlich horizontal gespiegelt. Freie 360°-Richtung
+zeigen Pfeile, Bogenlinie und Telegrafien; eine komplette Rasterfigur wird nie
+gedreht. Echte 4- oder 8-Richtungsanimationen benötigen später einen dafür
+produzierten Atlas und werden nicht durch Rotation vorgetäuscht.
+
+Auto-Angriffe verwenden die lesbare Priorität `Boss → Elite → nächstes Ziel`.
+Ein auf den Boss gerichteter Langbogenpfeil durchschlägt normale Gegner und
+erhält +45 % Boss-Schaden. Der Boss erscheint sichtbar innerhalb der
+Waffenreichweite; sein Prototyp-HP-Multiplikator sinkt von 90 auf 55. Damit
+bleibt Fernkampf eine Bossstrategie, ohne dass der Spieler in den Gegnerpulk
+laufen muss.
+
+Die Referenzdichte sinkt von 55 + 1.250 auf 42 + 550 Gegner in der
+Sättigungsformel; das Entity-Limit sinkt von 1.500 auf 900. Im Gegenzug wird
+die XP-Kurve auf `82 × Level^0,70` abgeflacht. Kontakttreffer haben 0,50 statt
+0,70 Sekunden Unverwundbarkeit, Regeneration sinkt auf 0,75 HP/s und der
+Kontaktfaktor steigt auf 1,10. Weniger, lesbarere Gegner bleiben dadurch
+gefährlicher als eine reine, folgenlose Sprite-Wand.
