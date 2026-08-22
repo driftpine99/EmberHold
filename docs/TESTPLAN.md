@@ -40,6 +40,75 @@ Server, keine Installation. Läuft auf Desktop und Handy.
 Die kurzen Timer dienen nur dazu, den vollständigen Loop innerhalb weniger
 Minuten zu testen. Die langfristigen GDD-Zeiten sind noch nicht aktiv.
 
+## Manueller Gesamttest des Phase-0.5-Slices
+
+> **Diesen Test kann nur der Besitzer fahren.** In der Claude-Code-Umgebung wird
+> die Browser-Pane nicht angezeigt. Die Seite komponiert dann keine Frames,
+> `requestAnimationFrame` feuert null Mal und die Rundenuhr bleibt bei 0:00
+> stehen — gemessen am 22.08.2026: 0 Frames in 14,4 Sekunden, Screenshot
+> ebenfalls nicht möglich. FPS und `peakVisibleEnemies` entstehen ausschließlich
+> beim echten Rendern und lassen sich nicht ersatzweise berechnen.
+
+### Vorbereitung
+
+1. `prototype/web/index.html` per Doppelklick öffnen. Kein Server nötig.
+2. `F3` drücken. Die Entwickleranzeige zeigt oben rechts FPS und Minimum,
+   darunter getrennt Gesamtgegner, SIM-Radius und tatsächlich sichtbare Gegner.
+3. Fenster im **Querformat** lassen, möglichst 16:9. Hochformat ist laut D-017
+   kein unterstützter Kampfmodus.
+
+### Durchgang A — Hold → Run → Hold
+
+Die neun Schritte aus **Hold-MVP testen** der Reihe nach. Danach zusätzlich:
+
+10. Sortietafel: einmal **Sturmbruch** und einmal **Aschengruft** wählen. Beide
+    müssen im HUD und im Run-Bericht namentlich erscheinen, und die Erzbeute
+    muss sichtbar höher ausfallen als beim Wächterring.
+11. Ein Ausrüstungsteil anlegen und ein zweites zerlegen. Der Staub muss steigen,
+    das zerlegte Teil verschwinden, und nichts darf ohne Rückfrage verloren gehen.
+12. **Seite neu laden.** Erz, Barren, Essenz, Marken, Staub, Gebäudestufen,
+    Vorbereitung, Meisterschaften, Ausrüstung und der gewählte Vertrag müssen
+    vollständig erhalten sein.
+
+### Durchgang B — Vollständiger 8-Minuten-Run
+
+**Wächterring** wählen — nur dieser Vertrag ist die Balance-Referenz. Dann
+durchspielen und unterwegs auf Folgendes achten:
+
+| Zeit | Worauf achten |
+|---|---|
+| 0:00–1:00 | Startet der Run ohne Erklärung verständlich? Erster Kartenzug bei etwa 25–35 s? |
+| 2:00 | Erste Elite: eigene Silhouette, orangefarbener Prioritätsrahmen erkennbar? |
+| 3:00–5:00 | **Schwärmer im Pulk:** wirken sie ruhig und geerdet, oder marschieren sie sichtbar im Gleichschritt? Haftet der Kontaktschatten am Fuß? |
+| 4:10 | Warden-Einstieg: **ist er vollständig sichtbar oder oben/unten angeschnitten?** (offener Vorbehalt aus D-017) |
+| 6:00–8:00 | **Das eigentliche Lastfenster.** Minimum-FPS im Auge behalten. Hier steht die Dichte bei rund 300 Gegnern, nicht bei den 53 des alten Smoke-Tests. |
+| 8:00 | Extraktion: ist der nächste sinnvolle Schritt eindeutig? |
+
+Danach **„Bericht kopieren"** drücken und den Text unverändert zurückgeben. Er
+enthält bereits Seed, Vertrag, Build, Evolutionen, Elite-Relikte, Ausrüstung,
+Hold-Vorbereitung, beide Telemetriespitzen, den Kampfausschnitt und die
+schlechteste FPS.
+
+### Fünf Fragen, die der Bericht nicht beantworten kann
+
+Diese fünf Antworten braucht es zusätzlich; sie sind der eigentliche Zweck des
+Laufs und entscheiden über die Freigabe des Schwärmers:
+
+1. **Schwärmer:** ruhig und geerdet, oder synchron marschierend?
+2. **Kampfausschnitt:** wirkt 1000 × 563 auf 16:9 zu eng? Falls ja, ist
+   Pillarboxing der in D-017 dokumentierte Gegenentwurf.
+3. **Safe-Area:** sieht der seitliche Rand auf breiten Fenstern ruhig gerahmt
+   aus oder wie ein abgeschnittenes Bild? (Nur relevant, wenn breiter als 16:9.)
+4. **Warden-Einstieg:** vollständig sichtbar oder angeschnitten?
+5. **Zweiter Run:** hättest du ohne Auftrag freiwillig sofort noch einen
+   gestartet? Das ist die Phase-0-Kernfrage.
+
+### Freigabe
+
+Erst wenn dieser Lauf keine neue Rotations-, Sichtbarkeits- oder deutliche
+Performance-Regression zeigt und Frage 1 positiv ausfällt, darf der Stürmer als
+nächste Gegnerfamilie animiert werden.
+
 ## Automatisierter Balance-Vertrag
 
 `npm test` lädt den echten Headless-Spielpfad ohne zusätzliche

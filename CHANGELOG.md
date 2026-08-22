@@ -117,6 +117,18 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 - Späten optionalen Fokus-Schutz für fast fertige Evolutionspfade ergänzt
 - CI-Vertrag um die Evolutionserreichbarkeit in 8-Minuten-Runs erweitert
 
+### Documentation
+
+- Fertiges Protokoll `Manueller Gesamttest des Phase-0.5-Slices` in
+  `docs/TESTPLAN.md`: Vorbereitung, Durchgang A für Hold → Run → Hold,
+  Durchgang B für den vollständigen 8-Minuten-Run mit Beobachtungsfenstern je
+  Zeitmarke und fünf Fragen, die der kopierbare Run-Bericht nicht beantworten
+  kann
+- Blocker in `ROADMAP.md` festgehalten: Ein gerenderter Lauf ist in der
+  Claude-Code-Umgebung nicht möglich, weil die Browser-Pane nicht angezeigt
+  wird und `requestAnimationFrame` deshalb nicht feuert (nachgemessen:
+  0 Frames in 14,4 Sekunden)
+
 ### Known issues
 
 - Das Workbook enthält noch das analytische Langfristmodell. Für Phase 0 ist

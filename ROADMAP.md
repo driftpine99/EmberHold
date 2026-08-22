@@ -19,17 +19,29 @@ Nicht mehrere Grafikfamilien gleichzeitig beginnen:
 4. [ ] Erst danach entscheiden, ob Aelric einen aufwendigeren Richtungsatlas
    mit 6–8 Lauf- und Bogenphasen erhält.
 
-**Stand 21.08.2026 zu Punkt 1.** Der Punkt bleibt offen. Der gerenderte
-8-Minuten-Run konnte nicht durchgeführt werden: In der Claude-Code-Umgebung wird
-die Browser-Pane nicht angezeigt, dadurch komponiert die Seite keine Frames,
-`requestAnimationFrame` feuert null Mal und die Rundenuhr bleibt bei 0:00 stehen.
-Eine echte FPS-Messung setzt ein sichtbares Fenster voraus und muss deshalb vom
-Besitzer oder bei geöffneter Pane gefahren werden.
+**Stand 22.08.2026 zu Punkt 1. Der Punkt ist blockiert und wartet auf den
+Besitzer.** Der gerenderte 8-Minuten-Run ist in der Claude-Code-Umgebung
+weiterhin nicht durchführbar: Die Browser-Pane wird nicht angezeigt, dadurch
+komponiert die Seite keine Frames, `requestAnimationFrame` feuert null Mal und
+die Rundenuhr bleibt bei 0:00 stehen. Nachgemessen am 22.08.2026: **0 Frames in
+14,4 Sekunden**, Screenshot ebenfalls nicht möglich. FPS und
+`peakVisibleEnemies` entstehen ausschließlich beim echten Rendern; es gibt
+keinen Ersatzweg, sie zu berechnen.
+
+Deshalb wurde in dieser Sitzung bewusst **kein Spielcode geändert**. Stattdessen
+liegt in `docs/TESTPLAN.md` unter **Manueller Gesamttest des
+Phase-0.5-Slices** ein fertiges Protokoll: Vorbereitung, Durchgang A für
+Hold → Run → Hold, Durchgang B für den vollständigen 8-Minuten-Run mit
+Beobachtungsfenstern je Zeitmarke, und fünf Fragen, die der kopierbare
+Run-Bericht nicht beantworten kann. **Benötigt wird der kopierte Run-Bericht
+plus die Antworten auf diese fünf Fragen.**
 
 Vorbereitend gemessen und dokumentiert wurde:
 
-- `npm test` ist grün (24/24 Checks, Exitcode 0). D-017 und D-018 sind mit
-  Commit `246cc64` auf `main` gesichert.
+- `npm test` ist grün (30/30 Checks, Exitcode 0) auf dem aktuellen `main`.
+  D-017 und D-018 sind mit Commit `246cc64` gesichert, Phase 0.5 mit den
+  Commits bis `e71a984`. Phase 0.5 ergänzt die Checks `contractFlow`,
+  `holdExpansion`, `equipmentFlow`, `evolutionCatalog` und `eliteChoices`.
 - Der Schwärmer-Renderpfad hält D-014, D-015 und D-016 vollständig ein:
   deterministischer Phasenversatz, vorgerenderter Kontaktschatten, ein
   Zeichendurchlauf, keine Rotation an Rasterfiguren, allokationsfreie
