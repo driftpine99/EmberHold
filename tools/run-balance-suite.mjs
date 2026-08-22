@@ -138,6 +138,27 @@ const combatReadability =
   html.includes("E.vx[i]=Math.cos(E.ang[i])*sp*7.5") &&
   html.includes("Goldene Lücke suchen · roten Korridor meiden") &&
   html.includes('id="bossbar"') && html.includes('id="bossfill"');
+
+// --- D-027 Punkt G: Die Slotanzeige links darf bei niedriger Fensterhoehe
+// (Feldlaufgroesse 1422x613) nicht unten aus dem Bild laufen. Eine echte
+// Layoutmessung (tatsaechliche Pixelhoehen, Umbruch) ist im Node-DOM-Shim
+// nicht moeglich, da hier nicht gerendert wird. Geprueft wird deshalb
+// strukturell: Die Liste ist per "bottom" hoehenbegrenzt statt unbegrenzt zu
+// wachsen, bricht bei Ueberlauf per flex-wrap in eine weitere Spalte um,
+// bleibt dabei per max-width unter der halben Bildschirmbreite und wird bei
+// niedrigen Fenstern zusaetzlich kompakter (kleinere Slots, schmalere
+// Evolutionspfad-Bloecke). Die manuelle Sichtpruefung bei 1422x613 bleibt
+// trotzdem noetig.
+const slotsRule = html.match(/#slots\{[^}]*\}/)?.[0] || "";
+const slotLayout =
+  slotsRule.includes("bottom:14px") &&
+  slotsRule.includes("flex-wrap:wrap") &&
+  slotsRule.includes("max-width:min(50vw,460px)") &&
+  html.includes(".slot .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}") &&
+  html.includes("@media (max-height:700px)") &&
+  html.includes(".slot{padding:2px 6px 2px 4px;font-size:10px;width:150px}") &&
+  html.includes(".evopath{width:168px;padding:5px 7px 6px;margin-top:0}");
+
 const uniqueChainTargets = html.includes("const CHAIN_HITS = new Int16Array(8)") &&
   html.includes("CHAIN_HITS[seenN++]=best");
 let bossTargeting = false;
@@ -684,8 +705,8 @@ try {
 }
 
 const output = {
-  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && contractFlow && holdExpansion && equipmentFlow && evolutionCatalog && eliteChoices && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling && fpsMetrics && reportHardened,
-  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, contractFlow, holdExpansion, equipmentFlow, evolutionCatalog, eliteChoices, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling, fpsMetrics, reportHardened },
+  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && slotLayout && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && contractFlow && holdExpansion && equipmentFlow && evolutionCatalog && eliteChoices && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling && fpsMetrics && reportHardened,
+  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, slotLayout, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, contractFlow, holdExpansion, equipmentFlow, evolutionCatalog, eliteChoices, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling, fpsMetrics, reportHardened },
   targets: report.targets,
   seeds: report.seeds,
   summary: { ...report.summary, evolutionRuns, evolutionSeeds: report.seeds.length,

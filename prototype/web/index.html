@@ -38,15 +38,17 @@ canvas{display:block;position:absolute;inset:0;width:100%;height:100%}
   transition:width .12s ease}
 
 /* Waffenleiste */
-#slots{position:absolute;top:78px;left:14px;display:flex;flex-direction:column;gap:5px}
+#slots{position:absolute;top:78px;left:14px;bottom:14px;display:flex;flex-direction:column;
+  flex-wrap:wrap;align-content:flex-start;gap:5px 10px;max-width:min(50vw,460px)}
 .slot{display:flex;align-items:center;gap:7px;font-size:11px;color:#8b8577;
   background:rgba(23,23,33,.72);border:1px solid #262633;border-radius:6px;
   padding:3px 8px 3px 5px;backdrop-filter:blur(3px)}
 .slot .pip{width:7px;height:7px;border-radius:2px;flex-shrink:0}
-.slot .lv{margin-left:2px;color:#e8e4dc;font-weight:600;font-variant-numeric:tabular-nums}
+.slot .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.slot .lv{margin-left:2px;color:#e8e4dc;font-weight:600;font-variant-numeric:tabular-nums;flex-shrink:0}
 .slot.evo{border-color:#e07a3f;color:#e07a3f}
 .slot.evo .lv{color:#e07a3f}
-.evopath{width:205px;margin-top:3px;padding:7px 9px 8px;background:rgba(13,13,19,.82);
+.evopath{width:205px;flex-shrink:0;margin-top:3px;padding:7px 9px 8px;background:rgba(13,13,19,.82);
   border:1px solid #34303a;border-left:3px solid #e07a3f;border-radius:7px;
   backdrop-filter:blur(4px)}
 .evohead{display:flex;align-items:center;justify-content:space-between;gap:8px}
@@ -322,6 +324,19 @@ button.b.danger{background:#c9402e;color:#fff}
   .help{gap:6px}.help div{font-size:12.5px}
   .evopath{width:185px;padding:6px 8px}.evoreq{font-size:9px}
   #bossbar{top:67px;width:min(280px,calc(100% - 32px))}
+}
+
+/* Niedrige Fensterhoehe (z. B. 1422x613): Slotliste kompakter, damit auch ein
+   voller Build aus Hold-Bonus, Ausruestung, Meisterschaften, Elite-Relikten,
+   Waffen, Passiven und Evolutionspfaden ohne Scrollen in zwei Spalten passt. */
+@media (max-height:700px){
+  #slots{bottom:8px;gap:3px 8px}
+  .slot{padding:2px 6px 2px 4px;font-size:10px;width:150px}
+  .slot .pip{width:6px;height:6px}
+  .evopath{width:168px;padding:5px 7px 6px;margin-top:0}
+  .evohead b{font-size:10px}
+  .evoreq{font-size:8.5px;margin-top:2px}
+  .evometer{margin-top:4px}
 }
 </style>
 </head>
@@ -2765,8 +2780,8 @@ function renderSlots(){
   const sig=parts.map(p=>p.n+p.l).join('|')+'#'+paths.map(p=>p.name+p.wl+p.pl+p.ready).join('|');
   if (sig===slotSig) return; slotSig=sig;
   el('slots').innerHTML = parts.map(p=>
-    `<div class="slot${p.e?' evo':''}"><span class="pip" style="background:${p.c}"></span>`+
-    `${p.n}<span class="lv">${p.l}</span></div>`).join('')+paths.map(p=>
+    `<div class="slot${p.e?' evo':''}" title="${p.n}"><span class="pip" style="background:${p.c}"></span>`+
+    `<span class="nm">${p.n}</span><span class="lv">${p.l}</span></div>`).join('')+paths.map(p=>
     `<div class="evopath${p.ready?' ready':''}"><div class="evohead"><span>${p.ready?'Bereit':'Evolution'}</span>`+
     `<b>${p.name}</b></div><div class="evoreq">${p.weapon} <em>${p.wl}/${MAXLV}</em> + `+
     `${p.passive} <em>${p.pl}/${EVO_PASSIVE_LV}</em></div><div class="evometer"><span style="width:${p.pct}%"></span></div></div>`
