@@ -68,7 +68,13 @@ Vorbereitend gemessen und dokumentiert wurde:
 - [x] Cover auf 16:9 gedeckelt. Breitere Formate behalten einen zentralen
   Kampfausschnitt von 1000 × 563 Welteinheiten; überschüssige Breite wird
   seitliche Safe-Area, und Welt, Gegner und Telegrafien werden darauf geclippt.
-- [ ] **Offen:** Den 8-Minuten-Run bei sichtbarem Fenster fahren und dabei
+- [x] Sauberer 8-Minuten-Lauf gefahren und ausgewertet. FPS-Befund aufgelöst
+  (D-024), Pacing-Abweichung als D-026 eröffnet.
+- [ ] **Neu und vorrangig:** D-027 entscheiden. Die erste Spielerbewertung sagt
+  „Lust ja, aber so funktioniert der Run nicht". Der Schwärmer ist **nicht**
+  freigegeben, der Stürmer bleibt gesperrt. Vorgeschlagene Reihenfolge und
+  Begründung stehen in D-027.
+- [ ] ~~Offen:~~ Den 8-Minuten-Run bei sichtbarem Fenster fahren und dabei
   ausdrücklich das Fenster 6:00–8:00 protokollieren, nicht nur den Start.
   Mitzuprüfen sind drei Dinge, die keine Messung beantworten kann:
   ob der Kampfausschnitt von 1000 × 563 auf 16:9 zu eng wirkt, ob die seitliche

@@ -142,6 +142,17 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 
 ### Known issues
 
+- **Der Run trägt in diesem Zustand nicht (D-027).** Erste Spielerbewertung:
+  Die Gegnerdichte macht Laufen und Ausweichen unmöglich, der Boss ist nicht
+  erreichbar, Buildmacht ist zu zufällig, Heilung fehlt, der Zweck des Runs ist
+  unsichtbar und der Hold erklärt sich nicht. Der Schwärmer ist nicht
+  freigegeben.
+- Die Animation wird als ruckelig bewertet. Der Besitzer würde Detailqualität
+  je Figur gegen mehr Phasen tauschen — das kehrt D-015 und D-016 um und
+  braucht eine eigene Entscheidung (D-027 Punkt F).
+- Die Slotanzeige rutscht bei niedriger Fensterhöhe aus dem Bild, genau die
+  Information, die für gezieltes Aufwerten gebraucht wird (D-027 Punkt G).
+
 - Ein sauberer 8-Minuten-Feldlauf fehlt weiterhin. Er ist laut D-024 der
   entscheidende Test, weil die Füllung des Lichtkreises ab Buildmacht 31
   sättigt und er damit Lichtkreis gegen Gegnerzahl trennt.

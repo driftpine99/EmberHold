@@ -791,3 +791,116 @@ falsche Referenz getunt.
 
 Empfehlung: erst Punkt 1, dann entscheiden. Der Balancevertrag bleibt bis dahin
 unverändert; er erfüllt seinen Zweck als Regressionswächter unabhängig davon.
+
+## D-027 – Erste Spielerbewertung: der Run trägt in diesem Zustand nicht
+
+**Status:** offen – Reihenfolge und Umfang müssen vom Besitzer freigegeben
+werden. Es wurde noch kein Code geändert.
+
+Am 22.08.2026 hat der Besitzer nach drei Läufen die fünf Sichtfragen aus dem
+Testplan beantwortet. Die Antwort auf Frage 5 lautet sinngemäß: **Lust ja, aber
+so funktioniert der Run nicht.** Der wichtigste Satz daraus:
+
+> „Aktuell weiß ich nicht, wofür ich die Runs mache."
+
+Damit ist die Kernfrage von Phase 0 – trägt der Kampf einen freiwilligen
+zweiten Run? – **noch nicht mit Ja beantwortet.** Der Schwärmer ist nicht
+freigegeben; der Stürmer bleibt gesperrt.
+
+### Die Rückmeldungen im Wortlaut, nach Ursache sortiert
+
+**A. Die Gegnerdichte nimmt dem Spiel sein einziges Verb.**
+
+> „aktuell kommen ohnehin so viele Gegner, dass es fast keinen Unterschied mehr
+> macht. Man kann gar nicht mehr so richtig laufen/ausweichen." · „es ist alles
+> überlagert mit Gegnern" · „An den Boss kommt man wegen der vielen Gegner nicht."
+
+Das trifft den Kern: Das GDD baut auf *ein* Verb, Bewegung, und verlangt in
+Kapitel 5.2, dass jedes Bossmuster mit reiner Bewegung ausweichbar ist. Wenn
+Bewegung nicht mehr möglich ist, ist der Entwurf verletzt, nicht nur unbequem.
+
+Messbar ist es auch. Der Lauf erreichte 445 Gegner im Simulationsradius bei
+einer Zieldichte von 301 – ein Überschuss von 48 %. Die Ursache ist eine
+Rückkopplung, die mit D-026 zusammenhängt: Mehr Kartenzüge führen zu einer
+höheren Spielerstufe, und `HP_PER_LVL` macht Gegner mit jeder Stufe zäher. Auf
+Stufe 37 haben sie den 4,54-fachen Grund-HP-Wert statt 3,49 auf der
+Bot-Baseline von Stufe 18, also **30 % mehr Leben**. Sie sterben langsamer als
+sie nachrücken, und das Feld läuft voll.
+
+Das heißt: **Dichte und Pacing sind dasselbe Problem von zwei Seiten.** Wer nur
+die Spawnzahl senkt, behandelt das Symptom.
+
+**B. Buildmacht ist zu schwer zu erreichen.**
+
+> „Die Buffs sind teils so schwer zu erlangen, weil die Karten wirklich random
+> kommen – ohne empowerte Fähigkeiten wird es extrem schwer."
+
+Die 22-%-Trefferquote aus GDD Kapitel 5.7 („Dominant Strategy Denial") ist als
+Zahl bewusst gewählt, wird in der Praxis aber als Willkür erlebt. Reroll und
+Verbannen existieren, sind aber knapp.
+
+**C. Überleben ist undurchsichtig.**
+
+> „Lebensreg fühlt sich langsam an + es gibt keine Lebenspunkte zum Einsammeln."
+
+`REGEN` steht auf 0,75 HP/s. Heilung gibt es ausschließlich über die Karte
+Glutherz, also zufällig. Es gibt keine Gesundheits-Drops von Gegnern.
+
+**D. Der Zweck des Runs ist unsichtbar.**
+
+> „Aktuell weiß ich nicht, wofür ich die Runs mache."
+
+Das ist die schwerwiegendste Rückmeldung. Die Belohnungskette existiert
+technisch – Beute wird zu Erz, Erz zu Barren, Barren zu Verbesserungen – aber
+sie kommt beim Spieler nicht an. Siehe auch D-025: Eine Verdopplung der Beute
+bringt genau ein Erz mehr, was den Ertrag zusätzlich entwertet.
+
+**E. Der Hold erklärt sich nicht.**
+
+> „Hold ist aktuell sehr unübersichtlich. Ich verstehe teils gar nicht so
+> richtig, was ich da machen soll."
+
+Damit ist die Leitfrage von H0.1 – verstärkt eine Produktionskette den Wunsch
+nach der nächsten Sortie? – negativ beantwortet.
+
+**F. Die Animation wirkt ruckelig. Das widerspricht D-015 und D-016.**
+
+> „die Animationen sehen insgesamt noch scheußlich aus (die Qualität der
+> einzelnen Figuren könnte schlechter sein, dafür sollte es viel animierter
+> sein… aktuell ist es zu ruckelig)."
+
+D-015 und D-016 legen den Posentakt bewusst auf neun bis zehn Bilder pro Sekunde
+fest, gegen Doppelkonturen durch Überblendung. Der Besitzer bewertet genau das
+als Ruckeln und wäre bereit, **Detailqualität je Figur gegen mehr Phasen zu
+tauschen**. Das ist eine bewusste Umkehr der beiden Entscheidungen und keine
+beiläufige Korrektur.
+
+**G. Anzeigen rutschen aus dem Bild, und die Safe-Area gefällt nicht.**
+
+> „die dunklen Flächen sehen nicht so schön aus. Wir müssen insbesondere auch
+> die ganzen Anzeigen komprimieren, vieles rutscht dann links aus dem Bild (was
+> ich brauche um die Fähigkeiten zu empowern)."
+
+Zwei Dinge in einem: Die seitliche Safe-Area aus D-017 wird als unschön
+empfunden, und die Slotanzeige läuft bei niedriger Fensterhöhe aus dem Bild.
+Der zweite Punkt verschärft B unmittelbar – wer nicht sieht, was er hat, kann
+nicht gezielt aufwerten.
+
+### Vorgeschlagene Reihenfolge
+
+Die Punkte sind nicht gleichrangig. A ist Voraussetzung für alles andere: Ein
+Run, in dem man nicht laufen kann, lässt sich weder mit Zweck noch mit
+Belohnung retten.
+
+| Rang | Paket | Warum dort |
+|---|---|---|
+| 1 | **A + Pacing (D-026)** | Gemeinsame Ursache. Ohne Bewegung kein Spiel. |
+| 2 | **G, nur die Slotanzeige** | Kleinster Eingriff mit direkter Wirkung auf B. |
+| 3 | **B + C** | Buildmacht erreichbar, Überleben lesbar machen. |
+| 4 | **D + E** | Zweck und Hold verständlich machen. |
+| 5 | **F** | Teuerste Änderung, braucht neue Assets und die Revision von D-015/D-016. |
+| 6 | **G, Safe-Area** | Rein kosmetisch, erst wenn der Run trägt. |
+
+Nicht jedes Paket ist eine reine Umsetzung. Rang 1 revidiert die Dichtewerte aus
+D-014, Rang 5 revidiert D-015 und D-016. Beides braucht eine eigene bewusste
+Entscheidung, keine stille Anpassung während der Arbeit.
