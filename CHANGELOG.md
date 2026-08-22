@@ -149,6 +149,8 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
   34,9 Sekunden — oberhalb der gesamten Bot-Streuung von 21,0 bis 30,7. Der
   Verdacht ist, dass die Baseline gegen einen Bot kalibriert ist, der im
   Frühlauf besser spielt als ein Mensch.
+- Der Auslöser der einzelnen schlechtesten Halbsekunde (35 FPS bei sonst 58 im
+  1-%-Low) ist unbekannt. Bei 0,5 % Zeitanteil kein Untersuchungsgrund.
 - Erster Feldlauf am 22.08.2026 meldete **21 FPS** gegen ein Ziel von 55. Der
   Lauf war durch bewegte Tuning-Regler verfälscht und ist kein gültiger
   Nachweis, aber Simulation (0,1 ms) und Zeichenbefehle (2,1 ms bei 681
@@ -156,11 +158,11 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
   Füllrate des ungedeckelten Lichtkreises. Siehe D-024.
 - Die Abnahmeschwelle für Phase 0.3 steht noch auf „mindestens 55 FPS". D-024
   schlägt vor, sie auf „1-%-Low mindestens 55 und höchstens 2 % der Proben
-  unter 55" umzustellen; das ist noch nicht beschlossen.
-- Die Füllrate des Lichtkreises bleibt die leitende Hypothese für den
-  FPS-Einbruch, ist aber weiter unbelegt. Die wirksame Optimierung wäre ein
-  vorgerenderter Verlauf statt einer Verlaufsrasterung pro Frame; sie ist
-  bewusst zurückgestellt, bis die Grafik manuell abgenommen ist (D-024).
+  unter 55" umzustellen; das ist noch nicht beschlossen. Der erste saubere
+  8-Minuten-Lauf hätte diese Schwelle bestanden.
+- Der Testbot trifft die menschliche Runkurve nicht: früh rund acht Sekunden
+  zu schnell, spät deutlich zu langsam. Der Balancevertrag ist auf dieser Kurve
+  kalibriert (D-026).
 - Erz aus einem Run wächst nur logarithmisch: Eine Verdopplung der Beute bringt
   ein einziges Erz mehr (D-025).
 

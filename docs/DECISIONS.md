@@ -514,9 +514,9 @@ ohne Scrollen erreichbar; Produktion, Training und Rüstkammer folgen darunter.
 
 ## D-024 – Erster Feldlauf: FPS-Einbruch, Metrik und Lichtkreis
 
-**Status:** teilweise umgesetzt (22.08.2026). Punkt 2 (FPS-Metrik) und Punkt 3
-(Härtung des Berichts) sind implementiert und getestet. **Punkt 1 (Lichtkreis)
-bleibt offen** und ist bewusst zurückgestellt – Begründung unten.
+**Status:** Punkt 2 und 3 umgesetzt. **Der ursprüngliche Befund hat sich als
+Messartefakt herausgestellt** – Auflösung am Ende dieses Eintrags. Punkt 1
+(Lichtkreis) wird nicht mehr verfolgt.
 
 Am 22.08.2026 lieferte der Besitzer den ersten echten 8-Minuten-Run. Er ist
 **kein gültiger Baseline-Nachweis**: Die Live-Tuning-Regler wurden während des
@@ -691,3 +691,103 @@ angewendet werden (17 wird zu 23 bzw. 26). Die Frage ist nicht der
 Multiplikator, sondern die Kurve darunter. Eine Wurzelkurve statt eines
 Logarithmus wäre die naheliegende Alternative, ändert aber die Hold-Ökonomie
 spürbar und braucht deshalb eine eigene Entscheidung.
+
+### Auflösung von D-024 am 22.08.2026
+
+Der erste saubere 8-Minuten-Lauf (Seed 242369191, Wächterring,
+`Tuning: unverändert`) hat den Befund entschärft:
+
+| Kennzahl | Wert | Bewertung |
+|---|---:|---|
+| Schlechteste FPS | 35 | eine einzelne halbe Sekunde |
+| FPS 1-%-Low | **58** | über der Zielmarke von 55 |
+| Anteil unter 55 FPS | **0,5 %** von 935 Proben | 2,3 Sekunden von 480 |
+
+**Das Spiel läuft praktisch durchgehend flüssig.** Der alarmierende Wert von 21
+aus dem ersten Feldlauf war der schlechteste Einzelmoment, nicht das
+Spielgefühl — und beide Zahlen aus demselben Lauf zeigen, wie weit sie
+auseinanderliegen können: 35 gegen 58. Ohne die neue Metrik hätten wir hier
+eine Performancekrise diagnostiziert, die es nicht gibt.
+
+**Die Lichtkreis-Hypothese ist damit widerlegt.** Der Lauf erreichte Buildmacht
+32, also einen Lichtradius von 591 Welteinheiten gegen eine halbe
+Bildschirmdiagonale von 574. Der Verlauf füllte in der zweiten Runhälfte also
+den **gesamten** Bildschirm — bei gleichzeitig 218 sichtbaren Gegnern — und das
+1-%-Low lag trotzdem bei 58. Punkt 1 wird nicht umgesetzt; ein vorgerenderter
+Verlauf bliebe eine saubere Optimierung, löst aber kein vorhandenes Problem.
+
+Was die einzelne 35er-Halbsekunde verursacht hat, bleibt offen. Garbage
+Collection, die Schatzflut bei 7:00 oder ein Vorgang außerhalb des Browsers sind
+alle plausibel. Bei 0,5 % Zeitanteil ist das kein Grund für eine Untersuchung.
+
+**Die vorgeschlagene Abnahmeschwelle bewährt sich.** „1-%-Low mindestens 55 und
+höchstens 2 % der Proben unter 55" hätte diesen Lauf mit 58 und 0,5 % sauber
+bestanden und den ersten Feldlauf korrekt hinterfragt. Sie bleibt zur
+Bestätigung durch den Besitzer vorgemerkt.
+
+**Nebenbefund: die Safe-Area aus D-017 ist erstmals im Feld gelaufen.** Das
+Fenster war 1422 × 613 CSS groß, also ein Seitenverhältnis von 2,32 und damit
+deutlich breiter als 16:9. Der Kampfausschnitt wurde korrekt auf 1000 × 562
+begrenzt, mit rechnerisch 166 Pixel Safe-Area je Seite. Ob sie ruhig aussieht,
+ist weiterhin eine offene Sichtfrage.
+
+## D-026 – Der Testbot bildet die menschliche Runkurve nicht ab
+
+**Status:** offen – Entscheidung durch den Besitzer erforderlich
+
+Zwei saubere Menschenläufe liegen jetzt vor und weichen systematisch vom
+Bot ab, auf dem der gesamte Balancevertrag kalibriert ist.
+
+**Früh ist der Bot zu schnell.**
+
+| Quelle | Erster Kartenzug |
+|---|---:|
+| Designziel (GDD) | 35,0 s |
+| Bot, Mittel über 9 Seeds | 26,5 s |
+| Bot, gesamte Streuung | 21,0–30,7 s |
+| Mensch, 3-Min-Lauf | 34,9 s |
+| Mensch, 8-Min-Lauf | 35,2 s |
+
+Beide Menschenläufe liegen **oberhalb der gesamten Bot-Streuung** und treffen
+das Designziel von 35 Sekunden fast exakt. Zwei unabhängige Messungen mit
+einer Abweichung von 0,3 Sekunden untereinander — das ist kein Zufall mehr.
+Die im Testplan geführte Abweichung „erster Zug zu früh" beschreibt damit
+nicht das Spiel, sondern das Messinstrument.
+
+**Spät ist der Bot zu langsam.**
+
+| Quelle | Kartenzüge in 8 Minuten |
+|---|---:|
+| Designziel | 21 |
+| Bot, Mittel | 21,8 |
+| Bot, gesamte Streuung | 10–35 |
+| Mensch, 8-Min-Lauf | **36** |
+
+Der Mensch liegt über der gesamten Bot-Streuung, erreichte Stufe 37, zwei
+Evolutionen und 20.143 Kills. Ein 8-Minuten-Lauf liefert damit annähernd das,
+was laut GDD Kapitel 5.3 der 15-Minuten-Tiefenzug liefern soll (39 Kartenzüge).
+Die vier Runlängen wären dann mechanisch nicht mehr klar getrennt.
+
+**Einschränkung:** Für den Frühlauf gibt es zwei Messpunkte, für den Spätlauf
+nur einen. Der Menschenlauf hatte zudem einen leicht ausgebauten Hold
+(Training 2/2/2, Runenfibel R1), den die Baseline gemäß D-020 bis D-023
+absichtlich ausblendet. Wie viel davon Können, wie viel Hold-Bonus und wie viel
+Seed-Glück ist, lässt sich aus einem Lauf nicht trennen.
+
+**Warum das zählt:** Ein Bot, der früh zu schnell und spät zu langsam ist, hat
+eine andere Kurvenform als ein Mensch — nicht nur einen anderen Mittelwert. Ein
+Korridor, der auf dieser Kurve kalibriert ist, beschreibt das Spielerlebnis
+nicht. Vor dem externen Spieltest sollte das geklärt sein, sonst wird gegen die
+falsche Referenz getunt.
+
+**Zur Entscheidung stehen:**
+
+1. Zwei bis drei weitere saubere 8-Minuten-Menschenläufe sammeln, bevor
+   irgendetwas geändert wird. Billigster Schritt, klärt die Streuung.
+2. Den Botkorridor als das führen, was er ist — ein Regressionswächter gegen
+   stille Änderungen — und die Designziele getrennt an Menschenläufen prüfen.
+3. Den Bot verbessern, damit er die menschliche Kurve trifft. Teuer und nur
+   sinnvoll, wenn er weiter als Designreferenz dienen soll.
+
+Empfehlung: erst Punkt 1, dann entscheiden. Der Balancevertrag bleibt bis dahin
+unverändert; er erfüllt seinen Zweck als Regressionswächter unabhängig davon.

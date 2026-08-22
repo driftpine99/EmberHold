@@ -111,14 +111,17 @@ Laufs und entscheiden über die Freigabe des Schwärmers:
 
 ### Bisherige Feldläufe
 
-| Datum | Modus | Sauber? | Sichtbar | Erster Zug | Züge | Erz | FPS |
-|---|---|---|---:|---:|---:|---:|---:|
-| 22.08.2026 | 8 Min | **nein**, Regler bewegt | 339 | 26,9 s | 50 | 17 | **21** |
-| 22.08.2026 | 3 Min | ja | 60 | 34,9 s | 6 | 10 | **57** |
+| Datum | Modus | Sauber? | Sichtbar | Erster Zug | Züge | Erz | FPS schlecht. | 1-%-Low | unter 55 |
+|---|---|---|---:|---:|---:|---:|---:|---:|---:|
+| 22.08.2026 | 8 Min | **nein**, Regler bewegt | 339 | 26,9 s | 50 | 17 | 21 | – | – |
+| 22.08.2026 | 3 Min | ja | 60 | 34,9 s | 6 | 10 | 57 | – | – |
+| 22.08.2026 | 8 Min | ja | 218 | 35,2 s | 36 | 15 | 35 | **58** | **0,5 %** |
 
-Der 3-Minuten-Lauf ist der erste saubere Referenzpunkt. Ein sauberer
-8-Minuten-Lauf fehlt weiterhin und ist laut D-024 der entscheidende Test für
-die FPS-Ursache.
+Der dritte Lauf ist der erste saubere 8-Minuten-Referenzpunkt und der erste mit
+der neuen Metrik. Er löst den FPS-Befund auf: 1-%-Low 58 bei 0,5 % Zeitanteil
+unter der Zielmarke, also rund 2,3 Sekunden von 480. Details und die Widerlegung
+der Lichtkreis-Hypothese in D-024. Die Abweichung der Kartenzüge vom Botkorridor
+ist als D-026 festgehalten.
 
 ### Freigabe
 
