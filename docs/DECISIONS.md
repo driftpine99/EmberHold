@@ -669,7 +669,9 @@ acht Minuten, nichts anfassen.
 
 ## D-025 – Beobachtung: Erz aus einem Run wächst nur logarithmisch
 
-**Status:** offen – nur beobachtet, keine Änderung vorgenommen
+**Status:** gelöst durch D-034 (22.08.2026). Der Befund war richtig, aber
+untertrieben: Die Kurve war nicht nur flach, sie stellte den Anreiz auf den
+Kopf. Details und die neue Kurve stehen in D-034.
 
 Beim Auswerten des Feldlaufs fiel auf: 137.872 Basis-Beute ergaben 17 Eisenerz.
 Die Umrechnung ist `rewardOre(r) = max(3, round(log2(r+1)))`.
@@ -1325,3 +1327,84 @@ kaum schneller darauf zu. Ein Banner kann eine flache Kurve sichtbar machen — 
 kann sie nicht steiler machen.
 
 D-025 bleibt damit die wichtigste offene Entscheidung an diesem Strang.
+
+## D-034 – Die Erzkurve setzte den Anreiz falsch herum
+
+**Status:** beschlossen und umgesetzt (22.08.2026). Löst D-025 und damit die
+mechanische Hälfte von D-027 Rang 4.
+
+D-025 hielt seit dem ersten Feldlauf fest, dass eine Verdopplung der Beute genau
+ein Erz mehr bringt. Das klang nach einer flachen Kurve. Beim Durchrechnen war
+es schlimmer: **Die Kurve stellte den Anreiz auf den Kopf.**
+
+| Lauf | Dauer | Beute | Erz (alt) | **Erz je Minute** |
+|---|---:|---:|---:|---:|
+| Scharmützel | 3 Min | 1.412 | 10 | **3,33** |
+| typisch | 8 Min | 17.290 | 14 | **1,75** |
+| gut | 8 Min | 28.425 | 15 | 1,88 |
+| Ausnahmelauf | 8 Min | 137.872 | 17 | 2,13 |
+
+Das 3-Minuten-Scharmützel war **1,9-mal ertragreicher je Spielminute** als der
+typische 8-Minuten-Run. Wer den Ertrag maximieren wollte, musste kurze Läufe
+spammen. Das Herzstück des Spiels — die achtminütige Sortie mit Elite,
+Mittelboss, Schatzflut und Extraktionsentscheidung — war mathematisch die
+schlechtere Wahl.
+
+Das ist kein Geschmacksurteil, sondern ein Widerspruch zum eigenen Entwurf.
+Und es beantwortet die Frage des Besitzers wörtlich: „Aktuell weiß ich nicht,
+wofür ich die Runs mache." Für den Hold-Ertrag gab es tatsächlich keinen Grund.
+
+### Die neue Kurve
+
+```
+rewardOre(Beute) = max(4, round(14 × (Beute / 17.290)^0,40))
+```
+
+Sie ist **am typischen Lauf verankert**: 17.290 Beute ergeben weiterhin 14 Erz.
+Das Wirtschaftstempo bleibt damit unverändert — ein typischer Spieler braucht
+nach wie vor rund 3,6 Läufe, um den Hold vollständig auszubauen. Nur die
+Spreizung wächst.
+
+| Lauf | Erz (alt) | Erz (neu) | Erz je Minute (neu) |
+|---|---:|---:|---:|
+| Scharmützel | 10 | 5 | 1,67 |
+| typisch | 14 | **14** | 1,75 |
+| gut | 15 | 17 | 2,13 |
+| Ausnahmelauf | 17 | 32 | 4,00 |
+
+Erz je Minute steigt jetzt **monoton mit der Laufgüte**. Länger und besser
+spielen lohnt sich, kürzer spielen ist schneller erledigt — beides hat seinen
+Platz, aber die Rangfolge stimmt wieder.
+
+Der Ausnahmelauf bringt jetzt das 2,29-fache des typischen statt des
+1,21-fachen. Ein 100-mal besserer Lauf ergibt rund das Sechsfache an Erz statt
+1,2-fach.
+
+**Was das Scharmützel verliert.** Es fällt von 10 auf 5 Erz. Das ist gewollt:
+Es dauert 37 % der Zeit und brachte 71 % des Ertrags. Regel 1 bleibt gewahrt —
+der Boden liegt bei 4 Erz, keine Sitzung geht leer aus.
+
+### Zwei Tests, die dabei besser geworden sind
+
+`holdFlow` und `contractFlow` hatten den Erzwert **hart verdrahtet**
+(`firstDeposit === 10`, `boostedOre === 14`). Beide sind an dieser Änderung
+zerbrochen, obwohl an dem, was sie prüfen sollen — einmalige Auszahlung
+beziehungsweise Wirkung des Vertragsmultiplikators — nichts falsch war. Beide
+leiten ihre Erwartung jetzt aus `rewardOre()` und den Vertragsdaten ab. Sie
+prüfen damit ihre eigene Zuständigkeit statt einer fremden Zahl.
+
+`contractFlow` verlangt zusätzlich ausdrücklich `boostedOre > basisErz` — der
+Vertrag muss überhaupt etwas bewirken. Das war vorher nur implizit.
+
+### Der neue Check
+
+`oreCurve` prüft fünf Eigenschaften, und zwar die, die der Spieler spürt:
+
+1. Erz je Minute steigt monoton über Scharmützel, typisch, gut, Ausnahmelauf.
+2. Der Anker hält: 17.290 Beute ergeben exakt 14 Erz.
+3. Mehr Beute gibt nie weniger Erz.
+4. Können zählt: Der Ausnahmelauf bringt mindestens das 1,8-fache des typischen.
+5. Regel 1: Auch ein Lauf ohne Beute geht nicht leer aus.
+
+Punkt 1 ist der eigentliche Wächter. Er hätte den ursprünglichen Defekt sofort
+gemeldet — die alte Kurve verletzt ihn.

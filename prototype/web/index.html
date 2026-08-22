@@ -2591,7 +2591,25 @@ function advanceHold(now){
   return {seconds,mine:META.mineStored-mineBefore,bars:META.forgeStored-barsBefore,
     essence:META.arcanumStored-essenceBefore,marks:META.yardStored-marksBefore};
 }
-function rewardOre(reward){ return Math.max(3,Math.round(Math.log2(Math.max(0,reward)+1))); }
+// Beute wird zu Eisenerz. Die frühere Kurve war `log2(Beute+1)`, also so flach,
+// dass eine Verdopplung der Beute genau ein Erz mehr brachte. Folge: Das
+// 3-Minuten-Scharmützel lieferte 3,33 Erz je Spielminute, der typische
+// 8-Minuten-Run nur 1,75 — das Herzstück des Spiels war mathematisch die
+// schlechtere Wahl. Genau das meinte der Besitzer mit „ich weiß nicht, wofür
+// ich die Runs mache" (D-025, D-034).
+//
+// Die neue Kurve ist am typischen Lauf verankert: Wer 17.290 Beute macht,
+// bekommt weiterhin 14 Erz. Das Wirtschaftstempo bleibt damit unverändert, nur
+// die Spreizung wächst. Erz je Minute steigt jetzt monoton mit der Laufgüte:
+// 1,67 (Scharmützel) · 1,75 (typisch) · 2,13 (gut) · 4,00 (Ausnahmelauf).
+const ORE_REF_LOOT = 17290;   // Beute eines typischen sauberen 8-Minuten-Laufs
+const ORE_REF      = 14;      // Erz, das dieser Lauf bringt — unverändert
+const ORE_EXP      = 0.40;    // Steigung: 100-fache Beute ergibt rund 6-faches Erz
+const ORE_MIN      = 4;       // Regel 1: keine Sitzung geht leer aus
+function rewardOre(reward){
+  const r = Math.max(0, reward);
+  return Math.max(ORE_MIN, Math.round(ORE_REF*Math.pow(r/ORE_REF_LOOT, ORE_EXP)));
+}
 function gearUpgradeCost(item,rank){ return rank*(item.rarity==='Selten'?12:6); }
 function grantGear(forcedId){
   let item=GEAR_BY_ID[forcedId];
@@ -3676,7 +3694,7 @@ window.__EH = { get S(){return S;}, get H(){return META;}, CFG, HOLD_CFG, CONTRA
                 stats:stat, dashCooldown,
                 enemyHp:(i)=>E.hp[i], enemyMax:(i)=>E.max[i],
                 advanceHold, saveHold, loadHold, depositRunReward, selectContract,
-                holdGoal, goalHTML,
+                holdGoal, goalHTML, rewardOre,
                 arcanumAction, yardAction, prepareReroll, trainMastery,
                 grantGear, equipGear, upgradeGear, salvageGear, gearUpgradeCost,
                 contractById, showHold:showStartMenu,

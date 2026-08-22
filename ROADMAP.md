@@ -73,6 +73,9 @@ Vorbereitend gemessen und dokumentiert wurde:
 - [x] D-027 Rang 1 und 2 umgesetzt: Bewegungsüberschuss beseitigt (D-030) und
   Slotanzeige bei niedrigen Fenstern vollständig sichtbar. Beides wartet auf
   einen Feldlauf zur Bestätigung.
+- [x] D-027 Rang 4 vollständig umgesetzt: Zweck sichtbar (D-033) und Erzkurve
+  korrigiert (D-034). Offen bleiben nur noch Rang 5 (Animation, braucht neue
+  Assets) und Rang 6 (Safe-Area, kosmetisch).
 - [x] D-027 Rang 4 teilweise umgesetzt: Der Zweck des Runs ist sichtbar (D-033).
   Die mechanische Hälfte bleibt offen — siehe D-025, die Erzkurve ist flach.
 - [x] D-027 Rang 3 umgesetzt: Fokus-Schutz ab 5:30 (D-031) und Gluttropfen als

@@ -158,6 +158,15 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 
 ### Added
 
+- Erzkurve von logarithmisch auf eine am typischen Lauf verankerte Potenzkurve
+  umgestellt. Das 3-Minuten-Scharmützel war 1,9-mal ertragreicher je Minute als
+  der 8-Minuten-Run — das Herzstück des Spiels war mathematisch die schlechtere
+  Wahl. Erz je Minute steigt jetzt monoton mit der Laufgüte, das Wirtschafts-
+  tempo für einen typischen Lauf bleibt unverändert (D-025, D-034)
+- Check `oreCurve` prüft fünf Eigenschaften der Kurve, darunter als Wächter,
+  dass Erz je Minute mit der Laufgüte steigt
+- `holdFlow` und `contractFlow` leiten ihre Erwartung jetzt aus der Kurve und
+  den Vertragsdaten ab, statt Erzwerte hart zu verdrahten
 - Sichtbares nächstes Ziel im Hold und am Run-Ende: genau eine Handlung mit
   Fortschritt und Begründung statt sechs gleichrangiger Anzeigen. Der Run endet
   nicht mehr mit einer Zahl, sondern mit dem, was sie bewirkt (D-033)

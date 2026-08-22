@@ -273,8 +273,11 @@ try {
   const beforeOre = engine.H.ore, beforeRuns = engine.H.runs;
   const firstDeposit = engine.depositRunReward();
   const secondDeposit = engine.depositRunReward();
-  const depositedOnce = firstDeposit === 10 && secondDeposit === 0 &&
-    engine.H.ore === beforeOre + 10 && engine.H.runs === beforeRuns + 1;
+  // Erwartung aus der Kurve ableiten statt hart verdrahten: Der Check soll die
+  // einmalige Auszahlung pruefen, nicht den Zahlenwert der Kurve (D-034).
+  const erwartetesErz = engine.rewardOre(1023);
+  const depositedOnce = firstDeposit === erwartetesErz && secondDeposit === 0 &&
+    engine.H.ore === beforeOre + erwartetesErz && engine.H.runs === beforeRuns + 1;
   engine.showHold();
   const returnedToHold = engine.S.running === false && elements.get("start").getAttribute("aria-hidden") === "false";
   holdFlow = producedOnce && timestampIdempotent && forgedOne && persisted && upgraded &&
@@ -304,7 +307,14 @@ try {
   engine.S.reward = 1023;
   engine.S.rewardGranted = false;
   const boostedOre = engine.depositRunReward();
-  const rewardApplied = boostedOre === 14; // Basis 10 × 1,35, gerundet
+  // Erwartung aus Kurve und Vertragsmultiplikator ableiten statt hart
+  // verdrahten. Der Check gehoert dem Vertragsmultiplikator, nicht dem
+  // Zahlenwert der Erzkurve -- sonst bricht er bei jeder Kurvenaenderung,
+  // ohne dass am Vertrag etwas falsch waere (D-034).
+  const basisErz = engine.rewardOre(1023);
+  const breachMul = engine.CONTRACTS.find((c) => c.id === "breach").reward;
+  const rewardApplied = boostedOre === Math.max(basisErz, Math.round(basisErz*breachMul)) &&
+    boostedOre > basisErz;   // der Vertrag muss ueberhaupt etwas bewirken
 
   const ring = engine.headlessRun(180, {
     seed: 1701, xpC: engine.CFG.XP_C, xpK: engine.CFG.XP_K,
@@ -822,9 +832,55 @@ try {
   holdGoalError = error instanceof Error ? error.message : String(error);
 }
 
+// --- D-034: Erzkurve --------------------------------------------------------
+// Geprueft wird die Eigenschaft, die der Spieler spuert: Laenger und besser
+// spielen muss sich pro Minute lohnen. Die alte log2-Kurve verletzte das --
+// das 3-Minuten-Scharmuetzel war 1,9-mal effizienter als der 8-Minuten-Run.
+let oreCurve = false;
+let oreCurveError = "";
+let oreCurveDiagnostics = null;
+try {
+  const ore = engine.rewardOre;
+  // Beobachtete Beutewerte aus echten Feldlaeufen, mit ihrer Laufdauer.
+  const laeufe = [
+    { label: "3-Min-Scharmuetzel", minuten: 3, beute: 1412 },
+    { label: "8 Min typisch",      minuten: 8, beute: 17290 },
+    { label: "8 Min gut",          minuten: 8, beute: 28425 },
+    { label: "8 Min Ausnahme",     minuten: 8, beute: 137872 },
+  ].map(l => ({ ...l, erz: ore(l.beute), proMinute: Number((ore(l.beute)/l.minuten).toFixed(2)) }));
+
+  // 1. Erz je Minute steigt monoton mit der Laufguete. Das ist der Kern.
+  let monotonProMinute = true;
+  for (let i = 1; i < laeufe.length; i++)
+    if (laeufe[i].proMinute < laeufe[i-1].proMinute) monotonProMinute = false;
+
+  // 2. Der typische Lauf bleibt verankert -- das Wirtschaftstempo darf sich
+  //    durch eine Kurvenaenderung nicht verschieben.
+  const ankerHaelt = ore(17290) === 14;
+
+  // 3. Mehr Beute darf nie weniger Erz geben.
+  let monotonInBeute = true;
+  for (let r = 500; r < 200000; r = Math.round(r*1.7))
+    if (ore(Math.round(r*1.7)) < ore(r)) monotonInBeute = false;
+
+  // 4. Koennen muss sich lohnen: Der Ausnahmelauf bringt deutlich mehr als der
+  //    typische. Unter log2 waren es 1,21x, das war der eigentliche Defekt.
+  const spreizung = ore(137872)/ore(17290);
+  const koennenZaehlt = spreizung >= 1.8;
+
+  // 5. Regel 1: keine Sitzung geht leer aus.
+  const bodenHaelt = ore(0) >= 1 && ore(1) >= 1;
+
+  oreCurve = monotonProMinute && ankerHaelt && monotonInBeute && koennenZaehlt && bodenHaelt;
+  oreCurveDiagnostics = { laeufe, spreizung: Number(spreizung.toFixed(2)),
+    monotonProMinute, ankerHaelt, monotonInBeute, koennenZaehlt, bodenHaelt };
+} catch (error) {
+  oreCurveError = error instanceof Error ? error.message : String(error);
+}
+
 const output = {
-  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && slotLayout && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && contractFlow && holdExpansion && equipmentFlow && evolutionCatalog && eliteChoices && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling && fpsMetrics && reportHardened && healOrbFlow && holdGoalLadder,
-  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, slotLayout, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, contractFlow, holdExpansion, equipmentFlow, evolutionCatalog, eliteChoices, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling, fpsMetrics, reportHardened, healOrbFlow, holdGoalLadder },
+  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && slotLayout && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && contractFlow && holdExpansion && equipmentFlow && evolutionCatalog && eliteChoices && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling && fpsMetrics && reportHardened && healOrbFlow && holdGoalLadder && oreCurve,
+  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, slotLayout, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, contractFlow, holdExpansion, equipmentFlow, evolutionCatalog, eliteChoices, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling, fpsMetrics, reportHardened, healOrbFlow, holdGoalLadder, oreCurve },
   targets: report.targets,
   ueberschuss: report.ueberschuss,
   seeds: report.seeds,
@@ -841,6 +897,8 @@ if (visibleError) output.visibleError = visibleError;
 if (fpsError) output.fpsError = fpsError;
 if (healOrbError) output.healOrbError = healOrbError;
 if (holdGoalError) output.holdGoalError = holdGoalError;
+if (oreCurveError) output.oreCurveError = oreCurveError;
+if (oreCurveDiagnostics) output.summary.oreCurve = oreCurveDiagnostics;
 if (holdGoalDiagnostics) output.summary.holdGoal = holdGoalDiagnostics;
 if (healOrbDiagnostics) output.summary.healOrb = healOrbDiagnostics;
 if (uxError) output.uxError = uxError;
