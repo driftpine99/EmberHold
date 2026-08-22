@@ -94,20 +94,66 @@ D-024 zusätzlich drei Zeilen, die den Bericht selbsterklärend machen:
 | `Anzeige: 1280×720 CSS · 1920×1080 px · DPR 1.50` | Die Füllrate hängt an der echten Pixelzahl. Auf einem HiDPI-Gerät rechnet dieselbe Szene mit einem Vielfachen. |
 | `Tuning: unverändert` | Bewegte Live-Regler werden namentlich gemeldet. Ein getunter Lauf ist damit nicht mehr von einem sauberen zu verwechseln. |
 | `FPS 1-%-Low` und `Anteil unter 55 FPS` | Die schlechteste halbe Sekunde allein sagt wenig; ein einzelner Aussetzer setzt sie dauerhaft. Erst diese beiden Zahlen zeigen, ob es ruckelt oder einmal gehakt hat. |
+| `Gluttropfen eingesammelt` | Wie oft du wirklich hingelaufen bist. Null hieße: Der Tropfen ist zu unauffällig oder zu riskant zu holen. |
 
-### Fünf Fragen, die der Bericht nicht beantworten kann
+**Worauf bei den Zahlen besonders zu achten ist:** `Spitze sichtbar gezeichnet`
+sollte deutlich unter den 294 des letzten Laufs liegen — das ist der Wert, an
+dem laut D-029 die Bildrate hängt. Und `Anteil unter 55 FPS` sollte weit unter
+den 40 % von damals liegen.
 
-Diese fünf Antworten braucht es zusätzlich; sie sind der eigentliche Zweck des
-Laufs und entscheiden über die Freigabe des Schwärmers:
+### Sechs Fragen, die der Bericht nicht beantworten kann
 
-1. **Schwärmer:** ruhig und geerdet, oder synchron marschierend?
-2. **Kampfausschnitt:** wirkt 1000 × 563 auf 16:9 zu eng? Falls ja, ist
-   Pillarboxing der in D-017 dokumentierte Gegenentwurf.
-3. **Safe-Area:** sieht der seitliche Rand auf breiten Fenstern ruhig gerahmt
-   aus oder wie ein abgeschnittenes Bild? (Nur relevant, wenn breiter als 16:9.)
-4. **Warden-Einstieg:** vollständig sichtbar oder angeschnitten?
-5. **Zweiter Run:** hättest du ohne Auftrag freiwillig sofort noch einen
-   gestartet? Das ist die Phase-0-Kernfrage.
+**Stand 22.08.2026.** Seit der letzten Fassung sind sechs Änderungen gelandet,
+die alle auf dieselbe Spielerbewertung aus D-027 antworten. Die Fragen prüfen
+gezielt, ob sie gewirkt haben — jede nennt, was sie entscheidet.
+
+**1. Bewegung.** *Entscheidet: ob D-030 gewirkt hat — der Kernbefund von D-027.*
+Vorher hieß es: „man kann gar nicht mehr so richtig laufen/ausweichen" und „an
+den Boss kommt man wegen der vielen Gegner nicht". Der Bewegungsüberschuss ist
+beseitigt, das Feld sollte rund ein Drittel leerer sein.
+
+> Kannst du wieder kiten und ausweichen? Und kommst du zum Warden durch?
+
+**2. Buildmacht.** *Entscheidet: ob D-031 gewirkt hat.* Der Fokus-Schutz greift
+jetzt ab 5:30 statt 7:30; eine begonnene Evolution bleibt dadurch länger im
+Angebot sichtbar.
+
+> Hast du eine Evolution abgeschlossen? Und ist erkennbar geworden, worauf du
+> hinarbeitest — oder kamen die Karten weiter beliebig?
+
+**3. Gluttropfen.** *Entscheidet: ob D-032 die richtige Form hat.* Neu: Gegner
+lassen etwa alle 25 Sekunden einen warmen Tropfen fallen, der 6 % der
+Lebenspunkte heilt. Er hat absichtlich einen kleinen Einzugsradius und keinen
+Fernsog — **man muss hingehen.**
+
+> Sind sie dir aufgefallen? Bist du hingelaufen, obwohl es riskant war? Und
+> fühlt sich Heilung jetzt planbar an?
+
+**4. Zweck.** *Entscheidet: ob D-033 und D-034 die wichtigste Beschwerde lösen.*
+Vorher: „Aktuell weiß ich nicht, wofür ich die Runs mache." Jetzt zeigt der Hold
+genau **ein** nächstes Ziel mit Fortschritt und Begründung, und dasselbe Ziel
+steht am Run-Ende unter „Damit als Nächstes". Zusätzlich wurde die Erzkurve
+korrigiert: Ein besserer Lauf bringt jetzt spürbar mehr Erz statt eines
+einzigen Punktes mehr.
+
+> Weißt du beim Blick in den Hold, was du als Nächstes tust? Und hat sich der
+> Run am Ende gelohnt angefühlt?
+
+**5. Slotanzeige.** *Entscheidet: ob der Überlauf behoben ist.* Bei niedrigen
+Fenstern bricht die Liste jetzt in eine zweite Spalte um.
+
+> War dein vollständiger Build links sichtbar, ohne dass unten etwas fehlte?
+
+**6. Der zweite Run.** *Entscheidet: das Phase-0-Gate. Die einzige Frage, an der
+laut GDD das ganze Projekt hängt.*
+
+> Hattest du beim Extraktionsbildschirm Lust, sofort noch einen zu starten?
+> Nicht „war es okay", sondern: hat es gezogen? Und falls nein — was fehlte?
+
+**Weiterhin offen und nicht Teil dieser Runde:** die Animation wirkt ruckelig
+(D-027 Punkt F, braucht neue Assets und die Revision von D-015/D-016) und die
+seitliche Safe-Area gefällt nicht (D-027 Punkt G, rein kosmetisch). Beides
+bleibt bewusst unangetastet, bis der Kern trägt.
 
 ### Bisherige Feldläufe
 
