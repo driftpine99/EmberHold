@@ -1069,3 +1069,81 @@ Das ist die nächste zu bauende Änderung. Sie revidiert den Despawn-Radius aus
 D-014 und stellt den Kartenzug-Korridor gemäß D-026 auf einen Regressionswächter
 um. Beides braucht die Freigabe des Besitzers, weil es zwei Entscheidungen
 zugleich berührt.
+
+## D-030 – Bewegungsüberschuss beseitigt, Botkorridor wird Regressionswächter
+
+**Status:** beschlossen und umgesetzt (22.08.2026). Freigabe durch den Besitzer
+liegt vor. Revidiert den Recyclingrand aus D-014 und setzt D-026 Option 2 um.
+
+Umgesetzt wurde das Paket, das aus D-028 und D-029 folgt.
+
+### Was geändert wurde
+
+**1. Recyclingrand von 1,55 auf 1,20.** Neue benannte Konstante `DESPAWN_F`.
+Normale Gegner werden jetzt ab 732 statt ab 946 Welteinheiten recycelt. Der
+ungezählte Vorrat zwischen Zählkreis (702) und Recyclingrand schrumpft damit von
+82 % auf 21 % der Zählfläche. Elite und Boss bleiben wie bisher ausgenommen.
+
+| | vorher | nachher |
+|---|---:|---:|
+| Spitze im Feld (Bot, kitend) | 357 | **308** |
+| Überschuss über Zieldichte 301 | +19 % | **+2,2 %** |
+| Erster Kartenzug (Bot) | 26,5 s | **31,0 s** |
+| Kartenzüge (Bot) | 20,56 | 15,33 |
+
+Der erste Kartenzug wandert damit von 26,5 auf 31,0 Sekunden — **näher an das
+Designziel von 35 und näher an die gemessenen Menschenwerte** von 34,9, 35,2 und
+33,9. Das war nicht das Ziel der Änderung, bestätigt aber die Richtung.
+
+**Sichtbarkeit geprüft.** Bei 1422 × 613, dem Fenster des Besitzers, liegt die
+Ecke des Zeichenfensters bei 656 Welteinheiten, der Recyclingrand bei 732 — also
+77 Welteinheiten Abstand. Im Referenzformat 1000 × 700 sind es 694 gegen 732.
+Es kann also nichts recycelt werden, während es noch gezeichnet wird.
+
+**2. Der Kartenzug-Korridor ist jetzt ein Regressionswächter.** `totalPicks`
+vergleicht nicht mehr gegen `CFG.PICK_TARGETS` (21), sondern gegen
+`BOT_PICK_REF` (15,3) mit Toleranz 3. Begründung ist D-026: Der Bot bildet die
+menschliche Kurve nicht ab, früh ist er zu schnell, spät zu langsam. Ein
+Korridor auf dieser Kurve beschreibt kein Spielerlebnis.
+
+Beide Zahlen stehen jetzt getrennt in der Testausgabe:
+
+```
+"targets": { "first": 35, "designTotal": 21, "botRef": 15.3 }
+```
+
+`designTotal` bleibt das Designziel und wird **an Menschenläufen** geprüft und in
+`docs/TESTPLAN.md` dokumentiert, nicht automatisiert. `botRef` hält nur fest, was
+der Bot heute liefert, damit eine stille Verschiebung auffällt. Die Trennung ist
+ausdrücklich gewollt: Ein automatischer Test kann eine Regression erkennen, aber
+kein Spielgefühl beurteilen.
+
+**3. Neuer Check `densityOvershoot`.** Die Spitzenbelegung darf die Zieldichte
+um höchstens 10 % überschreiten. Geprüft wird bewusst das **Maximum** über alle
+neun Seeds, nicht der Mittelwert — ein Mittelwert könnte einen einzelnen
+entgleisten Seed verdecken. Aktuell liegen die Seeds zwischen 303 und 314, also
+Mittel +2,2 % und Maximum +4,2 % bei einer Grenze von 10 %. Damit kann der
+Defekt aus D-028 nicht unbemerkt zurückkehren. Die Zahlen stehen als eigener
+Block in der Testausgabe.
+
+**4. `evolutionReachable` von 2/9 auf 1/9 gesenkt.** Weniger Gegner bedeuten
+weniger XP, der Bot erreicht dadurch seltener eine Evolution. Das ist eine
+**Bodenschwelle, kein Designziel**: Sie stellt sicher, dass Evolutionen nicht
+völlig unerreichbar werden. Die Designgarantie „eine Evolution ist in einer
+Sortie erreichbar" wird an Menschenläufen geprüft; dort waren es in beiden
+sauberen 8-Minuten-Läufen eine beziehungsweise zwei.
+
+### Was offen bleibt und beobachtet werden muss
+
+- **Ob es reicht.** Die Rechnung sagt: Spitze 308 statt 441 bedeutet bei einem
+  sichtbaren Anteil von 0,67 rund 205 statt 294 sichtbare Gegner — also im
+  Bereich, der in Lauf 3 mit einem 1-%-Low von 58 lief. Das ist eine Prognose,
+  keine Messung. Nur ein Feldlauf kann sie bestätigen.
+- **Die Evolutionsquote.** 1 von 9 beim Bot ist wenig. Falls ein Mensch künftig
+  keine Evolution mehr erreicht, ist das ein Rückschritt gegenüber D-021 und
+  muss nachgesteuert werden.
+- **Der Kartenzug-Korridor am Menschen.** Der Mensch lag mit 28 und 36 über dem
+  Designziel von 21. Die Senkung sollte ihn dorthin bewegen. Ob sie zu weit
+  geht, zeigt erst der nächste Lauf.
+
+Diese drei Punkte beantwortet ein einziger sauberer 8-Minuten-Lauf.

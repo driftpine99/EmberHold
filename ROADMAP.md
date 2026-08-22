@@ -70,6 +70,9 @@ Vorbereitend gemessen und dokumentiert wurde:
   seitliche Safe-Area, und Welt, Gegner und Telegrafien werden darauf geclippt.
 - [x] Sauberer 8-Minuten-Lauf gefahren und ausgewertet. FPS-Befund aufgelöst
   (D-024), Pacing-Abweichung als D-026 eröffnet.
+- [x] D-027 Rang 1 und 2 umgesetzt: Bewegungsüberschuss beseitigt (D-030) und
+  Slotanzeige bei niedrigen Fenstern vollständig sichtbar. Beides wartet auf
+  einen Feldlauf zur Bestätigung.
 - [ ] **Neu und vorrangig:** D-027 entscheiden. Die erste Spielerbewertung sagt
   „Lust ja, aber so funktioniert der Run nicht". Der Schwärmer ist **nicht**
   freigegeben, der Stürmer bleibt gesperrt. Vorgeschlagene Reihenfolge und

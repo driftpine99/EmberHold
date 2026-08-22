@@ -140,6 +140,25 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
   wird und `requestAnimationFrame` deshalb nicht feuert (nachgemessen:
   0 Frames in 14,4 Sekunden)
 
+### Changed
+
+- Recyclingrand für normale Gegner von 1,55 auf 1,20 mal `SIM_DIAG` gesenkt
+  (neue Konstante `DESPAWN_F`). Bewegung erzeugt dadurch keinen
+  Gegnerüberschuss mehr: Die Spitze im Feld fällt von 357 auf 308 bei einer
+  Zieldichte von 301, der Überschuss von +19 % auf +2,2 % (D-030)
+- Der Kartenzug-Korridor ist jetzt ein Regressionswächter gegen
+  `BOT_PICK_REF` statt gegen das Designziel. Designziel und Botanker stehen
+  getrennt in der Testausgabe; das Designziel wird an Menschenläufen geprüft
+  (D-026, D-030)
+- `evolutionReachable` von 2/9 auf 1/9 gesenkt und ausdrücklich als
+  Bodenschwelle statt als Designziel geführt (D-030)
+
+### Added
+
+- Check `densityOvershoot`: die Spitzenbelegung darf die Zieldichte um
+  höchstens 10 % überschreiten, damit der Defekt aus D-028 nicht unbemerkt
+  zurückkehrt
+
 ### Known issues
 
 - **Der Run trägt in diesem Zustand nicht (D-027).** Erste Spielerbewertung:

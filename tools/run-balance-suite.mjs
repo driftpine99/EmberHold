@@ -101,7 +101,13 @@ if (!engine?.runBalanceSuite) throw new Error("Balance suite is not exposed as w
 
 const report = engine.runBalanceSuite();
 const evolutionRuns = report.runs.baseline.filter((run) => run.evo.length > 0).length;
-const evolutionReachable = evolutionRuns >= 2;
+// Bodenschwelle, kein Designziel. Der Bot erreicht seit D-029 seltener eine
+// Evolution, weil weniger Gegner weniger XP bedeuten. Die Designgarantie
+// "Evolution ist in einer Sortie erreichbar" wird an Menschenlaeufen geprueft;
+// dort waren es in beiden sauberen 8-Minuten-Laeufen eine bzw. zwei. Diese
+// Schwelle stellt nur sicher, dass Evolutionen nicht voellig unerreichbar
+// werden. Faellt sie auf 0, ist der Buildpfad kaputt.
+const evolutionReachable = evolutionRuns >= 1;
 const feedbackRun = report.runs.baseline.find((run) => run.seed === 2474367456);
 const repeat = engine.headlessRun(report.runLen, {
   seed: report.seeds[0],
@@ -708,6 +714,7 @@ const output = {
   pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && slotLayout && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && contractFlow && holdExpansion && equipmentFlow && evolutionCatalog && eliteChoices && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling && fpsMetrics && reportHardened,
   checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, slotLayout, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, contractFlow, holdExpansion, equipmentFlow, evolutionCatalog, eliteChoices, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling, fpsMetrics, reportHardened },
   targets: report.targets,
+  ueberschuss: report.ueberschuss,
   seeds: report.seeds,
   summary: { ...report.summary, evolutionRuns, evolutionSeeds: report.seeds.length,
     stationaryDeath: stationaryRun.died,

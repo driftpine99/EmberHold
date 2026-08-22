@@ -573,6 +573,18 @@ function rand(){
 }
 function targetPicks(runLen){ return CFG.PICK_TARGETS[runLen] ?? null; }
 
+// Regressionsanker fuer die Botsuite. Das ist ausdruecklich KEIN Designziel.
+// Der Testbot bildet die menschliche Runkurve nicht ab (D-026): Menschen
+// erreichen den ersten Kartenzug nach 34,9 / 35,2 / 33,9 Sekunden, der Bot nach
+// 26,5 bei einer Streuung von 21,0 bis 30,7. Beim Spaetlauf ist es umgekehrt,
+// dort liegt der Mensch mit 28 und 36 Kartenzuegen ueber dem Bot.
+// Das Designziel aus CFG.PICK_TARGETS wird deshalb an Menschenlaeufen geprueft
+// und in docs/TESTPLAN.md dokumentiert, nicht automatisiert. Diese Zahl haelt
+// nur fest, was der Bot heute liefert, damit eine stille Verschiebung auffaellt.
+const BOT_PICK_REF = 15.3, BOT_PICK_TOL = 3;
+// Bewegung darf keinen Gegnerueberschuss mehr erzeugen (D-028, D-029).
+const OVERSHOOT_MAX = 1.10;
+
 // Unveraenderter Ausgangszustand aller Balancewerte. Die Live-Tuning-Regler
 // schreiben direkt in CFG; ohne diesen Schnappschuss ist ein getunter Lauf im
 // Run-Bericht nicht von einem sauberen zu unterscheiden. Genau das hat am
@@ -1138,6 +1150,16 @@ const SIM_W=1000, SIM_H=700, SIM_DIAG=Math.hypot(SIM_W,SIM_H)/2;
 const ASPECT_MAX=16/9, COMBAT_H_MIN=SIM_W/ASPECT_MAX;      // 562,5
 // Boss-Einstieg: fest, damit er auf jedem Format im Kampfausschnitt liegt.
 const BOSS_ENTRY=Math.min(300, SIM_H*0.40);                // 280
+// Recyclingrand fuer normale Gegner, als Vielfaches von SIM_DIAG.
+// Frueher 1.55 (946 Welteinheiten). Zwischen Zaehlkreis (1.15 = 702) und
+// Recyclingrand lag damit ein ungezaehlter Vorrat von 82 Prozent der
+// Zaehlflaeche. Wer kitete, zog eine Schleppe hinein, der Spawner fuellte vorne
+// nach weil er sie nicht sah, und beim Wenden sammelte der Spieler beides ein:
+// Bewegung erzeugte einen Gegnerueberschuss von bis zu 48 Prozent, und die
+// korrekte Spielweise zerstoerte ihre eigene Voraussetzung (D-028, D-029).
+// 1.20 ergibt 732 Welteinheiten und liegt damit weiterhin ausserhalb des
+// Zeichenfensters (Ecke bei 694), es verschwindet also nichts sichtbar.
+const DESPAWN_F = 1.20;
 // Nur Darstellung und Render-Culling. Niemals in der Simulation verwenden.
 let VIEW_W=SIM_W, VIEW_H=SIM_H;
 // Pixelrechteck des zentralen Kampfausschnitts auf der Leinwand.
@@ -1512,7 +1534,7 @@ function updateEnemies(dt){
     }
     // Zu weit weg? Recyceln statt löschen.
     const fx2=E.x[i]-S.x, fy2=E.y[i]-S.y;
-    const lim = SIM_DIAG*1.55;
+    const lim = SIM_DIAG*DESPAWN_F;
     if (fx2*fx2+fy2*fy2 > lim*lim && kind===0) freeSlot(E,i);
   }
   if (S.nearbyEnemies>S.peakNearbyEnemies) S.peakNearbyEnemies=S.nearbyEnemies;
@@ -3503,15 +3525,28 @@ function runBalanceSuite(opts){
     baseline.reduce((sum,run)=>sum+(run.perMin[minute]||0),0)/baseline.length);
   const sensitivityRatio = Math.max(lowAvg,highAvg)/Math.max(1,Math.min(lowAvg,highAvg));
   const pickTarget = targetPicks(runLen);
+  // Spitzenbelegung gegen die Zieldichte. Vor D-029 lag sie bei +19 Prozent,
+  // weil Kiten eine ungezaehlte Schleppe aufbaute. Geprueft wird bewusst das
+  // MAXIMUM ueber alle Seeds, nicht der Mittelwert: Ein Mittelwert koennte
+  // einen einzelnen entgleisten Seed verdecken. targetEnemies waechst monoton
+  // ueber den Run, targetEnemies(runLen) ist also die hoechste Zieldichte.
+  const dichteZiel = targetEnemies(runLen);
+  const spitzeMittel = average(baseline,'peak');
+  const spitzeMax = Math.max(...baseline.map(r=>r.peak));
   const checks = {
     firstPick: firstAvg>=CFG.FIRST_PICK_RANGE[0] && firstAvg<=CFG.FIRST_PICK_RANGE[1],
-    totalPicks: pickTarget===null || Math.abs(totalAvg-pickTarget)<=3,
+    totalPicks: runLen!==480 || Math.abs(totalAvg-BOT_PICK_REF)<=BOT_PICK_TOL,
     sensitivity: sensitivityRatio<=1.75,
     configStable: JSON.stringify(CFG)===configBefore,
+    densityOvershoot: spitzeMax <= dichteZiel*OVERSHOOT_MAX,
   };
   return {
     pass:Object.values(checks).every(Boolean), checks, runLen, seeds:[...seeds],
-    targets:{first:CFG.FIRST_PICK_S,total:pickTarget},
+    targets:{first:CFG.FIRST_PICK_S, designTotal:pickTarget, botRef:BOT_PICK_REF},
+    ueberschuss:{zieldichte:Math.round(dichteZiel), spitzeMittel:Math.round(spitzeMittel),
+            spitzeMax, prozentMittel:+(((spitzeMittel/dichteZiel)-1)*100).toFixed(1),
+            prozentMax:+(((spitzeMax/dichteZiel)-1)*100).toFixed(1),
+            grenzeProzent:Math.round((OVERSHOOT_MAX-1)*100)},
     summary:{
       firstAvg, firstRange:[Math.min(...baseline.map(run=>run.first)),Math.max(...baseline.map(run=>run.first))],
       totalAvg, totalRange:[Math.min(...baseline.map(run=>run.total)),Math.max(...baseline.map(run=>run.total))],
@@ -3540,7 +3575,7 @@ window.__EH = { get S(){return S;}, get H(){return META;}, CFG, HOLD_CFG, CONTRA
                 targetEnemies, resize, render,
                 viewport:()=>({W,H,SCALE,VIEW_W,VIEW_H,SIM_W,SIM_H,SIM_DIAG,
                                CLIP_X,CLIP_Y,CLIP_W,CLIP_H,ASPECT_MAX,
-                               COMBAT_H_MIN,BOSS_ENTRY}),
+                               COMBAT_H_MIN,BOSS_ENTRY,DESPAWN_F}),
                 counts:()=>{let e=0,p=0,g=0;
                   for(let i=0;i<E.n;i++) if(E.alive[i])e++;
                   for(let i=0;i<P.n;i++) if(P.alive[i])p++;
