@@ -904,3 +904,94 @@ Belohnung retten.
 Nicht jedes Paket ist eine reine Umsetzung. Rang 1 revidiert die Dichtewerte aus
 D-014, Rang 5 revidiert D-015 und D-016. Beides braucht eine eigene bewusste
 Entscheidung, keine stille Anpassung während der Arbeit.
+
+## D-028 – Warum das Feld verstopft: Bewegung erzeugt den Gegnerüberschuss
+
+**Status:** untersucht und gemessen, **Entscheidung offen**. Es wurde kein
+Balancewert geändert.
+
+D-027 Rang 1 verlangt, die Gegnerdichte zu entschärfen. Die Untersuchung hat
+eine andere Ursache ergeben als vermutet, und sie führt in eine Zwickmühle.
+
+### Die Ursache
+
+Nicht der Build, nicht die Spielerstufe, nicht die Spawnkurve — **die Bewegung
+des Spielers selbst**:
+
+| Spieler | Spitze im Feld | über Zieldichte 301 |
+|---|---:|---:|
+| steht still | 303 | +1 % |
+| Bot, kitet | 357 (Streuung bis 438) | +19 % |
+| Besitzer, Feldlauf | 445 | +48 % |
+
+Widerlegt wurden dabei ausdrücklich:
+
+- *Spielerstufe und \`HP_PER_LVL\`.* Bei festgehaltener Stufe von 10 bis 45 sitzt
+  die Population im Gleichgewicht exakt auf der Zieldichte (297–300 bei Ziel 301).
+- *Buildstärke.* Vom Startbogen bis zum Maximalbuild mit vier Evolutionen und
+  67.854 Kills bleibt die Spitze zwischen 295 und 303.
+- *Der Spawn-Bias nach hinten.* Ihn ganz zu entfernen senkt den Überschuss nur
+  von +19 % auf +12 %.
+
+**Der Mechanismus.** Gezählt wird in einem Kreis von \`SIM_DIAG*1.15\` = 702
+Welteinheiten, recycelt erst ab \`SIM_DIAG*1.55\` = 946. Dazwischen liegt ein
+ungezählter Vorrat mit 82 % der Zählfläche. Wer kitet, zieht eine Schleppe in
+diesen Vorrat; der Spawner füllt vorne bis zur Zieldichte nach, weil er die
+Schleppe nicht sieht. Beim Wenden sammelt der Spieler beides wieder ein.
+
+**Das ist strukturell schädlich, nicht nur unbequem:** Je besser jemand
+ausweicht, desto voller wird sein Feld — bis Ausweichen unmöglich ist. Die
+korrekte Spielweise zerstört ihre eigene Voraussetzung. Genau das beschreibt
+der Besitzer mit „man kann gar nicht mehr so richtig laufen/ausweichen".
+
+### Die Zwickmühle
+
+Jeder wirksame Hebel senkt zugleich die Kills und damit die XP. Gemessen mit
+der vollen Vertragssuite:
+
+| Despawn-Faktor | Spitze | über Ziel | Kartenzüge | Vertrag 18–24 |
+|---:|---:|---:|---:|---|
+| 1,55 (heute) | 357 | +19 % | 20,56 | erfüllt |
+| 1,40 | 338 | +12 % | 18,44 | erfüllt, knapp |
+| 1,30 | 331 | +10 % | 17,44 | **verletzt** |
+| 1,25 | 321 | +7 % | 15,78 | **verletzt** |
+| 1,20 | 308 | +2 % | 15,33 | **verletzt** |
+
+Eine XP-Kompensation über \`XP_C\` wurde ebenfalls durchgerechnet. Keine der
+zehn geprüften Kombinationen erfüllt alle vier Kriterien gleichzeitig: Bei
+Despawn 1,20 und \`XP_C\` 74 stimmen Kartenzüge und Sensitivität, aber nur ein
+Lauf von neun erreicht eine Evolution. Bei 1,25 und \`XP_C\` 68 stimmen
+Kartenzüge und Evolutionen, aber die Sensitivität steigt auf 1,83 über die
+erlaubten 1,75.
+
+### Warum hier nicht weitergetunt wird
+
+Der Vertrag ist auf dem Testbot kalibriert, und **D-026 zeigt, dass dieser Bot
+die menschliche Kurve nicht abbildet**: Der Besitzer erreichte 36 Kartenzüge,
+wo der Bot 20,6 erreicht. Eine XP-Kompensation, die den *Bot* zurück auf 21
+hebt, würde den *Menschen* noch weiter über 36 treiben — also genau das
+Gegenteil dessen, was das Spielgefühl braucht.
+
+Drei gekoppelte Stellschrauben gegen vier verrauschte Kriterien zu optimieren,
+während die Referenz nachweislich falsch ist, ist keine saubere Arbeit. Die
+Reihenfolge muss umgekehrt werden.
+
+### Zur Entscheidung stehen
+
+1. **Erst die Referenz reparieren.** Zwei bis drei weitere saubere
+   Menschenläufe sammeln (D-026), den Kartenzug-Korridor aus Menschendaten neu
+   ableiten und den Botkorridor nur noch als Regressionswächter führen. Danach
+   ist die Dichte in einem Zug lösbar, ohne gegen eine falsche Referenz zu
+   tunen. **Empfohlen.**
+2. **Den Defekt sofort beheben und den Korridor mitziehen.** Despawn auf 1,20,
+   Überschuss auf +2 %, und den Kartenzug-Korridor auf den dann gemessenen Wert
+   setzen. Schnell wirksam, verschiebt aber den Balancevertrag auf Basis
+   derselben fragwürdigen Botreferenz.
+3. **Die Zieldichte selbst senken** (\`SPAWN_SPAN\`, heute 450). Das ist eine
+   Revision von D-014 und wirkt unabhängig vom Überschuss. Kann mit 1 oder 2
+   kombiniert werden, ersetzt aber keines von beiden, weil der Überschuss
+   bleibt.
+
+Bis zur Entscheidung bleibt der Code unverändert. Der Überschuss ist als
+Messgröße jetzt bekannt und reproduzierbar; er lässt sich jederzeit gegen jede
+Änderung nachprüfen.
