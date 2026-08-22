@@ -558,6 +558,25 @@ function rand(){
 }
 function targetPicks(runLen){ return CFG.PICK_TARGETS[runLen] ?? null; }
 
+// Unveraenderter Ausgangszustand aller Balancewerte. Die Live-Tuning-Regler
+// schreiben direkt in CFG; ohne diesen Schnappschuss ist ein getunter Lauf im
+// Run-Bericht nicht von einem sauberen zu unterscheiden. Genau das hat am
+// 22.08.2026 einen Feldlauf unbrauchbar gemacht (D-024).
+const CFG_DEFAULTS = Object.freeze(Object.assign({}, CFG));
+function tuningDeviations(){
+  const out=[];
+  for(const k in CFG_DEFAULTS){
+    const a=CFG_DEFAULTS[k], b=CFG[k];
+    if(typeof a==='number' && a!==b) out.push(k+' '+a+'→'+b);
+  }
+  return out;
+}
+
+// Zielmarke fuer die Abnahme. Bewusst NICHT in CFG: das ist ein
+// Performanceziel, kein Balancewert, und darf den Balancevertrag nicht
+// beruehren.
+const FPS_TARGET = 55;
+
 // --------------------------------------------------------------------- Farben
 const COL = {
   bg:'#1b1e25', grid:'#2b2e36',
@@ -1052,7 +1071,7 @@ function newRun(runLen, seed, contractId){
     gearCardTaken:false,gearCardActive:false,lootGear:null,
     preparedRerollsUsed:0,
     cool:{}, seed:runSeed,
-    fps:60, worstFps:999,
+    fps:60, worstFps:999, fpsLog:[],
   };
   S.W['bogen']=1; S.cool['bogen']=0;
   E.n=0;E.free.length=0;E.alive.fill(0);
@@ -2926,6 +2945,27 @@ function endRun(survived){
   setSheet('over',true,'btnMenu');
 }
 
+/** Der Minimalwert allein taugt nicht zur Abnahme. Er ist das Minimum aus rund
+ *  960 Halbsekundenproben; ein einziger Ausreisser durch Garbage Collection
+ *  oder einen Hintergrundprozess setzt ihn dauerhaft. Deshalb zusaetzlich ein
+ *  1-%-Low und der Zeitanteil unterhalb der Zielmarke (D-024). */
+function fpsStats(){
+  const log = (S && S.fpsLog) ? S.fpsLog : [];
+  if (!log.length) return null;
+  const sorted = log.slice().sort((a,b)=>a-b);
+  const idx = Math.min(sorted.length-1, Math.floor(sorted.length*0.01));
+  let below = 0;
+  for (const v of log) if (v < FPS_TARGET) below++;
+  return { proben:log.length, worst:sorted[0], low1:sorted[idx],
+           anteilUnterZiel:below/log.length };
+}
+
+/** Die Fuellrate haengt an der echten Pixelzahl, nicht an der CSS-Groesse. Auf
+ *  einem HiDPI-Geraet rechnet dieselbe Szene mit einem Vielfachen davon. */
+function displayInfo(){
+  return (W|0)+'×'+(H|0)+' CSS · '+cv.width+'×'+cv.height+' px · DPR '+DPR.toFixed(2);
+}
+
 function buildText(){
   const w=WEAPONS.filter(x=>S.W[x.id]).map(x=>(S.evo[x.id]?x.evo.name:x.name)+' '+(S.evo[x.id]?'EVO':S.W[x.id]));
   const p=PASSIVES.filter(x=>S.Pa[x.id]).map(x=>x.name+' '+S.Pa[x.id]);
@@ -2950,6 +2990,7 @@ function runReportText(){
   const fps=S.worstFps<500?(S.worstFps|0):'–';
   const evos=WEAPONS.filter(w=>S.evo[w.id]).map(w=>w.evo.name).join(', ')||'keine';
   const bonus=S.otActive?(S.result==='Extrahiert'?(S.reward-S.baseReward).toLocaleString('de-DE'):'verloren'):'–';
+  const st=fpsStats(), tune=tuningDeviations();
   return [
     'EMBERHOLD RUN-BERICHT',
     'Seed: '+S.seed,
@@ -2974,7 +3015,11 @@ function runReportText(){
     'Spitze im SIM-Radius: '+S.peakNearbyEnemies,
     'Spitze sichtbar gezeichnet: '+S.peakVisibleEnemies,
     'Kampfausschnitt: '+(VIEW_W|0)+'×'+(VIEW_H|0)+' Welteinheiten',
+    'Anzeige: '+displayInfo(),
+    'Tuning: '+(tune.length?tune.join(', '):'unverändert'),
     'Schlechteste FPS: '+fps,
+    'FPS 1-%-Low: '+(st?st.low1.toFixed(0):'–'),
+    'Anteil unter '+FPS_TARGET+' FPS: '+(st?(st.anteilUnterZiel*100).toFixed(1)+' % von '+st.proben+' Proben':'–'),
   ].join('\n');
 }
 async function copyRunReport(){
@@ -3028,7 +3073,13 @@ function pacingReport(){
   h += `<hr>Spitze im SIM-Radius: <b>${S.peakNearbyEnemies}</b> / ${CFG.CAP_ENEMY}<br>`;
   h += `Spitze sichtbar gezeichnet: <b>${S.peakVisibleEnemies}</b><br>`;
   h += `Kampfausschnitt: <b>${VIEW_W|0}×${VIEW_H|0}</b> Welteinheiten<br>`;
-  h += `Schlechteste FPS: <b class="${S.worstFps>=50?'ok':'bad'}">${S.worstFps|0}</b>`;
+  const fst=fpsStats();
+  h += `Schlechteste FPS: <b class="${S.worstFps>=50?'ok':'bad'}">${S.worstFps|0}</b><br>`;
+  h += fst
+    ? `1-%-Low: <b class="${fst.low1>=FPS_TARGET?'ok':'bad'}">${fst.low1.toFixed(0)}</b> &nbsp; unter ${FPS_TARGET}: <b class="${fst.anteilUnterZiel<=0.02?'ok':'bad'}">${(fst.anteilUnterZiel*100).toFixed(1)} %</b>`
+    : `1-%-Low: <b>–</b>`;
+  const dev=tuningDeviations();
+  if (dev.length) h += `<br><b class="bad">Tuning aktiv:</b> ${dev.join(", ")}`;
   return h;
 }
 
@@ -3179,7 +3230,10 @@ function frame(ts){
     fpsAcc+=dt; fpsN++;
     if (fpsAcc>=0.5){
       S.fps = fpsN/fpsAcc;
-      if (S.running && S.phase==='run' && S.t>4 && S.fps<S.worstFps) S.worstFps=S.fps;
+      if (S.running && S.phase==='run' && S.t>4){
+        if (S.fps<S.worstFps) S.worstFps=S.fps;
+        S.fpsLog.push(S.fps);
+      }
       fpsAcc=0; fpsN=0;
     }
   }

@@ -6,6 +6,17 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 
 ### Added
 
+- FPS-Metrik nach D-024: alle Halbsekundenproben werden gesammelt, `fpsStats()`
+  liefert 1-%-Low und den Zeitanteil unter der Zielmarke. `FPS_TARGET` liegt
+  bewusst außerhalb von `CFG`, damit ein Performanceziel den Balancevertrag
+  nicht berührt
+- Härtung des Run-Berichts nach D-024: `CFG_DEFAULTS` und
+  `tuningDeviations()` machen bewegte Live-Tuning-Regler sichtbar,
+  `displayInfo()` ergänzt CSS-Größe, echte Pixelzahl und `devicePixelRatio`
+- Zwei weitere Prüfungen in `npm test`: `fpsMetrics` schreibt fest, dass ein
+  einzelner Ausreißer das 1-%-Low nicht kippt, `reportHardened` prüft die
+  Tuning-Erkennung in beide Richtungen
+
 - Rüstkammer mit sechs festen Ausrüstungsteilen für Waffe, Talisman und Gewand;
   jede Sortie vergibt genau einen Fund
 - Direkte Duplikatverwertung zu Runenstaub, manuelles Zerlegen und gezielte
@@ -143,11 +154,13 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
   Nachweis, aber Simulation (0,1 ms) und Zeichenbefehle (2,1 ms bei 681
   Gegnern) sind als Ursache ausgeschlossen. Leitende Hypothese ist die
   Füllrate des ungedeckelten Lichtkreises. Siehe D-024.
-- `worstFps` ist das Minimum aus rund 960 Halbsekundenproben; ein einziger
-  Ausreißer setzt den Wert dauerhaft. Für die Abnahme fehlt ein 1-%-Low oder
-  der Zeitanteil unter 55 FPS (D-024).
-- Der Run-Bericht macht nicht sichtbar, ob die Live-Tuning-Regler bewegt
-  wurden, und nennt weder `devicePixelRatio` noch die Leinwandgröße (D-024).
+- Die Abnahmeschwelle für Phase 0.3 steht noch auf „mindestens 55 FPS". D-024
+  schlägt vor, sie auf „1-%-Low mindestens 55 und höchstens 2 % der Proben
+  unter 55" umzustellen; das ist noch nicht beschlossen.
+- Die Füllrate des Lichtkreises bleibt die leitende Hypothese für den
+  FPS-Einbruch, ist aber weiter unbelegt. Die wirksame Optimierung wäre ein
+  vorgerenderter Verlauf statt einer Verlaufsrasterung pro Frame; sie ist
+  bewusst zurückgestellt, bis die Grafik manuell abgenommen ist (D-024).
 - Erz aus einem Run wächst nur logarithmisch: Eine Verdopplung der Beute bringt
   ein einziges Erz mehr (D-025).
 

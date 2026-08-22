@@ -636,9 +636,50 @@ canvasElement.clientWidth = 1000;
 canvasElement.clientHeight = 700;
 engine.resize();
 
+// --- D-024: FPS-Metrik und Haertung des Run-Berichts ----------------------
+// worstFps ist das Minimum aus rund 960 Halbsekundenproben. Ein einziger
+// Ausreisser durch Garbage Collection setzt ihn dauerhaft. Der Test schreibt
+// genau diese Absicht fest: 99 saubere Proben plus ein Ausreisser duerfen das
+// 1-%-Low NICHT kippen, waehrend der Minimalwert sehr wohl faellt.
+let fpsMetrics = false;
+let reportHardened = false;
+let fpsError = "";
+try {
+  engine.begin(180);
+  engine.S.result = "Extrahiert";
+  engine.S.t = 180;
+  engine.S.worstFps = 20;
+  engine.S.fpsLog = new Array(99).fill(60).concat([20]);
+  const text = engine.runReportText();
+  fpsMetrics =
+    text.includes("Schlechteste FPS: 20") &&
+    text.includes("FPS 1-%-Low: 60") &&
+    text.includes("Anteil unter 55 FPS: 1.0 % von 100 Proben");
+
+  // Ohne Proben darf der Bericht nicht brechen, sondern muss Striche zeigen.
+  engine.S.fpsLog = [];
+  const leer = engine.runReportText();
+  const leerOk = leer.includes("FPS 1-%-Low: –") && leer.includes("Anteil unter 55 FPS: –");
+
+  // Haertung: saubere Laeufe melden "unveraendert", getunte nennen den Wert.
+  const sauber = engine.runReportText();
+  const sauberOk = sauber.includes("Tuning: unverändert") &&
+    sauber.includes("Anzeige: ") && sauber.includes("DPR ");
+  const vorher = engine.CFG.DMG_GLOBAL;
+  engine.CFG.DMG_GLOBAL = vorher + 1;
+  const getunt = engine.runReportText();
+  const getuntOk = getunt.includes("Tuning: DMG_GLOBAL") && !getunt.includes("Tuning: unverändert");
+  engine.CFG.DMG_GLOBAL = vorher;
+  const wiederSauber = engine.runReportText().includes("Tuning: unverändert");
+
+  reportHardened = leerOk && sauberOk && getuntOk && wiederSauber;
+} catch (error) {
+  fpsError = error instanceof Error ? error.message : String(error);
+}
+
 const output = {
-  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && contractFlow && holdExpansion && equipmentFlow && evolutionCatalog && eliteChoices && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling,
-  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, contractFlow, holdExpansion, equipmentFlow, evolutionCatalog, eliteChoices, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling },
+  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && contractFlow && holdExpansion && equipmentFlow && evolutionCatalog && eliteChoices && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling && fpsMetrics && reportHardened,
+  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, contractFlow, holdExpansion, equipmentFlow, evolutionCatalog, eliteChoices, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling, fpsMetrics, reportHardened },
   targets: report.targets,
   seeds: report.seeds,
   summary: { ...report.summary, evolutionRuns, evolutionSeeds: report.seeds.length,
@@ -651,6 +692,7 @@ const output = {
 if (aspectError) output.aspectError = aspectError;
 if (telemetryError) output.telemetryError = telemetryError;
 if (visibleError) output.visibleError = visibleError;
+if (fpsError) output.fpsError = fpsError;
 if (uxError) output.uxError = uxError;
 if (holdError) output.holdError = holdError;
 if (contractError) output.contractError = contractError;

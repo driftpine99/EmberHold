@@ -514,8 +514,9 @@ ohne Scrollen erreichbar; Produktion, Training und Rüstkammer folgen darunter.
 
 ## D-024 – Erster Feldlauf: FPS-Einbruch, Metrik und Lichtkreis
 
-**Status:** offen – Entscheidung durch den Besitzer erforderlich. Es wurde kein
-Spielcode geändert.
+**Status:** teilweise umgesetzt (22.08.2026). Punkt 2 (FPS-Metrik) und Punkt 3
+(Härtung des Berichts) sind implementiert und getestet. **Punkt 1 (Lichtkreis)
+bleibt offen** und ist bewusst zurückgestellt – Begründung unten.
 
 Am 22.08.2026 lieferte der Besitzer den ersten echten 8-Minuten-Run. Er ist
 **kein gültiger Baseline-Nachweis**: Die Live-Tuning-Regler wurden während des
@@ -617,12 +618,50 @@ vielen sichtbaren Gegnern:
   Buildmacht 22 und 46 — dann ist die Sättigungsschwelle des Lichts der erste
   Verdächtige.
 
-**Zur Entscheidung stehen:**
+**Korrektur zu Punkt 1.** Die zuerst vorgeschlagene Lösung „Radius deckeln"
+bringt nichts. Der Kreis wird ohnehin auf die Leinwand geclippt: Sobald sein
+Radius die halbe Bildschirmdiagonale überschreitet, ist die gefüllte Fläche
+identisch, egal wie groß der Radius rechnerisch ist. Ein Deckel würde nur die
+Verlaufskurve stauchen und damit das Bild verändern, ohne Füllrate zu sparen.
 
-1. Lichtkreis auf die halbe sichtbare Diagonale deckeln und den Gradienten
-   nicht pro Frame neu erzeugen.
-2. FPS-Metrik um Zeitanteil unter 55 FPS oder 1-%-Low erweitern.
-3. Run-Bericht um Tuning-Marker, `devicePixelRatio` und Leinwandpixel ergänzen.
+Die wirksame Optimierung wäre stattdessen, den Verlauf **einmal in eine
+Offscreen-Leinwand vorzurendern** und pro Frame nur noch zu kopieren, statt
+einen Radialverlauf pro Frame zu rastern. Das ist visuell identisch und
+potenziell ein großer Gewinn, weil Verlaufsrasterung deutlich teurer ist als
+ein Bitmap-Kopiervorgang.
+
+**Warum das trotzdem noch nicht gebaut wird:** Der Gewinn ist in dieser
+Umgebung nicht messbar, weil im nicht angezeigten Tab nicht rasterisiert wird.
+Und die Änderung sitzt genau in der Grafikschicht, die gerade auf ihre manuelle
+Abnahme wartet. Eine unverifizierbare Renderänderung unmittelbar vor dieser
+Abnahme würde das Urteil über den Schwärmer verunreinigen. Punkt 1 wird deshalb
+erst nach der Abnahme umgesetzt.
+
+**Umgesetzt am 22.08.2026:**
+
+2. **FPS-Metrik.** Alle Halbsekundenproben landen in `S.fpsLog`. `fpsStats()`
+   liefert daraus 1-%-Low und den Zeitanteil unterhalb von `FPS_TARGET` (55).
+   `FPS_TARGET` liegt bewusst außerhalb von `CFG`, damit ein Performanceziel
+   den Balancevertrag nicht berührt. Der Check `fpsMetrics` schreibt die
+   Absicht fest: 99 saubere Proben plus ein einzelner Ausreißer drücken den
+   Minimalwert auf 20, lassen das 1-%-Low aber bei 60.
+3. **Härtung des Berichts.** `CFG_DEFAULTS` hält den Ausgangszustand aller
+   Balancewerte beim Laden fest, `tuningDeviations()` meldet jede Abweichung
+   namentlich. `displayInfo()` ergänzt CSS-Größe, echte Pixelzahl und
+   `devicePixelRatio`. Der Check `reportHardened` prüft beide Richtungen:
+   „Tuning: unverändert" im sauberen Fall, der Wertname im getunten Fall.
+
+**Vorschlag für die Abnahmeschwelle** – noch nicht beschlossen: statt „mindestens
+55 FPS" künftig „1-%-Low mindestens 55 **und** höchstens 2 % der Proben
+unterhalb von 55". Der bisherige Minimalwert allein ist als Abnahmekriterium
+nicht belastbar.
+
+**Zur Hardware.** Der Besitzer testet auf einem ThinkPad X1 Carbon von etwa
+2022: Ultrabook mit integrierter Iris-Xe-Grafik, typischerweise 1920×1200 bei
+150 % Skalierung, also `devicePixelRatio` 1,5 und damit 2,25-fache Pixelzahl.
+Das ist genau die Geräteklasse, in der Füllrate zum Engpass wird. Der Bericht
+meldet den echten Wert ab jetzt selbst, womit sich die Frage beim nächsten Lauf
+ohne Rückfrage klärt.
 
 Vor diesen Änderungen fehlt weiterhin ein **sauberer** Referenzlauf: Seite neu
 laden (das setzt alle Regler zurück, sie werden nicht gespeichert), Wächterring,

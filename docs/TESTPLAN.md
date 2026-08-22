@@ -86,8 +86,14 @@ durchspielen und unterwegs auf Folgendes achten:
 
 Danach **„Bericht kopieren"** drücken und den Text unverändert zurückgeben. Er
 enthält bereits Seed, Vertrag, Build, Evolutionen, Elite-Relikte, Ausrüstung,
-Hold-Vorbereitung, beide Telemetriespitzen, den Kampfausschnitt und die
-schlechteste FPS.
+Hold-Vorbereitung, beide Telemetriespitzen und den Kampfausschnitt. Seit
+D-024 zusätzlich drei Zeilen, die den Bericht selbsterklärend machen:
+
+| Zeile | Wozu |
+|---|---|
+| `Anzeige: 1280×720 CSS · 1920×1080 px · DPR 1.50` | Die Füllrate hängt an der echten Pixelzahl. Auf einem HiDPI-Gerät rechnet dieselbe Szene mit einem Vielfachen. |
+| `Tuning: unverändert` | Bewegte Live-Regler werden namentlich gemeldet. Ein getunter Lauf ist damit nicht mehr von einem sauberen zu verwechseln. |
+| `FPS 1-%-Low` und `Anteil unter 55 FPS` | Die schlechteste halbe Sekunde allein sagt wenig; ein einzelner Aussetzer setzt sie dauerhaft. Erst diese beiden Zahlen zeigen, ob es ruckelt oder einmal gehakt hat. |
 
 ### Fünf Fragen, die der Bericht nicht beantworten kann
 
