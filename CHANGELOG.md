@@ -144,6 +144,16 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 - Der manuelle 8-Minuten-Run zur Abnahme des Schwärmers steht weiterhin aus.
   Solange er fehlt, gibt es keine gemessene FPS-Zahl und keinen realen Wert für
   `peakVisibleEnemies`; beide entstehen erst beim echten Rendern.
+- Die Neutralität der Baseline gegenüber Vertragsmodifikatoren hängt an einem
+  Default-Parameter (`contractId` fällt auf `ring` zurück), nicht an einem
+  harten HEADLESS-Gate in den Formeln selbst — anders als bei `holdDmg`,
+  `holdUtility` und `gearBonus`. Funktional gleichwertig und durch
+  `baselineIsolated` getestet, aber bei künftigem Refactoring von `runBatch`
+  fragiler, weil ein Grep nach `HEADLESS` den Fehler nicht fände.
+- Das Feld `version` im Hold-Speicherstand wird geschrieben, aber nirgends
+  gelesen. Die Migration ist rein feldweise und additiv. Das trägt, solange
+  Schema-Erweiterungen additiv bleiben; eine künftige Feldumbenennung hätte
+  keinen eingebauten Schutz.
 - Der Warden betritt den Kampfausschnitt bei 280 Welteinheiten. Auf 16:9 und
   breiter beträgt die halbe sichtbare Höhe 281,25 — die Reserve ist also nur
   1,25 Einheiten, und ein vertikaler Einstieg dürfte den Warden sichtbar
