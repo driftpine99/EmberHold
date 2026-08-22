@@ -158,6 +158,10 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 
 ### Added
 
+- Sichtbares nächstes Ziel im Hold und am Run-Ende: genau eine Handlung mit
+  Fortschritt und Begründung statt sechs gleichrangiger Anzeigen. Der Run endet
+  nicht mehr mit einer Zahl, sondern mit dem, was sie bewirkt (D-033)
+- Check `holdGoalLadder` prüft alle sechs Zustände der Zielleiter
 - Gluttropfen: einsammelbare Heilung, die beim Tod eines Gegners fällt, 6 %
   der Lebenspunkte heilt und einen kleineren Einzugsradius ohne Fernsog hat —
   man muss hingehen. Abklingzeit 25 Sekunden statt Trefferchance je Kill, damit

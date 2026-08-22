@@ -1265,3 +1265,63 @@ vier Teilprüfungen: Der Tropfen heilt und gibt keine Erfahrung, ein Splitter am
 selben Ort gibt Erfahrung und heilt nicht, auf 70 % des Magnetradius zieht der
 Splitter aber der Tropfen nicht, und fünfzig Kills innerhalb der Abklingzeit
 erzeugen keinen zweiten Tropfen.
+
+## D-033 – Ein sichtbares nächstes Ziel im Hold und am Run-Ende
+
+**Status:** beschlossen und umgesetzt (22.08.2026). Beantwortet den
+kommunikativen Teil von D-027 Rang 4.
+
+Zwei Rückmeldungen des Besitzers gehören zusammen:
+
+> „Aktuell weiß ich nicht, wofür ich die Runs mache."
+> „Hold ist aktuell sehr unübersichtlich. Ich verstehe teils gar nicht so
+> richtig, was ich da machen soll."
+
+**Es fehlt kein Inhalt, es fehlt eine Rangfolge.** Der Hold zeigt sechs
+Ressourcen, vier Gebäude, drei Verträge, Ausrüstung, Vorbereitung und
+Meisterschaften gleichzeitig und gleichgewichtig. Wer neu hinschaut, hat keinen
+Einstieg. Und der Run endete mit der Zeile „+14 Eisenerz" — einer Zahl ohne
+Bezug.
+
+**Genau ein Ziel, mit Fortschritt und Begründung.** `holdGoal()` liefert die
+nächste sinnvolle Handlung als Struktur statt als Satz. Die Leiter ist dieselbe,
+die `holdMessage()` schon kannte; neu sind die Zahlen:
+
+| Zustand | Ziel | Fortschritt |
+|---|---|---|
+| frisch | Tiefmine reparieren | ohne Kosten |
+| Mine steht | Emberschmiede reparieren | 6 / 10 Eisenerz |
+| Schmiede steht | Wächterbogen verstärken | 1 / 2 Barren |
+| Bogen verstärkt | Arkanum reparieren | 9 / 15 Eisenerz |
+| Arkanum steht | Übungshof reparieren | 2 / 3 Barren |
+| alles gebaut | Die nächste Sortie fahren | bereit |
+
+Jedes Ziel trägt eine Begründung — nicht „repariere das Arkanum", sondern „Aus
+Essenz werden vorbereitete Rerolls — mehr Auswahl bei den Karten". Der Spieler
+soll nicht nur wissen *was*, sondern *wofür*.
+
+**Das Ziel steht an beiden Enden der Schleife.** Im Hold als Banner über den
+Gebäuden, und am Run-Ende unter den Ergebniskacheln mit dem Vorspann „Damit als
+Nächstes". Der Run endet damit nicht mit einer Zahl, sondern mit dem, was sie
+bewirkt. Genau diese Verbindung fehlte.
+
+**Geprüft wird die ganze Leiter.** `holdGoalLadder` läuft alle sechs Zustände
+durch und verlangt für jeden: Der Titel passt zum erwarteten Gebäude, Titel und
+Begründung sind gefüllt und tauchen im gerenderten HTML auf, die Zahlen
+spiegeln die echten Ressourcen, und ein Fortschrittsbalken erscheint genau dann,
+wenn das Ziel wirklich etwas kostet. Ein leeres oder falsches Banner wäre
+schlimmer als gar keins.
+
+### Was das ausdrücklich **nicht** löst
+
+Die Frage „wofür mache ich die Runs" hat zwei Hälften. Diese Entscheidung löst
+die **kommunikative**: Man sieht jetzt, worauf man hinspielt.
+
+Die **mechanische** Hälfte bleibt offen und steht als D-025: Die Umrechnung von
+Beute in Eisenerz ist `max(3, round(log2(Beute+1)))`. Eine Verdopplung der Beute
+bringt exakt ein Erz mehr; ein 138-mal besserer Lauf brachte 17 statt 10. Solange
+das so bleibt, sieht der Spieler zwar sein Ziel, aber sein Können bewegt ihn
+kaum schneller darauf zu. Ein Banner kann eine flache Kurve sichtbar machen — es
+kann sie nicht steiler machen.
+
+D-025 bleibt damit die wichtigste offene Entscheidung an diesem Strang.

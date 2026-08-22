@@ -73,6 +73,8 @@ Vorbereitend gemessen und dokumentiert wurde:
 - [x] D-027 Rang 1 und 2 umgesetzt: Bewegungsüberschuss beseitigt (D-030) und
   Slotanzeige bei niedrigen Fenstern vollständig sichtbar. Beides wartet auf
   einen Feldlauf zur Bestätigung.
+- [x] D-027 Rang 4 teilweise umgesetzt: Der Zweck des Runs ist sichtbar (D-033).
+  Die mechanische Hälfte bleibt offen — siehe D-025, die Erzkurve ist flach.
 - [x] D-027 Rang 3 umgesetzt: Fokus-Schutz ab 5:30 (D-031) und Gluttropfen als
   einsammelbare Heilung (D-032). Offen bleiben Rang 4 bis 6.
 - [ ] **Neu und vorrangig:** D-027 entscheiden. Die erste Spielerbewertung sagt

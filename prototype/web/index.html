@@ -163,6 +163,22 @@ button.b.danger{background:#c9402e;color:#fff}
 @media (prefers-reduced-motion:reduce){.embercore:before{animation:none}}
 .holdstatus{position:absolute;top:146px;left:50%;transform:translateX(-50%);font-size:11px;
   color:#a88672;width:min(620px,92vw);text-align:center}
+/* Ein einziges hervorgehobenes Ziel. Der Hold zeigt sechs Ressourcen, vier
+   Gebaeude, Vertraege, Ausruestung und Meisterschaften gleichzeitig; es fehlt
+   kein Inhalt, es fehlt eine Rangfolge (D-033). */
+.holdgoal{width:min(620px,92vw);margin:0 auto 14px;padding:11px 14px 12px;text-align:left;
+  background:rgba(24,20,26,.94);border:1px solid #3a2b2c;border-left:3px solid #e07a3f;
+  border-radius:10px}
+.holdgoal .goalhead{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.holdgoal .goalhead>span{font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:#8b8577}
+.holdgoal .goalhead>b{font-size:14px;color:#e8e4dc;font-weight:650}
+.holdgoal .goalhead>em{margin-left:auto;font-style:normal;font-size:11.5px;color:#a88672;
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+.holdgoal .goalhead>em.ok{color:#e07a3f;font-weight:650}
+.holdgoal .goalbar{height:4px;margin-top:8px;background:#241d22;border-radius:2px;overflow:hidden}
+.holdgoal .goalbar span{display:block;height:100%;background:linear-gradient(90deg,#8d4c32,#e07a3f);
+  transition:width .25s ease}
+.holdgoal p{margin:7px 0 0;font-size:11.5px;color:#a8a396}
 .holdgrid{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .holdbuilding,.holdupgrade{background:rgba(20,20,29,.94);border:1px solid #2b2b38;border-radius:11px;
   padding:13px 14px;text-align:left;min-width:0}.holdbuilding.ready{border-color:#8d4c32}
@@ -394,6 +410,7 @@ button.b.danger{background:#c9402e;color:#fff}
     <div class="holdstage">
       <div class="crater" aria-hidden="true"></div><div class="embercore" aria-hidden="true"></div>
       <div class="holdstatus" id="holdstatus">Der innere Ring wartet auf Reparaturen.</div>
+      <div class="holdgoal" id="holdgoal"></div>
       <div class="holdgrid">
         <section class="holdbuilding" id="minecard">
           <div class="buildingtop"><b>Tiefmine</b><span id="minelevel">Ruine</span></div>
@@ -478,6 +495,7 @@ button.b.danger{background:#c9402e;color:#fff}
     <h1 id="overtitle">Die Aschung hält</h1>
     <p class="sub" id="oversub"></p>
     <div class="statgrid" id="ovstats"></div>
+    <div class="holdgoal" id="ovgoal"></div>
     <div class="btnrow">
       <button class="b" id="btnMenu">Zum Hold</button>
       <button class="b ghost" id="btnAgain">Gleichen Run wiederholen</button>
@@ -2605,6 +2623,43 @@ function depositRunReward(){
   S.lootGear=grantGear();
   saveHold(); return ore;
 }
+/** Genau ein naechstes Ziel, mit Fortschritt und Begruendung. Der Besitzer
+ *  schrieb: "Aktuell weiss ich nicht, wofuer ich die Runs mache" und "Hold ist
+ *  sehr unuebersichtlich, ich verstehe teils gar nicht was ich da machen soll".
+ *  Beides sind Informationsprobleme. Die Leiter unten ist dieselbe, die
+ *  holdMessage() schon kannte -- nur liefert sie jetzt Zahlen statt eines
+ *  Satzes, damit der Fortschritt sichtbar wird (D-033). */
+function holdGoal(){
+  const g=(titel,warum,haben,brauchen,einheit)=>
+    ({titel,warum,haben:Math.floor(haben),brauchen,einheit});
+  if(!META.mineLevel)
+    return g('Tiefmine reparieren','Sie liefert das Eisenerz, aus dem alles Weitere entsteht. Kostenlos.',0,0,'');
+  if(!META.forgeLevel)
+    return g('Emberschmiede reparieren','Sie macht aus Eisenerz Barren — die Grundlage jeder dauerhaften Verbesserung.',META.ore,HOLD_CFG.FORGE_COST,'Eisenerz');
+  if(!META.bowUpgrade)
+    return g('Wächterbogen verstärken','Dauerhaft +10 % Schaden in jeder Sortie. Die erste echte Hold→Run-Verbesserung.',META.bars,HOLD_CFG.BOW_COST,'Barren');
+  if(!META.arcanumLevel)
+    return g('Arkanum reparieren','Aus Essenz werden vorbereitete Rerolls — mehr Auswahl bei den Karten.',META.ore,HOLD_CFG.ARCANUM_COST,'Eisenerz');
+  if(!META.yardLevel)
+    return g('Übungshof reparieren','Schaltet dauerhafte Meisterschaften frei.',META.bars,HOLD_CFG.YARD_COST,'Barren');
+  if(META.preparedRerolls<HOLD_CFG.REROLL_CAP)
+    return g('Reroll vorbereiten','Ein zusätzlicher Kartenzug in der nächsten Sortie.',META.essence,HOLD_CFG.REROLL_COST,'Essenz');
+  const gelernt=Object.values(META.masteries||{}).reduce((a,b)=>a+b,0);
+  if(gelernt<3*HOLD_CFG.MASTERY_MAX && META.marks>0)
+    return g('Meisterschaft lernen','Dauerhafte Verbesserung am Übungshof.',META.marks,1,'Trainingsmarken');
+  return g('Die nächste Sortie fahren','Der innere Ring arbeitet. Produktion, Vorbereitung und Training sind bereit.',0,0,'');
+}
+function goalHTML(goal,vorspann){
+  const offen = goal.brauchen>0;
+  const fertig = !offen || goal.haben>=goal.brauchen;
+  const pct = offen ? Math.min(100, goal.haben/goal.brauchen*100) : 100;
+  return '<div class="goalhead"><span>'+(vorspann||'Nächstes Ziel')+'</span><b>'+goal.titel+'</b>'+
+    '<em class="'+(fertig?'ok':'')+'">'+
+      (offen ? (fertig?'bereit · ':'')+goal.haben+' / '+goal.brauchen+' '+goal.einheit : 'bereit')+
+    '</em></div>'+
+    (offen ? '<div class="goalbar"><span style="width:'+pct.toFixed(0)+'%"></span></div>' : '')+
+    '<p>'+goal.warum+'</p>';
+}
 function holdMessage(){
   if(!META.mineLevel) return 'Der innere Ring wartet auf die Reparatur der Tiefmine.';
   if(!META.forgeLevel) return 'Sammle 10 Eisenerz, um die Emberschmiede zu reparieren.';
@@ -2646,6 +2701,7 @@ function renderHold(message){
   el('holddust').textContent=META.dust.toLocaleString('de-DE');
   el('holdruns').textContent=META.runs.toLocaleString('de-DE');
   el('holdstatus').textContent=Date.now()<holdNoticeUntil?holdNotice:holdMessage();
+  el('holdgoal').innerHTML=goalHTML(holdGoal());
   renderContracts();
 
   const mineN=Math.floor(META.mineStored), mineOn=META.mineLevel>0, mb=el('btnMine');
@@ -3024,6 +3080,8 @@ function endRun(survived){
     statTile(gearLootText(),'Ausrüstungsfund') +
     statTile(S.reward.toLocaleString('de-DE'),'Beute gesamt') +
     statTile('+'+S.holdOre,'Eisenerz · '+S.contract.name);
+  // Der Run endet nicht mit einer Zahl, sondern mit dem, was sie bewirkt.
+  el('ovgoal').innerHTML=goalHTML(holdGoal(),'Damit als Nächstes');
   const mode=S.runLen===180?'3-Minuten-Scharmützel':Math.round(S.runLen/60)+'-Minuten-Run';
   el('btnAgain').textContent=mode+' wiederholen';
   setSheet('over',true,'btnMenu');
@@ -3618,6 +3676,7 @@ window.__EH = { get S(){return S;}, get H(){return META;}, CFG, HOLD_CFG, CONTRA
                 stats:stat, dashCooldown,
                 enemyHp:(i)=>E.hp[i], enemyMax:(i)=>E.max[i],
                 advanceHold, saveHold, loadHold, depositRunReward, selectContract,
+                holdGoal, goalHTML,
                 arcanumAction, yardAction, prepareReroll, trainMastery,
                 grantGear, equipGear, upgradeGear, salvageGear, gearUpgradeCost,
                 contractById, showHold:showStartMenu,

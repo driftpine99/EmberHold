@@ -771,9 +771,60 @@ try {
   healOrbError = error instanceof Error ? error.message : String(error);
 }
 
+// --- D-033: sichtbares naechstes Ziel ---------------------------------------
+// Der Hold zeigt alles gleichzeitig und gleichgewichtig; der Besitzer wusste
+// deshalb nicht, was er tun soll. holdGoal() liefert genau ein Ziel mit
+// Fortschritt. Geprueft wird die ganze Leiter, damit kein Zustand ohne Ziel
+// dasteht -- ein leeres Banner waere schlimmer als gar keins.
+let holdGoalLadder = false;
+let holdGoalError = "";
+let holdGoalDiagnostics = null;
+try {
+  const H = engine.H, C = engine.HOLD_CFG;
+  const leer = {mineLevel:0,forgeLevel:0,bowUpgrade:0,arcanumLevel:0,yardLevel:0,
+                ore:0,bars:0,essence:0,marks:0,preparedRerolls:0,
+                masteries:{path:0,reach:0,dash:0}};
+  const stufen = [
+    ["frisch",        {},                                                  "Tiefmine"],
+    ["nach Mine",     {mineLevel:1, ore:6},                                "Emberschmiede"],
+    ["nach Schmiede", {mineLevel:1, forgeLevel:1, bars:1},                 "Wächterbogen"],
+    ["nach Bogen",    {mineLevel:1, forgeLevel:1, bowUpgrade:1, ore:9},    "Arkanum"],
+    ["nach Arkanum",  {mineLevel:1, forgeLevel:1, bowUpgrade:1, arcanumLevel:1, bars:2}, "Übungshof"],
+    ["alles gebaut",  {mineLevel:1, forgeLevel:1, bowUpgrade:1, arcanumLevel:1, yardLevel:1,
+                       preparedRerolls:C.REROLL_CAP, masteries:{path:2,reach:2,dash:2}}, "Sortie"],
+  ];
+  const rows = [];
+  let alleOk = true;
+  for (const [label, patch, erwartet] of stufen){
+    Object.assign(H, leer, patch);
+    const z = engine.holdGoal();
+    const html = engine.goalHTML(z);
+    const trifft = z.titel.includes(erwartet);
+    // Jedes Ziel braucht einen Titel, eine Begruendung und gueltige Zahlen.
+    const vollstaendig = !!z.titel && !!z.warum && z.haben >= 0 && z.brauchen >= 0 &&
+      typeof html === "string" && html.includes(z.titel) && html.includes(z.warum);
+    // Nur bei echten Kosten darf ein Fortschrittsbalken erscheinen.
+    const balkenStimmt = (z.brauchen > 0) === html.includes("goalbar");
+    if (!trifft || !vollstaendig || !balkenStimmt) alleOk = false;
+    rows.push({stufe:label, ziel:z.titel,
+      fortschritt: z.brauchen ? z.haben + "/" + z.brauchen + " " + z.einheit : "ohne Kosten",
+      ok: trifft && vollstaendig && balkenStimmt});
+  }
+  // Fortschritt muss die echten Ressourcen spiegeln, nicht geraten sein.
+  Object.assign(H, leer, {mineLevel:1, ore:7});
+  const sieben = engine.holdGoal();
+  const zahlenStimmen = sieben.haben === 7 && sieben.brauchen === C.FORGE_COST;
+
+  holdGoalLadder = alleOk && zahlenStimmen;
+  holdGoalDiagnostics = { stufen: rows, zahlenStimmen };
+  Object.assign(H, leer);
+} catch (error) {
+  holdGoalError = error instanceof Error ? error.message : String(error);
+}
+
 const output = {
-  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && slotLayout && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && contractFlow && holdExpansion && equipmentFlow && evolutionCatalog && eliteChoices && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling && fpsMetrics && reportHardened && healOrbFlow,
-  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, slotLayout, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, contractFlow, holdExpansion, equipmentFlow, evolutionCatalog, eliteChoices, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling, fpsMetrics, reportHardened, healOrbFlow },
+  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && slotLayout && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && contractFlow && holdExpansion && equipmentFlow && evolutionCatalog && eliteChoices && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling && fpsMetrics && reportHardened && healOrbFlow && holdGoalLadder,
+  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, slotLayout, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, contractFlow, holdExpansion, equipmentFlow, evolutionCatalog, eliteChoices, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling, fpsMetrics, reportHardened, healOrbFlow, holdGoalLadder },
   targets: report.targets,
   ueberschuss: report.ueberschuss,
   seeds: report.seeds,
@@ -789,6 +840,8 @@ if (telemetryError) output.telemetryError = telemetryError;
 if (visibleError) output.visibleError = visibleError;
 if (fpsError) output.fpsError = fpsError;
 if (healOrbError) output.healOrbError = healOrbError;
+if (holdGoalError) output.holdGoalError = holdGoalError;
+if (holdGoalDiagnostics) output.summary.holdGoal = holdGoalDiagnostics;
 if (healOrbDiagnostics) output.summary.healOrb = healOrbDiagnostics;
 if (uxError) output.uxError = uxError;
 if (holdError) output.holdError = holdError;
