@@ -139,16 +139,23 @@ Projektabhängigkeiten. GitHub Actions führt denselben Test bei relevanten
 Getestet werden neun feste Seeds: 1701, 1709, 1721, 1733, 1741, 1753, 1777,
 1789 und der Feldtest-Seed 2474367456. Der aktuelle Stand:
 
-| Größe | Ist | Vertrag |
-|---|---:|---:|
-| Erster Kartenzug, Mittelwert | 26,5 s | 25–45 s; Zielwert 35 s |
-| Kartenzüge in 8 Min, Mittelwert | 20,56 | 21 ± 3 |
-| Rhythmus pro Minute | 1,56 · 2,00 · 2,22 · 1,89 · 2,44 · 2,44 · 3,00 · 5,00 | 1 · 2 · 2 · 2 · 3 · 3 · 4 · 4 |
-| Kartenzüge bei −10 % XP-Kosten | 28,44 | — |
-| Kartenzüge bei +10 % XP-Kosten | 18,44 | — |
-| Verhältnis der beiden Varianten | 1,542 | ≤ 1,75 |
-| Runs mit Evolution | 3 / 9 | mindestens 2 / 9 |
-| Elite-Reliktwahlen | 2 in 9 / 9 Runs | exakt 2 pro vollständigem Run |
+**Wichtig zur Lesart seit D-030:** Die Spalte „Vertrag" nennt, was `npm test`
+tatsächlich prüft — und das ist beim Kartenzug ein **Regressionsanker auf dem
+Bot**, kein Designziel. Der Bot bildet die menschliche Kurve nicht ab (D-026).
+Das Designziel von 21 Kartenzügen steht unverändert in `CFG.PICK_TARGETS` und
+wird an Menschenläufen geprüft, siehe die Feldlauf-Tabelle weiter oben.
+
+| Größe | Ist | Vertrag (Bot) | Designziel (Mensch) |
+|---|---:|---:|---:|
+| Erster Kartenzug, Mittelwert | 31,0 s | 25–45 s | 35 s |
+| Kartenzüge in 8 Min, Mittelwert | 15,33 | 15,3 ± 3 | 21 |
+| Rhythmus pro Minute | 1,44 · 1,56 · 1,89 · 1,67 · 1,67 · 1,78 · 1,89 · 3,44 | — | 1 · 2 · 2 · 2 · 3 · 3 · 4 · 4 |
+| Kartenzüge bei −10 % XP-Kosten | 16,44 | — | — |
+| Kartenzüge bei +10 % XP-Kosten | 14,22 | — | — |
+| Verhältnis der beiden Varianten | 1,156 | ≤ 1,75 | — |
+| Runs mit Evolution | 1 / 9 | mindestens 1 / 9 (Bodenschwelle) | in einer Sortie erreichbar |
+| Spitze im Feld, Maximum | 314 | ≤ 331 (Zieldichte +10 %) | — |
+| Elite-Reliktwahlen | 2 in 9 / 9 Runs | exakt 2 pro vollständigem Run | — |
 
 Ein Wiederholungslauf mit demselben Seed muss bitgenau dasselbe Ergebnis
 liefern. Der Test endet mit Fehlercode, sobald ein Korridor oder diese

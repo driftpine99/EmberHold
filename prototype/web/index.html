@@ -3535,6 +3535,11 @@ function runBalanceSuite(opts){
   const spitzeMax = Math.max(...baseline.map(r=>r.peak));
   const checks = {
     firstPick: firstAvg>=CFG.FIRST_PICK_RANGE[0] && firstAvg<=CFG.FIRST_PICK_RANGE[1],
+    // BOT_PICK_REF ist ausschliesslich fuer den 8-Minuten-Lauf ermittelt. Bei
+    // anderen Runlaengen wird bewusst NICHT geprueft, statt gegen einen nicht
+    // gemessenen Wert zu vergleichen. Wird die Suite jemals fuer 3, 15 oder 20
+    // Minuten parametrisiert, braucht jede Laenge einen eigenen Anker -- sonst
+    // bleibt dieser Check dort still gruen.
     totalPicks: runLen!==480 || Math.abs(totalAvg-BOT_PICK_REF)<=BOT_PICK_TOL,
     sensitivity: sensitivityRatio<=1.75,
     configStable: JSON.stringify(CFG)===configBefore,
