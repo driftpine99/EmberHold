@@ -1052,7 +1052,15 @@ function equippedGearBonuses(meta){
 const MAXLV = 5, MAX_W = 6, MAX_P = 6;
 const EVO_PASSIVE_LV = 3;   // gemessen: bei 5 kam in 8 Läufen keine
                             // einzige Evolution zustande
-const EVO_FOCUS_AT = 450;   // letzte 30 Sekunden: fast fertigen Pfad sichtbar halten
+// Ab hier haelt genau eine der drei Karten einen bereits begonnenen
+// Evolutionspfad offen. Frueher 450, also die letzten 30 Sekunden -- praktisch
+// wirkungslos, seit D-030 die Kartenzuege von 20,6 auf 15,3 gesenkt hat: Es kam
+// schlicht kein Zug mehr. Gemessen ueber die neun Vertragsseeds erreichten mit
+// 450 nur 1 von 9 Laeufen eine Evolution, mit 330 wieder 3 von 9 wie vor D-030.
+// 240 haette 5 von 9 ergeben; das waere zu grosszuegig, denn das GDD reserviert
+// zuverlaessige Evolutionen fuer den 15-Minuten-Tiefenzug. Der Kartenzug-Anker
+// bleibt unberuehrt (15,00 gegen 15,3), die Gegnerdichte ebenfalls (D-031).
+const EVO_FOCUS_AT = 330;
 
 // ===========================================================================
 //  SPIELZUSTAND

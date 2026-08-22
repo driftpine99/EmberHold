@@ -1147,3 +1147,56 @@ sauberen 8-Minuten-Läufen eine beziehungsweise zwei.
   geht, zeigt erst der nächste Lauf.
 
 Diese drei Punkte beantwortet ein einziger sauberer 8-Minuten-Lauf.
+
+## D-031 – Fokus-Schutz greift ab 5:30 statt 7:30
+
+**Status:** beschlossen und umgesetzt (22.08.2026). Behebt eine Regression aus
+D-030 und beantwortet den ersten Teil von D-027 Rang 3.
+
+Der Besitzer schrieb: „Die Buffs sind teils so schwer zu erlangen, weil die
+Karten wirklich random kommen — ohne empowerte Fähigkeiten wird es extrem
+schwer." D-030 hat das verschärft, statt es zu lösen: Die Kartenzüge fielen von
+20,6 auf 15,3, und die Evolutionsquote der neun Vertragsseeds brach von 3 von 9
+auf 1 von 9 ein.
+
+**Die Ursache war kein Zufallsproblem, sondern ein Zeitproblem.** Der
+Fokus-Schutz — genau eine der drei Karten hält einen begonnenen Evolutionspfad
+offen — griff erst ab Sekunde 450, also in den letzten 30 Sekunden. Bei 20,6
+Kartenzügen kam dort noch ein Zug an. Bei 15,3 kam keiner mehr. Der Schutz war
+faktisch abgeschaltet.
+
+**Gemessen über die neun Vertragsseeds:**
+
+| Fokus-Schutz ab | Kartenzüge | Evolutionen | Dinge im Build | Spitze im Feld |
+|---|---:|---:|---:|---:|
+| 7:30 (vorher) | 15,33 | 1 / 9 | 6,6 | 314 |
+| **5:30 (jetzt)** | **15,00** | **3 / 9** | **5,6** | **313** |
+| 4:00 | 17,78 | 5 / 9 | 5,6 | 320 |
+| 2:30 | 18,11 | 6 / 9 | 5,3 | 326 |
+
+5:30 stellt exakt den Stand vor D-030 wieder her. 4:00 und 2:30 wären
+großzügiger, aber das GDD reserviert in Kapitel 5.3 die *zuverlässige*
+Evolution für den 15-Minuten-Tiefenzug; in der Sortie soll sie „mit Fokus knapp
+machbar" sein. 3 von 9 beim Bot heißt beim Menschen, der über dem Bot liegt,
+etwa jeder zweite Lauf. Das trifft „knapp machbar".
+
+**Was die Änderung nicht anfasst:** Der Kartenzug-Anker bleibt gültig (15,00
+gegen `BOT_PICK_REF` 15,3), die Gegnerdichte bleibt unverändert (Spitze 313
+gegen 314), die Sensitivität bleibt bei 1,24. Es ist eine einzige Zahl.
+
+**Ebenfalls geprüft und verworfen:** Eine Umgewichtung des Kartenangebots von
+Breite auf Tiefe. Heute bevorzugen die Gewichte neue Waffen (1,25) und neue
+Passive (1,10) gegenüber dem Aufwerten vorhandener (1,00 und 0,95) — sie ziehen
+den Build also auseinander, gerade wenn Züge knapp sind. Eine klare
+Tiefengewichtung hätte 4 bis 6 von 9 Evolutionen ergeben, aber die Kartenzüge
+über den Anker gehoben und die Buildbreite von 6,6 auf 5,2 Dinge gedrückt. Der
+Fokus-Schutz erreicht dasselbe Ziel mit einer Zahl statt mit vier und ohne die
+Zufallsvielfalt des frühen Builds anzutasten. Die Gewichte bleiben deshalb
+unverändert; die Messreihe ist hier festgehalten, falls die Frage wiederkommt.
+
+**Bodenschwelle wieder angehoben.** `evolutionReachable` steht wieder auf 2 von
+9 statt 1 von 9. Die Absenkung in D-030 war ausschließlich eine Folge der
+Dichtesenkung und ist damit erledigt.
+
+**Offen bleibt der zweite Teil von D-027 Rang 3:** „Lebensreg fühlt sich langsam
+an + es gibt keine Lebenspunkte zum Einsammeln."

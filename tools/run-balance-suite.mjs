@@ -101,13 +101,12 @@ if (!engine?.runBalanceSuite) throw new Error("Balance suite is not exposed as w
 
 const report = engine.runBalanceSuite();
 const evolutionRuns = report.runs.baseline.filter((run) => run.evo.length > 0).length;
-// Bodenschwelle, kein Designziel. Der Bot erreicht seit D-029 seltener eine
-// Evolution, weil weniger Gegner weniger XP bedeuten. Die Designgarantie
-// "Evolution ist in einer Sortie erreichbar" wird an Menschenlaeufen geprueft;
-// dort waren es in beiden sauberen 8-Minuten-Laeufen eine bzw. zwei. Diese
-// Schwelle stellt nur sicher, dass Evolutionen nicht voellig unerreichbar
-// werden. Faellt sie auf 0, ist der Buildpfad kaputt.
-const evolutionReachable = evolutionRuns >= 1;
+// Nach D-031 wieder auf 2 angehoben. Die Absenkung auf 1 war ausschliesslich
+// eine Folge der Dichtesenkung aus D-030 und ist mit dem frueheren
+// Fokus-Schutz behoben: 3 von 9 Botlaeufen erreichen wieder eine Evolution, wie
+// vor D-030. Der Mensch liegt darueber, in beiden sauberen 8-Minuten-Laeufen
+// waren es eine bzw. zwei. Faellt der Wert erneut, ist der Buildpfad kaputt.
+const evolutionReachable = evolutionRuns >= 2;
 const feedbackRun = report.runs.baseline.find((run) => run.seed === 2474367456);
 const repeat = engine.headlessRun(report.runLen, {
   seed: report.seeds[0],
