@@ -666,10 +666,16 @@ try {
   const sauberOk = sauber.includes("Tuning: unverändert") &&
     sauber.includes("Anzeige: ") && sauber.includes("DPR ");
   const vorher = engine.CFG.DMG_GLOBAL;
-  engine.CFG.DMG_GLOBAL = vorher + 1;
-  const getunt = engine.runReportText();
-  const getuntOk = getunt.includes("Tuning: DMG_GLOBAL") && !getunt.includes("Tuning: unverändert");
-  engine.CFG.DMG_GLOBAL = vorher;
+  let getuntOk = false;
+  try {
+    engine.CFG.DMG_GLOBAL = vorher + 1;
+    const getunt = engine.runReportText();
+    getuntOk = getunt.includes("Tuning: DMG_GLOBAL") && !getunt.includes("Tuning: unverändert");
+  } finally {
+    // Ohne finally bliebe ein Balancewert dauerhaft verstellt, sobald der
+    // Bericht wirft. Das ist exakt die Fehlerklasse, die D-018 ausgeloest hat.
+    engine.CFG.DMG_GLOBAL = vorher;
+  }
   const wiederSauber = engine.runReportText().includes("Tuning: unverändert");
 
   reportHardened = leerOk && sauberOk && getuntOk && wiederSauber;

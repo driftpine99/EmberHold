@@ -2948,7 +2948,12 @@ function endRun(survived){
 /** Der Minimalwert allein taugt nicht zur Abnahme. Er ist das Minimum aus rund
  *  960 Halbsekundenproben; ein einziger Ausreisser durch Garbage Collection
  *  oder einen Hintergrundprozess setzt ihn dauerhaft. Deshalb zusaetzlich ein
- *  1-%-Low und der Zeitanteil unterhalb der Zielmarke (D-024). */
+ *  1-%-Low und der Zeitanteil unterhalb der Zielmarke (D-024).
+ *  Unterhalb von 100 Proben, also bei weniger als etwa 50 Sekunden aktiver
+ *  Spielzeit, faellt das 1-%-Low rechnerisch mit dem Minimum zusammen. Das ist
+ *  korrekt, aber dort ohne Mehrwert. Das Protokoll bleibt bewusst ungedeckelt:
+ *  ein Deckel wuerde die Statistik auf einen Zeitausschnitt verzerren, und
+ *  selbst eine Stunde Overtime kostet nur einige Zehntausend Bytes. */
 function fpsStats(){
   const log = (S && S.fpsLog) ? S.fpsLog : [];
   if (!log.length) return null;
