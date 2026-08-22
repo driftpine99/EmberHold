@@ -511,3 +511,108 @@ isoliert bleiben und die Run-Belohnung nur einmal gebucht wird.
 Da der vollständige Hold jetzt höher als ein Desktop-Viewport ist, steht die
 Sortietafel visuell direkt unter dem Kopfbereich. Vertrag und Run-Start bleiben
 ohne Scrollen erreichbar; Produktion, Training und Rüstkammer folgen darunter.
+
+## D-024 – Erster Feldlauf: FPS-Einbruch, Metrik und Lichtkreis
+
+**Status:** offen – Entscheidung durch den Besitzer erforderlich. Es wurde kein
+Spielcode geändert.
+
+Am 22.08.2026 lieferte der Besitzer den ersten echten 8-Minuten-Run. Er ist
+**kein gültiger Baseline-Nachweis**: Die Live-Tuning-Regler wurden während des
+Laufs bewegt. Kennzahlen zum Vergleich (Vertrag Wächterring, Seed 3313572481):
+
+| Größe | Feldlauf | Baseline-Vertrag |
+|---|---:|---:|
+| Kartenzüge | 50 | 21 ± 3 |
+| Stufe | 51 | ~18 |
+| Kills | 133.121 | ~12.500 |
+| Evolutionen | 4 | 0–2 |
+| Spitze im SIM-Radius | 681 | 338 |
+| Erster Kartenzug | 26,9 s | 26,5 s |
+
+Der erste Kartenzug liegt exakt im Korridor. Die Regler wurden also erst nach
+dem Start bewegt. Die Spitze von 681 liegt bei 97 % von `CAP_ENEMY` (700) – der
+Entity-Deckel hat den Lauf abgefangen.
+
+**Was der Lauf trotzdem beweist.** Die Telemetrietrennung aus D-017 stimmt
+nachweislich: 339 sichtbare zu 681 Gegnern im Simulationsradius ist ein
+Verhältnis von 0,498. Geometrisch vorhergesagt sind 0,494 – Cullingfenster
+(1120 × 682,5 Welteinheiten) geteilt durch Simulationskreis (Radius 702). Beide
+Zähler messen also genau das, was sie behaupten. Der Kampfausschnitt wurde mit
+1000 × 562 korrekt gemeldet.
+
+**Der Befund: schlechteste FPS 21 gegen ein Ziel von 55.**
+
+`S.fps` ist ein Halbsekunden-Mittel; `worstFps` das Minimum dieser Mittel ab
+Sekunde 4. Die 21 sind also kein einzelner verlorener Frame, sondern eine volle
+halbe Sekunde mit etwa 10 Bildern. Gemessen wurde am selben Build, was die
+Ursache **nicht** ist:
+
+| Last | Simulation | Zeichenbefehle |
+|---|---:|---:|
+| 340 Gegner, Startbogen | 0,1 ms | 1,1 ms |
+| 681 Gegner, Startbogen | 0,1 ms | 2,0 ms |
+| 681 Gegner, 4 Evolutionen | 0,1 ms | 2,1 ms |
+
+Die Simulation ist damit ausgeschlossen: 0,1–0,2 ms gegen ein Frame-Budget von
+etwa 48 ms bei 21 FPS. Auch die Zahl der Zeichenbefehle ist unkritisch. Die
+Füllrate konnte nicht gemessen werden – ein Vergleich mit `devicePixelRatio` 1
+gegen 2 kostete trotz vierfacher Pixelzahl praktisch dasselbe, was beweist, dass
+im nicht angezeigten Tab gar nicht rasterisiert wird.
+
+**Leitende Hypothese: der Lichtkreis.** `lightRadius()` ist
+`175 + buildPower()*13` und **ungedeckelt**. Pro Frame wird ein frischer
+`createRadialGradient` erzeugt und als voller Kreis gefüllt. Ab einer
+Buildmacht von etwa 31 überdeckt dieser Kreis den gesamten Bildschirm; der
+Feldlauf lag bei etwa 46, also Radius 773. Auf einem HiDPI-Bildschirm sind das
+3,69 Millionen Pixel Gradientfüllung pro Frame. Ein Deckel auf die halbe
+Bildschirmdiagonale wäre die naheliegende Korrektur.
+
+**Zweiter Befund: die Metrik taugt so nicht für die Abnahme.** `worstFps` ist
+das Minimum aus rund 960 Halbsekundenproben. Ein einziger Ausreißer durch
+Garbage Collection oder einen Hintergrundprozess setzt den Wert dauerhaft.
+Für eine belastbare Abnahme braucht es zusätzlich den Zeitanteil unterhalb von
+55 FPS oder ein 1-%-Low.
+
+**Dritter Befund: getunte Läufe sind nicht erkennbar.** Der Run-Bericht enthält
+keinen Hinweis darauf, dass die Regler bewegt wurden. Ohne den mündlichen
+Hinweis des Besitzers wäre der Lauf nur an unplausiblen Zahlen aufgefallen. Für
+den externen Spieltest mit zwanzig Personen ist das ein echtes Risiko. Der
+Bericht sollte Tuning-Abweichungen sowie `devicePixelRatio` und die
+Leinwandgröße in Pixeln aufnehmen.
+
+**Zur Entscheidung stehen:**
+
+1. Lichtkreis auf die halbe sichtbare Diagonale deckeln und den Gradienten
+   nicht pro Frame neu erzeugen.
+2. FPS-Metrik um Zeitanteil unter 55 FPS oder 1-%-Low erweitern.
+3. Run-Bericht um Tuning-Marker, `devicePixelRatio` und Leinwandpixel ergänzen.
+
+Vor diesen Änderungen fehlt weiterhin ein **sauberer** Referenzlauf: Seite neu
+laden (das setzt alle Regler zurück, sie werden nicht gespeichert), Wächterring,
+acht Minuten, nichts anfassen.
+
+## D-025 – Beobachtung: Erz aus einem Run wächst nur logarithmisch
+
+**Status:** offen – nur beobachtet, keine Änderung vorgenommen
+
+Beim Auswerten des Feldlaufs fiel auf: 137.872 Basis-Beute ergaben 17 Eisenerz.
+Die Umrechnung ist `rewardOre(r) = max(3, round(log2(r+1)))`.
+
+| Basis-Beute | Eisenerz |
+|---:|---:|
+| 1.000 | 10 |
+| 20.000 | 14 |
+| 137.872 | 17 |
+| 500.000 | 19 |
+
+Eine **Verdopplung der Beute bringt exakt ein Erz mehr**. Ein 138-mal besserer
+Lauf bringt 1,7-mal so viel Erz. Damit ist aktives Können für den Hold-Ertrag
+nahezu bedeutungslos, was der Zielsetzung aus Kapitel 11.6 des GDD
+widerspricht: dort sollen Runs 60–70 % des Fortschritts tragen.
+
+Die Vertragsmultiplikatoren wirken weiterhin, weil sie **nach** dem Logarithmus
+angewendet werden (17 wird zu 23 bzw. 26). Die Frage ist nicht der
+Multiplikator, sondern die Kurve darunter. Eine Wurzelkurve statt eines
+Logarithmus wäre die naheliegende Alternative, ändert aber die Hold-Ökonomie
+spürbar und braucht deshalb eine eigene Entscheidung.

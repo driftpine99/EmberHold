@@ -131,6 +131,19 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 
 ### Known issues
 
+- Erster Feldlauf am 22.08.2026 meldete **21 FPS** gegen ein Ziel von 55. Der
+  Lauf war durch bewegte Tuning-Regler verfälscht und ist kein gültiger
+  Nachweis, aber Simulation (0,1 ms) und Zeichenbefehle (2,1 ms bei 681
+  Gegnern) sind als Ursache ausgeschlossen. Leitende Hypothese ist die
+  Füllrate des ungedeckelten Lichtkreises. Siehe D-024.
+- `worstFps` ist das Minimum aus rund 960 Halbsekundenproben; ein einziger
+  Ausreißer setzt den Wert dauerhaft. Für die Abnahme fehlt ein 1-%-Low oder
+  der Zeitanteil unter 55 FPS (D-024).
+- Der Run-Bericht macht nicht sichtbar, ob die Live-Tuning-Regler bewegt
+  wurden, und nennt weder `devicePixelRatio` noch die Leinwandgröße (D-024).
+- Erz aus einem Run wächst nur logarithmisch: Eine Verdopplung der Beute bringt
+  ein einziges Erz mehr (D-025).
+
 - Das Workbook enthält noch das analytische Langfristmodell. Für Phase 0 ist
   gemäß D-006 ausschließlich der ausführbare Laufzeitvertrag verbindlich.
 - Der derzeitige Arbeitstitel ist im Spielemarkt bereits belegt.
