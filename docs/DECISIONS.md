@@ -1200,3 +1200,68 @@ Dichtesenkung und ist damit erledigt.
 
 **Offen bleibt der zweite Teil von D-027 Rang 3:** „Lebensreg fühlt sich langsam
 an + es gibt keine Lebenspunkte zum Einsammeln."
+
+## D-032 – Gluttropfen: einsammelbare Heilung, die Bewegung belohnt
+
+**Status:** beschlossen und umgesetzt (22.08.2026). Beantwortet den zweiten Teil
+von D-027 Rang 3.
+
+Der Besitzer schrieb: „Lebensreg fühlt sich langsam an + es gibt keine
+Lebenspunkte zum Einsammeln." Beides stimmt. `REGEN` steht auf 0,75 HP/s, ein
+voller Balken braucht damit 320 Sekunden. Heilung gab es sonst nur über die
+Karte Glutherz — also zufällig, und sie kostet den Kartenzug, den man sonst in
+Macht steckt.
+
+**Der Gluttropfen** fällt beim Tod eines Gegners, heilt 6 % der maximalen
+Lebenspunkte (aktuell 14,4) und ist bewusst anders gebaut als ein
+Erfahrungssplitter:
+
+| | Splitter | Gluttropfen |
+|---|---|---|
+| Einzugsradius | voller Magnetradius | 45 % davon |
+| Fernsog | ja, wandert langsam heran | **nein** |
+| Wirkung | Erfahrung | Heilung |
+
+**Man muss hingehen.** Das ist die eigentliche Entscheidung dahinter: Heilung
+soll nicht nebenbei passieren, sondern das Verb belohnen, um das sich das ganze
+Spiel dreht. Ein Tropfen mitten im Pulk ist eine echte Abwägung — genau die Art
+Entscheidung, die D-027 Rang 1 überhaupt erst wieder möglich gemacht hat.
+
+Messbar bestätigt: `stationaryDeath` bleibt bei 38 Sekunden praktisch
+unverändert (vorher 38,85, jetzt 37,98). Wer stehen bleibt, heilt nicht.
+
+**Abklingzeit statt Trefferchance.** Der Tropfen hängt an 25 Sekunden Abstand,
+nicht an einer Wahrscheinlichkeit je Kill. Eine reine Chance wäre unlesbar: Ein
+starker Build tötet zwanzigtausendmal pro Lauf, ein schwacher viertausendmal —
+dieselbe Chance ergäbe völlig verschiedene Heilraten und würde ausgerechnet dem
+helfen, der es nicht braucht. Die Abklingzeit macht daraus einen Rhythmus, der
+für beide gleich ist: höchstens rund 19 Tropfen in acht Minuten.
+
+**Auswirkung auf den Vertrag:**
+
+| Kennzahl | vor D-032 | nach D-032 | Grenze |
+|---|---:|---:|---|
+| Kartenzüge | 15,00 | 16,11 | 15,3 ± 3 |
+| Erster Kartenzug | 31,0 s | 31,6 s | 25–45 s |
+| Evolutionen | 3 / 9 | 3 / 9 | ≥ 2 / 9 |
+| Sensitivität | 1,24 | 1,45 | ≤ 1,75 |
+| Tod im Stehen | 38,85 s | 37,98 s | 12–90 s |
+| Überschuss, Maximum | +3,9 % | **+6,8 %** | ≤ 10 % |
+
+Die Kartenzüge steigen leicht, und das ist eine erwünschte Kette: Der Bot nimmt
+seltener eine Heilkarte, steckt den Zug stattdessen in Macht, tötet mehr und
+sammelt mehr Erfahrung. Der Tropfen gibt also den Kartenzug zurück, den Heilung
+bisher gekostet hat.
+
+**Was beobachtet werden muss:** Der Überschuss ist von 3,9 % auf 6,8 %
+gestiegen, die Reserve zur 10-%-Grenze hat sich damit halbiert. Ursache ist
+dieselbe Kette — mehr Kartenzüge, höhere Stufe, zähere Gegner, langsameres
+Sterben. Sollte eine weitere Änderung die Kartenzüge nochmals heben, kann
+`densityOvershoot` reißen. Das ist kein Fehler, sondern genau die Warnung,
+für die der Check gebaut wurde.
+
+**Geprüft wird das Verhalten, nicht der Quelltext.** `healOrbFlow` belegt in
+vier Teilprüfungen: Der Tropfen heilt und gibt keine Erfahrung, ein Splitter am
+selben Ort gibt Erfahrung und heilt nicht, auf 70 % des Magnetradius zieht der
+Splitter aber der Tropfen nicht, und fünfzig Kills innerhalb der Abklingzeit
+erzeugen keinen zweiten Tropfen.

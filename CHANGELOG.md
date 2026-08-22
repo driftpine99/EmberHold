@@ -100,6 +100,9 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 
 - `resize()` beeinflusst nur noch Darstellung, Canvas-Skalierung und
   Render-Culling. `AREA_F` und `VIEW_DIAG` sind ersatzlos entfallen
+- Fokus-Schutz für begonnene Evolutionspfade greift ab 5:30 statt 7:30. Die
+  alte Marke war seit D-030 faktisch abgeschaltet, weil dort kein Kartenzug
+  mehr ankam; Evolutionen wieder bei 3/9 statt 1/9 (D-031)
 - Canvas-Skalierung auf „Cover" umgestellt und bei 16:9 gedeckelt, damit der
   feste Spawnring außerhalb des Bildes bleibt, ohne dass breite Formate an
   sichtbarer Höhe verlieren (844×390 und 21:9 blieben zwischenzeitlich bei 462
@@ -155,6 +158,11 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 
 ### Added
 
+- Gluttropfen: einsammelbare Heilung, die beim Tod eines Gegners fällt, 6 %
+  der Lebenspunkte heilt und einen kleineren Einzugsradius ohne Fernsog hat —
+  man muss hingehen. Abklingzeit 25 Sekunden statt Trefferchance je Kill, damit
+  ein starker und ein schwacher Build dieselbe Heilrate haben (D-032)
+- Check `healOrbFlow` prüft das Verhalten des Tropfens in vier Teilprüfungen
 - Check `densityOvershoot`: die Spitzenbelegung darf die Zieldichte um
   höchstens 10 % überschreiten, damit der Defekt aus D-028 nicht unbemerkt
   zurückkehrt

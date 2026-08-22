@@ -525,6 +525,12 @@ const CFG = {
   DASH_TIME:      0.20,
   DASH_IFRAME:    0.35,
   DASH_SPEED:     900,
+  // Gluttropfen: die einzige Heilung, die man im Lauf einsammeln kann. Bewusst
+  // selten, bewusst mit kleinem Sog und ohne Fernzug — man muss hingehen.
+  // Damit belohnt Heilung Bewegung, statt nebenbei zu passieren (D-032).
+  HEAL_ORB_CD:    25,      // Sekunden Abstand zwischen zwei Tropfen
+  HEAL_ORB_PCT: 0.06,      // Anteil der maximalen Lebenspunkte je Tropfen
+  HEAL_ORB_MAG: 0.45,      // Einzugsradius im Verhältnis zum Splittersog
   MAGNET_R:      175,      // Aelric tötet auf Distanz — ohne großzügigen
                             // Radius bleiben zwei Drittel der Splitter liegen
   DRIFT_R:       620,      // sanfter Fernsog: 'das Licht zieht sie heran'
@@ -611,6 +617,7 @@ const COL = {
   safe:'#15171c',
   player:'#ffc48a', playerCore:'#e07a3f',
   gem:'#6bb8d4', gemBig:'#a8e0f0',
+  heal:'#f2a65a',                         // Gluttropfen: warm, klar vom Splitter getrennt
   // Gegnerfamilien: eine Akzentfarbe kodiert die Familie
   fam:['#6b7b8c','#c9402e','#9b7fb8','#7d9463','#d4a94a'],
   elite:'#ff8a4a', boss:'#e05038',
@@ -746,6 +753,7 @@ function buildSprites(){
     g.beginPath();g.arc(S/2,S/2,r,0,6.2832);g.fill();return cv;};
   SPR.gem    = mkDot(COL.gem,3,5);
   SPR.gemBig = mkDot(COL.gemBig,6,12);
+  SPR.heal   = mkDot(COL.heal,5,14);
   SPR.orb    = mkDot('#ff9a4a',7,14);
   SPR.blade  = mkDot('#cfd8e3',6,10);
   SPR.frost  = mkDot('#8fd4e8',5,9);
@@ -898,6 +906,7 @@ const G = {                                   // Erfahrungssplitter
   x:new Float32Array(CFG.CAP_GEM), y:new Float32Array(CFG.CAP_GEM),
   vx:new Float32Array(CFG.CAP_GEM), vy:new Float32Array(CFG.CAP_GEM),
   val:new Float32Array(CFG.CAP_GEM), alive:new Uint8Array(CFG.CAP_GEM),
+  kind:new Uint8Array(CFG.CAP_GEM),          // 0 Erfahrungssplitter, 1 Gluttropfen
   n:0, free:[]
 };
 
@@ -1081,6 +1090,7 @@ function newRun(runLen, seed, contractId){
     dashCd:0, dashT:0, dashIf:0, dashVx:0, dashVy:0,
     level:1, xp:0, need:xpNeed(1),
     kills:0, gemsTaken:0, dmgDealt:0, xpTotal:0,
+    lastHealOrb:-999, healOrbs:0,
     contractId:contract.id, contract, famSpawns:[0,0,0,0,0],
     boons:{fury:0,stride:0,harvest:0,guard:0}, pendingEliteRewards:0,
     eliteChoices:0,
@@ -1244,9 +1254,9 @@ function spawnEnemy(t, fam, kind, atx, aty){
   if(S?.famSpawns) S.famSpawns[fam]++;
   return i;
 }
-function spawnGem(x,y,val){
+function spawnGem(x,y,val,kind){
   const i = alloc(G, CFG.CAP_GEM); if (i<0) return;
-  G.x[i]=x; G.y[i]=y; G.val[i]=val; G.alive[i]=1;
+  G.x[i]=x; G.y[i]=y; G.val[i]=val; G.kind[i]=kind||0; G.alive[i]=1;
   const a=rand()*6.2832, s=18+rand()*30;
   G.vx[i]=Math.cos(a)*s; G.vy[i]=Math.sin(a)*s;
 }
@@ -1432,6 +1442,14 @@ function killEnemy(i){
   const kind=E.kind[i], fam=E.fam[i], x=E.x[i], y=E.y[i];
   const shatter=kind===0&&!!S.evo.frost&&E.slow[i]>0;
   freeSlot(E,i); S.kills++;
+  // Gluttropfen haengen an einer Abklingzeit, nicht an einer Trefferchance.
+  // Eine reine Chance je Kill waere unlesbar: Ein starker Build toetet
+  // zehntausendfach, ein schwacher kaum. Die Abklingzeit macht daraus einen
+  // planbaren Rhythmus, der fuer beide gleich ist (D-032).
+  if (S.t - S.lastHealOrb >= CFG.HEAL_ORB_CD){
+    S.lastHealOrb = S.t;
+    spawnGem(x,y,0,1);
+  }
   if (kind===2){                                   // Boss
     S.bossIndex=-1;
     fx(x,y,150,0.7,COL.boss,1);
@@ -1667,17 +1685,29 @@ function updateGems(dt){
     n++;
     G.vx[i]*=0.88; G.vy[i]*=0.88;
     G.x[i]+=G.vx[i]*dt; G.y[i]+=G.vy[i]*dt;
+    const heal = G.kind[i]===1;
+    const rad = heal ? mr*CFG.HEAL_ORB_MAG : mr;
     const dx=S.x-G.x[i], dy=S.y-G.y[i], d2=dx*dx+dy*dy;
-    if (d2 < mr*mr){
+    if (d2 < rad*rad){
       const d=Math.sqrt(d2)||1;
-      const pull = 300 + (1-d/mr)*820;
+      const pull = 300 + (1-d/rad)*820;
       G.x[i]+=dx/d*pull*dt; G.y[i]+=dy/d*pull*dt;
-    } else if (d2 < CFG.DRIFT_R*CFG.DRIFT_R){
-      // Fernsog: Splitter bleiben nicht liegen, wandern aber nur langsam
+    } else if (!heal && d2 < CFG.DRIFT_R*CFG.DRIFT_R){
+      // Fernsog: Splitter bleiben nicht liegen, wandern aber nur langsam.
+      // Gluttropfen sind davon ausgenommen — sie kommen nicht von selbst.
       const d=Math.sqrt(d2)||1;
       G.x[i]+=dx/d*CFG.DRIFT_SPD*dt; G.y[i]+=dy/d*CFG.DRIFT_SPD*dt;
     }
-    if (d2 < 400){ gainXP(G.val[i]); S.gemsTaken++; freeSlot(G,i); }
+    if (d2 < 400){
+      if (heal){
+        S.hp = Math.min(S.maxhp, S.hp + S.maxhp*CFG.HEAL_ORB_PCT);
+        S.healOrbs++;
+        if (!HEADLESS){ fx(S.x,S.y,42,.3,COL.heal,0); toast('Gluttropfen'); }
+      } else {
+        gainXP(G.val[i]); S.gemsTaken++;
+      }
+      freeSlot(G,i);
+    }
   }
   return n;
 }
@@ -2318,8 +2348,17 @@ function render(){
     if (!G.alive[i]) continue;
     const x=G.x[i], y=G.y[i];
     if (x<vx0||x>vx1||y<vy0||y>vy1) continue;
+    if (G.kind[i]===1) continue;                    // Gluttropfen eigener Durchlauf
     if (G.val[i]>=5){ ctx.drawImage(SPR.gemBig, x-8, y-8); }
     else ctx.fillRect(x-2.2,y-2.2,4.4,4.4);
+  }
+  // Gluttropfen: wenige, aber sie muessen im Pulk sofort auffallen.
+  for (let i=0;i<G.n;i++){
+    if (!G.alive[i] || G.kind[i]!==1) continue;
+    const x=G.x[i], y=G.y[i];
+    if (x<vx0||x>vx1||y<vy0||y>vy1) continue;
+    const h=SPR.heal.width/2;
+    ctx.drawImage(SPR.heal, x-h, y-h);
   }
 
   // --- Gegner: ein Durchlauf statt 20 Familie×Lichtstufe-Scans -----------
@@ -3062,6 +3101,7 @@ function runReportText(){
     'Ausrüstungsfund: '+gearLootText(),
     'Hold-Vorbereitung: '+(S.preparedRerollsUsed?('+'+S.preparedRerollsUsed+' Rerolls'):'keine')+
       ' · Training '+Object.values(S.holdUtility||{}).join('/'),
+    'Gluttropfen eingesammelt: '+S.healOrbs,
     'Spitze im SIM-Radius: '+S.peakNearbyEnemies,
     'Spitze sichtbar gezeichnet: '+S.peakVisibleEnemies,
     'Kampfausschnitt: '+(VIEW_W|0)+'×'+(VIEW_H|0)+' Welteinheiten',
@@ -3585,7 +3625,10 @@ window.__EH = { get S(){return S;}, get H(){return META;}, CFG, HOLD_CFG, CONTRA
                   while(pendingPicks>0){currentOffer=buildOffer(); applyOffer(currentOffer[0]); pendingPicks--;}
                   while(S.pendingEliteRewards>0){currentOffer=buildEliteOffer(); applyOffer(currentOffer[0]); S.pendingEliteRewards--; S.eliteChoices++;}
                   HEADLESS=false;},
-                targetEnemies, resize, render,
+                targetEnemies, resize, render, spawnGem, updateGems, killEnemy,
+                gemCount:()=>{let a=0,b=0;
+                  for(let i=0;i<G.n;i++) if(G.alive[i]){ if(G.kind[i]===1)b++; else a++; }
+                  return {splitter:a, tropfen:b};},
                 viewport:()=>({W,H,SCALE,VIEW_W,VIEW_H,SIM_W,SIM_H,SIM_DIAG,
                                CLIP_X,CLIP_Y,CLIP_W,CLIP_H,ASPECT_MAX,
                                COMBAT_H_MIN,BOSS_ENTRY,DESPAWN_F}),

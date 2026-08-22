@@ -709,9 +709,71 @@ try {
   fpsError = error instanceof Error ? error.message : String(error);
 }
 
+// --- D-032: Gluttropfen -----------------------------------------------------
+// Geprueft wird das Verhalten, nicht der Quelltext: heilt statt XP zu geben,
+// hat einen kleineren Sog als ein Splitter und kommt nicht von selbst, und die
+// Abklingzeit verhindert eine Flut bei hohem Killtempo.
+let healOrbFlow = false;
+let healOrbError = "";
+let healOrbDiagnostics = null;
+try {
+  const CFG = engine.CFG;
+
+  // 1. Heilt und gibt KEINE Erfahrung.
+  engine.begin(480);
+  engine.S.x = 0; engine.S.y = 0;
+  engine.S.hp = engine.S.maxhp * 0.5;
+  const hpVorher = engine.S.hp, xpVorher = engine.S.xpTotal;
+  engine.spawnGem(8, 0, 0, 1);
+  engine.updateGems(CFG.TICK);
+  const geheilt = engine.S.hp - hpVorher;
+  const heiltRichtig = Math.abs(geheilt - engine.S.maxhp*CFG.HEAL_ORB_PCT) < 0.5 &&
+    engine.S.xpTotal === xpVorher && engine.S.healOrbs === 1;
+
+  // 2. Ein Splitter an derselben Stelle gibt Erfahrung und heilt nicht.
+  const hpVorSplitter = engine.S.hp;
+  engine.spawnGem(8, 0, 3, 0);
+  engine.updateGems(CFG.TICK);
+  const splitterRichtig = engine.S.xpTotal > xpVorher && engine.S.hp === hpVorSplitter;
+
+  // 3. Kleinerer Sog: Auf halber Splitterreichweite zieht der Tropfen nicht,
+  //    der Splitter schon. Ohne das koennte man Heilung nebenbei einsammeln.
+  const mr = CFG.MAGNET_R;
+  const abstand = mr * 0.7;                       // ausserhalb mr*0.45, innerhalb mr
+  engine.begin(480); engine.S.x = 0; engine.S.y = 0;
+  engine.spawnGem(abstand, 0, 0, 1);
+  const vorher = engine.gemCount();
+  let tropfenWeg = 0;
+  for (let k=0;k<40;k++) engine.updateGems(CFG.TICK);
+  tropfenWeg = engine.gemCount().tropfen;
+  engine.begin(480); engine.S.x = 0; engine.S.y = 0;
+  engine.spawnGem(abstand, 0, 3, 0);
+  for (let k=0;k<40;k++) engine.updateGems(CFG.TICK);
+  const splitterWeg = engine.gemCount().splitter;
+  const sogRichtig = vorher.tropfen === 1 && tropfenWeg === 1 && splitterWeg === 0;
+
+  // 4. Abklingzeit: Nach einem Tropfen darf im Fenster kein zweiter kommen.
+  engine.begin(480);
+  engine.S.t = 100; engine.S.lastHealOrb = 100;
+  engine.S.x = 0; engine.S.y = 0;
+  const vorFlut = engine.gemCount().tropfen;
+  for (let k=0;k<50;k++){
+    const e = engine.spawnEnemy(100, 0, 0, 40+k, 0);
+    if (e>=0) engine.killEnemy(e);
+  }
+  const nachFlut = engine.gemCount().tropfen;
+  const abklingRichtig = nachFlut === vorFlut;
+
+  healOrbFlow = heiltRichtig && splitterRichtig && sogRichtig && abklingRichtig;
+  healOrbDiagnostics = { heiltRichtig, splitterRichtig, sogRichtig, abklingRichtig,
+    geheilt:Number(geheilt.toFixed(1)), erwartet:Number((engine.S.maxhp*CFG.HEAL_ORB_PCT).toFixed(1)) };
+} catch (error) {
+  healOrbError = error instanceof Error ? error.message : String(error);
+}
+
 const output = {
-  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && slotLayout && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && contractFlow && holdExpansion && equipmentFlow && evolutionCatalog && eliteChoices && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling && fpsMetrics && reportHardened,
-  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, slotLayout, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, contractFlow, holdExpansion, equipmentFlow, evolutionCatalog, eliteChoices, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling, fpsMetrics, reportHardened },
+  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && slotLayout && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && contractFlow && holdExpansion && equipmentFlow && evolutionCatalog && eliteChoices && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling && fpsMetrics && reportHardened && healOrbFlow,
+  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, slotLayout, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, contractFlow, holdExpansion, equipmentFlow, evolutionCatalog, eliteChoices, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling, fpsMetrics, reportHardened, healOrbFlow },
   targets: report.targets,
   ueberschuss: report.ueberschuss,
   seeds: report.seeds,
@@ -726,6 +788,8 @@ if (aspectError) output.aspectError = aspectError;
 if (telemetryError) output.telemetryError = telemetryError;
 if (visibleError) output.visibleError = visibleError;
 if (fpsError) output.fpsError = fpsError;
+if (healOrbError) output.healOrbError = healOrbError;
+if (healOrbDiagnostics) output.summary.healOrb = healOrbDiagnostics;
 if (uxError) output.uxError = uxError;
 if (holdError) output.holdError = holdError;
 if (contractError) output.contractError = contractError;
