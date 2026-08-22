@@ -581,6 +581,42 @@ den externen Spieltest mit zwanzig Personen ist das ein echtes Risiko. Der
 Bericht sollte Tuning-Abweichungen sowie `devicePixelRatio` und die
 Leinwandgröße in Pixeln aufnehmen.
 
+**Zweiter Feldlauf am 22.08.2026: sauber, 3 Minuten, Seed 3548821049.** Keine
+Regler bewegt. Kartenzüge 6 (Ziel 5), erster Kartenzug 34,9 s, 888 Kills,
+Spitze 79 im Simulationsradius bei 60 sichtbaren Gegnern — und **57 FPS**. Bei
+einem vsync-Deckel von 60 heißt das: in der schlechtesten halben Sekunde von
+drei Minuten fielen drei Bilder aus. Praktisch fehlerfrei.
+
+Damit stehen zwei Messpunkte gegeneinander:
+
+| Lauf | sichtbare Gegner | Buildmacht | Lichtkreis füllt | schlechteste FPS |
+|---|---:|---:|---:|---:|
+| 3 Min, sauber | 60 | 6 | 36 % des Schirms | **57** |
+| 8 Min, getunt | 339 | ~46 | 100 % | **21** |
+
+Beide Größen sind zwischen den Läufen gemeinsam gewachsen; der A/B trennt sie
+also noch nicht. Entscheidend ist aber, dass die Gradientfüllung **sättigt**:
+
+| Buildmacht | Radius | Anteil des Schirms |
+|---:|---:|---:|
+| 6 | 324 px | 36 % |
+| 15 | 474 px | 66 % |
+| 22 | 590 px | 86 % |
+| 31 | 740 px | 100 % |
+| 46 | 989 px | 100 % |
+
+Ab Buildmacht 31 ist der Bildschirm voll; darüber kostet der Lichtkreis nichts
+mehr zusätzlich. **Daraus wird der saubere 8-Minuten-Lauf zum entscheidenden
+Test.** Er landet bei Buildmacht etwa 22, also 86 % Füllung gegenüber 100 % im
+getunten Lauf — praktisch derselbe Lichtanteil — bei aber nur etwa halb so
+vielen sichtbaren Gegnern:
+
+- Bleibt er bei etwa 21 FPS, scheidet der Lichtkreis als Erklärung aus und die
+  Ursache liegt bei Gegnerzahl, Projektilen oder Effekten.
+- Erreicht er 55 FPS oder mehr, liegt die Ursache im Bereich zwischen
+  Buildmacht 22 und 46 — dann ist die Sättigungsschwelle des Lichts der erste
+  Verdächtige.
+
 **Zur Entscheidung stehen:**
 
 1. Lichtkreis auf die halbe sichtbare Diagonale deckeln und den Gradienten

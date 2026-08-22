@@ -131,6 +131,13 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 
 ### Known issues
 
+- Ein sauberer 8-Minuten-Feldlauf fehlt weiterhin. Er ist laut D-024 der
+  entscheidende Test, weil die Füllung des Lichtkreises ab Buildmacht 31
+  sättigt und er damit Lichtkreis gegen Gegnerzahl trennt.
+- Der erste saubere Menschenlauf erreichte den ersten Kartenzug nach
+  34,9 Sekunden — oberhalb der gesamten Bot-Streuung von 21,0 bis 30,7. Der
+  Verdacht ist, dass die Baseline gegen einen Bot kalibriert ist, der im
+  Frühlauf besser spielt als ein Mensch.
 - Erster Feldlauf am 22.08.2026 meldete **21 FPS** gegen ein Ziel von 55. Der
   Lauf war durch bewegte Tuning-Regler verfälscht und ist kein gültiger
   Nachweis, aber Simulation (0,1 ms) und Zeichenbefehle (2,1 ms bei 681

@@ -103,6 +103,17 @@ Laufs und entscheiden über die Freigabe des Schwärmers:
 5. **Zweiter Run:** hättest du ohne Auftrag freiwillig sofort noch einen
    gestartet? Das ist die Phase-0-Kernfrage.
 
+### Bisherige Feldläufe
+
+| Datum | Modus | Sauber? | Sichtbar | Erster Zug | Züge | Erz | FPS |
+|---|---|---|---:|---:|---:|---:|---:|
+| 22.08.2026 | 8 Min | **nein**, Regler bewegt | 339 | 26,9 s | 50 | 17 | **21** |
+| 22.08.2026 | 3 Min | ja | 60 | 34,9 s | 6 | 10 | **57** |
+
+Der 3-Minuten-Lauf ist der erste saubere Referenzpunkt. Ein sauberer
+8-Minuten-Lauf fehlt weiterhin und ist laut D-024 der entscheidende Test für
+die FPS-Ursache.
+
 ### Freigabe
 
 Erst wenn dieser Lauf keine neue Rotations-, Sichtbarkeits- oder deutliche
@@ -345,8 +356,15 @@ auf Desktop und echten Mobilgeräten gemessen werden.
 
 ## Bekannte Abweichungen
 
-1. **Der erste Zug liegt am frühen Rand des Korridors.** 25,4 Sekunden im
-   Mittel sind akzeptiert, aber noch nicht das Designzentrum von 35 Sekunden.
+1. **Der erste Zug liegt am frühen Rand des Korridors — aber nur beim Bot.**
+   Der Testbot erreicht ihn im Mittel nach 26,5 Sekunden bei einer Streuung von
+   21,0 bis 30,7. Der erste saubere Menschenlauf am 22.08.2026 lag bei
+   **34,9 Sekunden** und damit fast exakt auf dem Designziel von 35 — und
+   oberhalb der gesamten Bot-Streuung. Das legt nahe, dass nicht das Spiel zu
+   schnell ist, sondern der Bot im Frühlauf besser spielt als ein Mensch. Ein
+   einzelner Lauf ist noch kein Beweis; zwei bis drei weitere saubere
+   Menschenläufe würden es klären. Falls es sich bestätigt, ist die Kalibrierung
+   der Baseline gegen den Bot systematisch zu schnell.
 2. **Die Build-Streuung ist hoch.** Ein starker Build schneeballt weiterhin.
    Die ±10-%-Prüfung kippt die mittlere Kartenzahl nicht mehr um Faktor zwei,
    einzelne Seeds liegen aber weit auseinander.
