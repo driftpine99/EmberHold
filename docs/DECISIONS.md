@@ -995,3 +995,77 @@ Reihenfolge muss umgekehrt werden.
 Bis zur Entscheidung bleibt der Code unverändert. Der Überschuss ist als
 Messgröße jetzt bekannt und reproduzierbar; er lässt sich jederzeit gegen jede
 Änderung nachprüfen.
+
+## D-029 – Korrektur zu D-024: Der FPS-Einbruch ist real und hängt an den sichtbaren Gegnern
+
+**Status:** gemessen und belegt. Ersetzt die Entwarnung aus der Auflösung von
+D-024.
+
+Der vierte Feldlauf (Seed 4265181367, sauber, Wächterring) widerlegt die
+Einschätzung, der FPS-Befund sei ein reines Messartefakt. Beide sauberen
+8-Minuten-Läufe liefen auf **demselben Rechner, demselben Fenster
+(1422 × 613, DPR 1,35) und mit unverändertem Tuning**:
+
+| | Lauf 3 | Lauf 4 |
+|---|---:|---:|
+| Spitze im SIM-Radius | 445 | 441 |
+| **Spitze sichtbar gezeichnet** | **218** | **294** |
+| Anteil sichtbar/SIM | 0,49 | 0,67 |
+| Buildmacht | 32 | 27 |
+| Lichtradius | 591 | 526 |
+| **FPS 1-%-Low** | **58** | **38** |
+| **Anteil unter 55 FPS** | **0,5 %** | **40,0 %** |
+
+**Der Treiber sind die sichtbar gezeichneten Gegner, nicht die Gesamtmenge.**
+Die Spitze im Simulationsradius ist in beiden Läufen praktisch gleich (445 zu
+441). Nur der sichtbare Anteil unterscheidet sich, weil der Spieler
+unterschiedlich viel Zeit mitten im Pulk verbracht hat. 35 % mehr sichtbare
+Gegner kosten 34 % des 1-%-Lows.
+
+**Der Lichtkreis ist damit endgültig ausgeschlossen.** Im schlechteren Lauf war
+er *kleiner* (Radius 526 gegen 591), weil die Buildmacht niedriger lag. Weniger
+Verlaufsfüllung, trotzdem 20 FPS weniger.
+
+**40 % der Zeit unterhalb der Zielmarke ist kein Ausreißer, sondern der
+Normalzustand dieses Laufs.** Die Entwarnung in D-024 galt nur für die Last von
+Lauf 3. Sie wird hiermit zurückgenommen.
+
+### Was daraus folgt
+
+Die Zwickmühle aus D-028 löst sich damit auf. Die Gegnerdichte zu senken ist
+nicht länger nur eine Frage des Spielgefühls, sondern **eine harte technische
+Notwendigkeit**. Damit fällt das Argument weg, man dürfe den Botkorridor nicht
+anfassen: Der Korridor ist nachgelagert, die Bildrate ist die Randbedingung.
+
+Drei Wirkungen ziehen dabei in dieselbe Richtung:
+
+1. **Technik.** Weniger sichtbare Gegner heben die Bildrate.
+2. **Spielgefühl.** Weniger Gegner machen Bewegung und Ausweichen wieder möglich
+   — die Hauptbeschwerde aus D-027.
+3. **Pacing.** Weniger Gegner bedeuten weniger XP. Der Mensch liegt mit 28 und
+   36 Kartenzügen **über** dem Designziel von 21; eine Senkung bewegt ihn also
+   in die richtige Richtung. Nur der Bot, der ohnehin die falsche Referenz ist
+   (D-026), fällt unter seinen Korridor.
+
+Der bisherige Konflikt bestand nur, weil der Botkorridor als Ziel behandelt
+wurde statt als Regressionswächter.
+
+### Vorgeschlagenes Budget
+
+Statt eines Entity-Deckels im Simulationsradius (\`CAP_ENEMY\` = 700) braucht es
+ein Budget für **sichtbar gezeichnete** Gegner, denn nur die kosten Bilder. Die
+beiden Läufe grenzen es ein:
+
+- 218 sichtbar → 1-%-Low 58, 0,5 % unter Ziel · **tragfähig**
+- 294 sichtbar → 1-%-Low 38, 40 % unter Ziel · **nicht tragfähig**
+
+Ein Zielwert von etwa **200 sichtbaren Gegnern** in der Spitze liegt sicher im
+tragfähigen Bereich. Bemerkenswert: Würde allein der Überschuss aus D-028
+beseitigt (SIM-Spitze von 441 auf die Zieldichte 301), läge der sichtbare Wert
+bei Anteil 0,67 schon bei etwa 200. **Der Defekt aus D-028 zu beheben reicht
+also möglicherweise aus, ohne die Zieldichte selbst anzutasten.**
+
+Das ist die nächste zu bauende Änderung. Sie revidiert den Despawn-Radius aus
+D-014 und stellt den Kartenzug-Korridor gemäß D-026 auf einen Regressionswächter
+um. Beides braucht die Freigabe des Besitzers, weil es zwei Entscheidungen
+zugleich berührt.
