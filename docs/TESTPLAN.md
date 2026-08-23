@@ -193,15 +193,19 @@ wird an Menschenläufen geprüft, siehe die Feldlauf-Tabelle weiter oben.
 
 | Größe | Ist | Vertrag (Bot) | Designziel (Mensch) |
 |---|---:|---:|---:|
-| Erster Kartenzug, Mittelwert | 31,0 s | 25–45 s | 35 s |
-| Kartenzüge in 8 Min, Mittelwert | 15,33 | 15,3 ± 3 | 21 |
-| Rhythmus pro Minute | 1,44 · 1,56 · 1,89 · 1,67 · 1,67 · 1,78 · 1,89 · 3,44 | — | 1 · 2 · 2 · 2 · 3 · 3 · 4 · 4 |
-| Kartenzüge bei −10 % XP-Kosten | 16,44 | — | — |
-| Kartenzüge bei +10 % XP-Kosten | 14,22 | — | — |
-| Verhältnis der beiden Varianten | 1,156 | ≤ 1,75 | — |
-| Runs mit Evolution | 1 / 9 | mindestens 1 / 9 (Bodenschwelle) | in einer Sortie erreichbar |
-| Spitze im Feld, Maximum | 314 | ≤ 331 (Zieldichte +10 %) | — |
+| Erster Kartenzug, Mittelwert | 31,6 s | 25–45 s | 35 s |
+| Kartenzüge in 8 Min, Mittelwert | 16,11 | 15,3 ± 3 | 21 |
+| Rhythmus pro Minute | 1,44 · 1,67 · 1,67 · 1,89 · 1,56 · 1,44 · 2,22 · 4,22 | — | 1 · 2 · 2 · 2 · 3 · 3 · 4 · 4 |
+| Kartenzüge bei −10 % XP-Kosten | 24,89 | — | — |
+| Kartenzüge bei +10 % XP-Kosten | 17,22 | — | — |
+| Verhältnis der beiden Varianten | 1,445 | ≤ 1,75 | — |
+| Runs mit Evolution | 3 / 9 | mindestens 2 / 9 (Bodenschwelle) | in einer Sortie erreichbar |
+| Spitze im Feld, Maximum | 322 | ≤ 331 (Zieldichte +10 %) | — |
 | Elite-Reliktwahlen | 2 in 9 / 9 Runs | exakt 2 pro vollständigem Run | — |
+| Erz aus absichtlich untätigem Lauf | 1 Erz, schlechteste Rate 1,58/Min | ≤ 1,75 Erz je Minute | — |
+
+Alle Ist-Werte dieser Tabelle stammen aus derselben `npm test`-Ausgabe vom
+23.08.2026 (Commit `42d7e29`).
 
 Ein Wiederholungslauf mit demselben Seed muss bitgenau dasselbe Ergebnis
 liefern. Der Test endet mit Fehlercode, sobald ein Korridor oder diese
@@ -209,7 +213,7 @@ Reproduzierbarkeit verletzt wird.
 
 Die neun Baseline-Runs werden mit einer fokussierten, aber nicht
 allwissenden Kartenstrategie gespielt. Mindestens zwei davon müssen in einer
-normalen 8-Minuten-Sortie eine Evolution abschließen. Ab 7:30 hält das Angebot
+normalen 8-Minuten-Sortie eine Evolution abschließen. Ab 5:30 hält das Angebot
 einen bereits begonnenen Evolutionspfad als eine von drei optionalen Karten
 sichtbar; die Voraussetzungen bleiben Waffenstufe 5 plus Passivstufe 3.
 `evolutionCatalog` erzwingt außerdem ein Angebot und die Kernmechanik jedes
@@ -251,6 +255,35 @@ sofortige Staubgutschrift bei einem Duplikat, gezielte Rangaufwertung, Anlegen,
 Zerlegen und einmalige Run-Auszahlung. Die seltene Runenfibel muss Runenfunke
 garantiert in ein Kartenangebot säen; nach der Wahl steigen Projektilzahl und
 Angriffstempo. In der Headless-Baseline bleiben alle Ausrüstungswerte null.
+
+`earlyLossGuard` schließt seit EH-2026-08-23-01 den Frühverlust-Farmweg. Der
+Check fährt den absichtlich untätigen Lauf (`stationary`, sterblich, ohne
+Kartenzüge) mit allen neun Seeds über den **echten** Weg
+`damagePlayer()` → `endRun(false)` → `depositRunReward()` — nicht über eine
+isolierte Hilfsfunktion, denn genau dort lag der Fehler. Geprüft wird:
+
+- Der Ertrag je Minute übersteigt nie den Anker des typischen Laufs von
+  1,75 Erz je Minute. Gemessen: 1 Erz je Lauf, schlechteste Rate 1,58/Min.
+  Gegen den Stand vor der Korrektur wird der Check rot (6,32 Erz/Min).
+- Regel 1 hält in beide Richtungen: Die erspielte Basis-Beute bleibt gebucht
+  und ein echter Versuch zahlt nie null Erz.
+- Ein Abbruch liefert **keinen** garantierten Ausrüstungsfund; weder ein Teil
+  noch Runenstaub kommt im Hold an.
+- Die Auszahlung erfolgt genau einmal; ein zweiter Aufruf gibt 0 zurück.
+- Die normalen Auszahlungen sind unverändert: Scharmützel bei 3:00, typische,
+  gute und Ausnahme-Sortie, ein später Tod mit magerer Beute sowie der
+  Grenzfall Tod exakt bei 3:00 zahlen alle den vollen Kurvenwert und den Fund.
+
+`oreCurve` fragt die vier Beuteanker zusätzlich **mit** ihrer echten Laufdauer
+ab. Die Abbruchgrenze darf keinen von ihnen verschieben.
+
+`healOrbFlow` prüft die Abklingzeit des Gluttropfens als vollständige Leiter:
+Ein Gegnerkill nach abgelaufener Abklingzeit erzeugt genau einen Tropfen, 50
+weitere Kills innerhalb der Abklingzeit erzeugen keinen zweiten, und nach
+erneutem Ablauf entsteht wieder genau einer. Die 50 Kills werden mitgezählt —
+ohne diese Zahl wäre der Check auch dann grün, wenn gar kein Gegner entstanden
+wäre. Heilmenge, fehlende XP-Gutschrift und der kleinere Sog gegenüber einem
+Splitter bleiben unverändert geprüft.
 
 Hochformat ist laut D-017 kein unterstützter Kampfmodus und wird bewusst nicht
 geprüft; der geplante „Gerät drehen"-Hinweis steht unter P0.3.
@@ -301,8 +334,10 @@ Manuell müssen die drei Vertragskarten im Hold auf Desktop und Mobil lesbar
 sein. Im Run müssen Vertragsname und leicht veränderte Bodenstimmung erkennbar
 bleiben, ohne Gegner- oder Telegrafiefarben zu überdecken.
 
-Nach einer Sortie muss im Endbildschirm genau ein Ausrüstungsfund oder dessen
-automatische Staubverwertung stehen. In der Rüstkammer sind fehlende, besessene
+Nach einer **vollständig gespielten** Sortie muss im Endbildschirm genau ein
+Ausrüstungsfund oder dessen automatische Staubverwertung stehen. Nach einem
+Abbruch vor 3:00 steht dort seit EH-2026-08-23-01 bewusst „kein Fund"; das ist
+die einzige sichtbare Textänderung dieser Korrektur. In der Rüstkammer sind fehlende, besessene
 und angelegte Teile unterscheidbar; Aufwerten ist nur mit genügend Staub aktiv.
 Die Sortietafel und beide Startknöpfe bleiben auf einem normalen Desktop ohne
 Scrollen sichtbar, auch wenn die Rüstkammer weiter unten liegt.

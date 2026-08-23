@@ -1408,3 +1408,73 @@ Vertrag muss überhaupt etwas bewirken. Das war vorher nur implizit.
 
 Punkt 1 ist der eigentliche Wächter. Er hätte den ursprünglichen Defekt sofort
 gemeldet — die alte Kurve verletzt ihn.
+
+### Nachtrag: Der Erzboden hatte dasselbe Vorzeichenproblem
+
+**Beauftragt von Codex als EH-2026-08-23-01, umgesetzt am 23.08.2026.**
+
+Die neue Kurve korrigierte die Steigung, nicht den **Boden**. Und der Boden von
+4 Erz galt unabhängig von der Laufdauer. Damit blieb dieselbe Umkehrung
+bestehen, nur an einer anderen Stelle:
+
+| Lauf | Dauer | Beute | Erz | **Erz je Minute** |
+|---|---:|---:|---:|---:|
+| absichtlich untätig | 0:38 | 216 | 4 (Boden) | **6,32** |
+| Scharmützel | 3:00 | 1.412 | 5 | 1,67 |
+| typisch | 8:00 | 17.290 | 14 | 1,75 |
+
+Der **schlechteste mögliche Lauf** war mit Abstand der ertragreichste je
+Minute — 3,6-mal so gut wie das Herzstück des Spiels. Gemessen über alle neun
+Seeds: Tod nach 37,98 bis 45,60 Sekunden, jedes Mal 4 Erz, 5,26 bis 6,32 Erz je
+Minute. Obendrauf kam der **garantierte Ausrüstungsfund**, der pro Sortie
+unabhängig von der Laufgüte ausgeschüttet wurde. Wer die Rüstkammer füllen
+wollte, fuhr am schnellsten, indem er nichts tat und starb.
+
+**Die Grenze war schon da.** Die Korrektur führt keine neue Währung, keinen
+neuen Regler und keine Strafe ein, sondern benutzt eine Zahl, die das Spiel
+bereits kennt: die kürzeste angebotene Sortie von drei Minuten. Eine Sortie,
+die diese Länge nicht erreicht, ist ein **Abbruch**.
+
+```
+Abbruch (unter 3:00):  Erz = clamp(1, Kurve, floor(Minuten × 1,75))
+                       kein garantierter Ausrüstungsfund
+ab 3:00:               Erz = Kurve, Fund wie bisher
+```
+
+Ein Abbruch zahlt damit nie mehr je Minute als der typische Lauf — und nie
+weniger als 1 Erz. Der untätige Lauf fällt von 4 auf 1 Erz, die schlechteste
+gemessene Rate von 6,32 auf **1,58** Erz je Minute.
+
+**Regel 1 bleibt unangetastet.** Sie hat zwei Hälften, und beide gelten weiter:
+Die bereits erspielte Basis-Beute wird bei einem Tod nicht gelöscht, und ein
+echter Versuch geht nie leer aus. Nur der Overtime-Bonus verfällt wie bisher.
+
+**Was sich nicht verändert hat.** Läufe ab drei Minuten sind rechnerisch
+unberührt. Alle vier Beuteanker bleiben exakt gleich: 1.412 → 5, 17.290 → 14,
+28.425 → 17, 137.872 → 32. Ein später Tod mit magerer Beute und ein Tod exakt
+auf der Grenze zahlen den vollen Kurvenwert. Der Vertragsmultiplikator wird
+weiterhin genau einmal angewendet, und bestehende Spielstände sind unberührt —
+die Änderung betrifft nur die Berechnung beim Auszahlen, kein gespeichertes
+Feld.
+
+**Zwei bewusste Abwägungen, die Codex kennen muss:**
+
+1. **Ein Tod zwischen 0:35 und 3:00 kostet jetzt auch ehrlich Erz.** Wer bei
+   2:00 mit 1.412 Beute stirbt, bekommt 3 statt 5 Erz; wer bei 2:59 stirbt,
+   bekommt weiterhin die vollen 5. Das ist die Kehrseite einer einzigen
+   Grenze statt zweier Sonderregeln — die Deckelung greift nur dort, wo der
+   Lauf pro Minute besser zahlen würde als eine saubere Sortie.
+2. **Unter rund 35 Sekunden bleibt die Rate rechnerisch über dem Anker**, weil
+   Regel 1 den Boden bei 1 Erz festhält und man nicht gleichzeitig „nie null"
+   und „höchstens 0,7 Erz" erfüllen kann. Praktisch ist das kein Farmweg mehr:
+   1 Erz je Abbruch, ohne Ausrüstungsfund, gegen 14 Erz plus Fund je sauberer
+   Sortie.
+
+**Der neue Check `earlyLossGuard`** prüft bewusst den echten Weg
+`damagePlayer()` → `endRun(false)` → `depositRunReward()`. Eine isolierte
+Abfrage von `rewardOre()` hätte den Defekt nie gefunden — der Boden war in der
+Kurve korrekt dokumentiert, falsch war erst, was der Auszahlungspfad daraus
+machte. Gegen den Stand vor der Korrektur meldet der Check rot.
+
+**Sichtbare Änderung im Spiel:** Nach einem Abbruch vor 3:00 zeigt die Kachel
+„Ausrüstungsfund" am Run-Ende „kein Fund". Alles andere bleibt gleich.

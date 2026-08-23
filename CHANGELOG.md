@@ -103,6 +103,22 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 
 ### Changed
 
+- Früh verlorene Runs sind kein Farmweg mehr (EH-2026-08-23-01): Eine Sortie,
+  die die kürzeste angebotene Länge von 3 Minuten nicht erreicht, gilt als
+  Abbruch. Ihr Erz wird auf den Takt des typischen Laufs von 1,75 Erz je Minute
+  gedeckelt, und der garantierte Ausrüstungsfund entfällt. Vorher zahlte ein
+  absichtlich untätiger Lauf nach rund 38 bis 46 Sekunden die vollen 4 Erz —
+  5,3 bis 6,3 Erz je Minute plus Fund. Regel 1 bleibt gewahrt: Die erspielte
+  Basis-Beute bleibt gebucht und ein echter Versuch zahlt nie null Erz. Läufe
+  ab 3 Minuten und alle vier Beuteanker sind unverändert
+- Neuer Check `earlyLossGuard` prüft den echten Auszahlungsweg über
+  `damagePlayer()` → `endRun(false)` → `depositRunReward()` mit allen neun
+  Seeds, dazu die unveränderten Normalauszahlungen und den Grenzfall
+  Tod exakt bei 3:00
+- `healOrbFlow` prüft die Abklingzeit jetzt als vollständige Leiter: ein Kill
+  nach Ablauf erzeugt genau einen Gluttropfen, 50 Kills im Fenster keinen
+  weiteren, nach erneutem Ablauf wieder genau einer. Heilmenge, fehlende
+  XP-Gutschrift und kleinerer Sog bleiben unverändert
 - `resize()` beeinflusst nur noch Darstellung, Canvas-Skalierung und
   Render-Culling. `AREA_F` und `VIEW_DIAG` sind ersatzlos entfallen
 - Fokus-Schutz für begonnene Evolutionspfade greift ab 5:30 statt 7:30. Die
