@@ -268,6 +268,10 @@ try {
 
   engine.begin(180);
   const upgradeApplied = Math.abs(engine.S.holdDmg - 1.1) < 1e-9;
+  // Der Auszahlungspfad kennt seit EH-2026-08-23-01 die gespielte Dauer. Dieser
+  // Check gehoert der einmaligen Auszahlung, nicht der Abbruchgrenze -- also
+  // muss die Sortie hier auch wirklich zu Ende gespielt worden sein.
+  engine.S.t = engine.S.runLen;
   engine.S.reward = 1023;
   engine.S.rewardGranted = false;
   const beforeOre = engine.H.ore, beforeRuns = engine.H.runs;
@@ -304,6 +308,9 @@ try {
 
   engine.begin(180);
   const selectedApplied = engine.S.contractId === "breach";
+  // Vollstaendig gespielte Sortie: Der Vertragsmultiplikator soll hier geprueft
+  // werden, nicht die Abbruchgrenze aus EH-2026-08-23-01.
+  engine.S.t = engine.S.runLen;
   engine.S.reward = 1023;
   engine.S.rewardGranted = false;
   const boostedOre = engine.depositRunReward();
@@ -438,7 +445,10 @@ try {
   const baselineIsolated = engine.S.gearSeed === null &&
     Object.entries(engine.S.gearBonus).every(([key,value])=>key==="seed"?value===null:value===0);
 
-  engine.begin(180,"ring"); engine.S.reward=500; engine.S.rewardGranted=false;
+  // Der garantierte Fund haengt seit EH-2026-08-23-01 an einer vollstaendig
+  // gespielten Sortie; der Abbruchfall wird in earlyLossGuard geprueft.
+  engine.begin(180,"ring"); engine.S.t=engine.S.runLen;
+  engine.S.reward=500; engine.S.rewardGranted=false;
   const beforeOwned=Object.keys(engine.H.gearOwned).length, beforeDust=engine.H.dust;
   engine.depositRunReward();
   const afterFirstDeposit=JSON.stringify({owned:engine.H.gearOwned,dust:engine.H.dust,runs:engine.H.runs});
@@ -762,20 +772,46 @@ try {
   const splitterWeg = engine.gemCount().splitter;
   const sogRichtig = vorher.tropfen === 1 && tropfenWeg === 1 && splitterWeg === 0;
 
-  // 4. Abklingzeit: Nach einem Tropfen darf im Fenster kein zweiter kommen.
+  // 4. Abklingzeit: Leiter mit drei Teilpruefungen.
   engine.begin(480);
-  engine.S.t = 100; engine.S.lastHealOrb = 100;
   engine.S.x = 0; engine.S.y = 0;
-  const vorFlut = engine.gemCount().tropfen;
-  for (let k=0;k<50;k++){
-    const e = engine.spawnEnemy(100, 0, 0, 40+k, 0);
-    if (e>=0) engine.killEnemy(e);
+  engine.S.t = 100;
+  engine.S.lastHealOrb = 100 - CFG.HEAL_ORB_CD;
+
+  // Schritt 1: Erster Kill nach abgelaufener Abklingzeit erzeugt genau einen Tropfen.
+  const vorErster = engine.gemCount().tropfen;
+  const e1 = engine.spawnEnemy(100, 0, 0, 4000, 0);
+  if (e1 >= 0) engine.killEnemy(e1);
+  const nachErster = engine.gemCount().tropfen;
+  const ersterKillTropft = nachErster === vorErster + 1 &&
+    engine.S.lastHealOrb === 100;
+
+  // Schritt 2: 50 weitere Kills innerhalb des Fensters erzeugen keinen neuen Tropfen.
+  // Die Kills werden mitgezaehlt: Ohne diese Zahl waere der Check auch dann
+  // gruen, wenn gar kein Gegner entstanden waere -- er wuerde still nichts pruefen.
+  const vorFenster = engine.gemCount().tropfen;
+  let killsImFenster = 0;
+  for (let k = 0; k < 50; k++) {
+    engine.S.t = 100 + (k / 50) * (CFG.HEAL_ORB_CD * 0.9);
+    const e = engine.spawnEnemy(100, 0, 0, 4001 + k, 0);
+    if (e >= 0) { engine.killEnemy(e); killsImFenster++; }
   }
-  const nachFlut = engine.gemCount().tropfen;
-  const abklingRichtig = nachFlut === vorFlut;
+  const nachFenster = engine.gemCount().tropfen;
+  const fensterHaeltDicht = killsImFenster === 50 && nachFenster === vorFenster;
+
+  // Schritt 3: Nach weiterer Abklingzeit erzeugt der naechste Kill wieder einen Tropfen.
+  engine.S.t = 100 + CFG.HEAL_ORB_CD;
+  const vorZweiter = engine.gemCount().tropfen;
+  const e2 = engine.spawnEnemy(100, 0, 0, 5000, 0);
+  if (e2 >= 0) engine.killEnemy(e2);
+  const nachZweiter = engine.gemCount().tropfen;
+  const zweiterZyklus = nachZweiter === vorZweiter + 1;
+
+  const abklingRichtig = ersterKillTropft && fensterHaeltDicht && zweiterZyklus;
 
   healOrbFlow = heiltRichtig && splitterRichtig && sogRichtig && abklingRichtig;
   healOrbDiagnostics = { heiltRichtig, splitterRichtig, sogRichtig, abklingRichtig,
+    ersterKillTropft, fensterHaeltDicht, zweiterZyklus, killsImFenster,
     geheilt:Number(geheilt.toFixed(1)), erwartet:Number((engine.S.maxhp*CFG.HEAL_ORB_PCT).toFixed(1)) };
 } catch (error) {
   healOrbError = error instanceof Error ? error.message : String(error);
@@ -847,7 +883,12 @@ try {
     { label: "8 Min typisch",      minuten: 8, beute: 17290 },
     { label: "8 Min gut",          minuten: 8, beute: 28425 },
     { label: "8 Min Ausnahme",     minuten: 8, beute: 137872 },
-  ].map(l => ({ ...l, erz: ore(l.beute), proMinute: Number((ore(l.beute)/l.minuten).toFixed(2)) }));
+    // Die Anker werden bewusst MIT ihrer echten Laufdauer abgefragt. Die
+    // Abbruchgrenze aus EH-2026-08-23-01 darf keinen von ihnen verschieben --
+    // sonst haette die Exploitkorrektur die Wirtschaft angefasst.
+  ].map(l => ({ ...l, erz: ore(l.beute, l.minuten*60),
+                proMinute: Number((ore(l.beute, l.minuten*60)/l.minuten).toFixed(2)) }));
+  const ankerOhneDauer = laeufe.every(l => ore(l.beute) === l.erz);
 
   // 1. Erz je Minute steigt monoton mit der Laufguete. Das ist der Kern.
   let monotonProMinute = true;
@@ -871,16 +912,118 @@ try {
   // 5. Regel 1: keine Sitzung geht leer aus.
   const bodenHaelt = ore(0) >= 1 && ore(1) >= 1;
 
-  oreCurve = monotonProMinute && ankerHaelt && monotonInBeute && koennenZaehlt && bodenHaelt;
+  oreCurve = monotonProMinute && ankerHaelt && monotonInBeute && koennenZaehlt &&
+    bodenHaelt && ankerOhneDauer;
   oreCurveDiagnostics = { laeufe, spreizung: Number(spreizung.toFixed(2)),
-    monotonProMinute, ankerHaelt, monotonInBeute, koennenZaehlt, bodenHaelt };
+    monotonProMinute, ankerHaelt, monotonInBeute, koennenZaehlt, bodenHaelt,
+    ankerOhneDauer };
 } catch (error) {
   oreCurveError = error instanceof Error ? error.message : String(error);
 }
 
+// --- EH-2026-08-23-01: Frueh verlorene Runs sind kein Farmweg ---------------
+// Der Erzboden galt unabhaengig von der Laufdauer. Ein absichtlich untaetiger
+// Spieler starb nach rund 38 bis 46 Sekunden und kassierte die vollen 4 Erz --
+// gemessen 5,3 bis 6,3 Erz je Minute gegen 1,75 im typischen 8-Minuten-Lauf.
+// Der schlechteste Lauf war der ertragreichste, und der garantierte
+// Ausruestungsfund kam obendrauf.
+//
+// Geprueft wird deshalb der ECHTE Weg: Der Lauf stirbt im Simulator, laeuft
+// dabei durch damagePlayer() -> endRun(false) und wird anschliessend ueber
+// depositRunReward() ausgezahlt. Eine isolierte Kurvenabfrage wuerde genau das
+// verfehlen, was hier schiefging.
+let earlyLossGuard = false;
+let earlyLossError = "";
+let earlyLossDiagnostics = null;
+try {
+  // Alle Erwartungen aus der Laufzeit ableiten, nicht hart verdrahten.
+  const ankerRate = engine.ORE.ORE_RATE_REF;        // 1,75 Erz je Minute
+  const grenze = engine.ORE.RUN_MIN_S;              // kuerzeste angebotene Sortie
+  const ringMul = engine.contractById("ring").reward;
+  const holdVorher = JSON.parse(JSON.stringify(engine.H));
+
+  // 1. Der absichtlich untaetige Lauf, ueber alle neun Seeds.
+  const abbrueche = report.seeds.map((seed) => {
+    engine.headlessRun(120, {
+      seed, smart: true, immortal: false, stationary: true, noPicks: true,
+    });
+    const S = engine.S;
+    const teileVorher = Object.keys(engine.H.gearOwned).length;
+    const staubVorher = engine.H.dust;
+    const erz = engine.depositRunReward();
+    const nochmal = engine.depositRunReward();
+    return {
+      seed, sekunden: Number(S.t.toFixed(2)), ergebnis: S.result, phase: S.phase,
+      basisBeute: S.baseReward, erz, zweiteZahlung: nochmal,
+      proMinute: Number((erz / (S.t / 60)).toFixed(2)),
+      fund: S.lootGear, neueTeile: Object.keys(engine.H.gearOwned).length - teileVorher,
+      neuerStaub: engine.H.dust - staubVorher,
+      kills: S.kills, gemsTaken: S.gemsTaken,
+      // Regel 1 wortwoertlich: Der Tod zieht von der Basis-Beute nichts ab, es
+      // wurde ueberhaupt etwas verbucht, und mehr als die tatsaechlich
+      // erspielte Beute kann nie gebucht sein. Bewusst KEINE Gleichheit mit der
+      // Endsumme: Ein Spieler sammelt im Todesframe teils noch Splitter ein,
+      // die endRun() nicht mehr sieht. Das ist ein alter, hier nicht
+      // beauftragter Nebeneffekt und gehoert nicht in diesen Check.
+      basisStimmt: S.baseReward > 0 && S.reward === S.baseReward &&
+        S.baseReward <= Math.round(S.kills * 1.0 + S.gemsTaken * 0.6) &&
+        erz === engine.rewardOre(S.reward, engine.runSeconds()),
+    };
+  });
+  // Der Lauf muss wirklich ueber das Run-Ende gegangen sein, sonst prueft der
+  // Check eine Attrappe.
+  const echterRunPfad = abbrueche.every((a) => a.phase === "over" &&
+    a.ergebnis === "Gefallen" && a.sekunden > 0 && a.sekunden < 120);
+  // Kern des Auftrags: nie ertragreicher je Minute als der typische Lauf.
+  const rateHaelt = abbrueche.every((a) => a.proMinute <= ankerRate);
+  // Regel 1 bleibt: Ein echter Versuch geht nie leer aus.
+  const regelEinsHaelt = abbrueche.every((a) => a.erz >= 1);
+  // Regel 1 zweite Haelfte: Die erspielte Basis-Beute wird nicht geloescht.
+  const basisBleibt = abbrueche.every((a) => a.basisBeute > 0 && a.basisStimmt);
+  // Kein garantierter Ausruestungsfund beim Fruehverlust.
+  const keinFruehfund = abbrueche.every((a) => a.fund === null &&
+    a.neueTeile === 0 && a.neuerStaub === 0);
+  // Genau einmal ausgezahlt.
+  const einmalGezahlt = abbrueche.every((a) => a.zweiteZahlung === 0);
+
+  // 2. Die normalen Auszahlungen duerfen sich NICHT veraendert haben.
+  Object.assign(engine.H, JSON.parse(JSON.stringify(holdVorher)));
+  const normal = (laenge, sekunden, beute) => {
+    engine.begin(laenge, "ring");
+    engine.S.t = sekunden; engine.S.reward = beute; engine.S.baseReward = beute;
+    engine.S.rewardGranted = false;
+    const erz = engine.depositRunReward();
+    return { laenge, sekunden, beute, erz, kurve: engine.rewardOre(beute),
+             fund: engine.S.lootGear ? "Teil" : "kein" };
+  };
+  const normale = [
+    normal(grenze, grenze, 1412),   // Scharmuetzel, sauber zu Ende
+    normal(480, 480, 17290),        // typische Sortie
+    normal(480, 480, 28425),        // gute Sortie
+    normal(480, 480, 137872),       // Ausnahmelauf
+    normal(480, 480, 1412),         // spaeter Tod mit magerer Beute: volle Kurve
+    normal(480, grenze, 1412),      // Tod exakt auf der Grenze: noch voller Wert
+  ];
+  const normalUnveraendert = normale.every((n) =>
+    n.erz === Math.max(n.kurve, Math.round(n.kurve * ringMul)) && n.fund === "Teil");
+  Object.assign(engine.H, JSON.parse(JSON.stringify(holdVorher)));
+  engine.saveHold();
+
+  earlyLossGuard = echterRunPfad && rateHaelt && regelEinsHaelt && basisBleibt &&
+    keinFruehfund && einmalGezahlt && normalUnveraendert;
+  earlyLossDiagnostics = { ankerRate, echterRunPfad, rateHaelt, regelEinsHaelt,
+    basisBleibt, keinFruehfund, einmalGezahlt, normalUnveraendert,
+    schlechtesteRate: Math.max(...abbrueche.map((a) => a.proMinute)),
+    abbrueche: abbrueche.map(({ seed, sekunden, basisBeute, erz, proMinute, fund, basisStimmt, kills, gemsTaken }) =>
+      ({ seed, sekunden, basisBeute, erz, proMinute, fund: fund ? "Teil" : "kein", basisStimmt, kills, gemsTaken })),
+    normale };
+} catch (error) {
+  earlyLossError = error instanceof Error ? error.message : String(error);
+}
+
 const output = {
-  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && slotLayout && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && contractFlow && holdExpansion && equipmentFlow && evolutionCatalog && eliteChoices && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling && fpsMetrics && reportHardened && healOrbFlow && holdGoalLadder && oreCurve,
-  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, slotLayout, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, contractFlow, holdExpansion, equipmentFlow, evolutionCatalog, eliteChoices, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling, fpsMetrics, reportHardened, healOrbFlow, holdGoalLadder, oreCurve },
+  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && slotLayout && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && contractFlow && holdExpansion && equipmentFlow && evolutionCatalog && eliteChoices && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling && fpsMetrics && reportHardened && healOrbFlow && holdGoalLadder && oreCurve && earlyLossGuard,
+  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, slotLayout, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, contractFlow, holdExpansion, equipmentFlow, evolutionCatalog, eliteChoices, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling, fpsMetrics, reportHardened, healOrbFlow, holdGoalLadder, oreCurve, earlyLossGuard },
   targets: report.targets,
   ueberschuss: report.ueberschuss,
   seeds: report.seeds,
@@ -898,6 +1041,8 @@ if (fpsError) output.fpsError = fpsError;
 if (healOrbError) output.healOrbError = healOrbError;
 if (holdGoalError) output.holdGoalError = holdGoalError;
 if (oreCurveError) output.oreCurveError = oreCurveError;
+if (earlyLossError) output.earlyLossError = earlyLossError;
+if (earlyLossDiagnostics) output.summary.earlyLoss = earlyLossDiagnostics;
 if (oreCurveDiagnostics) output.summary.oreCurve = oreCurveDiagnostics;
 if (holdGoalDiagnostics) output.summary.holdGoal = holdGoalDiagnostics;
 if (healOrbDiagnostics) output.summary.healOrb = healOrbDiagnostics;

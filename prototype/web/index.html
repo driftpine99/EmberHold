@@ -2604,12 +2604,33 @@ function advanceHold(now){
 // 1,67 (Scharmützel) · 1,75 (typisch) · 2,13 (gut) · 4,00 (Ausnahmelauf).
 const ORE_REF_LOOT = 17290;   // Beute eines typischen sauberen 8-Minuten-Laufs
 const ORE_REF      = 14;      // Erz, das dieser Lauf bringt — unverändert
+const ORE_REF_MIN  = 8;       // Dauer dieses Referenzlaufs in Minuten
 const ORE_EXP      = 0.40;    // Steigung: 100-fache Beute ergibt rund 6-faches Erz
 const ORE_MIN      = 4;       // Regel 1: keine Sitzung geht leer aus
-function rewardOre(reward){
+// Der Erzboden galt bisher unabhaengig von der Laufdauer, und genau daraus
+// entstand ein Farmweg, der schlechtes Spiel belohnte: Ein absichtlich
+// untaetiger Spieler stirbt nach rund 38 bis 46 Sekunden und kassierte dafuer
+// die vollen 4 Erz — gemessen 5,3 bis 6,3 Erz je Minute, waehrend die typische
+// 8-Minuten-Sortie 1,75 liefert. Der schlechteste Lauf war der ertragreichste.
+//
+// Die Korrektur fuehrt keine neue Waehrung und keine Strafe ein, sondern eine
+// Grenze, die es im Spiel schon gibt: Eine Sortie, die nicht einmal die
+// kuerzeste angebotene Laenge erreicht, ist ein Abbruch. Ihr Ertrag wird auf
+// den Takt des typischen Laufs gedeckelt — und nie unter ein Erz, denn Regel 1
+// gilt weiter: Ein echter Versuch geht nie leer aus. Laeufe ab drei Minuten
+// bleiben rechnerisch unberuehrt, damit auch alle vier Beuteanker.
+const RUN_MIN_S    = 180;                  // kuerzeste angebotene Sortie
+const ORE_RATE_REF = ORE_REF/ORE_REF_MIN;  // 1,75 Erz je Minute im typischen Lauf
+function rewardOre(reward, seconds){
   const r = Math.max(0, reward);
-  return Math.max(ORE_MIN, Math.round(ORE_REF*Math.pow(r/ORE_REF_LOOT, ORE_EXP)));
+  const voll = Math.max(ORE_MIN, Math.round(ORE_REF*Math.pow(r/ORE_REF_LOOT, ORE_EXP)));
+  // Ohne Dauerangabe bleibt die reine Beutekurve gueltig; sie ist der Vertrag,
+  // an dem die Beuteanker haengen.
+  if (!Number.isFinite(seconds) || seconds >= RUN_MIN_S) return voll;
+  return Math.max(1, Math.min(voll, Math.floor(seconds/60*ORE_RATE_REF)));
 }
+/** Die tatsaechlich gespielte Dauer einer Sortie. Overtime zaehlt voll mit. */
+function runSeconds(){ return S ? (S.otActive ? S.runLen+S.ot : S.t) : 0; }
 function gearUpgradeCost(item,rank){ return rank*(item.rarity==='Selten'?12:6); }
 function grantGear(forcedId){
   let item=GEAR_BY_ID[forcedId];
@@ -2635,10 +2656,14 @@ function depositRunReward(){
   if(HEADLESS||!S||S.rewardGranted) return 0;
   // Erst die Zeit waehrend der Sortie abrechnen; ihre Beute existiert erst jetzt.
   advanceHold(Date.now());
-  const baseOre=rewardOre(S.reward), mul=S.contract?.reward||1;
+  const dauer=runSeconds();
+  const baseOre=rewardOre(S.reward,dauer), mul=S.contract?.reward||1;
   const ore=Math.max(baseOre,Math.round(baseOre*mul));
   META.ore+=ore; META.runs++; S.holdOre=ore; S.holdOreBase=baseOre; S.rewardGranted=true;
-  S.lootGear=grantGear();
+  // Der garantierte Ausruestungsfund haengt an derselben Grenze. Er ist die
+  // staerkste Belohnung je Sortie und war damit der eigentliche Grund, einen
+  // Run absichtlich wegzuwerfen: Ein Abbruch bringt Erz, aber kein Teil.
+  S.lootGear=dauer>=RUN_MIN_S?grantGear():null;
   saveHold(); return ore;
 }
 /** Genau ein naechstes Ziel, mit Fortschritt und Begruendung. Der Besitzer
@@ -3429,7 +3454,7 @@ function begin(len,contractId){
   toast(S.contract.name);
 }
 el('btnStart').onclick   = ()=>begin(480);
-el('btnStart3').onclick  = ()=>begin(180);
+el('btnStart3').onclick  = ()=>begin(RUN_MIN_S);
 el('btnLeave').onclick   = ()=>endRun(true);
 el('btnOT').onclick      = startOvertime;
 el('pausebtn').onclick   = togglePause;
@@ -3694,7 +3719,8 @@ window.__EH = { get S(){return S;}, get H(){return META;}, CFG, HOLD_CFG, CONTRA
                 stats:stat, dashCooldown,
                 enemyHp:(i)=>E.hp[i], enemyMax:(i)=>E.max[i],
                 advanceHold, saveHold, loadHold, depositRunReward, selectContract,
-                holdGoal, goalHTML, rewardOre,
+                holdGoal, goalHTML, rewardOre, runSeconds,
+                ORE: {RUN_MIN_S, ORE_RATE_REF},
                 arcanumAction, yardAction, prepareReroll, trainMastery,
                 grantGear, equipGear, upgradeGear, salvageGear, gearUpgradeCost,
                 contractById, showHold:showStartMenu,
