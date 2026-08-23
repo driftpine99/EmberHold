@@ -624,7 +624,13 @@ try {
     html.includes("S.nearbyEnemies = nearby") &&
     html.includes("S.visibleEnemies = drawnEnemies") &&
     html.includes("if (drawnEnemies > S.peakVisibleEnemies)") &&
-    html.includes("Math.ceil((want-nearby)*0.16)") &&
+    // Die Spawnentscheidung darf ausschliesslich aus dem Simulationskreis
+    // stammen. Seit EH-2026-08-23-02 heisst die Vergleichsgroesse `have`, weil
+    // waehrend eines lebenden Wardens nur normale Gegner zaehlen -- beide
+    // Quellen bleiben aber Simulationstelemetrie, nie Renderwerte.
+    html.includes("Math.ceil((want-have)*0.16)") &&
+    html.includes("const have = bossAlive ? nearbyAdds : nearby;") &&
+    !/const (want|have)[^\n]*visible/i.test(html) &&
     !html.includes("S.onScreen") &&
     !html.includes("S.peakEnemies");
   telemetrySeparated = laufzeitGetrennt && berichtOhneRenderwerte && quelltextGetrennt;
@@ -1021,9 +1027,380 @@ try {
   earlyLossError = error instanceof Error ? error.message : String(error);
 }
 
+// --- EH-2026-08-23-02 / D-035: Der Warden ist eine eigene Kampfphase --------
+// Die Zieldichte waechst waehrend eines langen Bosskampfs ungebremst weiter --
+// im Feldlauf bis 273. Ein schwacher Build wird dadurch doppelt bestraft.
+// Geprueft wird das Verhalten des echten Spawnpfads in step(), nicht die
+// Konstante: Mit abgeschalteten Waffen kann nichts sterben, die Menge haengt
+// also ausschliesslich am Nachspawnen.
+let bossCombatPocket = false;
+let bossPocketError = "";
+let bossPocketDiagnostics = null;
+try {
+  const ZIEL = engine.BOSS.BOSS_ADD_TARGET;
+  const TICK = engine.CFG.TICK;
+  // Waffen aus: kein Schaden, keine Kills, keine Splitter. Was uebrig bleibt,
+  // ist reine Spawnmechanik. Die Drehbuch-Ereignisse werden ebenfalls
+  // stillgelegt, sonst setzt der planmaessige Warden bei 4:10 einen ZWEITEN
+  // Boss und ueberschreibt bossIndex -- der Test wuerde dann etwas anderes
+  // messen als er behauptet.
+  const stillLegen = () => {
+    engine.S.W = {}; engine.S.hp = engine.S.maxhp = 1e9;
+    engine.S.events.boss = true; engine.S.events.surge = true;
+    engine.S.events.elite = engine.CFG.ELITE_AT.length;
+  };
+  const laufen = (n) => { for (let i=0;i<n;i++) engine.tick(TICK); };
+
+  // A) Ohne Boss waechst die Menge zur normalen Zieldichte.
+  engine.begin(480); engine.S.x = 0; engine.S.y = 0; engine.S.t = 240; stillLegen();
+  laufen(900);
+  const ohneBoss = engine.enemyCounts();
+  const zielOhneBoss = Math.round(engine.targetEnemies(engine.S.t));
+
+  // B) Mit lebendem Warden bleibt das Nachspawnziel bei hoechstens 90.
+  //    Eliten stehen bewusst mit im Feld: Sie duerfen das Budget fuer normale
+  //    Gegner nicht aufbrauchen und nicht entfernt werden.
+  engine.begin(480); engine.S.x = 0; engine.S.y = 0; engine.S.t = 240; stillLegen();
+  const bossB = engine.spawnEnemy(240, 4, 2, 260, 0);
+  engine.S.bossIndex = bossB;
+  for (let k=0;k<5;k++) engine.spawnEnemy(240, 1, 1, 300+k*20, 40);
+  laufen(900);
+  const mitBoss = engine.enemyCounts();
+
+  // C) Vorhandene Gegner werden NICHT schlagartig geloescht, und dabei
+  //    entstehen weder Kills noch Beute.
+  engine.begin(480); engine.S.x = 0; engine.S.y = 0; engine.S.t = 240; stillLegen();
+  laufen(900);
+  const vorBoss = engine.enemyCounts().normal;
+  const killsVor = engine.S.kills, gemsVor = engine.gemCount();
+  const bossC = engine.spawnEnemy(engine.S.t, 4, 2, 260, 0);
+  engine.S.bossIndex = bossC;
+  laufen(120);
+  const nachBossEintritt = engine.enemyCounts().normal;
+  const keineLoeschung = nachBossEintritt >= vorBoss - 2;
+  const keineKunstKills = engine.S.kills === killsVor &&
+    engine.gemCount().splitter === gemsVor.splitter &&
+    engine.gemCount().tropfen === gemsVor.tropfen;
+
+  // D) Nach dem Boss-Tod gilt wieder die normale Kurve.
+  engine.begin(480); engine.S.x = 0; engine.S.y = 0; engine.S.t = 240; stillLegen();
+  const bossD = engine.spawnEnemy(240, 4, 2, 260, 0);
+  engine.S.bossIndex = bossD;
+  laufen(600);
+  const waehrend = engine.enemyCounts().normal;
+  engine.killEnemy(bossD);
+  const bossWeg = !engine.bossIsAlive();
+  laufen(900);
+  const danach = engine.enemyCounts().normal;
+
+  const zielGedeckelt = mitBoss.normal <= ZIEL;
+  // Boss und Eliten leben weiter UND haben das Budget nicht verbraucht: Die
+  // normalen Gegner erreichen trotzdem das volle Ziel von 90.
+  const bossZaehltNichtMit = mitBoss.boss === 1 && mitBoss.elite === 5 &&
+    mitBoss.normal >= ZIEL - 2;
+  const normalHoeherOhneBoss = ohneBoss.normal > ZIEL;
+  const baustWiederAuf = danach > waehrend;
+
+  bossCombatPocket = zielGedeckelt && bossZaehltNichtMit && normalHoeherOhneBoss &&
+    keineLoeschung && keineKunstKills && bossWeg && baustWiederAuf;
+  bossPocketDiagnostics = { ziel: ZIEL, zielOhneBoss,
+    ohneBossNormal: ohneBoss.normal, mitBossNormal: mitBoss.normal,
+    vorBoss, nachBossEintritt, waehrend, danach,
+    zielGedeckelt, bossZaehltNichtMit, normalHoeherOhneBoss,
+    keineLoeschung, keineKunstKills, bossWeg, baustWiederAuf };
+} catch (error) {
+  bossPocketError = error instanceof Error ? error.message : String(error);
+}
+
+// --- EH-2026-08-23-02: Warden-Ortung ---------------------------------------
+// Der Besitzer verlor den Warden im Pulk. Geprueft wird der Zustand, nicht das
+// Zeichnen: Der Shim rendert nicht, aber bossLocator() ist reine Geometrie.
+let bossLocatorState = false;
+let bossLocatorError = "";
+let bossLocatorDiagnostics = null;
+try {
+  engine.begin(480);
+  engine.S.x = 0; engine.S.y = 0;
+  const ohneBoss = engine.bossLocator();
+  const boss = engine.spawnEnemy(240, 4, 2, 0, 0);   // Warden fest im Ursprung
+  engine.S.bossIndex = boss;
+  const view = engine.viewport();
+  const fern = 4000;
+  // Nicht der Boss wandert, sondern der Spieler -- so bleibt der Warden ein
+  // echter, lebender Gegner und es wird nichts direkt in die Arrays geschrieben.
+  const ausRichtung = (px,py) => { engine.S.x = px; engine.S.y = py; return engine.bossLocator(); };
+  const rechts = ausRichtung(-fern, 0);
+  const links  = ausRichtung( fern, 0);
+  const unten  = ausRichtung(0, -fern);
+  const oben   = ausRichtung(0,  fern);
+  const drin   = ausRichtung(0, 0);
+  const randfaelle = [rechts, links, unten, oben];
+  const richtungenStimmen = rechts.richtung === "rechts" && links.richtung === "links" &&
+    unten.richtung === "unten" && oben.richtung === "oben";
+  const alleRandpfeile = randfaelle.every(l => l.modus === "pfeil");
+  const chevronInnen = drin.modus === "chevron" && drin.x === 0 && drin.y === 0;
+  // Der Randpfeil muss im Kampfausschnitt bleiben, sonst laege er auf breiten
+  // Formaten in der Safe-Area.
+  const imAusschnitt = randfaelle.every(l => {
+    engine.S.x = l === rechts ? -fern : l === links ? fern : 0;
+    engine.S.y = l === unten ? -fern : l === oben ? fern : 0;
+    return Math.abs(l.x - engine.S.x) <= view.VIEW_W/2 + 1e-6 &&
+           Math.abs(l.y - engine.S.y) <= view.VIEW_H/2 + 1e-6;
+  });
+  engine.S.x = 0; engine.S.y = 0;
+  engine.killEnemy(boss);
+  const nachTod = engine.bossLocator();
+
+  bossLocatorState = ohneBoss === null && richtungenStimmen && alleRandpfeile &&
+    chevronInnen && imAusschnitt && nachTod === null;
+  bossLocatorDiagnostics = { ohneBoss, nachTod,
+    richtungen: randfaelle.map(l => l.richtung + ":" + l.modus),
+    chevron: drin.modus, richtungenStimmen, alleRandpfeile, chevronInnen, imAusschnitt };
+} catch (error) {
+  bossLocatorError = error instanceof Error ? error.message : String(error);
+}
+
+// --- EH-2026-08-23-02: Das Kampfbild traegt nur noch Entscheidungen ---------
+// Der Feldbuild erzeugte bis zu 19 linke Flaechen. Geprueft wird mit genau
+// diesem Build: fuenf Waffen, zwei Passive, ein Fokuspfad -- und dass die
+// ausgeblendeten Meta-Boni in der Pause vollstaendig ankommen.
+let compactCombatHud = false;
+let compactHudError = "";
+let compactHudDiagnostics = null;
+try {
+  engine.begin(480, "ring");
+  const S = engine.S;
+  // D-035-Feldbuild, wortgetreu aus dem Run-Bericht vom 23.08.2026.
+  S.W = { bogen:5, splitter:1, kugel:1, blitz:2, klinge:2 };
+  S.Pa = { sehne:3, koecher:2 };
+  S.evo = {};
+  // Meta-Boni, die frueher dauerhaft links standen.
+  S.holdDmg = 1.1;
+  S.holdUtility = { path:2, reach:2, dash:2 };
+  S.gearEquipped = { weapon:"kraehenbogen", charm:"sammlersiegel", mantle:null };
+  S.gearRanks = { kraehenbogen:2, sammlersiegel:2 };
+  S.boons = { fury:1, stride:0, harvest:0, guard:1 };
+
+  const kampf = engine.combatSlots();
+  const meta = engine.metaBoni();
+  const lead = engine.leadingEvoPath();
+  const pfade = engine.evoPaths();
+
+  engine.renderSlots();
+  const slotsHTML = elements.get("slots").innerHTML;
+  const zaehle = (s, muster) => (s.match(muster) || []).length;
+  const slotFlaechen = zaehle(slotsHTML, /class="slot/g);
+  const pfadFlaechen = zaehle(slotsHTML, /class="evopath/g);
+  const kampfEintraege = slotFlaechen + pfadFlaechen;
+
+  engine.renderPauseDetail();
+  const pauseHTML = elements.get("pausedetail").innerHTML;
+
+  const hoechstensAcht = kampfEintraege <= 8;
+  const genauEinPfad = pfadFlaechen === 1 && !!lead;
+  // Der Fokus ist der am weitesten fortgeschrittene Pfad: Langbogen 5 + Sehne 3.
+  const fuehrenderPfad = lead.w.id === "bogen" && lead.wl === 5 && lead.pl === 3 && lead.ready;
+  const mehrPfadeVorhanden = pfade.length > 1;   // sonst pruefte die Auswahl nichts
+  // Kein Meta-Bonus steht mehr im Kampfbild ...
+  const metaRaus = meta.length > 0 && meta.every(p => !slotsHTML.includes(">"+p.n+"<"));
+  // ... aber jeder einzelne ist in der Pause vorhanden.
+  const metaInPause = meta.every(p => pauseHTML.includes(">"+p.n+"<"));
+  const pauseAbschnitte = pauseHTML.includes("Run-Boni") && pauseHTML.includes("Build") &&
+    pauseHTML.includes("Evolutionspfade");
+  // Die Pause zeigt ausserdem den vollstaendigen Build und ALLE Pfade.
+  const buildInPause = kampf.every(p => pauseHTML.includes(">"+p.n+"<"));
+  const allePfadeInPause = zaehle(pauseHTML, /class="evopath/g) === pfade.length;
+
+  compactCombatHud = hoechstensAcht && genauEinPfad && fuehrenderPfad && mehrPfadeVorhanden &&
+    metaRaus && metaInPause && pauseAbschnitte && buildInPause && allePfadeInPause;
+  compactHudDiagnostics = { kampfEintraege, slotFlaechen, pfadFlaechen,
+    metaAnzahl: meta.length, pfadeGesamt: pfade.length,
+    fokus: lead ? lead.w.evo.name : null,
+    hoechstensAcht, genauEinPfad, fuehrenderPfad, mehrPfadeVorhanden,
+    metaRaus, metaInPause, pauseAbschnitte, buildInPause, allePfadeInPause };
+} catch (error) {
+  compactHudError = error instanceof Error ? error.message : String(error);
+}
+
+// --- EH-2026-08-23-02: Ein erfuellter Pfad ist abgeschlossen ---------------
+// Langbogen 5 plus Sehne 3 lagen im Feldlauf vor, Windriss kam trotzdem nie:
+// buildOffer() verlangte danach noch einen zusaetzlichen Zufallszug (D-035).
+let evolutionCompletion = false;
+let evolutionCompletionError = "";
+let evolutionCompletionDiagnostics = null;
+try {
+  const bogen = engine.WEAPONS.find(w => w.id === "bogen");
+  const klinge = engine.WEAPONS.find(w => w.id === "klinge");
+  const sehne = engine.PASSIVES.find(p => p.id === "sehne");
+  const federung = engine.PASSIVES.find(p => p.id === "federung");
+  const fokusAb = engine.BOSS.EVO_FOCUS_AT;
+
+  // 1. Der Fokus greift ab 4:00 und verfolgt den fuehrenden Pfad, nicht die
+  //    erste Waffe im Katalog. Langbogen steht im Katalog vorn, liegt hier
+  //    aber deutlich zurueck.
+  engine.begin(480, "ring");
+  engine.S.W = { bogen:1, klinge:4 };
+  engine.S.Pa = { federung:2 };
+  engine.S.evo = {};
+  const fuehrend = engine.leadingEvoPath();
+  const fokusTrifftFuehrenden = fuehrend.w.id === "klinge";
+  engine.S.t = fokusAb;
+  let fokusKarteGesehen = false;
+  for (let k=0;k<40;k++){
+    const angebot = engine.buildOffer();
+    if (angebot.some(o => (o.type === "w" && o.w.id === "klinge") ||
+                          (o.type === "p" && o.p.id === "federung"))) fokusKarteGesehen = true;
+  }
+  engine.S.t = fokusAb - 1;
+  let vorFokusImmerDrin = true;
+  for (let k=0;k<40;k++){
+    const angebot = engine.buildOffer();
+    if (!angebot.some(o => (o.type === "w" && o.w.id === "klinge") ||
+                           (o.type === "p" && o.p.id === "federung"))) vorFokusImmerDrin = false;
+  }
+  const fokusIstNichtErzwungenVorher = !vorFokusImmerDrin;
+
+  // 2. Letzte WAFFENstufe schliesst den Pfad sofort ab.
+  engine.begin(480, "ring");
+  engine.S.W = { bogen:4 }; engine.S.Pa = { sehne:3 }; engine.S.evo = {};
+  engine.S.evoTimes.length = 0; engine.S.t = 300;
+  engine.applyOffer({ type:"w", w:bogen });
+  const sofortDurchWaffe = engine.S.evo.bogen === 1 && engine.S.evoTimes.length === 1;
+
+  // 3. Letzte PASSIVstufe schliesst den Pfad ebenso sofort ab.
+  engine.begin(480, "ring");
+  engine.S.W = { bogen:5 }; engine.S.Pa = { sehne:2 }; engine.S.evo = {};
+  engine.S.evoTimes.length = 0; engine.S.t = 300;
+  engine.applyOffer({ type:"p", p:sehne });
+  const sofortDurchPassiv = engine.S.evo.bogen === 1 && engine.S.evoTimes.length === 1;
+
+  // 4. Keine doppelte Evolution, und das naechste Angebot ist wieder normal.
+  engine.applyOffer({ type:"p", p:sehne });
+  const keineDoppelte = engine.S.evoTimes.length === 1;
+  const naechstes = engine.buildOffer();
+  const naechstesNormal = !naechstes.some(o => o.type === "evo") && naechstes.length === 3;
+  // 5. Ein bereits ausgeloester Pfad taucht nicht mehr als Pfad auf.
+  const pfadWeg = !engine.evoPaths().some(p => p.w.id === "bogen");
+
+  evolutionCompletion = fokusAb === 240 && fokusTrifftFuehrenden && fokusKarteGesehen &&
+    fokusIstNichtErzwungenVorher && sofortDurchWaffe && sofortDurchPassiv &&
+    keineDoppelte && naechstesNormal && pfadWeg;
+  evolutionCompletionDiagnostics = { fokusAb, fuehrend: fuehrend.w.id,
+    fokusTrifftFuehrenden, fokusKarteGesehen, fokusIstNichtErzwungenVorher,
+    sofortDurchWaffe, sofortDurchPassiv, keineDoppelte, naechstesNormal, pfadWeg };
+} catch (error) {
+  evolutionCompletionError = error instanceof Error ? error.message : String(error);
+}
+
+// --- EH-2026-08-23-02: Waffen erst messen, dann balancieren ----------------
+// Vor jedem Zahlen-Nerf steht die Messung. Geprueft wird, dass sie stimmt:
+// echter statt ueberzaehlter Schaden und die richtige Ursprungswaffe.
+let weaponDamageReport = false;
+let weaponDamageError = "";
+let weaponDamageDiagnostics = null;
+try {
+  const IDX = engine.W_IDX, TICK = engine.CFG.TICK;
+  const ruhig = () => { engine.S.W = {}; engine.S.evo = {}; };
+
+  // 1. Overkill zaehlt nur bis zur verbleibenden HP.
+  engine.begin(480, "ring"); engine.S.x = 0; engine.S.y = 0; ruhig();
+  const ziel = engine.spawnEnemy(0, 0, 0, 60, 0);
+  engine.rebuildGrid();
+  const hpVorher = engine.enemyHp(ziel);
+  engine.shoot(0, 0, 1, 0, 600, hpVorher*50, 5, 0, 9, IDX.bogen);
+  for (let i=0;i<6;i++) engine.updateProjectiles(TICK);
+  const gebucht = engine.S.dmgW[IDX.bogen];
+  const overkillGedeckelt = Math.abs(gebucht - hpVorher) < 0.01 && gebucht > 0;
+
+  // 2. Bossschaden wird getrennt gefuehrt, Normalschaden nicht mitgezaehlt.
+  engine.begin(480, "ring"); engine.S.x = 0; engine.S.y = 0; ruhig();
+  const normalo = engine.spawnEnemy(0, 0, 0, 60, 0);
+  engine.rebuildGrid();
+  engine.shoot(0, 0, 1, 0, 600, 5, 9, 0, 9, IDX.splitter);
+  for (let i=0;i<6;i++) engine.updateProjectiles(TICK);
+  const nurNormal = engine.S.dmgW[IDX.splitter] > 0 && engine.S.dmgWBoss[IDX.splitter] === 0;
+  const bossZiel = engine.spawnEnemy(0, 4, 2, 60, 0);
+  engine.rebuildGrid();
+  engine.shoot(0, 0, 1, 0, 600, 7, 9, 0, 9, IDX.splitter);
+  for (let i=0;i<6;i++) engine.updateProjectiles(TICK);
+  const bossGetrennt = engine.S.dmgWBoss[IDX.splitter] > 0 &&
+    engine.S.dmgWBoss[IDX.splitter] <= engine.S.dmgW[IDX.splitter];
+
+  // 3. Quellzuordnung: Kettenblitz und Rundenklinge treffen ohne Projektil.
+  // Ohne gesetzte Abklingzeit steht C.<waffe> auf undefined; `C.x -= dt` waere
+  // dann NaN und die Waffe feuerte nie -- der Check waere still gruen.
+  const trefferDurch = (aufbau) => {
+    engine.begin(480, "ring"); engine.S.x = 0; engine.S.y = 0; ruhig();
+    aufbau();
+    for (let k=0;k<12;k++) engine.spawnEnemy(0, 0, 0, 30+k*12, 0);
+    engine.rebuildGrid();
+    engine.fireWeapons(TICK);
+    return Array.from(engine.S.dmgW);
+  };
+  const blitzWerte = trefferDurch(() => { engine.S.W = { blitz:2 }; engine.S.cool = { blitz:0 }; });
+  const blitzZugeordnet = blitzWerte[IDX.blitz] > 0 &&
+    blitzWerte.every((v,i) => i === IDX.blitz || v === 0);
+  const klingeWerte = trefferDurch(() => { engine.S.W = { klinge:2 }; engine.S.cool = { klinge:0 }; });
+  const klingeZugeordnet = klingeWerte[IDX.klinge] > 0 &&
+    klingeWerte.every((v,i) => i === IDX.klinge || v === 0);
+
+  // 4. Feuerboden gehoert der Feuerkugel, auch als Folgeschaden.
+  engine.begin(480, "ring"); engine.S.x = 0; engine.S.y = 0; ruhig();
+  engine.S.evo = { kugel:1 };
+  for (let k=0;k<10;k++) engine.spawnEnemy(0, 4, 2, 200+k*4, 0);   // zaeh, stirbt nicht
+  engine.rebuildGrid();
+  engine.shoot(0, 0, 1, 0, 900, 6, 1, 2, 12, IDX.kugel);
+  for (let i=0;i<12;i++) engine.updateProjectiles(TICK);
+  const bodenEntstanden = engine.GROUND.x.length > 0;
+  const nachExplosion = engine.S.dmgW[IDX.kugel];
+  for (let i=0;i<20;i++) engine.updateProjectiles(TICK);
+  const nachBoden = Array.from(engine.S.dmgW);
+  const bodenZugeordnet = bodenEntstanden && nachBoden[IDX.kugel] > nachExplosion &&
+    nachBoden.every((v,i) => i === IDX.kugel || v === 0);
+
+  // 5. Der Frostsplitter gehoert der Frostnova -- NICHT der Waffe, die den
+  //    Ausloeser getoetet hat. Deshalb toetet hier bewusst ein Bogenprojektil.
+  engine.begin(480, "ring"); engine.S.x = 0; engine.S.y = 0; ruhig();
+  engine.S.W = { frost:1 }; engine.S.cool = { frost:0 }; engine.S.evo = { frost:1 };
+  // Familie 4 ist zaeh genug, um die Nova zu ueberleben. Mit schwachen Gegnern
+  // toetet die Nova selbst -- dann pruefte der Check nicht mehr, WER den
+  // Splitter ausgeloest hat, sondern nur, dass Frost Schaden macht.
+  for (let k=0;k<14;k++) engine.spawnEnemy(0, 4, 0, 40+k*9, 0);
+  engine.rebuildGrid();
+  engine.fireWeapons(TICK);                       // verlangsamt und schwaecht an
+  const frostVorSchuss = engine.S.dmgW[IDX.frost];
+  const bogenVorSchuss = engine.S.dmgW[IDX.bogen];
+  engine.S.W = {};                                 // keine weitere Nova
+  engine.shoot(0, 0, 1, 0, 700, 9999, 99, 0, 9, IDX.bogen);
+  for (let i=0;i<8;i++) engine.updateProjectiles(TICK);
+  const frostNachSchuss = engine.S.dmgW[IDX.frost];
+  const bogenNachSchuss = engine.S.dmgW[IDX.bogen];
+  const splitterZugeordnet = frostNachSchuss > frostVorSchuss &&
+    bogenNachSchuss > bogenVorSchuss;
+
+  // 6. Der Bericht nennt beide Zeilen und nur aktive Waffen.
+  engine.begin(480, "ring");
+  engine.S.W = { bogen:3, blitz:1 }; engine.S.Pa = {}; engine.S.evo = {};
+  const zeile = engine.weaponDamageText("dmgW");
+  const berichtNurAktive = zeile.includes("Langbogen") && zeile.includes("Kettenblitz") &&
+    !zeile.includes("Frostnova") && !zeile.includes("Rundenklinge");
+  const bericht = engine.runReportText();
+  const berichtZeilen = bericht.includes("Schaden je Waffe:") &&
+    bericht.includes("Boss-Schaden je Waffe:");
+
+  weaponDamageReport = overkillGedeckelt && nurNormal && bossGetrennt &&
+    blitzZugeordnet && klingeZugeordnet && bodenZugeordnet && splitterZugeordnet &&
+    berichtNurAktive && berichtZeilen;
+  weaponDamageDiagnostics = { hpVorher:+hpVorher.toFixed(2), gebucht:+gebucht.toFixed(2),
+    overkillGedeckelt, nurNormal, bossGetrennt, blitzZugeordnet, klingeZugeordnet,
+    bodenZugeordnet, splitterZugeordnet, berichtNurAktive, berichtZeilen };
+} catch (error) {
+  weaponDamageError = error instanceof Error ? error.message : String(error);
+}
+
 const output = {
-  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && slotLayout && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && contractFlow && holdExpansion && equipmentFlow && evolutionCatalog && eliteChoices && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling && fpsMetrics && reportHardened && healOrbFlow && holdGoalLadder && oreCurve && earlyLossGuard,
-  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, slotLayout, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, contractFlow, holdExpansion, equipmentFlow, evolutionCatalog, eliteChoices, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling, fpsMetrics, reportHardened, healOrbFlow, holdGoalLadder, oreCurve, earlyLossGuard },
+  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && slotLayout && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && contractFlow && holdExpansion && equipmentFlow && evolutionCatalog && eliteChoices && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling && fpsMetrics && reportHardened && healOrbFlow && holdGoalLadder && oreCurve && earlyLossGuard && bossCombatPocket && bossLocatorState && compactCombatHud && evolutionCompletion && weaponDamageReport,
+  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, slotLayout, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, contractFlow, holdExpansion, equipmentFlow, evolutionCatalog, eliteChoices, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling, fpsMetrics, reportHardened, healOrbFlow, holdGoalLadder, oreCurve, earlyLossGuard, bossCombatPocket, bossLocatorState, compactCombatHud, evolutionCompletion, weaponDamageReport },
   targets: report.targets,
   ueberschuss: report.ueberschuss,
   seeds: report.seeds,
@@ -1042,6 +1419,16 @@ if (healOrbError) output.healOrbError = healOrbError;
 if (holdGoalError) output.holdGoalError = holdGoalError;
 if (oreCurveError) output.oreCurveError = oreCurveError;
 if (earlyLossError) output.earlyLossError = earlyLossError;
+if (bossPocketError) output.bossPocketError = bossPocketError;
+if (bossLocatorError) output.bossLocatorError = bossLocatorError;
+if (compactHudError) output.compactHudError = compactHudError;
+if (evolutionCompletionError) output.evolutionCompletionError = evolutionCompletionError;
+if (weaponDamageError) output.weaponDamageError = weaponDamageError;
+if (bossPocketDiagnostics) output.summary.bossPocket = bossPocketDiagnostics;
+if (bossLocatorDiagnostics) output.summary.bossLocator = bossLocatorDiagnostics;
+if (compactHudDiagnostics) output.summary.compactHud = compactHudDiagnostics;
+if (evolutionCompletionDiagnostics) output.summary.evolutionCompletion = evolutionCompletionDiagnostics;
+if (weaponDamageDiagnostics) output.summary.weaponDamage = weaponDamageDiagnostics;
 if (earlyLossDiagnostics) output.summary.earlyLoss = earlyLossDiagnostics;
 if (oreCurveDiagnostics) output.summary.oreCurve = oreCurveDiagnostics;
 if (holdGoalDiagnostics) output.summary.holdGoal = holdGoalDiagnostics;

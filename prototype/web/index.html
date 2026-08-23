@@ -236,6 +236,16 @@ button.b.danger{background:#c9402e;color:#fff}
   font-size:10px;line-height:1.35}.contractcard small{display:block;color:#b9a18a;
   font-size:9.5px;margin-top:6px}
 
+/* Die Pause traegt die vollstaendige Information, die aus dem Kampfbild
+   verlagert wurde: Run-Boni, kompletter Build und alle Evolutionspfade. */
+#pausedetail{width:100%;max-width:760px;margin-top:18px;text-align:left}
+.pausesec{margin-top:16px}.pausesec:first-child{margin-top:0}
+.pausesec h2{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:#8b8577;
+  font-weight:600;margin-bottom:8px;border-bottom:1px solid #262633;padding-bottom:6px}
+.chiprow{display:flex;flex-wrap:wrap;gap:6px 8px}
+.pathrow{display:flex;flex-wrap:wrap;gap:8px}
+.pauseleer{font-size:11.5px;color:#6d6862;font-style:italic}
+
 @media (max-width:620px){
   #start.holdsheet{padding:14px 12px 24px}.holdhead{align-items:flex-start;flex-direction:column}
   .holdresources{justify-content:flex-start}.holdres{min-width:82px;padding:5px 9px}
@@ -353,6 +363,11 @@ button.b.danger{background:#c9402e;color:#fff}
   .evohead b{font-size:10px}
   .evoreq{font-size:8.5px;margin-top:2px}
   .evometer{margin-top:4px}
+  #pausedetail{margin-top:10px;max-width:700px}
+  .pausesec{margin-top:10px}
+  .pausesec h2{margin-bottom:5px;padding-bottom:4px}
+  .chiprow{gap:4px 6px}
+  .pathrow{gap:6px}
 }
 </style>
 </head>
@@ -470,6 +485,7 @@ button.b.danger{background:#c9402e;color:#fff}
     <h1>Die Glut wartet</h1>
     <p class="sub">Kampf, Gegner und Timer stehen vollständig still.</p>
     <div class="statgrid" id="pausestats"></div>
+    <div id="pausedetail"></div>
     <div class="btnrow">
       <button class="b" id="btnResume">Weiterkämpfen</button>
     </div>
@@ -910,6 +926,7 @@ const P = {                                   // Spielerprojektile
   vx:new Float32Array(CFG.CAP_PROJ), vy:new Float32Array(CFG.CAP_PROJ),
   dmg:new Float32Array(CFG.CAP_PROJ), life:new Float32Array(CFG.CAP_PROJ),
   pierce:new Int16Array(CFG.CAP_PROJ), kind:new Uint8Array(CFG.CAP_PROJ),
+  src:new Int8Array(CFG.CAP_PROJ),             // Ursprungswaffe, -1 = unbekannt
   r:new Float32Array(CFG.CAP_PROJ), alive:new Uint8Array(CFG.CAP_PROJ),
   hit:new Uint32Array(CFG.CAP_PROJ*PROJ_HIT_WORDS),
   n:0, free:[]
@@ -938,7 +955,7 @@ function fx(x,y,r,life,col,kind){
 }
 const BOLT = {ax:[],ay:[],bx:[],by:[],t:[]};   // Kettenblitz-Segmente
 const CHAIN_HITS = new Int16Array(8);           // ein Ziel nur einmal je Kette
-const GROUND = {x:[],y:[],r:[],t:[],life:[],dmg:[]};  // brennender Boden
+const GROUND = {x:[],y:[],r:[],t:[],life:[],dmg:[],src:[]};  // brennender Boden
 
 // --- Allokationsfreie Slot-Vergabe -----------------------------------------
 function alloc(A, cap){
@@ -1084,10 +1101,34 @@ const EVO_PASSIVE_LV = 3;   // gemessen: bei 5 kam in 8 Läufen keine
 // wirkungslos, seit D-030 die Kartenzuege von 20,6 auf 15,3 gesenkt hat: Es kam
 // schlicht kein Zug mehr. Gemessen ueber die neun Vertragsseeds erreichten mit
 // 450 nur 1 von 9 Laeufen eine Evolution, mit 330 wieder 3 von 9 wie vor D-030.
-// 240 haette 5 von 9 ergeben; das waere zu grosszuegig, denn das GDD reserviert
-// zuverlaessige Evolutionen fuer den 15-Minuten-Tiefenzug. Der Kartenzug-Anker
-// bleibt unberuehrt (15,00 gegen 15,3), die Gegnerdichte ebenfalls (D-031).
-const EVO_FOCUS_AT = 330;
+//
+// D-035 senkt bewusst weiter auf 240. Der Feldlauf zeigte den Grund: Der
+// Besitzer hatte Langbogen 5 und Sehne 3, also den Vertrag erfuellt, und starb
+// bei 7:06 trotzdem ohne Evolution. Die frueher gegen 240 vorgebrachte Sorge
+// ("zu grosszuegig") galt einem System, das zusaetzlich noch einen Zufallszug
+// verlangte; dieser Zug entfaellt jetzt (siehe completeEvolutions).
+const EVO_FOCUS_AT = 240;
+// Der am weitesten fortgeschrittene noch offene Evolutionspfad. Eine einzige
+// Quelle fuer drei Verbraucher: die Fokuskarte, die linke Kampfanzeige und den
+// Pausenbericht. Vorher nahm der Fokus-Schutz schlicht die erste Waffe im
+// Katalog -- wer Klinge 4 und Bogen 1 hatte, bekam Bogenkarten (D-035).
+// Fortschritt zaehlt gedeckelte Waffen- plus Passivstufen; bei Gleichstand
+// gewinnt die Katalogreihenfolge, damit die Auswahl deterministisch bleibt.
+function evoPaths(){
+  const out=[];
+  for(const w of WEAPONS){
+    if(!w.evo || !S.W[w.id] || S.evo[w.id]) continue;
+    const passive=PASSIVES.find(p=>p.id===w.evo.need);
+    const wl=Math.min(S.W[w.id]||0,MAXLV), pl=Math.min(S.Pa[passive.id]||0,EVO_PASSIVE_LV);
+    out.push({w,passive,wl,pl,fortschritt:wl+pl,ready:wl>=MAXLV&&pl>=EVO_PASSIVE_LV});
+  }
+  return out;
+}
+function leadingEvoPath(){
+  let best=null;
+  for(const p of evoPaths()) if(!best||p.fortschritt>best.fortschritt) best=p;
+  return best;
+}
 
 // ===========================================================================
 //  SPIELZUSTAND
@@ -1119,9 +1160,15 @@ function newRun(runLen, seed, contractId){
     // Fenster und darf deshalb nie in die Simulation zurueckwirken.
     visibleEnemies:0, peakVisibleEnemies:0,
     W:{}, Pa:{}, evo:{},                    // Waffen-/Passivstufen, Evolutionen
+    evoTimes:[],                            // wann eine Evolution entstand
+    // Tatsaechlich abgezogener Schaden je Waffe, in Katalogreihenfolge. Feste
+    // Arrays statt Objekten: Der dichte Gegnerpfad darf je Treffer nichts
+    // allokieren (D-035). dmgWBoss ist der Anteil davon gegen Bossgegner.
+    dmgW:new Float64Array(WEAPONS.length),
+    dmgWBoss:new Float64Array(WEAPONS.length),
     rerolls:1,
     pickTimes:[],                           // für den Pacing-Bericht
-    events:{elite:0, boss:false, surge:false}, bossIndex:-1,
+    events:{elite:0, boss:false, surge:false}, bossIndex:-1, bossKills:0,
     bladeAng:0, ot:0, otActive:false,
     reward:0, baseReward:0,
     rewardGranted:false, holdOre:0,
@@ -1145,6 +1192,7 @@ function newRun(runLen, seed, contractId){
   for(const k in FX) FX[k].length=0;
   for(const k in BOLT) BOLT[k].length=0;
   for(const k in GROUND) GROUND[k].length=0;
+  DMG_SRC=-1;
   pendingPicks=0; currentOffer=[]; cardMode='level';
 }
 function xpNeed(L){ return CFG.XP_C * Math.pow(L, CFG.XP_K); }
@@ -1186,6 +1234,17 @@ const SIM_W=1000, SIM_H=700, SIM_DIAG=Math.hypot(SIM_W,SIM_H)/2;
 const ASPECT_MAX=16/9, COMBAT_H_MIN=SIM_W/ASPECT_MAX;      // 562,5
 // Boss-Einstieg: fest, damit er auf jedem Format im Kampfausschnitt liegt.
 const BOSS_ENTRY=Math.min(300, SIM_H*0.40);                // 280
+// Der Warden ist eine eigene Kampfphase, keine Kulisse im Dauerstrom. Die
+// Zieldichte liegt beim Einstieg um 4:10 erst bei rund 122, waechst aber
+// waehrend eines langen Bosskampfs ungebremst weiter -- im Feldlauf bis 273.
+// Das bestraft einen schwachen Build doppelt: Er braucht laenger fuer den Boss
+// und bekommt gerade deshalb immer mehr Verstaerkung (D-035).
+//
+// Solange der Warden lebt, gilt dieses Ziel fuer NORMALE Gegner. Boss und
+// Eliten zaehlen nicht mit und werden nicht entfernt. Vorhandene Gegner
+// verschwinden nicht schlagartig: Es wird nur nicht mehr nachgespawnt, bis
+// Kills und Recycling die Menge natuerlich abgesenkt haben.
+const BOSS_ADD_TARGET=90;
 // Recyclingrand fuer normale Gegner, als Vielfaches von SIM_DIAG.
 // Frueher 1.55 (946 Welteinheiten). Zwischen Zaehlkreis (1.15 = 702) und
 // Recyclingrand lag damit ein ungezaehlter Vorrat von 82 Prozent der
@@ -1302,11 +1361,12 @@ function priorityEnemy(maxR){
   });
   return boss>=0?boss:(elite>=0?elite:normal);
 }
-function shoot(x,y,dx,dy,speed,dmg,pierce,kind,r){
+function shoot(x,y,dx,dy,speed,dmg,pierce,kind,r,src){
   const i = alloc(P, CFG.CAP_PROJ); if (i<0) return;
   const l = Math.hypot(dx,dy)||1;
   P.x[i]=x; P.y[i]=y; P.vx[i]=dx/l*speed; P.vy[i]=dy/l*speed;
   P.dmg[i]=dmg; P.pierce[i]=pierce; P.kind[i]=kind; P.r[i]=r;
+  P.src[i]=Number.isInteger(src)?src:-1;
   P.hit.fill(0,i*PROJ_HIT_WORDS,(i+1)*PROJ_HIT_WORDS);
   P.life[i]=1.6; P.alive[i]=1;
 }
@@ -1339,7 +1399,7 @@ function fireWeapons(dt){
       const dmg = (12 + 5*L) * st.dmg * (L>=5?1.5:1) * (L>=2?1.4:1) * (evo?1.6:1);
       // Ein sichtbarer Boss-Fokus darf nicht an der Add-Wand verpuffen.
       const pierce = (evo||bossShot) ? 999 : (2 + (L>=1?1:0) + (L>=3?1:0));
-      shoot(S.x,S.y,dx,dy, 760, dmg, pierce, evo?1:0, 9);
+      shoot(S.x,S.y,dx,dy, 760, dmg, pierce, evo?1:0, 9, W_IDX.bogen);
       if(!HEADLESS) fx(S.x+S.shotAimx*25,S.y+S.shotAimy*25,12,.13,'#ffc48a',0);
     }
   }
@@ -1359,7 +1419,7 @@ function fireWeapons(dt){
       const dmg = (8 + 3*L) * st.dmg * (L>=2?1.35:1) * (evo?.82:1);
       for (let k=0;k<n;k++){
         const a = base + (k-(n-1)/2) * (spread/Math.max(n-1,1));
-        shoot(S.x,S.y,Math.cos(a),Math.sin(a), 680, dmg, evo?4:2, 0, 8);
+        shoot(S.x,S.y,Math.cos(a),Math.sin(a), 680, dmg, evo?4:2, 0, 8, W_IDX.splitter);
       }
     }
   }
@@ -1377,7 +1437,7 @@ function fireWeapons(dt){
       const dmg=(16+6*L)*st.dmg*(L>=2?1.4:1)*(L>=5?1.6:1);
       for(let k=0;k<n;k++){
         const a=base+(k-(n-1)/2)*0.35;
-        shoot(S.x,S.y,Math.cos(a),Math.sin(a), 300, dmg, 1, 2, 12);
+        shoot(S.x,S.y,Math.cos(a),Math.sin(a), 300, dmg, 1, 2, 12, W_IDX.kugel);
       }
     }
   }
@@ -1391,6 +1451,7 @@ function fireWeapons(dt){
       if(evo) jumps=Math.max(8,jumps);
       const dmg = (14+5*L)*st.dmg*(L>=2?1.4:1)*(evo?.68:1);
       let cx=S.x, cy=S.y, seenN=0;
+      DMG_SRC=W_IDX.blitz;
       for (let j=0;j<jumps;j++){
         let best=-1,bd=1e18;
         nearEnemies(cx,cy,evo?285:230,(i)=>{
@@ -1405,6 +1466,7 @@ function fireWeapons(dt){
         hurt(best, dmg);
         cx=E.x[best]; cy=E.y[best];
       }
+      DMG_SRC=-1;
       if (BOLT.t.length>90){ for(const k in BOLT) BOLT[k].splice(0,BOLT[k].length-90); }
     }
   }
@@ -1417,6 +1479,7 @@ function fireWeapons(dt){
     const n = 2 + (L>=1?1:0) + (L>=3?1:0) + (L>=5?2:0) + (evo?2:0);
     const rad = (74 + (L>=4?34:0)) * st.area;
     const dmg = (11+4*L)*st.dmg*(L>=2?1.35:1) * dt * 6 * (evo?(1.12+moving*.55):1);
+    DMG_SRC=W_IDX.klinge;
     for (let k=0;k<n;k++){
       const a = S.bladeAng + k*6.2832/n;
       const bx = S.x+Math.cos(a)*rad, by = S.y+Math.sin(a)*rad;
@@ -1425,6 +1488,7 @@ function fireWeapons(dt){
         if (dx*dx+dy*dy < 17*17) hurt(i, dmg);
       });
     }
+    DMG_SRC=-1;
   }
   // ---- Frostnova ---------------------------------------------------------
   if (S.W.frost){
@@ -1436,18 +1500,35 @@ function fireWeapons(dt){
       const dmg = (10+4*L)*st.dmg*(L>=2?1.4:1)*(evo?1.15:1);
       const slow = evo?4.0:(L>=4?2.6:1.6);
       fx(S.x,S.y,rad,0.34,'#8fd4e8',1);
+      DMG_SRC=W_IDX.frost;
       nearEnemies(S.x,S.y,rad,(i)=>{
         const dx=E.x[i]-S.x, dy=E.y[i]-S.y;
         if (dx*dx+dy*dy < rad*rad){ E.slow[i]=slow; hurt(i,dmg); }
       });
+      DMG_SRC=-1;
     }
   }
 }
 
 // --------------------------------------------------------------------- Schaden
+// Wer welchen Schaden verursacht hat, wird nicht je Treffer uebergeben, sondern
+// steht waehrend eines Schadensblocks in DMG_SRC. Das spart im dichten
+// Gegnerpfad jede Allokation und jedes zusaetzliche Argument (D-035). Wert ist
+// der Index der Waffe in WEAPONS, -1 heisst "nicht zugeordnet".
+const W_IDX={}; WEAPONS.forEach((w,i)=>{ W_IDX[w.id]=i; });
+let DMG_SRC=-1;
 let hitFlash = 0;
 function hurt(i, dmg){
   if (!E.alive[i]) return;
+  // Overkill zaehlt nur bis zu den verbleibenden Lebenspunkten. Ohne das waere
+  // eine Waffe mit hohem Einzelschlag allein durch Ueberschuss "staerker".
+  if (DMG_SRC>=0){
+    const echt = Math.min(dmg, Math.max(0, E.hp[i]));
+    if (echt>0){
+      S.dmgW[DMG_SRC]+=echt;
+      if (E.kind[i]===2) S.dmgWBoss[DMG_SRC]+=echt;
+    }
+  }
   E.hp[i] -= dmg; S.dmgDealt += dmg;
   if (E.hp[i] <= 0){
     // Sparsames Trefferfeedback: bei 100 Kills/Sek waere ein Effekt je Kill
@@ -1469,7 +1550,7 @@ function killEnemy(i){
     spawnGem(x,y,0,1);
   }
   if (kind===2){                                   // Boss
-    S.bossIndex=-1;
+    S.bossIndex=-1; S.bossKills++;
     fx(x,y,150,0.7,COL.boss,1);
     for(let k=0;k<30;k++) spawnGem(x+(rand()-.5)*260, y+(rand()-.5)*260, 5);
     toast('Mittelboss gefallen');
@@ -1489,10 +1570,15 @@ function killEnemy(i){
     if(shatter){                                    // Ewiger Winter: kein Ketten-Stackoverflow
       if(!HEADLESS) fx(x,y,54,.22,'#bdefff',1);
       const shatterDmg=10*stat().dmg;
+      // Der Frostsplitter gehoert der Frostnova, nicht der Waffe, die den
+      // Ausloeser getoetet hat. hurt() kann hierher zurueckkehren, deshalb wird
+      // die vorherige Quelle gesichert statt hart auf -1 gesetzt.
+      const vorher=DMG_SRC; DMG_SRC=W_IDX.frost;
       nearEnemies(x,y,54,(j)=>{
         const dx=E.x[j]-x,dy=E.y[j]-y;
         if(dx*dx+dy*dy<54*54){ E.slow[j]=0; hurt(j,shatterDmg); }
       });
+      DMG_SRC=vorher;
     }
   }
 }
@@ -1644,6 +1730,9 @@ function updateProjectiles(dt){
     }
     const r=P.r[i];
     let hit=false;
+    // Jedes Projektil traegt seine Ursprungswaffe mit; Explosion und Feuerboden
+    // der Feuerkugel werden dadurch ebenfalls ihr zugerechnet (D-035).
+    DMG_SRC=P.src[i];
     nearEnemies(P.x[i],P.y[i],r+18,(j)=>{
       if (hit) return;                              // bereits freigegeben/explodiert
       const dx=E.x[j]-P.x[i], dy=E.y[j]-P.y[i];
@@ -1663,6 +1752,7 @@ function updateProjectiles(dt){
           if (S.evo.kugel){
             GROUND.x.push(P.x[i]);GROUND.y.push(P.y[i]);GROUND.r.push(rad*0.85);
             GROUND.t.push(0);GROUND.life.push(4.0);GROUND.dmg.push(P.dmg[i]*0.55);
+            GROUND.src.push(P.src[i]);
             if (GROUND.x.length>40){ for(const k in GROUND) GROUND[k].shift(); }
           }
           freeSlot(P,i); hit=true; return;
@@ -1672,6 +1762,7 @@ function updateProjectiles(dt){
         if (P.pierce[i]<=0){ freeSlot(P,i); hit=true; }
       }
     });
+    DMG_SRC=-1;
   }
   // Gegnerprojektile
   for (let i=0;i<Q.n;i++){
@@ -1686,10 +1777,12 @@ function updateProjectiles(dt){
     GROUND.t[i]+=dt;
     if (GROUND.t[i]>=GROUND.life[i]){ for(const k in GROUND) GROUND[k].splice(i,1); continue; }
     const gx=GROUND.x[i], gy=GROUND.y[i], gr=GROUND.r[i];
+    DMG_SRC=GROUND.src[i]??-1;
     nearEnemies(gx,gy,gr,(j)=>{
       const dx=E.x[j]-gx, dy=E.y[j]-gy;
       if (dx*dx+dy*dy<gr*gr) hurt(j, GROUND.dmg[i]*dt);
     });
+    DMG_SRC=-1;
   }
   return n;
 }
@@ -1779,9 +1872,9 @@ function buildOffer(){
   // Evolutionspfad offen. Sie wird nicht erzwungen und greift erst ab 5:30,
   // damit der fruehe Build weiterhin variieren darf.
   if(S.t>=EVO_FOCUS_AT){
-    const w=WEAPONS.find(x=>x.evo&&S.W[x.id]&&!S.evo[x.id]);
-    if(w){
-      const wl=S.W[w.id]||0, passive=PASSIVES.find(p=>p.id===w.evo.need), pl=S.Pa[passive.id]||0;
+    const lead=leadingEvoPath();
+    if(lead){
+      const w=lead.w, passive=lead.passive, wl=S.W[w.id]||0, pl=S.Pa[passive.id]||0;
       let focus=null;
       if(wl<MAXLV) focus={type:'w',w,lv:wl,weight:1};
       else if(pl<EVO_PASSIVE_LV&&(pl>0||nP<MAX_P)) focus={type:'p',p:passive,lv:pl,weight:1};
@@ -1891,14 +1984,36 @@ function applyOffer(o){
   } else if (o.type==='boon'){
     applyBoon(o.boon);
   } else if (o.type==='evo'){
-    S.evo[o.w.id]=1; if(!HEADLESS) toast(o.w.evo.name+'!');
+    if(!S.evo[o.w.id]){
+      S.evo[o.w.id]=1; S.evoTimes.push(S.t);
+      if(!HEADLESS) toast(o.w.evo.name+'!');
+    }
   } else if (o.type==='heal'){
     S.hp=Math.min(S.maxhp, S.hp+S.maxhp*0.45);
   } else if (o.type==='w'){
     S.W[o.w.id]=(S.W[o.w.id]||0)+1;
     if (S.cool[o.w.id]===undefined) S.cool[o.w.id]=0;
+    completeEvolutions();
   } else {
     S.Pa[o.p.id]=(S.Pa[o.p.id]||0)+1;
+    completeEvolutions();
+  }
+}
+/** Ein erfuellter Pfad ist abgeschlossen -- sofort, im selben Kartenzug.
+ *  Vorher verlangte buildOffer() danach noch einen zusaetzlichen Zug: Der
+ *  Besitzer hatte Langbogen 5 plus Sehne 3 und starb bei 7:06 ohne Windriss,
+ *  weil dieser Zug nie kam. In einem Acht-Minuten-Format ist die Belohnung
+ *  damit vom naechsten XP-Wurf abhaengig statt von der eigenen Entscheidung
+ *  (D-035). Die Schleife deckt auch den seltenen Fall ab, dass eine Karte zwei
+ *  Pfade gleichzeitig schliesst. */
+function completeEvolutions(){
+  for(const w of WEAPONS){
+    if(!w.evo || S.evo[w.id]) continue;
+    if((S.W[w.id]||0)>=MAXLV && (S.Pa[w.evo.need]||0)>=EVO_PASSIVE_LV){
+      S.evo[w.id]=1;
+      S.evoTimes.push(S.t);
+      if(!HEADLESS) toast(w.evo.name+'!');
+    }
   }
 }
 function takeCard(idx){
@@ -2013,18 +2128,24 @@ function step(dt){
   // Das ist Simulationstelemetrie: Sie steuert das Nachspawnen und muss auf
   // jedem Format identisch sein. Wie viele Gegner wirklich gezeichnet werden,
   // steht getrennt davon in S.visibleEnemies.
-  const want = targetEnemies(S.t);
   const cr = SIM_DIAG*1.15, cr2 = cr*cr;
-  let nearby=0;
+  let nearby=0, nearbyAdds=0;
   for(let i=0;i<E.n;i++){
     if(!E.alive[i]) continue;
     const dx=E.x[i]-S.x, dy=E.y[i]-S.y;
-    if (dx*dx+dy*dy < cr2) nearby++;
+    if (dx*dx+dy*dy < cr2){ nearby++; if(E.kind[i]===0) nearbyAdds++; }
   }
+  // Telemetrie bleibt die Gesamtzahl im Zaehlkreis -- sie ist der Balancewert
+  // und darf sich durch die Bossphase nicht in ihrer Bedeutung veraendern.
   S.nearbyEnemies = nearby;
+  // Waehrend eines lebenden Wardens zaehlt fuer das Nachspawnen nur die Menge
+  // NORMALER Gegner gegen ein festes, niedrigeres Ziel (D-035).
+  const bossAlive = bossIsAlive();
+  const want = bossAlive ? Math.min(BOSS_ADD_TARGET, targetEnemies(S.t)) : targetEnemies(S.t);
+  const have = bossAlive ? nearbyAdds : nearby;
   // Deckel pro Tick: ohne ihn steht nach zwei Sekunden eine Wand aus
   // 42 Gegnern statt eines Stroms, der sich aufbaut.
-  let toSpawn = Math.min(Math.ceil((want-nearby)*0.16), 9);
+  let toSpawn = Math.min(Math.ceil((want-have)*0.16), 9);
   for (let k=0;k<toSpawn;k++) spawnEnemy(S.t, pickFam(S.t), 0);
 
   fireWeapons(dt);
@@ -2476,6 +2597,7 @@ function render(){
 
   // --- Spieler: gerenderter Warden mit Bewegung, Bogen und Dash ---------
   drawAelric();
+  drawBossLocator();
   ctx.restore();
 
   // --- Seitliche Safe-Area auf Formaten breiter als 16:9 -----------------
@@ -2489,6 +2611,42 @@ function render(){
     ctx.fillRect(CLIP_X-1,0,1,H);
     ctx.fillRect(CLIP_X+CLIP_W,0,1,H);
   }
+}
+
+/** Rot-goldene Warden-Ortung. Bewusst schwer und kantig gezeichnet, damit sie
+ *  nicht mit Aelrics hellen, duennen Geschossen verwechselt wird. Sie liegt im
+ *  geclippten Weltraum, respektiert also die Safe-Area automatisch. */
+function drawBossLocator(){
+  const loc=bossLocator(); if(!loc) return;
+  const puls=0.82+0.18*Math.sin(S.t*6.0);
+  ctx.save();
+  ctx.translate(loc.x,loc.y);
+  if(loc.modus==='chevron'){
+    // Chevron ueber dem Warden, aufrecht und nicht mitgedreht.
+    ctx.translate(0,-58);
+    ctx.globalAlpha=puls;
+    ctx.fillStyle='#c8331f';
+    ctx.beginPath();
+    ctx.moveTo(0,14); ctx.lineTo(-15,-6); ctx.lineTo(-8,-13);
+    ctx.lineTo(0,-2);  ctx.lineTo(8,-13);  ctx.lineTo(15,-6);
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle='#f0c45a'; ctx.lineWidth=2.4; ctx.stroke();
+  } else {
+    // Randpfeil in Richtung Warden.
+    ctx.rotate(loc.winkel);
+    ctx.globalAlpha=puls;
+    ctx.fillStyle='#c8331f';
+    ctx.beginPath();
+    ctx.moveTo(24,0); ctx.lineTo(-12,-17); ctx.lineTo(-4,0); ctx.lineTo(-12,17);
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle='#f0c45a'; ctx.lineWidth=2.8; ctx.stroke();
+    ctx.rotate(-loc.winkel);
+    ctx.globalAlpha=puls*0.55;
+    ctx.strokeStyle='#f0c45a'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.arc(0,0,30,0,6.2832); ctx.stroke();
+  }
+  ctx.restore();
+  ctx.globalAlpha=1;
 }
 
 // ===========================================================================
@@ -2912,9 +3070,32 @@ function trainMastery(id){
   renderHold('Aelric hat '+({path:'Pfadkunde',reach:'Reichgriff',dash:'Stoßschule'}[id])+' trainiert.');
 }
 
-let slotSig='';
-function renderSlots(){
-  const parts=[], paths=[];
+// Die linke Kampfanzeige zeigte alles gleichzeitig: Meta-Bonus, Ausruestung,
+// Meisterschaften, Relikte, Waffen, Passive und JEDEN begonnenen
+// Evolutionspfad. Beim Feldbuild waren das bis zu 19 Flaechen. Nichts war
+// abgeschnitten, trotzdem nannte der Besitzer die Anzeige unbrauchbar (D-035).
+//
+// Im Kampf bleibt jetzt nur, was eine Entscheidung in den naechsten Sekunden
+// beeinflusst: aktive Waffen, aktive Passive und genau der fuehrende
+// Evolutionspfad. Alles Uebrige ist waehrend des Kampfes unveraenderlich und
+// wandert in die Pause -- verlagert, nicht geloescht.
+function combatSlots(){
+  const parts=[];
+  for (const w of WEAPONS){
+    const lv=S.W[w.id]; if(!lv) continue;
+    const evo=!!S.evo[w.id];
+    parts.push({c:w.col, n:evo?w.evo.name:w.name, l:evo?'EVO':lv, e:evo});
+  }
+  for (const p of PASSIVES){
+    const lv=S.Pa[p.id]; if(!lv) continue;
+    parts.push({c:p.col, n:p.name, l:lv, e:false});
+  }
+  return parts;
+}
+/** Waehrend eines Runs unveraenderliche Boni: vor dem Start entschieden oder
+ *  aus einer Elitewahl entstanden. Nur in der Pause sichtbar. */
+function metaBoni(){
+  const parts=[];
   if(S.holdDmg>1) parts.push({c:'#e07a3f',n:'Wächterbogen',l:'+10%',e:true});
   for(const slot of ['weapon','charm','mantle']){
     const id=S.gearEquipped?.[slot],item=GEAR_BY_ID[id];
@@ -2929,35 +3110,76 @@ function renderSlots(){
     const n=S.boons?.[boon.id]||0;
     if(n) parts.push({c:boon.col,n:boon.name,l:n>1?'×'+n:'Relikt',e:true});
   }
-  for (const w of WEAPONS){
-    const lv=S.W[w.id]; if(!lv) continue;
-    const evo=!!S.evo[w.id];
-    parts.push({c:w.col, n:evo?w.evo.name:w.name, l:evo?'EVO':lv, e:evo});
-    if(w.evo&&!evo){
-      const passive=PASSIVES.find(p=>p.id===w.evo.need), pl=S.Pa[passive.id]||0;
-      const ready=lv>=MAXLV&&pl>=EVO_PASSIVE_LV;
-      paths.push({name:w.evo.name,weapon:w.name,wl:Math.min(lv,MAXLV),
-        passive:passive.name,pl:Math.min(pl,EVO_PASSIVE_LV),ready,
-        pct:(Math.min(lv,MAXLV)+Math.min(pl,EVO_PASSIVE_LV))/(MAXLV+EVO_PASSIVE_LV)*100});
-    }
-  }
-  for (const p of PASSIVES){
-    const lv=S.Pa[p.id]; if(!lv) continue;
-    parts.push({c:p.col, n:p.name, l:lv, e:false});
-  }
-  const sig=parts.map(p=>p.n+p.l).join('|')+'#'+paths.map(p=>p.name+p.wl+p.pl+p.ready).join('|');
+  return parts;
+}
+function slotHTML(p){
+  return `<div class="slot${p.e?' evo':''}" title="${p.n}"><span class="pip" style="background:${p.c}"></span>`+
+    `<span class="nm">${p.n}</span><span class="lv">${p.l}</span></div>`;
+}
+function pathHTML(p){
+  const pct=(p.wl+p.pl)/(MAXLV+EVO_PASSIVE_LV)*100;
+  return `<div class="evopath${p.ready?' ready':''}"><div class="evohead"><span>${p.ready?'Bereit':'Evolution'}</span>`+
+    `<b>${p.w.evo.name}</b></div><div class="evoreq">${p.w.name} <em>${p.wl}/${MAXLV}</em> + `+
+    `${p.passive.name} <em>${p.pl}/${EVO_PASSIVE_LV}</em></div>`+
+    `<div class="evometer"><span style="width:${pct}%"></span></div></div>`;
+}
+let slotSig='';
+function renderSlots(){
+  const parts=combatSlots(), lead=leadingEvoPath();
+  const sig=parts.map(p=>p.n+p.l).join('|')+'#'+
+    (lead?lead.w.id+lead.wl+lead.pl+lead.ready:'-');
   if (sig===slotSig) return; slotSig=sig;
-  el('slots').innerHTML = parts.map(p=>
-    `<div class="slot${p.e?' evo':''}" title="${p.n}"><span class="pip" style="background:${p.c}"></span>`+
-    `<span class="nm">${p.n}</span><span class="lv">${p.l}</span></div>`).join('')+paths.map(p=>
-    `<div class="evopath${p.ready?' ready':''}"><div class="evohead"><span>${p.ready?'Bereit':'Evolution'}</span>`+
-    `<b>${p.name}</b></div><div class="evoreq">${p.weapon} <em>${p.wl}/${MAXLV}</em> + `+
-    `${p.passive} <em>${p.pl}/${EVO_PASSIVE_LV}</em></div><div class="evometer"><span style="width:${p.pct}%"></span></div></div>`
-  ).join('');
+  el('slots').innerHTML = parts.map(slotHTML).join('')+(lead?pathHTML(lead):'');
+}
+/** Die Pause traegt jetzt die vollstaendige Information: nichts geht verloren,
+ *  es steht nur nicht mehr im Kampfbild. */
+function renderPauseDetail(){
+  const abschnitt=(titel,inhalt)=>`<section class="pausesec"><h2>${titel}</h2>${inhalt}</section>`;
+  const reihe=(items,leer)=>items.length
+    ? `<div class="chiprow">${items.map(slotHTML).join('')}</div>`
+    : `<p class="pauseleer">${leer}</p>`;
+  const paths=evoPaths();
+  el('pausedetail').innerHTML =
+    abschnitt('Run-Boni', reihe(metaBoni(),'keine – Hold-Ausbau, Ausrüstung und Relikte fehlen noch')) +
+    abschnitt('Build', reihe(combatSlots(),'nur der Startbogen')) +
+    abschnitt('Evolutionspfade', paths.length
+      ? `<div class="pathrow">${paths.map(pathHTML).join('')}</div>`
+      : '<p class="pauseleer">kein Pfad begonnen</p>');
 }
 function fmtTime(t){
   const m=Math.floor(t/60), s=Math.floor(t%60);
   return m+':'+String(s).padStart(2,'0');
+}
+/** Lebt der Warden gerade? Eine Quelle fuer Spawnziel, HUD und Ortung. */
+function bossIsAlive(){
+  const bi=S?S.bossIndex:-1;
+  return bi>=0 && !!E.alive[bi] && E.kind[bi]===2;
+}
+// Der Besitzer verlor den Warden im Pulk (D-035). Die Ortung ist bewusst reine
+// Anzeige: Sie liest nur Positionen und veraendert weder Simulation noch
+// Zielwahl. Ausserhalb des Kampfausschnitts zeigt ein Randpfeil die Richtung,
+// innerhalb steht ein Chevron ueber ihm. Der Rand wird am Kampfausschnitt
+// geklemmt, nie an der Fensterbreite -- sonst laege der Pfeil auf 21:9 in der
+// Safe-Area.
+const BOSS_MARK_PAD=34;
+function bossLocator(){
+  if(!bossIsAlive()) return null;
+  const bi=S.bossIndex;
+  const dx=E.x[bi]-S.x, dy=E.y[bi]-S.y;
+  const hw=VIEW_W/2-BOSS_MARK_PAD, hh=VIEW_H/2-BOSS_MARK_PAD;
+  // Dominante Achse benennt die Richtung. Sie ist nur fuer Anzeige und Test
+  // gedacht; gezeichnet wird immer der echte Winkel.
+  const richtung=Math.abs(dx)>=Math.abs(dy)?(dx>=0?'rechts':'links')
+                                           :(dy>=0?'unten':'oben');
+  if(Math.abs(dx)<=hw && Math.abs(dy)<=hh)
+    return {modus:'chevron', x:E.x[bi], y:E.y[bi], dx, dy, richtung,
+            winkel:Math.atan2(dy,dx), abstand:Math.hypot(dx,dy)};
+  // Auf den Rand des Kampfausschnitts klemmen, Seitenverhaeltnis erhalten.
+  const sx=Math.abs(dx)>1e-6?hw/Math.abs(dx):Infinity;
+  const sy=Math.abs(dy)>1e-6?hh/Math.abs(dy):Infinity;
+  const s=Math.min(sx,sy);
+  return {modus:'pfeil', x:S.x+dx*s, y:S.y+dy*s, dx, dy, richtung,
+          winkel:Math.atan2(dy,dx), abstand:Math.hypot(dx,dy)};
 }
 function updateHUD(){
   if (!S) return;
@@ -2969,7 +3191,7 @@ function updateHUD(){
   el('contracthud').textContent=S.contract?.name||'Wächterring';
   el('xpbar').style.width=Math.min(S.xp/S.need*100,100)+'%';
   el('hpbar').style.width=Math.max(S.hp/S.maxhp*100,0)+'%';
-  const bi=S.bossIndex, bossAlive=bi>=0&&E.alive[bi]&&E.kind[bi]===2;
+  const bi=S.bossIndex, bossAlive=bossIsAlive();
   const bb=el('bossbar'); bb.classList.toggle('on',bossAlive);
   bb.setAttribute('aria-hidden',bossAlive?'false':'true');
   if(bossAlive) el('bossfill').style.width=Math.max(0,E.hp[bi]/E.max[bi]*100)+'%';
@@ -3062,6 +3284,7 @@ function togglePause(){
       statTile(S.kills.toLocaleString('de-DE'),'Kills')+
       statTile(S.level,'Stufe')+
       statTile(S.pickTimes.length,'Kartenzüge');
+    renderPauseDetail();
     setSheet('pause',true,'btnResume');
   } else if(S.phase==='pause'){
     setSheet('pause',false); S.phase='run';
@@ -3166,6 +3389,20 @@ function boonText(){
     b.name+((S.boons[b.id]||0)>1?' ×'+S.boons[b.id]:''));
   return out.join(', ')||'keine';
 }
+/** Schaden je Waffe, nur fuer tatsaechlich besessene Waffen. Vor einem
+ *  Balance-Pass steht die Messung: Der Eindruck "Splitterköcher ist staerker
+ *  als Blitz und Klinge" ist aus einem Build mit verschiedenen Stufen nicht
+ *  ableitbar (D-035). `feld` waehlt Gesamt- oder Boss-Schaden. */
+function weaponDamageText(feld){
+  const werte=S[feld]||[];
+  let summe=0; for(const w of WEAPONS) if(S.W[w.id]) summe+=werte[W_IDX[w.id]]||0;
+  const out=WEAPONS.filter(w=>S.W[w.id]).map(w=>{
+    const v=werte[W_IDX[w.id]]||0;
+    const anteil=summe>0?Math.round(v/summe*100):0;
+    return (S.evo[w.id]?w.evo.name:w.name)+' '+Math.round(v).toLocaleString('de-DE')+' ('+anteil+' %)';
+  });
+  return out.join(', ')||'keine';
+}
 function equippedGearText(){
   const out=[];
   for(const slot of ['weapon','charm','mantle']){
@@ -3196,6 +3433,8 @@ function runReportText(){
     'Sortievertrag: '+S.contract.name+' · Erz ×'+S.contract.reward.toFixed(2),
     'Eisenerz für Hold: '+(S.holdOre||0),
     'Build: '+buildText(),
+    'Schaden je Waffe: '+weaponDamageText('dmgW'),
+    'Boss-Schaden je Waffe: '+weaponDamageText('dmgWBoss'),
     'Evolutionen: '+evos,
     'Elite-Relikte: '+boonText(),
     'Ausrüstung: '+equippedGearText(),
@@ -3643,6 +3882,8 @@ function headlessRun(runLen, opts){
              W:Object.assign({},S.W), Pa:Object.assign({},S.Pa),
              evo:Object.keys(S.evo), boons:Object.assign({},S.boons),
              eliteChoices:S.eliteChoices, gearSeed:S.gearSeed,
+             bossKills:S.bossKills, evoTimes:S.evoTimes.slice(),
+             dmgW:Array.from(S.dmgW), dmgWBoss:Array.from(S.dmgWBoss),
              gearBonus:Object.assign({},S.gearBonus),
              dps:S.dmgDealt/runLen, xpTotal:S.xpTotal };
   } finally {
@@ -3728,6 +3969,10 @@ window.__EH = { get S(){return S;}, get H(){return META;}, CFG, HOLD_CFG, CONTRA
                   while(pendingPicks>0){currentOffer=buildOffer(); applyOffer(currentOffer[0]); pendingPicks--;}
                   while(S.pendingEliteRewards>0){currentOffer=buildEliteOffer(); applyOffer(currentOffer[0]); S.pendingEliteRewards--; S.eliteChoices++;}
                   HEADLESS=false;},
+                bossIsAlive, bossLocator, evoPaths, leadingEvoPath, completeEvolutions,
+                combatSlots, metaBoni, renderSlots, renderPauseDetail, togglePause,
+                weaponDamageText, hurt, W_IDX, GROUND,
+                BOSS: {BOSS_ADD_TARGET, EVO_FOCUS_AT, MAXLV, EVO_PASSIVE_LV},
                 targetEnemies, resize, render, spawnGem, updateGems, killEnemy,
                 gemCount:()=>{let a=0,b=0;
                   for(let i=0;i<G.n;i++) if(G.alive[i]){ if(G.kind[i]===1)b++; else a++; }
@@ -3735,6 +3980,11 @@ window.__EH = { get S(){return S;}, get H(){return META;}, CFG, HOLD_CFG, CONTRA
                 viewport:()=>({W,H,SCALE,VIEW_W,VIEW_H,SIM_W,SIM_H,SIM_DIAG,
                                CLIP_X,CLIP_Y,CLIP_W,CLIP_H,ASPECT_MAX,
                                COMBAT_H_MIN,BOSS_ENTRY,DESPAWN_F}),
+                enemyCounts:()=>{let normal=0,elite=0,boss=0;
+                  for(let i=0;i<E.n;i++) if(E.alive[i]){
+                    if(E.kind[i]===2) boss++; else if(E.kind[i]===1) elite++; else normal++;
+                  }
+                  return {normal,elite,boss};},
                 counts:()=>{let e=0,p=0,g=0;
                   for(let i=0;i<E.n;i++) if(E.alive[i])e++;
                   for(let i=0;i<P.n;i++) if(P.alive[i])p++;
