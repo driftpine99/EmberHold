@@ -1484,3 +1484,66 @@ machte. Gegen den Stand vor der Korrektur meldet der Check rot.
 
 **Sichtbare Änderung im Spiel:** Nach einem Abbruch vor 3:00 zeigt die Kachel
 „Ausrüstungsfund" am Run-Ende „kein Fund". Alles andere bleibt gleich.
+
+## D-035 – Renderziel erreicht, Kampfziel verfehlt
+
+**Status:** beschlossen für Umsetzung (23.08.2026). Grundlage ist der saubere
+Wächterring-Feldlauf mit Seed 3887882394.
+
+Der Lauf endete bei 7:06 mit 4.121 Kills, Stufe 16, 15 Kartenzügen und
+9 Eisenerz. Bis dorthin ist D-030 technisch bestätigt: Spitze sichtbar 202,
+1-%-Low 58 FPS und 0,7 % der 833 Proben unter 55 FPS. Die einzelne
+Schlechtestmessung von 35 FPS beschreibt keinen anhaltenden Einbruch. Weil
+die letzten 54 Sekunden fehlen, ist das vollständige 8-Minuten-Rendergate
+noch nicht geschlossen.
+
+Spielerisch reicht das Ergebnis nicht. Der Besitzer beschreibt die linke
+Anzeige als massiv überladen, verliert den Warden im Pulk und kommt wegen
+der Gegnermenge kaum zu ihm. Damit ist genau die subjektive Bedingung aus
+D-030 weiterhin negativ. Neue Gegneranimationen bleiben gesperrt.
+
+### Ursache der Warden-Wand
+
+Die Zieldichte liegt beim Warden-Einstieg um 4:10 erst bei rund 122, wächst
+aber während eines langen Bosskampfs ungebremst weiter. Im Feldlauf erreichte
+die Spitze im SIM-Radius 273. Ein schwacher Build wird dadurch doppelt
+bestraft: Er braucht länger für den Boss und erhält gerade deshalb immer mehr
+Verstärkung.
+
+Der Warden wird deshalb zu einer eigenen Kampfphase. Solange er lebt, liegt
+das Nachspawnziel normaler Gegner fest bei höchstens **90**. Vorhandene
+Gegner verschwinden nicht schlagartig; Kills und Recycling senken die Menge
+natürlich. Nach dem Boss gilt wieder die normale Kurve. Ein rot-goldener
+Randpfeil weist zu einem Warden außerhalb des Kampfausschnitts, ein Chevron
+markiert ihn im Bild. Bossleiste und Waffenpriorisierung bleiben.
+
+### Kampfinformation bekommt eine Rangfolge
+
+Der gemeldete Build erzeugt heute bis zu 19 linke Flächen: Meta-Bonus, zwei
+Ausrüstungen, drei Meisterschaften, zwei Relikte, fünf Waffen, zwei Passive
+und fünf Evolutionspfade. Nichts ist abgeschnitten, trotzdem ist die Anzeige
+unbrauchbar. Im laufenden Kampf bleiben nur Waffen, Passive und genau der am
+weitesten fortgeschrittene Evolutionspfad. Der konkrete Feldbuild fällt
+damit auf höchstens acht Einträge. Meta-Boni, Relikte und alle Pfaddetails
+bleiben in der Pause vollständig einsehbar.
+
+### Ein erfüllter Pfad ist abgeschlossen
+
+Langbogen 5 plus Sehne 3 lagen im Bericht vor, aber `buildOffer()` verlangt
+danach noch einen zusätzlichen Kartenzug für Windriss. Der Spieler hatte die
+Anforderung also erfüllt und wurde trotzdem vom nächsten XP-Wurf abhängig.
+Das passt nicht zum kurzen Acht-Minuten-Format.
+
+Der Fokus-Schutz beginnt künftig bei **4:00** und verfolgt deterministisch
+den am weitesten fortgeschrittenen Pfad. Vervollständigt eine gewählte Karte
+Waffe 5 plus Passiv 3, entsteht die Evolution im selben Kartenzug. Die beiden
+anderen Angebotsplätze, Karten-Gewichte und Rerolls bleiben unverändert.
+
+### Waffen erst messen, dann balancieren
+
+Der Eindruck, Splitterköcher sei stärker als Kettenblitz und Rundenklinge,
+ist plausibel, aber aus diesem Build nicht numerisch ableitbar: Die Waffen
+hatten verschiedene Stufen und Köcher 2 vervielfachte gerade den
+Splitterfächer. Vor Zahlenänderungen weist der Run-Bericht tatsächlichen
+Schaden und Boss-Schaden je Waffe aus, Overkill nur bis zur verbleibenden
+Gegner-HP. Erst der nächste Feldlauf entscheidet über einen Balance-Pass.

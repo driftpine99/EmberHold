@@ -2,26 +2,36 @@
 
 ## Aktueller Arbeitsfokus
 
-**Verbindlicher Stand 23.08.2026:** Der Auftrag in `docs/CURRENT_TASK.md` ist
-durch Codex abgenommen; als Nächstes folgt der manuelle Gesamttest.
+**Verbindlicher Stand 23.08.2026:** Der saubere Feldlauf mit Wächterring
+endete bei 7:06. Die Renderentlastung ist bis dorthin tragfähig, aber das
+Phase-0-Spielgefühl-Gate ist wegen Gegnerwand, verlorenem Bossfokus,
+HUD-Überladung und zu sprödem Evolutionsabschluss nicht bestanden (D-035).
 
-1. [x] Task EH-2026-08-23-01 durch Claude bearbeiten lassen.
-2. [x] Codex prüft Diff, Tests und `docs/WORK_REPORT.md` und pusht nur einen
-   abgenommenen Stand.
-3. [ ] Danach spielt der Besitzer den vollständigen 8-Minuten-Lauf nach
-   `docs/TESTPLAN.md`.
+Abgeschlossener Übergabeschritt:
 
-Die Codex-Abnahme vom 23.08.2026 bestätigt 38/38 automatische Checks. Bis zum
-manuellen Gesamttest keine weitere Balance-, Content- oder
-Gegneranimationsänderung stapeln. Die folgenden älteren Notizen bleiben als
-Projektverlauf erhalten, sind aber kein Ersatz für den aktiven Arbeitsauftrag.
+1. [x] EH-2026-08-23-01 durch Claude umgesetzt.
+2. [x] Durch Codex mit 38/38 Checks abgenommen und gepusht.
+3. [x] Feldlauf gefahren und als negativer Spielgefühl-Befund ausgewertet.
 
-Nach dem Feldlauf bleibt eine kleine technische Nacharbeit vorgemerkt: Im
-Todesframe können einzelne Splitter noch eingesammelt werden, nachdem
-`endRun()` die Basis-Beute bereits festgeschrieben hat. Das verändert die
-Auszahlung nicht, kann aber Kills, eingesammelte Splitter und Beute im Bericht
-uneinheitlich wirken lassen. Dieser vorbestehende Telemetriefehler blockiert
-den manuellen Test nicht.
+Nächste verbindliche Reihenfolge:
+
+1. [ ] Claude bearbeitet ausschließlich EH-2026-08-23-02 aus
+   `docs/CURRENT_TASK.md`: Warden-Kampfphase, kompaktes Kampf-HUD,
+   zuverlässiger Evolutionsabschluss und Waffenschaden-Telemetrie.
+2. [ ] Codex prüft Diff, Messwerte und `docs/WORK_REPORT.md`; nur ein
+   abgenommener Stand wird gepusht.
+3. [ ] Der Besitzer wiederholt den 8-Minuten-Wächterring-Lauf.
+4. [ ] Erst anhand der neuen Schadensaufschlüsselung entscheiden, ob
+   Splitterköcher, Kettenblitz oder Rundenklinge numerisch angepasst werden.
+
+Bis zu dieser Abnahme keine globale Dichte-, Waffenbalance-, Content- oder
+Gegneranimationsänderung stapeln.
+
+Nach dem nächsten Feldlauf bleibt eine kleine technische Nacharbeit
+vorgemerkt: Im Todesframe können einzelne Splitter noch eingesammelt werden,
+nachdem `endRun()` die Basis-Beute bereits festgeschrieben hat. Das verändert
+die Auszahlung nicht, kann aber Kills, eingesammelte Splitter und Beute im
+Bericht uneinheitlich wirken lassen.
 
 ### Historischer Verlauf
 

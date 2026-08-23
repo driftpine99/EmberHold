@@ -163,6 +163,28 @@ bleibt bewusst unangetastet, bis der Kern trägt.
 | 22.08.2026 | 3 Min | ja | 60 | 34,9 s | 6 | 10 | 57 | – | – |
 | 22.08.2026 | 8 Min | ja | 218 | 35,2 s | 36 | 15 | 35 | **58** | **0,5 %** |
 | 22.08.2026 | 8 Min | ja | 294 | 33,9 s | 28 | 14 | 34 | **38** | **40,0 %** |
+| 23.08.2026 | 8 Min | **ja, gefallen 7:06** | 202 | 31,8 s | 15 | 9 | 35 | **58** | **0,7 %** |
+
+Der fünfte Lauf ist sauber, aber kein vollständiger 8-Minuten-Nachweis. Bis
+zum Tod ist die Renderentlastung deutlich: 202 statt 294 sichtbar
+gezeichnete Gegner und nur 0,7 % statt 40,0 % der Proben unter 55 FPS.
+`Schlechteste FPS 35` war bei einem 1-%-Low von 58 ein einzelner Aussetzer,
+kein dauerhafter Einbruch. Ob die letzten 54 Sekunden ebenfalls tragen,
+bleibt offen.
+
+Das Spielgefühl-Gate ist dagegen klar negativ. Frage 1 scheitert: Der
+Besitzer kam wegen der Gegnermenge kaum zum Warden und verlor seine Position
+im Pulk. Frage 2 scheitert: Langbogen 5 plus Sehne 3 waren vollständig, aber
+ohne einen weiteren Kartenzug entstand keine Evolution. Frage 5 scheitert
+nicht an abgeschnittenen Einträgen, sondern an massiver Informationsdichte
+links. Neun eingesammelte Gluttropfen belegen, dass die Heilobjekte
+wahrgenommen und genutzt wurden; Planbarkeit, Hold-Zweck und freiwilliger
+zweiter Run wurden in diesem Bericht nicht beantwortet.
+
+Konsequenz D-035: keine Freigabe für die nächste Gegneranimation. Zuerst
+Warden-Kampfphase, Bossortung, kompaktes HUD, unmittelbarer
+Evolutionsabschluss und Waffenschaden-Telemetrie umsetzen; danach denselben
+Feldtest wiederholen.
 
 Der dritte Lauf ist der erste saubere 8-Minuten-Referenzpunkt und der erste mit
 der neuen Metrik. Er löst den FPS-Befund auf: 1-%-Low 58 bei 0,5 % Zeitanteil
