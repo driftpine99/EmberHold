@@ -1776,7 +1776,7 @@ function buildOffer(){
     out.push(pool.splice(idx,1)[0]);
   }
   // Spaeter Fokus-Schutz: genau eine der drei Karten haelt einen begonnenen
-  // Evolutionspfad offen. Sie wird nicht erzwungen und greift erst ab 7:30,
+  // Evolutionspfad offen. Sie wird nicht erzwungen und greift erst ab 5:30,
   // damit der fruehe Build weiterhin variieren darf.
   if(S.t>=EVO_FOCUS_AT){
     const w=WEAPONS.find(x=>x.evo&&S.W[x.id]&&!S.evo[x.id]);

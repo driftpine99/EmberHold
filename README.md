@@ -38,10 +38,12 @@ Elite-Kills öffnen bei 2:00 und 6:00 eine eigene Auswahl aus drei Run-Relikten;
 die zweite Wahl schafft bewusst eine neue Buildentscheidung zwischen Warden
 und Extraktion.
 
-Jede Sortie bringt außerdem ein Teil für die Rüstkammer. Sechs feste Teile
-verteilen sich auf drei Slots, Duplikate werden sofort zu Runenstaub und Ränge
-werden gezielt statt über Fusionen erhöht. Die seltene Runenfibel sät mit
-Runenfunke eine eigene Karte in das Angebot des nächsten Runs.
+Jede mindestens drei Minuten gespielte Sortie bringt außerdem ein Teil für die
+Rüstkammer. Ein früher Abbruch behält seine erspielte Basis-Beute, liefert aber
+keinen garantierten Ausrüstungsfund. Sechs feste Teile verteilen sich auf drei
+Slots, Duplikate werden sofort zu Runenstaub und Ränge werden gezielt statt über
+Fusionen erhöht. Die seltene Runenfibel sät mit Runenfunke eine eigene Karte in
+das Angebot des nächsten Runs.
 
 Die einzige Produktfrage der Phase 0 lautet:
 

@@ -2,18 +2,26 @@
 
 ## Aktueller Arbeitsfokus
 
-**Verbindlicher Stand 23.08.2026:** Für die Ausführung gilt ausschließlich der
-freigegebene Auftrag in `docs/CURRENT_TASK.md`.
+**Verbindlicher Stand 23.08.2026:** Der Auftrag in `docs/CURRENT_TASK.md` ist
+durch Codex abgenommen; als Nächstes folgt der manuelle Gesamttest.
 
-1. [ ] Task EH-2026-08-23-01 durch Claude bearbeiten lassen.
-2. [ ] Codex prüft Diff, Tests und `docs/WORK_REPORT.md` und pusht nur einen
+1. [x] Task EH-2026-08-23-01 durch Claude bearbeiten lassen.
+2. [x] Codex prüft Diff, Tests und `docs/WORK_REPORT.md` und pusht nur einen
    abgenommenen Stand.
 3. [ ] Danach spielt der Besitzer den vollständigen 8-Minuten-Lauf nach
    `docs/TESTPLAN.md`.
 
-Bis zu dieser Abnahme keine weitere Balance-, Content- oder
+Die Codex-Abnahme vom 23.08.2026 bestätigt 38/38 automatische Checks. Bis zum
+manuellen Gesamttest keine weitere Balance-, Content- oder
 Gegneranimationsänderung stapeln. Die folgenden älteren Notizen bleiben als
 Projektverlauf erhalten, sind aber kein Ersatz für den aktiven Arbeitsauftrag.
+
+Nach dem Feldlauf bleibt eine kleine technische Nacharbeit vorgemerkt: Im
+Todesframe können einzelne Splitter noch eingesammelt werden, nachdem
+`endRun()` die Basis-Beute bereits festgeschrieben hat. Das verändert die
+Auszahlung nicht, kann aber Kills, eingesammelte Splitter und Beute im Bericht
+uneinheitlich wirken lassen. Dieser vorbestehende Telemetriefehler blockiert
+den manuellen Test nicht.
 
 ### Historischer Verlauf
 

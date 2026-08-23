@@ -493,6 +493,12 @@ umgewandelt. Es gibt deshalb weder Inventarkapazität noch wertlose Kopien oder
 ein Fusionssystem. Nicht mehr gewünschte Teile lassen sich ebenfalls direkt
 zerlegen.
 
+**Nachtrag durch D-034 (23.08.2026):** Der garantierte Fund gilt nur noch für
+Sortien, die mindestens die kürzeste angebotene Dauer von drei Minuten
+erreichen. Ein früher Abbruch behält seine Basis-Beute und mindestens ein Erz,
+liefert aber kein Ausrüstungsteil. Der restliche Ausrüstungsvertrag aus D-023
+bleibt unverändert.
+
 Runenstaub wertet ein gezielt gewähltes Teil bis Rang 3 auf. Gewöhnliche Teile
 kosten 6 beziehungsweise 12 Staub, die seltene Runenfibel 12 beziehungsweise
 24. Angelegte Werte werden erst beim Start in den Run kopiert und verändern

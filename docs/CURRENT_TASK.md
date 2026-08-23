@@ -3,7 +3,7 @@
 ## Steuerung
 
 - **Task-ID:** EH-2026-08-23-01
-- **Status:** FREIGEGEBEN_FUER_CLAUDE
+- **Status:** ABGENOMMEN_DURCH_CODEX
 - **Auftraggeber und Abnahme:** Codex
 - **Ausführung:** Claude Code
 - **Priorität:** P1 – vor dem nächsten manuellen 8-Minuten-Lauf
@@ -111,3 +111,23 @@ Claude darf höchstens zwei kleine lokale Commits erstellen: einen für
 Code/Tests und optional einen für erlaubte Dokumentation. Kein Push und keine
 Folgeaufgabe. Abschließend `docs/WORK_REPORT.md` vollständig ausfüllen und
 stoppen.
+
+## Codex-Abnahme
+
+**Abgenommen am 23.08.2026.** Geprüft wurden die lokalen Commits `42d7e29`
+(Code und Tests) und `7eab3e6` (Dokumentation). Der unabhängige Lauf von
+`npm test` meldet 38/38 Checks grün; `git diff 091edd0..HEAD --check` ist
+sauber. Der Auftrag ist vollständig erfüllt und eröffnet keine neue
+Balance-, Content- oder Grafikbaustelle.
+
+Die gemeinsame Drei-Minuten-Grenze für Erzdeckel und garantierten
+Ausrüstungsfund wird für Phase 0 bewusst beibehalten: Sie entspricht der
+kürzesten angebotenen Sortie und bleibt für Spieler verständlich. Die
+mathematische Ausnahme unter rund 35 Sekunden ist akzeptiert, weil der
+verbindliche Boden von einem Erz sonst nicht gleichzeitig gelten könnte. Die
+neun echten stationären Verlustläufe sterben erst nach 37,98 bis 45,60
+Sekunden, bleiben mit höchstens 1,58 Erz pro Minute unter dem Referenzwert und
+liefern kein Teil.
+
+Der nächste Schritt ist kein neuer Claude-Auftrag, sondern der manuelle
+8-Minuten-Gesamttest durch den Besitzer gemäß `docs/TESTPLAN.md`.
