@@ -2,30 +2,36 @@
 
 ## Aktueller Arbeitsfokus
 
-**Verbindlicher Stand 23.08.2026:** Der saubere Feldlauf mit Wächterring
-endete bei 7:06. Die Renderentlastung ist bis dorthin tragfähig, aber das
-Phase-0-Spielgefühl-Gate ist wegen Gegnerwand, verlorenem Bossfokus,
-HUD-Überladung und zu sprödem Evolutionsabschluss nicht bestanden (D-035).
+**Verbindlicher Stand 23.08.2026:** EH-2026-08-23-02 ist durch Claude
+umgesetzt und durch Codex technisch abgenommen. Der Warden hat jetzt ein
+eigenes Verstärkungsziel von 90 normalen Gegnern, eine dauerhafte Ortung,
+das Kampf-HUD ist entschlackt, erfüllte Evolutionspfade schließen sofort und
+der Run-Bericht misst Waffen- sowie Boss-Schaden getrennt (D-035).
 
-Abgeschlossener Übergabeschritt:
+Abgeschlossen:
 
 1. [x] EH-2026-08-23-01 durch Claude umgesetzt.
 2. [x] Durch Codex mit 38/38 Checks abgenommen und gepusht.
 3. [x] Feldlauf gefahren und als negativer Spielgefühl-Befund ausgewertet.
+4. [x] EH-2026-08-23-02 durch Claude umgesetzt.
+5. [x] Codex-Review: Diff und Messreihe geprüft, oberen Bossmarker-Randfall
+   nachgebessert und `npm test` mit 43/43 Checks bestanden.
+6. [x] Bot-Regressionsanker wegen der ausdrücklich gewünschten
+   Evolutionsänderung von 15,3 auf 21,7 neu referenziert; Toleranz unverändert
+   bei ±3.
 
 Nächste verbindliche Reihenfolge:
 
-1. [ ] Claude bearbeitet ausschließlich EH-2026-08-23-02 aus
-   `docs/CURRENT_TASK.md`: Warden-Kampfphase, kompaktes Kampf-HUD,
-   zuverlässiger Evolutionsabschluss und Waffenschaden-Telemetrie.
-2. [ ] Codex prüft Diff, Messwerte und `docs/WORK_REPORT.md`; nur ein
-   abgenommener Stand wird gepusht.
-3. [ ] Der Besitzer wiederholt den 8-Minuten-Wächterring-Lauf.
-4. [ ] Erst anhand der neuen Schadensaufschlüsselung entscheiden, ob
+1. [ ] Der Besitzer wiederholt den vollständigen 8-Minuten-Wächterring-Lauf
+   nach dem aktualisierten Protokoll in `docs/TESTPLAN.md`.
+2. [ ] Erst anhand der neuen Schadensaufschlüsselung entscheiden, ob
    Splitterköcher, Kettenblitz oder Rundenklinge numerisch angepasst werden.
+3. [ ] Nur bei bestandenem Spielgefühl- und Rendergate die nächste
+   Gegneranimation oder eine weitere Inhaltserweiterung freigeben.
 
-Bis zu dieser Abnahme keine globale Dichte-, Waffenbalance-, Content- oder
-Gegneranimationsänderung stapeln.
+Bis zu diesem Feldlauf keine globale Dichte-, Waffenbalance-, Content- oder
+Gegneranimationsänderung stapeln. Der sichtbare Browser-Smoke von Claude ist
+kein Ersatz für die subjektive Abnahme durch den Besitzer.
 
 Nach dem nächsten Feldlauf bleibt eine kleine technische Nacharbeit
 vorgemerkt: Im Todesframe können einzelne Splitter noch eingesammelt werden,

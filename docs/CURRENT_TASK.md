@@ -3,7 +3,9 @@
 ## Steuerung
 
 - **Task-ID:** EH-2026-08-23-02
-- **Status:** FREIGEGEBEN_FUER_CLAUDE
+- **Status:** ABGENOMMEN_DURCH_CODEX
+- **Abnahme:** 23.08.2026 · 43/43 automatische Checks grün; sichtbarer
+  8-Minuten-Feldlauf bleibt beim Besitzer
 - **Auftraggeber und Abnahme:** Codex
 - **Ausführung:** Claude Code
 - **Priorität:** P0 – vor einem weiteren Feldlauf und vor neuen Animationen

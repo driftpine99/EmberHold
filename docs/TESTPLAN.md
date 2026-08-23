@@ -103,57 +103,52 @@ den 40 % von damals liegen.
 
 ### Sechs Fragen, die der Bericht nicht beantworten kann
 
-**Stand 22.08.2026.** Seit der letzten Fassung sind sechs Änderungen gelandet,
-die alle auf dieselbe Spielerbewertung aus D-027 antworten. Die Fragen prüfen
-gezielt, ob sie gewirkt haben — jede nennt, was sie entscheidet.
+**Stand 23.08.2026, nach D-035.** Bitte den vollständigen
+8-Minuten-Wächterring-Lauf ohne Live-Tuning spielen. Danach den gesamten
+Run-Bericht kopieren; die beiden neuen Schadenszeilen sind die Grundlage für
+den späteren Waffenvergleich.
 
-**1. Bewegung.** *Entscheidet: ob D-030 gewirkt hat — der Kernbefund von D-027.*
-Vorher hieß es: „man kann gar nicht mehr so richtig laufen/ausweichen" und „an
-den Boss kommt man wegen der vielen Gegner nicht". Der Bewegungsüberschuss ist
-beseitigt, das Feld sollte rund ein Drittel leerer sein.
+**1. Warden-Kampfphase.** Solange der Warden lebt, sinkt das Nachspawnziel auf
+90 normale Gegner. Bereits vorhandene Gegner verschwinden nicht künstlich;
+nach dem Boss baut sich die normale Kurve wieder auf.
 
-> Kannst du wieder kiten und ausweichen? Und kommst du zum Warden durch?
+> Kommst du jetzt gezielt zum Warden und kannst ihn im Fernkampf sinnvoll
+> bekämpfen? Fühlt sich die Phase klarer an, ohne plötzlich leer zu werden?
 
-**2. Buildmacht.** *Entscheidet: ob D-031 gewirkt hat.* Der Fokus-Schutz greift
-jetzt ab 5:30 statt 7:30; eine begonnene Evolution bleibt dadurch länger im
-Angebot sichtbar.
+**2. Warden-Ortung.** Außerhalb des Kampfausschnitts weist ein rot-goldener
+Randpfeil zum Boss; im Bild steht ein Chevron über ihm.
 
-> Hast du eine Evolution abgeschlossen? Und ist erkennbar geworden, worauf du
-> hinarbeitest — oder kamen die Karten weiter beliebig?
+> War jederzeit klar, wo der Warden ist? Waren Pfeil und Chevron gut sichtbar,
+> ohne mit Aelrics Geschossen verwechselt zu werden?
 
-**3. Gluttropfen.** *Entscheidet: ob D-032 die richtige Form hat.* Neu: Gegner
-lassen etwa alle 25 Sekunden einen warmen Tropfen fallen, der 6 % der
-Lebenspunkte heilt. Er hat absichtlich einen kleinen Einzugsradius und keinen
-Fernsog — **man muss hingehen.**
+**3. Kampf-HUD und Pause.** Links stehen nur aktive Waffen, aktive Passive und
+ein führender Evolutionspfad. Run-Boni, vollständiger Build und alle Pfade
+liegen in der Pause.
 
-> Sind sie dir aufgefallen? Bist du hingelaufen, obwohl es riskant war? Und
-> fühlt sich Heilung jetzt planbar an?
+> Ist die linke Seite jetzt ruhig genug? Fehlt dir im Kampf etwas Wichtiges?
+> Findest du die ausgelagerten Details in der Pause ohne Suchen?
 
-**4. Zweck.** *Entscheidet: ob D-033 und D-034 die wichtigste Beschwerde lösen.*
-Vorher: „Aktuell weiß ich nicht, wofür ich die Runs mache." Jetzt zeigt der Hold
-genau **ein** nächstes Ziel mit Fortschritt und Begründung, und dasselbe Ziel
-steht am Run-Ende unter „Damit als Nächstes". Zusätzlich wurde die Erzkurve
-korrigiert: Ein besserer Lauf bringt jetzt spürbar mehr Erz statt eines
-einzigen Punktes mehr.
+**4. Evolution.** Ab 4:00 hält ein Kartenplatz den am weitesten
+fortgeschrittenen Pfad offen. Waffe 5 plus Passiv 3 löst die Evolution sofort
+mit derselben Kartenwahl aus.
 
-> Weißt du beim Blick in den Hold, was du als Nächstes tust? Und hat sich der
-> Run am Ende gelohnt angefühlt?
+> Konntest du mindestens eine Evolution planbar abschließen? Wirkte der
+> Kartenweg nachvollziehbar oder weiterhin überwiegend glücksabhängig?
 
-**5. Slotanzeige.** *Entscheidet: ob der Überlauf behoben ist.* Bei niedrigen
-Fenstern bricht die Liste jetzt in eine zweite Spalte um.
+**5. Heilung und Hold-Zweck.** Gluttropfen müssen weiterhin bewusst
+eingesammelt werden. Hold und Run-Ende zeigen genau ein nächstes Ausbauziel.
 
-> War dein vollständiger Build links sichtbar, ohne dass unten etwas fehlte?
+> Waren Heilung und nächster Hold-Schritt verständlich? Hat sich die
+> Run-Belohnung als Fortschritt angefühlt?
 
-**6. Der zweite Run.** *Entscheidet: das Phase-0-Gate. Die einzige Frage, an der
-laut GDD das ganze Projekt hängt.*
+**6. Der zweite Run.** Das bleibt das Phase-0-Gate.
 
-> Hattest du beim Extraktionsbildschirm Lust, sofort noch einen zu starten?
-> Nicht „war es okay", sondern: hat es gezogen? Und falls nein — was fehlte?
+> Hattest du am Ende Lust, sofort noch einen Run zu starten? Nicht nur „war es
+> okay": Was hat gezogen — oder was hat noch gefehlt?
 
-**Weiterhin offen und nicht Teil dieser Runde:** die Animation wirkt ruckelig
-(D-027 Punkt F, braucht neue Assets und die Revision von D-015/D-016) und die
-seitliche Safe-Area gefällt nicht (D-027 Punkt G, rein kosmetisch). Beides
-bleibt bewusst unangetastet, bis der Kern trägt.
+**Weiterhin nicht Teil dieses Laufs:** neue Gegneranimationen, Änderungen der
+seitlichen Safe-Area und numerisches Waffenbalancing. Der Bericht misst die
+Waffen jetzt erst einmal; Codex entscheidet danach anhand der Daten.
 
 ### Bisherige Feldläufe
 
@@ -181,10 +176,10 @@ links. Neun eingesammelte Gluttropfen belegen, dass die Heilobjekte
 wahrgenommen und genutzt wurden; Planbarkeit, Hold-Zweck und freiwilliger
 zweiter Run wurden in diesem Bericht nicht beantwortet.
 
-Konsequenz D-035: keine Freigabe für die nächste Gegneranimation. Zuerst
-Warden-Kampfphase, Bossortung, kompaktes HUD, unmittelbarer
-Evolutionsabschluss und Waffenschaden-Telemetrie umsetzen; danach denselben
-Feldtest wiederholen.
+Konsequenz D-035: Warden-Kampfphase, Bossortung, kompaktes HUD,
+unmittelbarer Evolutionsabschluss und Waffenschaden-Telemetrie sind inzwischen
+technisch abgenommen. Die nächste Gegneranimation bleibt gesperrt, bis der
+Besitzer denselben vollständigen Feldtest erfolgreich wiederholt.
 
 Der dritte Lauf ist der erste saubere 8-Minuten-Referenzpunkt und der erste mit
 der neuen Metrik. Er löst den FPS-Befund auf: 1-%-Low 58 bei 0,5 % Zeitanteil
@@ -216,18 +211,19 @@ wird an Menschenläufen geprüft, siehe die Feldlauf-Tabelle weiter oben.
 | Größe | Ist | Vertrag (Bot) | Designziel (Mensch) |
 |---|---:|---:|---:|
 | Erster Kartenzug, Mittelwert | 31,6 s | 25–45 s | 35 s |
-| Kartenzüge in 8 Min, Mittelwert | 16,11 | 15,3 ± 3 | 21 |
-| Rhythmus pro Minute | 1,44 · 1,67 · 1,67 · 1,89 · 1,56 · 1,44 · 2,22 · 4,22 | — | 1 · 2 · 2 · 2 · 3 · 3 · 4 · 4 |
-| Kartenzüge bei −10 % XP-Kosten | 24,89 | — | — |
-| Kartenzüge bei +10 % XP-Kosten | 17,22 | — | — |
-| Verhältnis der beiden Varianten | 1,445 | ≤ 1,75 | — |
-| Runs mit Evolution | 3 / 9 | mindestens 2 / 9 (Bodenschwelle) | in einer Sortie erreichbar |
-| Spitze im Feld, Maximum | 322 | ≤ 331 (Zieldichte +10 %) | — |
+| Kartenzüge in 8 Min, Mittelwert | 21,67 | 21,7 ± 3 | 21 |
+| Rhythmus pro Minute | 1,44 · 1,67 · 1,67 · 1,89 · 1,67 · 1,89 · 3,56 · 7,89 | — | 1 · 2 · 2 · 2 · 3 · 3 · 4 · 4 |
+| Kartenzüge bei −10 % XP-Kosten | 33,56 | — | — |
+| Kartenzüge bei +10 % XP-Kosten | 22,44 | — | — |
+| Verhältnis der beiden Varianten | 1,495 | ≤ 1,75 | — |
+| Runs mit Evolution | 9 / 9 | mindestens 2 / 9 (Bodenschwelle) | in einer Sortie erreichbar |
+| Evolutionen je Run, Mittelwert | 1,89 | — | — |
+| Spitze im Feld, Maximum | 312 | ≤ 331 (Zieldichte +10 %) | — |
 | Elite-Reliktwahlen | 2 in 9 / 9 Runs | exakt 2 pro vollständigem Run | — |
 | Erz aus absichtlich untätigem Lauf | 1 Erz, schlechteste Rate 1,58/Min | ≤ 1,75 Erz je Minute | — |
 
-Alle Ist-Werte dieser Tabelle stammen aus derselben `npm test`-Ausgabe vom
-23.08.2026 (Commit `42d7e29`).
+Alle Ist-Werte dieser Tabelle stammen aus der grünen `npm test`-Ausgabe mit
+43/43 Checks bei der Codex-Abnahme vom 23.08.2026.
 
 Ein Wiederholungslauf mit demselben Seed muss bitgenau dasselbe Ergebnis
 liefern. Der Test endet mit Fehlercode, sobald ein Korridor oder diese
@@ -235,12 +231,26 @@ Reproduzierbarkeit verletzt wird.
 
 Die neun Baseline-Runs werden mit einer fokussierten, aber nicht
 allwissenden Kartenstrategie gespielt. Mindestens zwei davon müssen in einer
-normalen 8-Minuten-Sortie eine Evolution abschließen. Ab 5:30 hält das Angebot
-einen bereits begonnenen Evolutionspfad als eine von drei optionalen Karten
-sichtbar; die Voraussetzungen bleiben Waffenstufe 5 plus Passivstufe 3.
+normalen 8-Minuten-Sortie eine Evolution abschließen. Ab 4:00 hält das Angebot
+den am weitesten fortgeschrittenen Evolutionspfad als eine von drei optionalen
+Karten sichtbar. Die Voraussetzungen bleiben Waffenstufe 5 plus Passivstufe 3;
+die abschließende Karte löst die Evolution sofort im selben Kartenzug aus.
 `evolutionCatalog` erzwingt außerdem ein Angebot und die Kernmechanik jedes
 der sechs Pfade. `eliteChoices` prüft den Weg vom Elite-Kill zur einmaligen
 3er-Auswahl, alle vier Relikteffekte und die zweite Entscheidung nach dem Boss.
+
+Fünf Checks sichern D-035 zusätzlich:
+
+- `bossCombatPocket` prüft Ziel 90 ohne künstliche Kills oder Beute und den
+  Wiederaufbau nach dem Boss.
+- `bossLocatorState` prüft vier Pfeilrichtungen, sichtbaren Chevron, Tod und
+  den knappen oberen 16:9-Rand.
+- `compactCombatHud` prüft acht Einträge beim Feldbuild und alle
+  ausgelagerten Informationen in der Pause.
+- `evolutionCompletion` prüft Fokuszeit, führenden Pfad, Sofortabschluss und
+  Schutz vor doppelter Evolution.
+- `weaponDamageReport` prüft Overkill-Deckel, sechs Quellen einschließlich
+  Feuerboden und Frostsplitter sowie getrennten Boss-Schaden.
 
 Seit D-017 führt der Test `resize()` tatsächlich aus und prüft fünf
 Querformate mit demselben Seed:

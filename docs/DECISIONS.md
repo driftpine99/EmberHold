@@ -1487,8 +1487,9 @@ machte. Gegen den Stand vor der Korrektur meldet der Check rot.
 
 ## D-035 – Renderziel erreicht, Kampfziel verfehlt
 
-**Status:** beschlossen für Umsetzung (23.08.2026). Grundlage ist der saubere
-Wächterring-Feldlauf mit Seed 3887882394.
+**Status:** beschlossen und technisch abgenommen (23.08.2026). Grundlage ist
+der saubere Wächterring-Feldlauf mit Seed 3887882394; die sichtbare
+Spielgefühl-Abnahme folgt im nächsten Besitzerlauf.
 
 Der Lauf endete bei 7:06 mit 4.121 Kills, Stufe 16, 15 Kartenzügen und
 9 Eisenerz. Bis dorthin ist D-030 technisch bestätigt: Spitze sichtbar 202,
@@ -1547,3 +1548,46 @@ hatten verschiedene Stufen und Köcher 2 vervielfachte gerade den
 Splitterfächer. Vor Zahlenänderungen weist der Run-Bericht tatsächlichen
 Schaden und Boss-Schaden je Waffe aus, Overkill nur bis zur verbleibenden
 Gegner-HP. Erst der nächste Feldlauf entscheidet über einen Balance-Pass.
+
+### Umsetzung und Codex-Abnahme
+
+EH-2026-08-23-02 setzt alle vier Teile um. Während eines lebenden Wardens
+steuert ausschließlich die Zahl normaler Gegner auf das Ziel 90; Boss und
+Eliten verbrauchen dieses Budget nicht. Bereits vorhandene Gegner werden
+nicht gelöscht. Nach dem Boss baut der vorhandene Spawn-Deckel die normale
+Dichte wieder auf. Randpfeil und Chevron lesen denselben Bosszustand wie die
+Bossleiste; Codex ergänzte bei der Review eine Klemme gegen Abschneiden am
+oberen 16:9-Rand.
+
+Das Kampf-HUD zeigt beim gemeldeten Build sieben Waffen-/Passivflächen und
+genau einen führenden Pfad. Run-Boni, vollständiger Build und alle offenen
+Pfade stehen in der Pause. Der Fokus greift ab 4:00; die Karte, die Waffe 5
+plus Passiv 3 vervollständigt, löst die Evolution sofort aus. Der Bericht
+weist tatsächlich abgezogenen Gesamt- und Boss-Schaden je aktive Waffe aus.
+
+Claude meldete korrekt `BLOCKIERT`, weil die beauftragte Evolutionsregel den
+alten Bot-Regressionsanker 15,3 ± 3 entwertete. Die Vier-Varianten-Messung
+isoliert beide ausdrücklich gewünschten Ursachen: Fokus ab 4:00 und
+Sofortabschluss. Codex referenziert deshalb `BOT_PICK_REF` auf **21,7** neu;
+die Toleranz bleibt unverändert bei ±3. Das ist keine nachträgliche Lockerung.
+
+| Automatischer Wert | Vorher | Nachher |
+|---|---:|---:|
+| Erster Kartenzug, Mittel | 31,64 s | 31,64 s |
+| Kartenzüge, Mittel | 16,11 | 21,67 |
+| Läufe mit Evolution | 3/9 | 9/9 |
+| Evolutionen je Lauf | 0,67 | 1,89 |
+| Kills, Mittel | 4.852 | 6.915 |
+| Dichteziel bei 8:00 | 301 | 301 |
+| Feldspitze, Maximum | 322 | 312 |
+
+`npm test` besteht nach der unabhängigen Review mit **43/43 Checks**.
+Insbesondere sind `bossCombatPocket`, `bossLocatorState`,
+`compactCombatHud`, `evolutionCompletion` und `weaponDamageReport` grün;
+`git diff --check` ist sauber.
+
+Die 9/9 Evolutionsläufe des Bots sind ein bewusst sichtbares Signal, kein
+Beweis für die Menschenkurve. Bis zum nächsten vollständigen Besitzerlauf
+folgt weder ein Waffen-Nerf noch eine weitere Dichte-, Content- oder
+Animationsänderung. Der Browser-Smoke von Claude war erfolgreich; Codex
+konnte ihn wegen eines Windows-Sandboxfehlers nicht unabhängig wiederholen.

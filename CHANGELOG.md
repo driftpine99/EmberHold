@@ -11,6 +11,13 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 - Kanonische Dateien für aktiven Auftrag und standardisierten Arbeitsbericht
 ### Added
 
+- Waffen-Telemetrie im kopierbaren Run-Bericht: tatsächlich abgezogener
+  Gesamtschaden und Boss-Schaden je aktive Waffe; Overkill und Folgeeffekte
+  werden ihrer Ursprungswaffe korrekt zugerechnet
+- Fünf neue Verhaltenschecks für Warden-Kampfphase, Bossortung, kompaktes HUD,
+  unmittelbaren Evolutionsabschluss und Waffen-Schadensbericht; zusammen mit
+  dem oberen Bossmarker-Randfall jetzt 43/43 Checks grün
+
 - FPS-Metrik nach D-024: alle Halbsekundenproben werden gesammelt, `fpsStats()`
   liefert 1-%-Low und den Zeitanteil unter der Zielmarke. `FPS_TARGET` liegt
   bewusst außerhalb von `CFG`, damit ein Performanceziel den Balancevertrag
@@ -102,6 +109,20 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 - Automatische Prüfung der aktiven lokalen RGBA-Assets und des Bogen-Animationszustands
 
 ### Changed
+
+- Der Warden bildet eine lesbare Kampfphase: höchstens 90 nachspawnende
+  normale Gegner, keine künstliche Entfernung, danach schrittweiser
+  Wiederaufbau der normalen Dichte
+- Rot-goldener Randpfeil außerhalb des Kampfausschnitts und Chevron über dem
+  sichtbaren Warden; der Chevron bleibt auch am knappen oberen 16:9-Rand
+  vollständig sichtbar
+- Kampf-HUD auf aktive Waffen, Passive und genau einen führenden
+  Evolutionspfad reduziert; Run-Boni, vollständiger Build und alle Pfade in
+  die Pause verschoben
+- Evolutionsfokus von 5:30 auf 4:00 gelegt und erfüllte Pfade schließen ohne
+  zusätzlichen Zufallskartenzug sofort
+- Bot-Regressionsanker wegen dieser beabsichtigten Produktänderung von 15,3
+  auf 21,7 neu referenziert; Toleranz unverändert bei ±3
 
 - Früh verlorene Runs sind kein Farmweg mehr (EH-2026-08-23-01): Eine Sortie,
   die die kürzeste angebotene Länge von 3 Minuten nicht erreicht, gilt als

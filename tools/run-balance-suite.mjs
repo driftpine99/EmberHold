@@ -1139,6 +1139,15 @@ try {
     unten.richtung === "unten" && oben.richtung === "oben";
   const alleRandpfeile = randfaelle.every(l => l.modus === "pfeil");
   const chevronInnen = drin.modus === "chevron" && drin.x === 0 && drin.y === 0;
+  // Der Warden tritt auf 16:9 mit nur 1,25 Welteinheiten Reserve ein. Sobald
+  // sein Zentrum als sichtbar gilt, darf der Chevron am oberen Rand nicht
+  // abgeschnitten sein oder unterhalb des Bosses landen.
+  engine.S.x = 0; engine.S.y = view.VIEW_H/2 - engine.BOSS.BOSS_MARK_PAD;
+  const obenDrin = engine.bossLocator();
+  const obereKante = engine.S.y - view.VIEW_H/2;
+  const chevronObenSichtbar = obenDrin.modus === "chevron" &&
+    obenDrin.markY < 0 &&
+    obenDrin.markY - engine.BOSS.BOSS_CHEV_HALF >= obereKante - 1e-6;
   // Der Randpfeil muss im Kampfausschnitt bleiben, sonst laege er auf breiten
   // Formaten in der Safe-Area.
   const imAusschnitt = randfaelle.every(l => {
@@ -1152,10 +1161,11 @@ try {
   const nachTod = engine.bossLocator();
 
   bossLocatorState = ohneBoss === null && richtungenStimmen && alleRandpfeile &&
-    chevronInnen && imAusschnitt && nachTod === null;
+    chevronInnen && chevronObenSichtbar && imAusschnitt && nachTod === null;
   bossLocatorDiagnostics = { ohneBoss, nachTod,
     richtungen: randfaelle.map(l => l.richtung + ":" + l.modus),
-    chevron: drin.modus, richtungenStimmen, alleRandpfeile, chevronInnen, imAusschnitt };
+    chevron: drin.modus, richtungenStimmen, alleRandpfeile, chevronInnen,
+    chevronObenSichtbar, imAusschnitt };
 } catch (error) {
   bossLocatorError = error instanceof Error ? error.message : String(error);
 }

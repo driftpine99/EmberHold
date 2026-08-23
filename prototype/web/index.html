@@ -621,7 +621,10 @@ function targetPicks(runLen){ return CFG.PICK_TARGETS[runLen] ?? null; }
 // Das Designziel aus CFG.PICK_TARGETS wird deshalb an Menschenlaeufen geprueft
 // und in docs/TESTPLAN.md dokumentiert, nicht automatisiert. Diese Zahl haelt
 // nur fest, was der Bot heute liefert, damit eine stille Verschiebung auffaellt.
-const BOT_PICK_REF = 15.3, BOT_PICK_TOL = 3;
+// D-035 hat diese Kurve absichtlich veraendert: Fokus ab 4:00 und unmittelbarer
+// Evolutionsabschluss verschieben den reproduzierbaren Mittelwert von 16,11
+// auf 21,67. Codex hat deshalb den Anker neu referenziert, nicht die Toleranz.
+const BOT_PICK_REF = 21.7, BOT_PICK_TOL = 3;
 // Bewegung darf keinen Gegnerueberschuss mehr erzeugen (D-028, D-029).
 const OVERSHOOT_MAX = 1.10;
 
@@ -1869,7 +1872,7 @@ function buildOffer(){
     out.push(pool.splice(idx,1)[0]);
   }
   // Spaeter Fokus-Schutz: genau eine der drei Karten haelt einen begonnenen
-  // Evolutionspfad offen. Sie wird nicht erzwungen und greift erst ab 5:30,
+  // Evolutionspfad offen. Sie wird nicht erzwungen und greift erst ab 4:00,
   // damit der fruehe Build weiterhin variieren darf.
   if(S.t>=EVO_FOCUS_AT){
     const lead=leadingEvoPath();
@@ -2620,10 +2623,10 @@ function drawBossLocator(){
   const loc=bossLocator(); if(!loc) return;
   const puls=0.82+0.18*Math.sin(S.t*6.0);
   ctx.save();
-  ctx.translate(loc.x,loc.y);
   if(loc.modus==='chevron'){
-    // Chevron ueber dem Warden, aufrecht und nicht mitgedreht.
-    ctx.translate(0,-58);
+    // Chevron ueber dem Warden, aufrecht und nicht mitgedreht. markY klemmt
+    // ihn am oberen Bildrand, wo der Warden bei 16:9 fast ohne Reserve eintritt.
+    ctx.translate(loc.x,loc.markY);
     ctx.globalAlpha=puls;
     ctx.fillStyle='#c8331f';
     ctx.beginPath();
@@ -2633,6 +2636,7 @@ function drawBossLocator(){
     ctx.strokeStyle='#f0c45a'; ctx.lineWidth=2.4; ctx.stroke();
   } else {
     // Randpfeil in Richtung Warden.
+    ctx.translate(loc.x,loc.y);
     ctx.rotate(loc.winkel);
     ctx.globalAlpha=puls;
     ctx.fillStyle='#c8331f';
@@ -3161,7 +3165,7 @@ function bossIsAlive(){
 // innerhalb steht ein Chevron ueber ihm. Der Rand wird am Kampfausschnitt
 // geklemmt, nie an der Fensterbreite -- sonst laege der Pfeil auf 21:9 in der
 // Safe-Area.
-const BOSS_MARK_PAD=34;
+const BOSS_MARK_PAD=34, BOSS_CHEV_OFFSET=58, BOSS_CHEV_HALF=15;
 function bossLocator(){
   if(!bossIsAlive()) return null;
   const bi=S.bossIndex;
@@ -3171,9 +3175,14 @@ function bossLocator(){
   // gedacht; gezeichnet wird immer der echte Winkel.
   const richtung=Math.abs(dx)>=Math.abs(dy)?(dx>=0?'rechts':'links')
                                            :(dy>=0?'unten':'oben');
-  if(Math.abs(dx)<=hw && Math.abs(dy)<=hh)
-    return {modus:'chevron', x:E.x[bi], y:E.y[bi], dx, dy, richtung,
+  if(Math.abs(dx)<=hw && Math.abs(dy)<=hh){
+    // Der Chevron bleibt oberhalb des Bosszentrums, aber seine obere Spitze
+    // darf nicht aus dem geclippten Kampfausschnitt verschwinden.
+    const obereKante=S.y-VIEW_H/2+BOSS_CHEV_HALF;
+    const markY=Math.max(E.y[bi]-BOSS_CHEV_OFFSET, obereKante);
+    return {modus:'chevron', x:E.x[bi], y:E.y[bi], markY, dx, dy, richtung,
             winkel:Math.atan2(dy,dx), abstand:Math.hypot(dx,dy)};
+  }
   // Auf den Rand des Kampfausschnitts klemmen, Seitenverhaeltnis erhalten.
   const sx=Math.abs(dx)>1e-6?hw/Math.abs(dx):Infinity;
   const sy=Math.abs(dy)>1e-6?hh/Math.abs(dy):Infinity;
@@ -3972,7 +3981,8 @@ window.__EH = { get S(){return S;}, get H(){return META;}, CFG, HOLD_CFG, CONTRA
                 bossIsAlive, bossLocator, evoPaths, leadingEvoPath, completeEvolutions,
                 combatSlots, metaBoni, renderSlots, renderPauseDetail, togglePause,
                 weaponDamageText, hurt, W_IDX, GROUND,
-                BOSS: {BOSS_ADD_TARGET, EVO_FOCUS_AT, MAXLV, EVO_PASSIVE_LV},
+                BOSS: {BOSS_ADD_TARGET, EVO_FOCUS_AT, MAXLV, EVO_PASSIVE_LV,
+                       BOSS_MARK_PAD, BOSS_CHEV_HALF},
                 targetEnemies, resize, render, spawnGem, updateGems, killEnemy,
                 gemCount:()=>{let a=0,b=0;
                   for(let i=0;i<G.n;i++) if(G.alive[i]){ if(G.kind[i]===1)b++; else a++; }
