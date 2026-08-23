@@ -4,6 +4,11 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 
 ## Unreleased
 
+
+- Verbindlicher Codex–Claude-Workflow mit klarer Rollenverteilung:
+  Codex priorisiert, prüft und pusht; Claude implementiert nur den freigegebenen
+  Einzelauftrag
+- Kanonische Dateien für aktiven Auftrag und standardisierten Arbeitsbericht
 ### Added
 
 - FPS-Metrik nach D-024: alle Halbsekundenproben werden gesammelt, `fpsStats()`

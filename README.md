@@ -82,6 +82,9 @@ docs/
   BALANCING.xlsx         Balancing-Modell
   SYSTEM_OVERVIEW.html   Kompakte visuelle Systemübersicht
   DECISIONS.md           Verbindliche Projektentscheidungen
+  WORKFLOW.md            Rollen und Ablauf für Codex und Claude
+  CURRENT_TASK.md        Einziger aktiver Claude-Arbeitsauftrag
+  WORK_REPORT.md         Standardisierte Rückgabe an Codex
 prototype/
   web/
     index.html            Spielbarer Phase-0-Prototyp

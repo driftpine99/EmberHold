@@ -2,8 +2,24 @@
 
 ## Aktueller Arbeitsfokus
 
-Diese Reihenfolge ist die verbindliche Übergabe für den nächsten Entwickler.
-Nicht mehrere Grafikfamilien gleichzeitig beginnen:
+**Verbindlicher Stand 23.08.2026:** Für die Ausführung gilt ausschließlich der
+freigegebene Auftrag in `docs/CURRENT_TASK.md`.
+
+1. [ ] Task EH-2026-08-23-01 durch Claude bearbeiten lassen.
+2. [ ] Codex prüft Diff, Tests und `docs/WORK_REPORT.md` und pusht nur einen
+   abgenommenen Stand.
+3. [ ] Danach spielt der Besitzer den vollständigen 8-Minuten-Lauf nach
+   `docs/TESTPLAN.md`.
+
+Bis zu dieser Abnahme keine weitere Balance-, Content- oder
+Gegneranimationsänderung stapeln. Die folgenden älteren Notizen bleiben als
+Projektverlauf erhalten, sind aber kein Ersatz für den aktiven Arbeitsauftrag.
+
+### Historischer Verlauf
+
+
+Die folgende frühere Reihenfolge erklärt bestehende Abhängigkeiten.
+Weiterhin nicht mehrere Grafikfamilien gleichzeitig beginnen:
 
 1. [ ] Einen vollständigen 8-Minuten-Run mit dem animierten Schwärmer spielen.
    Run-Bericht, schlechteste FPS sowie Auffälligkeiten bei Lesbarkeit,

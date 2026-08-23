@@ -5,6 +5,18 @@ Projekt wird kosteneffizient und in kleinen, prüfbaren Schritten gebaut. Der
 Besitzer kann nicht selbst programmieren: Ergebnisse, Risiken und manuelle
 Tests deshalb immer in verständlichem Deutsch erklären.
 
+## Rolle und Zusammenarbeit
+
+Codex ist Projektmanager und technische Leitung. Der verbindliche Ablauf steht
+in docs/WORKFLOW.md. Codex besitzt Priorisierung, Scope, Abnahmekriterien,
+Review und Push. Genau ein freigegebener Arbeitsauftrag steht in
+docs/CURRENT_TASK.md; Claudes Rückgabe steht in docs/WORK_REPORT.md.
+
+Vor jeder Änderung zusätzlich den Workflow und den aktiven Auftrag vollständig
+lesen. Bei Widersprüchen gilt docs/CURRENT_TASK.md. Nach Claudes Arbeit prüft
+Codex Code und Tests unabhängig, aktualisiert erst dann Roadmap, Entscheidungen
+und Testplan und entscheidet über den Push.
+
 ## Vor jeder Änderung
 
 1. `git status --short --branch` prüfen und fremde Änderungen bewahren.
@@ -47,7 +59,10 @@ Tests deshalb immer in verständlichem Deutsch erklären.
   store-fertig oder rechtlich freigegeben. Ein finaler Art-/Rechte-Pass ist
   ein späteres eigenes Gate.
 
-## Aktueller Übergabepunkt
+## Historischer Produktkontext
+
+Dieser Abschnitt ist kein Arbeitsauftrag. Priorität und Scope stehen nur in
+docs/CURRENT_TASK.md.
 
 **Stand 22.08.2026, nach D-034.** Phase 0.5 ist umgesetzt (D-019 bis D-023).
 Danach hat der Besitzer zum ersten Mal selbst gespielt und bewertet — das
@@ -115,10 +130,11 @@ Grafikänderungen zusätzlich im Browser bei Bewegung, Richtungswechsel,
 Gegnerpulk und Boss prüfen. `Image` fehlt absichtlich im Node-Headless-Pfad;
 der prozedurale Fallback muss testbar bleiben.
 
-Bei einer abgeschlossenen Änderung `CHANGELOG.md` aktualisieren. Geänderte
-Entscheidungen gehören in `docs/DECISIONS.md`, offene Arbeit in `ROADMAP.md`
-und neue Abnahmeschritte in `docs/TESTPLAN.md`. Keine erledigten Punkte ohne
-Test als abgeschlossen markieren.
+Nach bestandener Review aktualisiert Codex `CHANGELOG.md`,
+`docs/DECISIONS.md`, `ROADMAP.md` und `docs/TESTPLAN.md` konsistent.
+Claude dokumentiert vor der Review in `docs/WORK_REPORT.md` und ändert andere
+Projektdokumente nur mit Freigabe in `docs/CURRENT_TASK.md`. Keine erledigten
+Punkte ohne Test und Codex-Abnahme als abgeschlossen markieren.
 
 ## Asset-Werkzeuge und Stolperfallen
 
