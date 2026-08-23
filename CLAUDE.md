@@ -49,21 +49,58 @@ Tests deshalb immer in verständlichem Deutsch erklären.
 
 ## Aktueller Übergabepunkt
 
-Der technische Kurztest des Schwärmers ergab vorläufig mindestens 59 FPS bei
-53 sichtbaren Gegnern nach ungefähr 30 Sekunden. Das ist kein vollständiger
-Stresstest. Vor der nächsten Gegnerfamilie braucht es einen manuellen
-8-Minuten-Run und das Feedback des Besitzers gemäß `docs/TESTPLAN.md`.
+**Stand 22.08.2026, nach D-034.** Phase 0.5 ist umgesetzt (D-019 bis D-023).
+Danach hat der Besitzer zum ersten Mal selbst gespielt und bewertet — das
+Ergebnis steht in **D-027** und ist das Dokument, an dem sich gerade alles
+ausrichtet: *„Lust ja, aber so funktioniert der Run nicht."* Der Schwärmer ist
+**nicht freigegeben**, der Stürmer bleibt gesperrt.
 
-Phase 0.5 ist gemäß D-019 bis D-023 vollständig umgesetzt: Sortieverträge,
-Build-/Run-Entscheidungen, Arkanum, Übungshof sowie Ausrüstung und Zerlegung
-liegen als getrennte spielbare Commits mit Tests vor. Vor weiteren
-Gegneranimationen folgt jetzt die manuelle Gesamtprüfung des Content-Slices
-einschließlich vollständigem 8-Minuten-Run und Hold→Run→Hold-Rückkehr.
+Aus D-027 sind Rang 1 bis 4 abgearbeitet:
 
-Der Standardvertrag muss die bestehende Balance-Referenz bitgenau oder innerhalb
-der dokumentierten Korridore erhalten. Neue Hold-Boni und Vertragsmodifikatoren
-dürfen nicht unbemerkt in die Baseline-Seed-Suite gelangen. Bestehende lokale
-Spielstände immer migrieren; niemals durch eine neue Save-Version still löschen.
+| Rang | Was | Entscheidung |
+|---|---|---|
+| 1 | Bewegungsüberschuss beseitigt, Feld verstopft nicht mehr | D-028 bis D-030 |
+| 2 | Slotanzeige läuft nicht mehr aus dem Bild | — |
+| 3 | Evolutionen wieder erreichbar; Gluttropfen als einsammelbare Heilung | D-031, D-032 |
+| 4 | Zweck sichtbar: ein Ziel im Hold und am Run-Ende; Erzkurve korrigiert | D-033, D-034 |
+
+**Offen bleiben Rang 5 und 6:** Die Animation wirkt für den Besitzer ruckelig,
+er würde Detailqualität gegen mehr Phasen tauschen — das **kehrt D-015 und
+D-016 um** und braucht neue Assets sowie eine eigene bewusste Entscheidung.
+Die seitliche Safe-Area gefällt ihm nicht, das ist rein kosmetisch.
+
+### Drei Dinge, die eine neue Sitzung wissen muss
+
+**1. Der Kartenzug-Korridor ist kein Designziel mehr.** Seit D-026 ist belegt,
+dass der Testbot die menschliche Kurve nicht abbildet: Menschen erreichen den
+ersten Kartenzug nach 34,9 / 35,2 / 33,9 Sekunden, der Bot nach 26,5 bei einer
+Streuung von 21,0 bis 30,7. `totalPicks` prüft deshalb gegen den
+Regressionsanker `BOT_PICK_REF`, nicht gegen `CFG.PICK_TARGETS`. Beide Zahlen
+stehen getrennt in der Testausgabe als `botRef` und `designTotal`. **Wer den
+Anker „zurück auf 21 repariert", macht es kaputt.** Das Designziel wird an
+Menschenläufen geprüft, siehe die Feldlauf-Tabelle in `docs/TESTPLAN.md`.
+
+**2. Sechs Änderungen warten auf einen Feldlauf.** D-030 bis D-034 sind
+gemessen und getestet, aber keine ist im Spiel bestätigt. **Keine weiteren
+Balanceänderungen stapeln**, bevor der Besitzer einen sauberen 8-Minuten-Lauf
+gefahren hat — sonst lässt sich nicht mehr zuordnen, was gewirkt hat. Das
+Prüfprotokoll mit sechs gezielten Fragen steht in `docs/TESTPLAN.md`.
+
+**3. Die Reserve beim Dichte-Überschuss ist halbiert.** `densityOvershoot`
+erlaubt 10 %, aktuell liegen wir bei 6,8 % (vorher 3,9 %). Ursache ist eine
+Kette: mehr Kartenzüge → höhere Stufe → zähere Gegner → langsameres Sterben.
+Jede Änderung, die die Kartenzüge weiter hebt, kann den Check reißen. Das ist
+kein Fehler, sondern genau die Warnung, für die er gebaut wurde.
+
+### Was weiterhin unverhandelbar ist
+
+Neue Hold-Boni und Vertragsmodifikatoren dürfen nicht unbemerkt in die
+Baseline-Seed-Suite gelangen; `baselineIsolated` prüft das in drei Checks.
+Bestehende lokale Spielstände immer migrieren, niemals durch eine neue
+Save-Version still löschen. Und Erwartungswerte in Tests nicht hart verdrahten:
+`holdFlow` und `contractFlow` sind an D-034 zerbrochen, weil sie Erzwerte fest
+eingetragen hatten, obwohl an dem was sie prüfen nichts falsch war. Beide leiten
+ihre Erwartung jetzt aus der Laufzeit ab.
 
 ## Prüfen und dokumentieren
 
