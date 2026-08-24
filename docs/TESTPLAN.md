@@ -101,7 +101,45 @@ sollte deutlich unter den 294 des letzten Laufs liegen — das ist der Wert, an
 dem laut D-029 die Bildrate hängt. Und `Anteil unter 55 FPS` sollte weit unter
 den 40 % von damals liegen.
 
-### Sechs Fragen, die der Bericht nicht beantworten kann
+
+### Aktueller Besitzerlauf nach D-036
+
+Bitte genau einen vollständigen **8-Minuten-Wächterring-Lauf** ohne
+Live-Tuning spielen. Hold-Vorbereitung und vorhandene Ausrüstung dürfen wie
+üblich verwendet werden. Danach den vollständigen Bericht einschließlich
+`Waffenverlauf` kopieren.
+
+Zielwerte sind keine Erfolgsgarantie für einen einzelnen Zufallsseed, sondern
+der Korridor, gegen den Codex den Feldlauf bewertet:
+
+- erster Kartenzug weiterhin ungefähr 30–38 Sekunden;
+- 28–34 Kartenzüge statt 46;
+- typisch ein bis zwei Evolutionen, drei nur bei einem außergewöhnlichen Run;
+- Warden-Phase und Gegnerzahl gefühlt unverändert gegenüber dem guten Lauf;
+- in Minute 6–8 wieder echte Gefahr, ohne mehr Gegner einzuführen.
+
+Sechs kurze Fragen zusätzlich zum Bericht:
+
+1. **Früher Run:** Fühlen sich die ersten drei bis vier Minuten genauso gut
+   und schnell an wie vorher?
+2. **Späte Progression:** Wird der Fortschritt nach Stufe 20 spürbar langsamer,
+   aber nicht blockiert oder zäh? Wie viele Kartenzüge stehen am Ende?
+3. **Gefahr:** Bist du zwischen Minute 6 und 8 weiterhin praktisch
+   unbesiegbar, oder entstehen wieder brenzlige Situationen?
+4. **Waffenrollen:** Ist Pfeilregen weiterhin stark, aber nicht mehr die
+   offensichtliche Pflichtwahl? Lohnt sich die Rundenklinge, falls du sie
+   angeboten bekommst, besonders im Warden-Kampf?
+5. **Warden und Übersicht:** Bleibt der Boss gezielt erreichbar und angemessen?
+   Fehlen im Kampf wichtige Informationen oder stehen weiterhin unnötige links?
+6. **Zweiter Run:** Hättest du unmittelbar Lust auf einen weiteren Run? Was
+   zieht – oder was macht ihn weiterhin eintönig?
+
+Die seitliche Safe-Area, abgeschnitten wirkende Ränder und die allgemeine
+Optik werden ausdrücklich mitbeobachtet, aber in D-036 noch nicht verändert.
+Sie bilden nach diesem Lauf einen eigenen Designschritt. Keine neue
+Gegneranimation oder Inhaltserweiterung wird gleichzeitig bewertet.
+
+### Historisches D-035-Protokoll (am 24.08.2026 erledigt)
 
 **Stand 23.08.2026, nach D-035.** Bitte den vollständigen
 8-Minuten-Wächterring-Lauf ohne Live-Tuning spielen. Danach den gesamten
@@ -159,6 +197,20 @@ Waffen jetzt erst einmal; Codex entscheidet danach anhand der Daten.
 | 22.08.2026 | 8 Min | ja | 218 | 35,2 s | 36 | 15 | 35 | **58** | **0,5 %** |
 | 22.08.2026 | 8 Min | ja | 294 | 33,9 s | 28 | 14 | 34 | **38** | **40,0 %** |
 | 23.08.2026 | 8 Min | **ja, gefallen 7:06** | 202 | 31,8 s | 15 | 9 | 35 | **58** | **0,7 %** |
+| 24.08.2026 | 8 Min | **ja, extrahiert** | 158 | 33,8 s | 46 | 19 | 57 | **60** | **0,0 %** |
+
+Der sechste Lauf schließt das D-035-Technikgate: Die Warden-Phase war
+angemessen und mit weniger Gegnern angenehmer; 57 FPS Minimum, 60 FPS 1-%-Low
+und 0 % unter 55 zeigen auch im vollständigen Run keine Renderkrise. Das
+Spielgefühl bleibt negativ. 46 Kartenzüge, Stufe 47 und drei Evolutionen
+machten den Spieler praktisch unbesiegbar. Pfeilregen verursachte 55 % des
+Gesamtschadens, die Rundenklinge auf Stufe 4 nur 291. Trotz mehrerer Runs ging
+die Lust schnell verloren.
+
+D-036 reagiert darauf, ohne Warden oder Dichte erneut zu verändern: späte
+XP-Bremse ab Stufe 21, ein einzelner Pfeilregen-EVO-Nerf,
+Rundenklingen-Trefferkorrektur und Aktivzeit-Telemetrie. Der folgende
+Besitzerlauf ist die erste subjektive Abnahme dieses Stands.
 
 Der fünfte Lauf ist sauber, aber kein vollständiger 8-Minuten-Nachweis. Bis
 zum Tod ist die Renderentlastung deutlich: 202 statt 294 sichtbar
@@ -189,9 +241,9 @@ ist als D-026 festgehalten.
 
 ### Freigabe
 
-Erst wenn dieser Lauf keine neue Rotations-, Sichtbarkeits- oder deutliche
-Performance-Regression zeigt und Frage 1 positiv ausfällt, darf der Stürmer als
-nächste Gegnerfamilie animiert werden.
+Vor weiterer Waffenbalance wird genau ein sauberer D-036-Lauf ausgewertet.
+Erst ein positives Spielgefühl-Gate gibt neue Inhalte oder Gegneranimationen
+frei. Der visuelle Safe-Area-/HUD-Schritt bleibt davon getrennt.
 
 ## Automatisierter Balance-Vertrag
 
@@ -205,25 +257,26 @@ Getestet werden neun feste Seeds: 1701, 1709, 1721, 1733, 1741, 1753, 1777,
 **Wichtig zur Lesart seit D-030:** Die Spalte „Vertrag" nennt, was `npm test`
 tatsächlich prüft — und das ist beim Kartenzug ein **Regressionsanker auf dem
 Bot**, kein Designziel. Der Bot bildet die menschliche Kurve nicht ab (D-026).
-Das Designziel von 21 Kartenzügen steht unverändert in `CFG.PICK_TARGETS` und
-wird an Menschenläufen geprüft, siehe die Feldlauf-Tabelle weiter oben.
+`CFG.PICK_TARGETS` enthält weiter den historischen Wert 21. Seit D-036 ist der
+aktuelle Menschenkorridor für diesen Feldtest **28–34 Kartenzüge**; der
+Bot-Regressionsanker bleibt davon getrennt bei 21,7 ± 3.
 
 | Größe | Ist | Vertrag (Bot) | Designziel (Mensch) |
 |---|---:|---:|---:|
 | Erster Kartenzug, Mittelwert | 31,6 s | 25–45 s | 35 s |
-| Kartenzüge in 8 Min, Mittelwert | 21,67 | 21,7 ± 3 | 21 |
-| Rhythmus pro Minute | 1,44 · 1,67 · 1,67 · 1,89 · 1,67 · 1,89 · 3,56 · 7,89 | — | 1 · 2 · 2 · 2 · 3 · 3 · 4 · 4 |
-| Kartenzüge bei −10 % XP-Kosten | 33,56 | — | — |
-| Kartenzüge bei +10 % XP-Kosten | 22,44 | — | — |
-| Verhältnis der beiden Varianten | 1,495 | ≤ 1,75 | — |
-| Runs mit Evolution | 9 / 9 | mindestens 2 / 9 (Bodenschwelle) | in einer Sortie erreichbar |
-| Evolutionen je Run, Mittelwert | 1,89 | — | — |
+| Kartenzüge in 8 Min, Mittelwert | 19,00 | 21,7 ± 3 | **28–34 im Menschenlauf** |
+| Rhythmus pro Minute | 1,44 · 1,67 · 1,78 · 2,00 · 1,44 · 2,00 · 3,00 · 5,67 | — | Feldlauf entscheidet |
+| Kartenzüge bei −10 % XP-Kosten | 25,00 | — | — |
+| Kartenzüge bei +10 % XP-Kosten | 20,56 | — | — |
+| Verhältnis der beiden Varianten | 1,216 | ≤ 1,75 | — |
+| Runs mit Evolution | 7 / 9 | mindestens 2 / 9 (Bodenschwelle) | 1–2 typisch |
+| Evolutionen je Run, Mittelwert | 1,44 | — | 1–2 typisch, 3 außergewöhnlich |
 | Spitze im Feld, Maximum | 312 | ≤ 331 (Zieldichte +10 %) | — |
 | Elite-Reliktwahlen | 2 in 9 / 9 Runs | exakt 2 pro vollständigem Run | — |
 | Erz aus absichtlich untätigem Lauf | 1 Erz, schlechteste Rate 1,58/Min | ≤ 1,75 Erz je Minute | — |
 
 Alle Ist-Werte dieser Tabelle stammen aus der grünen `npm test`-Ausgabe mit
-43/43 Checks bei der Codex-Abnahme vom 23.08.2026.
+45/45 Checks bei der Codex-Abnahme vom 24.08.2026.
 
 Ein Wiederholungslauf mit demselben Seed muss bitgenau dasselbe Ergebnis
 liefern. Der Test endet mit Fehlercode, sobald ein Korridor oder diese
@@ -249,8 +302,16 @@ Fünf Checks sichern D-035 zusätzlich:
   ausgelagerten Informationen in der Pause.
 - `evolutionCompletion` prüft Fokuszeit, führenden Pfad, Sofortabschluss und
   Schutz vor doppelter Evolution.
-- `weaponDamageReport` prüft Overkill-Deckel, sechs Quellen einschließlich
-  Feuerboden und Frostsplitter sowie getrennten Boss-Schaden.
+- `weaponDamageReport` prüft Overkill-Deckel, sechs Quellen, getrennten
+  Boss-Schaden und den vollständigen Waffenverlauf mit Aktivzeit und Rate.
+
+D-036 ergänzt zwei neue Checks:
+
+- `lateProgression` hält Stufe 1–20 bitgenau, prüft den stetigen späten Faktor,
+  das alte Stufe-47-Budget auf neu Stufe 30–34 und das Fehlen eines Deckels.
+- `weaponRoles` prüft den gegnerabhängigen Körperradius der Rundenklinge und
+  hält das Pfeilregen-/Grundköcher-Verhältnis im festen Fernfeld zwischen 2,0
+  und 3,0.
 
 Seit D-017 führt der Test `resize()` tatsächlich aus und prüft fünf
 Querformate mit demselben Seed:

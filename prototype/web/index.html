@@ -538,6 +538,15 @@ const CFG = {
   XP_C:            82,      // erster Zug bleibt um 30–35 Sekunden
   XP_K:          0.70,      // danach flacher als die alte, dichtebasierte Kurve
                             // nicht aus einem Modell abgeleitet
+  // Späte Bremse. Der Feldlauf vom 24.08.2026 erreichte Stufe 47 bei 46
+  // Kartenzügen: Ab der zweiten Runhälfte trägt sich die Kurve selbst, weil
+  // mehr Stufen mehr Schaden und damit noch mehr Erfahrung bedeuten. Bis
+  // einschließlich Stufe 20 bleibt deshalb alles unverändert — der frühe
+  // Fortschritt gefiel dem Besitzer ausdrücklich. Darüber steigt nur der
+  // Exponent von 0,70 auf 3,70. Kein Deckel, keine Sperre, keine Unstetigkeit:
+  // bei Stufe 20 ist der Zusatzfaktor exakt 1,0.
+  XP_LATE_AT:      20,      // bis hierhin identisch zur bisherigen Kurve
+  XP_LATE_K:      3.0,      // zusätzlicher Exponent oberhalb davon
 
   // --- Dichte (sättigt, weil das Entity-Budget bei 700 liegt) ---
   SPAWN_START:    42,       // lesbarer Einstieg statt sofortiger Sprite-Wand
@@ -1169,6 +1178,11 @@ function newRun(runLen, seed, contractId){
     // allokieren (D-035). dmgWBoss ist der Anteil davon gegen Bossgegner.
     dmgW:new Float64Array(WEAPONS.length),
     dmgWBoss:new Float64Array(WEAPONS.length),
+    // Zeitpunkt der ersten Aufnahme und der Evolution je Waffe, -1 = nie.
+    // Feste Felder statt Objekten; die aktive Zeit ergibt sich am Run-Ende
+    // aus der Differenz und kostet zur Laufzeit nichts.
+    wFirst:new Float64Array(WEAPONS.length).fill(-1),
+    evoAt:new Float64Array(WEAPONS.length).fill(-1),
     rerolls:1,
     pickTimes:[],                           // für den Pacing-Bericht
     events:{elite:0, boss:false, surge:false}, bossIndex:-1, bossKills:0,
@@ -1186,7 +1200,7 @@ function newRun(runLen, seed, contractId){
     cool:{}, seed:runSeed,
     fps:60, worstFps:999, fpsLog:[],
   };
-  S.W['bogen']=1; S.cool['bogen']=0;
+  S.W['bogen']=1; S.cool['bogen']=0; S.wFirst[W_IDX.bogen]=0;
   E.n=0;E.free.length=0;E.alive.fill(0);
   P.n=0;P.free.length=0;P.alive.fill(0);
   Q.n=0;Q.free.length=0;Q.alive.fill(0);
@@ -1198,7 +1212,13 @@ function newRun(runLen, seed, contractId){
   DMG_SRC=-1;
   pendingPicks=0; currentOffer=[]; cardMode='level';
 }
-function xpNeed(L){ return CFG.XP_C * Math.pow(L, CFG.XP_K); }
+/** Stufenkosten. Bis CFG.XP_LATE_AT exakt die bisherige Kurve; darüber wächst
+ *  sie stetig weiter, weil der Zusatzfaktor an der Grenze genau 1,0 ist. */
+function xpNeed(L){
+  const basis = CFG.XP_C * Math.pow(L, CFG.XP_K);
+  if (L <= CFG.XP_LATE_AT) return basis;
+  return basis * Math.pow(L/CFG.XP_LATE_AT, CFG.XP_LATE_K);
+}
 
 // --- Abgeleitete Werte ------------------------------------------------------
 function stat(){
@@ -1283,6 +1303,9 @@ function pickFam(t){
   let a=r*s; for(let i=0;i<5;i++){ a-=w[i]; if(a<=0) return i; }
   return 0;
 }
+// Eigenradius einer Rundenklinge. Der Körperradius des getroffenen Gegners
+// kommt beim Treffer hinzu, genau wie bei jedem Projektil (D-036).
+const BLADE_R = 17;
 const FAM_HP    = [8, 18, 13, 20, 44];
 const FAM_SPEED = [66, 40, 32, 54, 28];
 const FAM_GEM   = [1, 2, 3, 2, 6];
@@ -1419,7 +1442,13 @@ function fireWeapons(dt){
       const normalN = 3 + (L>=1?1:0) + (L>=3?1:0) + (L>=5?2:0) + st.proj;
       const n = evo?Math.max(11,normalN+3):normalN;
       const spread = evo?Math.PI:(L>=4?1.15:0.75);
-      const dmg = (8 + 3*L) * st.dmg * (L>=2?1.35:1) * (evo?.82:1);
+      // Pfeilregen lieferte im Feldlauf 55 % des Gesamtschadens und war damit
+      // die automatisch beste Wahl. Gesenkt wird bewusst NUR diese eine
+      // Stellschraube um 17,1 %: Fächerbreite, Projektilzahl, Durchschlag und
+      // Feuerrate bleiben unangetastet, damit die Evolution ihre Rolle als
+      // starke Flächenwaffe behält. Der normale Splitterköcher (evo = false)
+      // ist nicht betroffen.
+      const dmg = (8 + 3*L) * st.dmg * (L>=2?1.35:1) * (evo?.68:1);
       for (let k=0;k<n;k++){
         const a = base + (k-(n-1)/2) * (spread/Math.max(n-1,1));
         shoot(S.x,S.y,Math.cos(a),Math.sin(a), 680, dmg, evo?4:2, 0, 8, W_IDX.splitter);
@@ -1486,9 +1515,16 @@ function fireWeapons(dt){
     for (let k=0;k<n;k++){
       const a = S.bladeAng + k*6.2832/n;
       const bx = S.x+Math.cos(a)*rad, by = S.y+Math.sin(a)*rad;
-      nearEnemies(bx,by,17,(i)=>{
+      // Die Klinge war die einzige Waffe, die den Körperradius des Gegners
+      // ignorierte: Jedes Projektil rechnet mit `r + 9/16/30`, die Klinge prüfte
+      // nur gegen den Mittelpunkt. Sie zog dadurch sichtbar durch Gegner
+      // hindurch, ohne zu treffen — gegen den Warden mit 30 Einheiten Körper
+      // fast völlig wirkungslos. Das ist kein Balancewert, sondern eine
+      // Inkonsistenz in der Trefferprüfung (D-036).
+      nearEnemies(bx,by,BLADE_R+30,(i)=>{
         const dx=E.x[i]-bx, dy=E.y[i]-by;
-        if (dx*dx+dy*dy < 17*17) hurt(i, dmg);
+        const rr=BLADE_R+(E.kind[i]===2?30:(E.kind[i]===1?16:9));
+        if (dx*dx+dy*dy < rr*rr) hurt(i, dmg);
       });
     }
     DMG_SRC=-1;
@@ -1988,14 +2024,16 @@ function applyOffer(o){
     applyBoon(o.boon);
   } else if (o.type==='evo'){
     if(!S.evo[o.w.id]){
-      S.evo[o.w.id]=1; S.evoTimes.push(S.t);
+      S.evo[o.w.id]=1; S.evoTimes.push(S.t); S.evoAt[W_IDX[o.w.id]]=S.t;
       if(!HEADLESS) toast(o.w.evo.name+'!');
     }
   } else if (o.type==='heal'){
     S.hp=Math.min(S.maxhp, S.hp+S.maxhp*0.45);
   } else if (o.type==='w'){
-    S.W[o.w.id]=(S.W[o.w.id]||0)+1;
+    const vorher=S.W[o.w.id]||0;
+    S.W[o.w.id]=vorher+1;
     if (S.cool[o.w.id]===undefined) S.cool[o.w.id]=0;
+    if (!vorher) S.wFirst[W_IDX[o.w.id]]=S.t;
     completeEvolutions();
   } else {
     S.Pa[o.p.id]=(S.Pa[o.p.id]||0)+1;
@@ -2014,7 +2052,7 @@ function completeEvolutions(){
     if(!w.evo || S.evo[w.id]) continue;
     if((S.W[w.id]||0)>=MAXLV && (S.Pa[w.evo.need]||0)>=EVO_PASSIVE_LV){
       S.evo[w.id]=1;
-      S.evoTimes.push(S.t);
+      S.evoTimes.push(S.t); S.evoAt[W_IDX[w.id]]=S.t;
       if(!HEADLESS) toast(w.evo.name+'!');
     }
   }
@@ -3412,6 +3450,25 @@ function weaponDamageText(feld){
   });
   return out.join(', ')||'keine';
 }
+/** Verlauf je tatsächlich aufgenommener Waffe: wann sie kam, wie lange sie
+ *  gelaufen ist, was sie je aktiver Sekunde geleistet hat und wann sie
+ *  evolviert ist. Alles wird erst hier gerechnet — zur Laufzeit stehen nur
+ *  zwei Zeitstempel je Waffe in festen Feldern (D-036). */
+function weaponTimelineText(){
+  const ende=runSeconds();
+  const out=WEAPONS.filter(w=>S.W[w.id]).map(w=>{
+    const i=W_IDX[w.id];
+    const ab=S.wFirst[i]>=0?S.wFirst[i]:0;
+    const aktiv=Math.max(0, ende-ab);
+    // Unter einer Sekunde ist eine Rate keine Aussage, sondern Rauschen.
+    // Dann lieber ein Strich als eine erfundene Null.
+    const rate=aktiv>=1?Math.round((S.dmgW[i]||0)/aktiv).toLocaleString('de-DE')+'/s':'–/s';
+    const evo=S.evoAt[i]>=0?' · EVO '+fmtTime(S.evoAt[i]):'';
+    return (S.evo[w.id]?w.evo.name:w.name)+' ab '+fmtTime(ab)+
+           ' · '+fmtTime(aktiv)+' aktiv · '+rate+evo;
+  });
+  return out.join(', ')||'keine';
+}
 function equippedGearText(){
   const out=[];
   for(const slot of ['weapon','charm','mantle']){
@@ -3444,6 +3501,7 @@ function runReportText(){
     'Build: '+buildText(),
     'Schaden je Waffe: '+weaponDamageText('dmgW'),
     'Boss-Schaden je Waffe: '+weaponDamageText('dmgWBoss'),
+    'Waffenverlauf: '+weaponTimelineText(),
     'Evolutionen: '+evos,
     'Elite-Relikte: '+boonText(),
     'Ausrüstung: '+equippedGearText(),
@@ -3892,6 +3950,7 @@ function headlessRun(runLen, opts){
              evo:Object.keys(S.evo), boons:Object.assign({},S.boons),
              eliteChoices:S.eliteChoices, gearSeed:S.gearSeed,
              bossKills:S.bossKills, evoTimes:S.evoTimes.slice(),
+             wFirst:Array.from(S.wFirst), evoAt:Array.from(S.evoAt),
              dmgW:Array.from(S.dmgW), dmgWBoss:Array.from(S.dmgWBoss),
              gearBonus:Object.assign({},S.gearBonus),
              dps:S.dmgDealt/runLen, xpTotal:S.xpTotal };
@@ -3980,7 +4039,7 @@ window.__EH = { get S(){return S;}, get H(){return META;}, CFG, HOLD_CFG, CONTRA
                   HEADLESS=false;},
                 bossIsAlive, bossLocator, evoPaths, leadingEvoPath, completeEvolutions,
                 combatSlots, metaBoni, renderSlots, renderPauseDetail, togglePause,
-                weaponDamageText, hurt, W_IDX, GROUND,
+                weaponDamageText, weaponTimelineText, xpNeed, hurt, W_IDX, GROUND,
                 BOSS: {BOSS_ADD_TARGET, EVO_FOCUS_AT, MAXLV, EVO_PASSIVE_LV,
                        BOSS_MARK_PAD, BOSS_CHEV_HALF},
                 targetEnemies, resize, render, spawnGem, updateGems, killEnemy,

@@ -1388,29 +1388,221 @@ try {
   const splitterZugeordnet = frostNachSchuss > frostVorSchuss &&
     bogenNachSchuss > bogenVorSchuss;
 
-  // 6. Der Bericht nennt beide Zeilen und nur aktive Waffen.
+  // 6. Der Bericht nennt beide Schadenszeilen, nur aktive Waffen und den
+  //    neuen Verlauf mit Aufnahmezeit, aktiver Zeit, Rate und Evolution.
   engine.begin(480, "ring");
   engine.S.W = { bogen:3, blitz:1 }; engine.S.Pa = {}; engine.S.evo = {};
+  engine.S.t = 240;
+  engine.S.wFirst[IDX.bogen] = 0;
+  engine.S.wFirst[IDX.blitz] = 60;
+  engine.S.evo.blitz = 1;
+  engine.S.evoAt[IDX.blitz] = 180;
+  engine.S.dmgW[IDX.bogen] = 480;
+  engine.S.dmgW[IDX.blitz] = 540;
   const zeile = engine.weaponDamageText("dmgW");
-  const berichtNurAktive = zeile.includes("Langbogen") && zeile.includes("Kettenblitz") &&
+  const berichtNurAktive = zeile.includes("Langbogen") && zeile.includes("Sturmherz") &&
     !zeile.includes("Frostnova") && !zeile.includes("Rundenklinge");
+  const verlauf = engine.weaponTimelineText();
+  const verlaufStimmt = verlauf.includes("Langbogen ab 0:00") &&
+    verlauf.includes("4:00 aktiv") && verlauf.includes("2/s") &&
+    verlauf.includes("Sturmherz ab 1:00") && verlauf.includes("3:00 aktiv") &&
+    verlauf.includes("3/s") && verlauf.includes("EVO 3:00") &&
+    !verlauf.includes("Frostnova") && !verlauf.includes("Rundenklinge");
   const bericht = engine.runReportText();
   const berichtZeilen = bericht.includes("Schaden je Waffe:") &&
-    bericht.includes("Boss-Schaden je Waffe:");
+    bericht.includes("Boss-Schaden je Waffe:") &&
+    bericht.includes("Waffenverlauf:") && bericht.includes(verlauf);
 
   weaponDamageReport = overkillGedeckelt && nurNormal && bossGetrennt &&
     blitzZugeordnet && klingeZugeordnet && bodenZugeordnet && splitterZugeordnet &&
-    berichtNurAktive && berichtZeilen;
+    berichtNurAktive && verlaufStimmt && berichtZeilen;
   weaponDamageDiagnostics = { hpVorher:+hpVorher.toFixed(2), gebucht:+gebucht.toFixed(2),
     overkillGedeckelt, nurNormal, bossGetrennt, blitzZugeordnet, klingeZugeordnet,
-    bodenZugeordnet, splitterZugeordnet, berichtNurAktive, berichtZeilen };
+    bodenZugeordnet, splitterZugeordnet, berichtNurAktive, verlaufStimmt, berichtZeilen };
 } catch (error) {
   weaponDamageError = error instanceof Error ? error.message : String(error);
 }
 
+// --- EH-2026-08-24: Spaete Progressionsbremse --------------------------------
+// Der Feldlauf vom 24.08.2026 erreichte Stufe 47 bei 46 Kartenzuegen.
+// Die fruehe Progression bis einschliesslich Stufe 20 bleibt unverändert, nur
+// die spaete wird gebremst, damit der Lauf nicht ins Unendliche verlaengert wird.
+let lateProgression = false;
+let lateProgressionError = "";
+let lateProgressionDiagnostics = null;
+try {
+  const AT = engine.CFG.XP_LATE_AT;           // 20
+  const C = engine.CFG.XP_C;                  // 82
+  const K = engine.CFG.XP_K;                  // 0.70
+  const LK = engine.CFG.XP_LATE_K;            // 3.0
+  // Hilfsfunktion: Welche Stufe erreicht man mit einem gegebenen XP-Budget?
+  // "Erreicht" heisst: so viele Stufenkosten wurden vollstaendig bezahlt, plus
+  // die Startstufe 1. Genau so zaehlt auch gainXP() im Spiel.
+  const stufeFuer = (budget, kosten) => {
+    let summe = 0, stufe = 1;
+    while (stufe < 400 && summe + kosten(stufe) <= budget) { summe += kosten(stufe); stufe++; }
+    return stufe;
+  };
+  const basisKosten = (L) => C * Math.pow(L, K);
+
+  // 1. Fruehe Kurve bleibt identisch bis einschliesslich XP_LATE_AT.
+  let frueheKurveIdentisch = true;
+  for (let L = 1; L <= AT; L++) {
+    const actual = engine.xpNeed(L);
+    const expected = C * Math.pow(L, K);
+    if (Math.abs(actual - expected) >= 1e-9) {
+      frueheKurveIdentisch = false;
+      break;
+    }
+  }
+
+  // 2. Spaete Kurve steigt ueber der Basiskurve, der Quotient waechst monoton,
+  //    und er entspricht exakt der dokumentierten Formel (L/AT)^XP_LATE_K.
+  //    Ohne diese dritte Bedingung waere jede beliebige steigende Kurve gruen.
+  let spaeteKurveSteigt = true;
+  let vorherQuotient = 0;
+  for (let L = AT + 1; L <= 60; L++) {
+    const actual = engine.xpNeed(L);
+    const base = basisKosten(L);
+    const quotient = actual / base;
+    const erwartet = Math.pow(L / AT, LK);
+    if (actual <= base || quotient <= vorherQuotient ||
+        Math.abs(quotient - erwartet) > 1e-9) {
+      spaeteKurveSteigt = false;
+      break;
+    }
+    vorherQuotient = quotient;
+  }
+
+  // 3. Stetigkeit an der Grenze: Faktor ist exakt 1 bei AT, Sprung < 25%.
+  const xpAtAT = engine.xpNeed(AT);
+  const xpAtAT1 = engine.xpNeed(AT + 1);
+  const faktorAtAT = xpAtAT / (C * Math.pow(AT, K));
+  const stetigAnDerGrenze = Math.abs(faktorAtAT - 1) < 1e-9 &&
+    (xpAtAT1 / xpAtAT) < 1.25;
+
+  // 4. Das XP-Budget, mit dem die ALTE Kurve Stufe 47 erreichte, muss mit der
+  //    neuen Kurve bei Stufe 30 bis 34 landen.
+  let budget = 0;
+  for (let i = 1; i <= 46; i++) budget += basisKosten(i);
+  // Selbstkontrolle: Dasselbe Budget muss auf der alten Kurve wirklich 47
+  // ergeben. Sonst misst der Check ein falsch gebildetes Budget.
+  const stufeAltKurve = stufeFuer(budget, basisKosten);
+  const budgetStimmt = stufeAltKurve === 47;
+  const erreichteStufe = stufeFuer(budget, engine.xpNeed);
+  const budgetLandetImKorridor = budgetStimmt &&
+    erreichteStufe >= 30 && erreichteStufe <= 34;
+
+  // 5. Mit zehnfachem Budget muss eine echt hoehere Stufe erreichbar sein.
+  const stufeBeiZehnfachem = stufeFuer(budget * 10, engine.xpNeed);
+  const keinDeckel = stufeBeiZehnfachem > erreichteStufe;
+
+  lateProgression = frueheKurveIdentisch && spaeteKurveSteigt && stetigAnDerGrenze &&
+    budgetLandetImKorridor && keinDeckel;
+
+  lateProgressionDiagnostics = {
+    frueheKurveIdentisch, spaeteKurveSteigt, stetigAnDerGrenze,
+    budgetLandetImKorridor, keinDeckel,
+    budgetStimmt, budget: Math.round(budget),
+    stufeAltKurve, erreichteStufe, stufeBeiZehnfachem,
+    xpNeed: {
+      1: Number(engine.xpNeed(1).toFixed(1)),
+      20: Number(engine.xpNeed(20).toFixed(1)),
+      21: Number(engine.xpNeed(21).toFixed(1)),
+      30: Number(engine.xpNeed(30).toFixed(1)),
+      40: Number(engine.xpNeed(40).toFixed(1))
+    }
+  };
+} catch (error) {
+  lateProgressionError = error instanceof Error ? error.message : String(error);
+}
+
+// --- EH-2026-08-24-01 / D-036: Waffenrollen -------------------------------
+// Zwei getrennte Befunde aus dem Feldlauf vom 24.08.2026:
+//   Pfeilregen lieferte 55 % des Gesamtschadens und war damit die automatisch
+//   beste Wahl; die Rundenklinge kam auf 291 Schaden im ganzen Lauf.
+// Bei der Klinge lag ein echter Funktionsfehler vor: Sie war die einzige Waffe,
+// die den Koerperradius des Gegners ignorierte. Genau das wird hier geprueft --
+// als Verhalten, nicht als Quelltext.
+let weaponRoles = false;
+let weaponRolesError = "";
+let weaponRolesDiagnostics = null;
+try {
+  const IDX = engine.W_IDX, TICK = engine.CFG.TICK;
+
+  // --- Teil 1: Die Klinge rechnet den Gegnerkoerper mit --------------------
+  // Die Klingen kreisen bei Stufe 2 auf exakt 74 Welteinheiten. Ein Gegner in
+  // radialem Abstand d hat also |d-74| Abstand zur Klingenbahn. Damit lassen
+  // sich die drei Faelle exakt stellen, ohne in die Arrays zu schreiben.
+  const BAHN = 74, EIGEN = 17;
+  const klingeTrifft = (abstandZurBahn, kind) => {
+    engine.begin(480, "ring");
+    const S = engine.S;
+    S.x = 0; S.y = 0;
+    S.W = { klinge: 2 }; S.Pa = {}; S.evo = {}; S.cool = { klinge: 0 };
+    S.level = 4000;                       // Gegner ueberleben die Messung
+    const ziel = engine.spawnEnemy(480, 4, kind, BAHN + abstandZurBahn, 0);
+    engine.rebuildGrid();
+    for (let t = 0; t < 600; t++) { engine.fireWeapons(TICK); }
+    return { ziel, dmg: kind === 2 ? S.dmgWBoss[IDX.klinge] : S.dmgW[IDX.klinge] };
+  };
+  // Normalgegner, Koerper 9: 20 liegt ausserhalb des Eigenradius 17, aber
+  // innerhalb von 17+9 = 26. Vor der Korrektur war das ein Fehlschlag.
+  const normalKnapp = klingeTrifft(20, 0).dmg;
+  // Klar ausserhalb von 17+9: Es darf NICHTS ankommen, sonst greift die
+  // Klinge weiter als erlaubt.
+  const normalZuWeit = klingeTrifft(40, 0).dmg;
+  // Warden, Koerper 30: 40 liegt innerhalb von 17+30 = 47.
+  const bossKnapp = klingeTrifft(40, 2).dmg;
+  const koerperRadiusZaehlt = normalKnapp > 0 && normalZuWeit === 0 && bossKnapp > 0;
+
+  // --- Teil 2: Pfeilregen ist nicht mehr automatisch die beste Wahl -------
+  // Gleiches Fernfeld, einmal normaler Splitterkoecher, einmal die Evolution.
+  const fernfeld = [];
+  for (let gx = -430; gx <= 430; gx += 34)
+    for (let gy = -430; gy <= 430; gy += 34) {
+      const r = Math.hypot(gx, gy);
+      if (r >= 150 && r <= 430) fernfeld.push([gx, gy]);
+    }
+  const splitterLauf = (evo) => {
+    engine.begin(480, "ring");
+    const S = engine.S;
+    S.x = 0; S.y = 0;
+    S.W = { splitter: 5 }; S.Pa = evo ? { koecher: 3 } : {};
+    S.evo = evo ? { splitter: 1 } : {}; S.cool = { splitter: 0 };
+    S.level = 4000;
+    for (const [x, y] of fernfeld) engine.spawnEnemy(480, 4, 0, x, y);
+    engine.rebuildGrid();
+    for (let t = 0; t < 600; t++) {
+      engine.rebuildGrid(); engine.fireWeapons(TICK); engine.updateProjectiles(TICK);
+    }
+    return S.dmgW[IDX.splitter];
+  };
+  const normalSchaden = splitterLauf(false);
+  const evoSchaden = splitterLauf(true);
+  const verhaeltnis = normalSchaden > 0 ? evoSchaden / normalSchaden : Infinity;
+  // Vor D-036 lag das Verhaeltnis bei 3,30, jetzt bei 2,74. Die Decke von 3,0
+  // liegt bewusst dazwischen: Pfeilregen bleibt deutlich staerker als der
+  // Grundkoecher, ist aber keine automatische Wahl mehr. Wer den Nerf
+  // zuruecknimmt, reisst diesen Check.
+  const pfeilregenGedeckelt = verhaeltnis < 3.0;
+  // Stark bleiben muss die Evolution trotzdem, sonst waere sie entwertet.
+  const pfeilregenBleibtStark = verhaeltnis > 2.0;
+
+  weaponRoles = koerperRadiusZaehlt && pfeilregenGedeckelt && pfeilregenBleibtStark;
+  weaponRolesDiagnostics = { koerperRadiusZaehlt, pfeilregenGedeckelt, pfeilregenBleibtStark,
+    klingeEigenradius: EIGEN, klingenbahn: BAHN,
+    normalKnapp: Math.round(normalKnapp), normalZuWeit: Math.round(normalZuWeit),
+    bossKnapp: Math.round(bossKnapp),
+    splitterNormal: Math.round(normalSchaden), pfeilregen: Math.round(evoSchaden),
+    verhaeltnis: Number(verhaeltnis.toFixed(2)) };
+} catch (error) {
+  weaponRolesError = error instanceof Error ? error.message : String(error);
+}
+
 const output = {
-  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && slotLayout && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && contractFlow && holdExpansion && equipmentFlow && evolutionCatalog && eliteChoices && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling && fpsMetrics && reportHardened && healOrbFlow && holdGoalLadder && oreCurve && earlyLossGuard && bossCombatPocket && bossLocatorState && compactCombatHud && evolutionCompletion && weaponDamageReport,
-  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, slotLayout, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, contractFlow, holdExpansion, equipmentFlow, evolutionCatalog, eliteChoices, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling, fpsMetrics, reportHardened, healOrbFlow, holdGoalLadder, oreCurve, earlyLossGuard, bossCombatPocket, bossLocatorState, compactCombatHud, evolutionCompletion, weaponDamageReport },
+  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && slotLayout && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && contractFlow && holdExpansion && equipmentFlow && evolutionCatalog && eliteChoices && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling && fpsMetrics && reportHardened && healOrbFlow && holdGoalLadder && oreCurve && earlyLossGuard && bossCombatPocket && bossLocatorState && compactCombatHud && evolutionCompletion && weaponDamageReport && lateProgression && weaponRoles,
+  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, slotLayout, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, contractFlow, holdExpansion, equipmentFlow, evolutionCatalog, eliteChoices, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling, fpsMetrics, reportHardened, healOrbFlow, holdGoalLadder, oreCurve, earlyLossGuard, bossCombatPocket, bossLocatorState, compactCombatHud, evolutionCompletion, weaponDamageReport, lateProgression, weaponRoles },
   targets: report.targets,
   ueberschuss: report.ueberschuss,
   seeds: report.seeds,
@@ -1434,6 +1626,10 @@ if (bossLocatorError) output.bossLocatorError = bossLocatorError;
 if (compactHudError) output.compactHudError = compactHudError;
 if (evolutionCompletionError) output.evolutionCompletionError = evolutionCompletionError;
 if (weaponDamageError) output.weaponDamageError = weaponDamageError;
+if (lateProgressionError) output.lateProgressionError = lateProgressionError;
+if (weaponRolesError) output.weaponRolesError = weaponRolesError;
+if (weaponRolesDiagnostics) output.summary.weaponRoles = weaponRolesDiagnostics;
+if (lateProgressionDiagnostics) output.summary.lateProgression = lateProgressionDiagnostics;
 if (bossPocketDiagnostics) output.summary.bossPocket = bossPocketDiagnostics;
 if (bossLocatorDiagnostics) output.summary.bossLocator = bossLocatorDiagnostics;
 if (compactHudDiagnostics) output.summary.compactHud = compactHudDiagnostics;

@@ -1591,3 +1591,63 @@ Beweis für die Menschenkurve. Bis zum nächsten vollständigen Besitzerlauf
 folgt weder ein Waffen-Nerf noch eine weitere Dichte-, Content- oder
 Animationsänderung. Der Browser-Smoke von Claude war erfolgreich; Codex
 konnte ihn wegen eines Windows-Sandboxfehlers nicht unabhängig wiederholen.
+
+## D-036 – Späte Progression bremsen und Waffenrollen reparieren
+
+**Status:** beschlossen und technisch abgenommen (24.08.2026). Der
+abschließende Besitzerlauf steht aus.
+
+Der vollständige Wächterring-Lauf mit Seed 3902262916 bestätigt D-035 für
+Warden und Performance: Extraktion bei 8:00, angemessener Boss, angenehmere
+Gegnerzahl, schlechteste FPS 57, 1-%-Low 60 und keine Probe unter 55 FPS.
+Spielerisch kippt der Run jedoch in eine Stärke-Schneeballkurve: Stufe 47,
+46 Kartenzüge, drei Evolutionen und das Gefühl, nicht mehr verlieren zu können.
+Pfeilregen verursachte 55 % des Gesamtschadens; die Rundenklinge auf Stufe 4
+nur 291 Schaden. Der Besitzer verliert trotz mehrerer Runs schnell die Lust.
+
+### Progression
+
+Die frühe Kurve bleibt bis einschließlich Stufe 20 bitgenau
+`82 · L^0,70`. Erst darüber multipliziert `xpNeed()` mit `(L/20)^3,0`.
+Die Funktion besitzt weder Deckel noch Sperre; der zusätzliche Faktor ist an
+der Grenze 1. Das alte Roh-XP-Budget für Stufe 47 landet im deterministischen
+Vertrag nun auf Stufe 33. Der erste Bot-Kartenzug bleibt unverändert bei
+31,64 Sekunden. Der nächste Menschenlauf soll bei 28–34 Kartenzügen und
+typischerweise ein bis zwei Evolutionen landen; dieser Korridor ist ein
+Feldziel, kein neuer Botanker.
+
+### Waffenrollen
+
+Pfeilregen verliert genau eine Dimension: Sein EVO-Schadensfaktor sinkt von
+0,82 auf 0,68 (−17,1 %). Projektilzahl, Fächer, Durchschlag, Feuerrate und der
+normale Splitterköcher bleiben unverändert.
+
+Bei der Rundenklinge lag ein Funktionsfehler vor. Anders als Projektile
+berücksichtigte sie nur den Mittelpunkt, nicht den Körperradius des Gegners.
+Die Trefferprüfung addiert nun 9 Einheiten für Normale, 16 für Eliten und 30
+für den Warden. Schaden, Klingenzahl, Umlaufbahn und Defensive bleiben gleich.
+Im festen Nahbereichsbenchmark steigt ihre Wirkung dadurch etwa 2,3-fach;
+gegen den Warden 3,15-fach. Das ist ein Bestfallbenchmark, keine Behauptung
+über den Anteil im echten Run.
+
+### Messung und Vertrag
+
+Der Run-Bericht nennt je verwendeter Waffe Aufnahmezeit, aktive Zeit, Schaden
+je aktiver Sekunde und Evolutionszeit. Zwei feste `Float64Array`-Felder halten
+nur die Zeitstempel; im Treffer- und Schwarm-Hot-Loop entsteht keine neue
+Allokation. Save-Version, HUD, Warden, Boss-Adds, Gegnerdichte, Hold und
+Safe-Area sind unverändert.
+
+`lateProgression` prüft frühe Identität, Kurvenform, Level-47-Budget und den
+fehlenden Deckel. `weaponRoles` prüft Körperradius und Pfeilregen-Verhältnis.
+Codex ergänzte in der Review die fehlende Regression für die komplette
+Waffenverlauf-Zeile. `npm test` besteht unabhängig mit **45/45 Checks**,
+`git diff --check` ist sauber. Der Bot liegt mit 19,00 Kartenzügen nur 0,30
+über der unveränderten Untergrenze von 18,70; dieser geringe Puffer wird nicht
+durch eine Lockerung verdeckt und bleibt Risiko für den nächsten Balancepass.
+
+Freigegeben ist ausschließlich ein neuer 8-Minuten-Feldlauf. Erst dessen
+Aktivzeitdaten entscheiden, ob Pfeilregen und Rundenklinge weiter angepasst
+werden. Safe-Area und unnötige Kampfinformationen folgen als eigener visueller
+Designschritt; neue Inhalte und Gegneranimationen bleiben bis zum positiven
+Spielgefühl-Gate gesperrt.

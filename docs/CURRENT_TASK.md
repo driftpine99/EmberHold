@@ -2,180 +2,126 @@
 
 ## Steuerung
 
-- **Task-ID:** EH-2026-08-23-02
-- **Status:** ABGENOMMEN_DURCH_CODEX
-- **Abnahme:** 23.08.2026 · 43/43 automatische Checks grün; sichtbarer
-  8-Minuten-Feldlauf bleibt beim Besitzer
+- **Task-ID:** EH-2026-08-24-01
+- **Thema:** D-036 – Späte Progression und Waffenrollen
+- **Status:** **ABGENOMMEN_DURCH_CODEX**
 - **Auftraggeber und Abnahme:** Codex
 - **Ausführung:** Claude Code
-- **Priorität:** P0 – vor einem weiteren Feldlauf und vor neuen Animationen
-- **Ausgangscommit:** Claude trägt `git rev-parse HEAD` vor der ersten Änderung
-  in `docs/WORK_REPORT.md` ein.
+- **Priorität:** P0 – vor dem nächsten Feldlauf
+- **Ausgangscommit:** `676506ffe24b8168fc7adb614d13a89811d34bef`
+- **Ausgangsstatus:** Arbeitsbaum sauber, `npm test` 43/43 grün
+- **Rückgabe:** `docs/WORK_REPORT.md`
+- **Nicht committet, nicht gepusht.**
 
-## Ausgangslage
+## Ausgangslage aus dem Feldtest vom 24.08.2026
 
-Der saubere Wächterring-Feldlauf vom 23.08.2026 endete bei 7:06. Die
-Renderentlastung wirkt bis dorthin technisch: 202 sichtbar gezeichnete Gegner,
-1-%-Low 58 FPS und nur 0,7 % der Proben unter 55 FPS. Das Spielgefühl-Gate ist
-trotzdem nicht bestanden:
+Manueller 8-Minuten-Lauf: 23.787 Kills, Level 47, 46 Kartenzüge, erster
+Kartenzug nach 33,8 s, 3 Evolutionen. Pfeilregen 55 % des Gesamtschadens,
+Rundenklinge Stufe 4 nur 291 Gesamtschaden. Schlechteste FPS 57, 1-%-Low 60,
+0 % unter 55 FPS. Warden-Schwierigkeit angemessen, reduzierte Gegnerzahl
+während des Warden-Kampfes positiv.
 
-- Die linke Seite ist mit Meta-Boni, Ausrüstung, Meisterschaften, Relikten,
-  Waffen, Passiven und mehreren Evolutionskarten gleichzeitig überladen.
-- Der Besitzer verlor den Warden im Pulk und kam wegen der weiter
-  eskalierenden Verstärkungen kaum zu ihm durch.
-- Langbogen 5 plus Sehne 3 erfüllten den Evolutionsvertrag, trotzdem kam vor
-  dem Tod keine Evolution: Das System verlangte noch einen weiteren
-  Kartenzug.
-- Splitterköcher wirkte deutlich mächtiger als Blitz und Rundenklinge. Dafür
-  fehlt aber eine Schadensaufschlüsselung; ein Zahlen-Nerf aus einem einzelnen
-  Eindruck ist nicht freigegeben.
+Subjektiv: Der frühe Fortschritt fühlt sich gut an. Ab der zweiten Runhälfte
+entsteht eine XP-/Stärke-Schneeballkurve, der Spieler wird praktisch
+unbesiegbar. Pfeilregen wirkt zu dominant, die Rundenklinge ist das Risiko der
+Nahdistanz nicht wert. Evolutionen sind planbar geworden; dieser Fortschritt
+soll erhalten bleiben.
 
-Die verbindliche Produktentscheidung dazu steht in D-035. Dieser Auftrag setzt
-nur diese Entscheidung um.
+## Verbindliche Produktziele
+
+1. Der erste Kartenzug bleibt unverändert; angestrebt 30–38 Sekunden.
+2. Die späte XP-Kurve wird erst oberhalb von Level 20 weich gebremst.
+3. Manueller Zielkorridor für einen vollständigen 8-Minuten-Lauf:
+   28–34 Kartenzüge, typischerweise 1–2 Evolutionen; 3 Evolutionen dürfen ein
+   außergewöhnlich guter Run bleiben.
+4. Kein harter Level- oder Kartenzug-Deckel.
+5. Pfeilregen bleibt eine starke Flächen-Evolution, aber nicht mehr automatisch
+   die beste Wahl.
+6. Rundenklinge bleibt eine riskante Nahbereichs-DPS-Waffe und wird keine
+   Fernkampfwaffe.
+7. Keine Projektilabwehr, Unverwundbarkeit oder zusätzliche Schadensreduktion
+   für die Rundenklinge – der Spieler ist bereits zu sicher.
+8. Warden, Warden-Adds, Gegnerdichte, Hold, Verträge, Ausrüstung, HUD,
+   Safe-Areas, Animationen und Grafik bleiben unverändert.
 
 ## Freigegebener Scope
 
-### 1. Warden als lesbare Kampfphase
+### A. XP-Kurve
 
-- Führe eine benannte Konstante `BOSS_ADD_TARGET = 90` ein.
-- Solange der Warden lebt, darf das Nachspawnziel für normale Gegner höchstens
-  90 betragen. Boss und Eliten zählen nicht zu diesem Ziel und werden nicht
-  entfernt.
-- Bereits vorhandene normale Gegner werden nicht schlagartig gelöscht. Durch
-  Kills und das vorhandene Recycling soll sich die Menge natürlich auf das
-  Bossziel absenken. Nach dem Boss-Tod gilt wieder die normale Dichtekurve und
-  der vorhandene Spawn-Deckel baut sie schrittweise auf.
-- Keine Beute, XP oder Kills für technisch entfernte Gegner erzeugen.
-- Ergänze eine dauerhafte Warden-Ortung: Ist er außerhalb des zentralen
-  Kampfausschnitts, zeigt ein klarer rot-goldener Randpfeil in seine Richtung.
-  Ist er sichtbar, steht ein gut lesbarer Chevron über ihm. Beides verschwindet
-  sofort nach seinem Tod.
-- Der Marker muss sich deutlich von Aelrics Geschossen unterscheiden, die
-  Safe-Area respektieren und darf keine Simulations- oder Zielwahllogik ändern.
-- Bossleiste und vorhandene Bosspriorisierung der Waffen bleiben erhalten.
+- Bis einschließlich Level 20 bleibt der XP-Bedarf exakt unverändert.
+- Ab Level 21 stetige, nachvollziehbare späte Verteuerung. Keine harte Sperre,
+  kein plötzlich sichtbarer Sprung.
+- Keine XP-Werte einzelner Gegner ändern, wenn die zentrale Levelkurve genügt.
+- `BOT_PICK_REF`, `PICK_TARGETS` und Testtoleranzen nicht ändern, nur damit
+  Tests grün werden.
+- Deterministischer Progressionstest: frühe Kosten identisch; das XP-Budget,
+  das bisher Level 47 erreichte, landet neu bei Level 30–34; First-Pick-Test,
+  Baseline-Isolation und CFG-Stabilität bleiben bestehen.
 
-### 2. Standard-HUD entschlacken, Details in die Pause verschieben
+### B. Pfeilregen
 
-- Links im laufenden Kampf stehen standardmäßig nur aktive Waffen, aktive
-  Passive und genau **ein** Evolutionspfad.
-- Der eine Pfad ist der am weitesten fortgeschrittene noch nicht evolutionierte
-  Pfad. Die Auswahl ist deterministisch; bei Gleichstand gilt die bestehende
-  Waffenreihenfolge.
-- Wächterbogen-Bonus, Ausrüstung, Meisterschaften und Elite-Relikte verschwinden
-  aus der dauerhaften linken Liste. Sie bleiben vollständig in der Pause unter
-  einem klar benannten Abschnitt `Run-Boni` sichtbar.
-- Die Pause zeigt außerdem den vollständigen Build und alle begonnenen
-  Evolutionspfade. Es darf keine Information verloren gehen, sie wird nur aus
-  dem Kampfbild verlagert.
-- Der konkrete Feldtest-Build aus D-035 darf im Kampf links höchstens acht
-  kompakte Einträge erzeugen: fünf Waffen, zwei Passive, ein Fokuspfad.
-- 1422×613 sowie die bestehenden niedrigen Querformate dürfen weder horizontal
-  überlaufen noch Bossmarker, Pause oder Stoß verdecken.
+- Ausschließlich die Evolution ändern, nicht den normalen Splitterköcher.
+- Nur **eine** Schadensdimension um ungefähr 15–20 % absenken.
+- Vorher-/Nachher-Werte in einem reproduzierbaren Benchmark festhalten.
 
-### 3. Evolutionsabschluss zuverlässig machen
+### C. Rundenklinge
 
-- Setze den Fokus-Schutz von 5:30 auf 4:00 (`EVO_FOCUS_AT = 240`).
-- Der Fokus-Schutz verfolgt den am weitesten fortgeschrittenen gültigen Pfad,
-  nicht pauschal die erste Waffe im Katalog.
-- Wenn die gerade gewählte Waffen- oder Passivkarte die Voraussetzung
-  Waffe 5 plus zugehöriges Passiv 3 vervollständigt, entsteht die Evolution
-  sofort innerhalb desselben Kartenzugs. Ein zusätzlicher Zufallszug ist nicht
-  mehr nötig.
-- Toast, HUD und Run-Bericht müssen diesen unmittelbaren Abschluss korrekt
-  anzeigen. Der folgende Kartenzug ist wieder ein normales Angebot und darf
-  keine bereits ausgelöste Evolution anbieten.
-- Die beiden übrigen Kartenplätze, Rerolls, frühe Zufallsvielfalt und alle
-  Karten-Gewichte bleiben unverändert.
+- Zuerst prüfen, ob die 291 Schadenspunkte aus einem Treffer-/Hitboxproblem
+  oder aus der Abstimmung stammen; dafür ein festes, deterministisches
+  Nahbereichsszenario bauen.
+- Liegt ein Funktionsfehler vor, zuerst diesen beheben und erneut messen.
+- Ziel: im definierten Benchmark ungefähr 2–3× wirksamer als vorher.
+- Keine gestapelten Buffs, keine Defensive, keine Rüstung.
+- Prüfen, dass die stärkere Klinge keine neue XP-Schneeballkurve auslöst.
 
-### 4. Waffenschaden messbar machen, noch nicht neu balancieren
+### D. Waffentelemetrie
 
-- Erfasse tatsächlich abgezogenen Schaden getrennt für alle sechs Waffen.
-  Overkill zählt nur bis zu den vor dem Treffer verbleibenden Lebenspunkten.
-- Folgeeffekte werden ihrer Ursprungswaffe zugerechnet: Feuerboden der
-  Feuerkugel, Frostsplitter der Frostnova und Evolutionswirkungen ihrer
-  jeweiligen Grundwaffe.
-- Erfasse zusätzlich je Waffe den Anteil am Schaden gegen Bossgegner.
-- Ergänze den kopierbaren Run-Bericht um zwei kompakte, nur für aktive Waffen
-  ausgegebene Zeilen: Gesamtschaden je Waffe und Boss-Schaden je Waffe.
-- Die Erfassung darf im dichten Gegnerpfad keine Objekte pro Treffer oder Frame
-  erzeugen. Feste Arrays oder feste Felder sind vorzuziehen.
-- An den Schadenswerten, Trefferzahlen, Abklingzeiten und Waffenmechaniken wird
-  in diesem Auftrag nichts geändert.
+Run-Bericht erweitern um Zeitpunkt der ersten Aufnahme je Waffe, aktive Zeit
+je Waffe, Schaden je aktiver Sekunde und den Zeitpunkt der Evolution. Keine
+neuen Allokationen in Treffer- oder Schwarm-Hot-Loops, feste Arrays im
+Run-State, Berechnung erst beim Erzeugen des Berichts, keine neuen
+HUD-Elemente, bestehende Spielstände weiterhin tolerieren.
 
-### 5. Vorbestehenden Todesframe-Befund nicht mitziehen
+Frostnova ist eine Kontrollwaffe und wird nicht allein anhand ihres geringen
+Rohschadens balanciert.
 
-Der in der Roadmap notierte Telemetriefehler, dass im Todesframe einzelne
-Splitter nach `endRun()` eingesammelt werden können, bleibt außerhalb dieses
-Auftrags. Nicht nebenbei reparieren.
+### E. Regressionen
 
-## Verbindliche Abnahmekriterien
-
-Claude ergänzt verhaltensbasierte Tests, mindestens:
-
-1. `bossCombatPocket`: normales Ziel vor dem Boss unverändert, während eines
-   lebenden Bosses höchstens 90, nach Boss-Tod wieder normale Kurve; keine
-   künstlichen Kills oder Beute.
-2. `bossLocatorState`: Randpfeil nur bei lebendem Boss außerhalb des
-   Kampfausschnitts, Chevron nur bei sichtbarem Boss, beide nach Tod aus.
-   Die Richtungsberechnung muss mindestens links, rechts, oben und unten
-   prüfen.
-3. `compactCombatHud`: Der D-035-Feldbuild erzeugt höchstens acht
-   Kampfeinträge und genau einen Fokuspfad; ausgeblendete Meta-Boni sind in der
-   Pause vollständig vorhanden.
-4. `evolutionCompletion`: Fokus ab 4:00 auf dem am weitesten
-   fortgeschrittenen Pfad; unmittelbare Evolution sowohl beim letzten
-   Waffenlevel als auch beim letzten Passivlevel; keine doppelte Evolution.
-5. `weaponDamageReport`: tatsächlicher statt überzählter Overkill-Schaden,
-   korrekte Quellzuordnung mindestens für Projektil, Kettenblitz, Klinge,
-   Feuerboden und Frostsplitter sowie getrennte Bosswerte.
-
-Danach:
-
-- `npm test`
-- `git diff --check`
-- finale Kontrolle aller bisherigen Checks, insbesondere `configStable`,
-  `aspectIndependent`, `densityOvershoot`, `bossTargeting`,
-  `bossDurability`, `evolutionReachable`, `healOrbFlow`, Hold-, Vertrags- und
-  Frühverlustchecks.
-- Vorher-/Nachher-Tabelle über alle neun Referenzseeds: erster Kartenzug,
-  Kartenzüge, Evolutionen, Kills, Zieldichte, Feldspitze und Boss-Tötungen.
-
-Die Dichte- und Evolutionsänderung ist beabsichtigt, aber bestehende
-Testschwellen dürfen nicht nur zum Grünwerden gelockert werden. Falls ein
-Regressionsanker durch die neue Produktregel nicht mehr sinnvoll ist, mit
-Messreihe `BLOCKIERT` melden; Codex entscheidet über eine Neureferenzierung.
-
-Ein sichtbarer Browser-Smoke bei 1422×613 ist erwünscht. Wenn die Browser-Pane
-keine Frames rendert, exakt dokumentieren und nicht behaupten, die Darstellung
-sei manuell geprüft. Die subjektive Abnahme bleibt beim Besitzer.
+Unverändert bleiben insbesondere Warden-HP und Warden-Angriffslogik, die
+reduzierte Add-Dichte während der Bossphase, Spawn- und Dichtekurve,
+Seitenverhältnis-Unabhängigkeit, `baselineIsolated`, `configStable`, die
+bestehenden Hold-, Vertrag-, Ausrüstungs- und Save-Migrationstests, die
+deterministischen Seeds und der prozedurale Grafik-Fallback ohne `Image` im
+Node-Testpfad.
 
 ## Außerhalb des Scopes
 
-- globale Dichtekurve außerhalb der lebenden Bossphase;
-- neue Gegner, Waffen, Karten, Relikte, Ausrüstung oder Grafiken;
-- numerisches Waffenbalancing;
-- Änderungen an XP-Kurve, Beute, Erz, Gegner-HP oder Boss-HP;
-- weitere Gegneranimationen, Audio, Backend, Monetarisierung oder Enginewechsel;
-- Save-Reset oder inkompatible Save-Version;
-- der vorbestehende Todesframe-Telemetriefehler;
-- neue Roadmap-Prioritäten.
+HUD, abgeschnittene Seitenflächen und allgemeine Optik gehören ausdrücklich
+**nicht** in diesen Auftrag. Ebenso wenig neue Gegner, Waffen, Karten,
+Relikte, Grafiken, Audio, Backend oder ein Enginewechsel.
 
-## Dokumentation und Übergabe
+## Verlangte Nachweise
 
-Wenn Code und Tests grün sind:
+`npm test`, `git diff --check`, Anzahl bestandener Checks, First-Pick vorher
+und nachher, durchschnittliche Kartenzüge vorher und nachher, Evolutionen
+vorher und nachher, Dichte- und Peakwerte, synthetischer Level-47-Budgettest,
+Pfeilregen-Benchmark, Rundenklingen-Benchmark, Bestätigung dass Warden und
+Boss-Adds unverändert sind, sowie `git diff --stat`.
 
-- `CHANGELOG.md` knapp unter `Unreleased` aktualisieren;
-- D-035 in `docs/DECISIONS.md` nur um belegte Umsetzungswerte ergänzen;
-- neue automatische und manuelle Checks in `docs/TESTPLAN.md` ergänzen;
-- `docs/WORK_REPORT.md` vollständig durch den Bericht dieses Tasks ersetzen;
-- `ROADMAP.md`, `docs/CURRENT_TASK.md`, `AGENTS.md`, `CLAUDE.md` und
-  `docs/WORKFLOW.md` nicht ändern.
+## Übergabe
 
-Claude darf einen günstigen, einfacheren Subagenten für eine klar isolierte
-CSS-/HUD- oder Testaufgabe einsetzen. Der Hauptagent muss dessen vollständigen
-Diff selbst prüfen, die Integration verstehen und alle Tests anschließend
-selbst erneut ausführen. Aussagen eines Subagenten gelten nie als Abnahme.
+`docs/WORK_REPORT.md` enthält den vollständigen Bericht. `ROADMAP.md`,
+`docs/DECISIONS.md`, `docs/TESTPLAN.md` und `CHANGELOG.md` bleiben bewusst
+unverändert – diese synchronisiert Codex nach unabhängiger Prüfung. Es wurde
+nichts committet und nichts gepusht.
 
-Höchstens zwei kleine lokale Commits: erst Laufzeitcode und Tests, dann
-Dokumentation. Kein Push, keine Folgeaufgabe. Danach stoppen und Codex die
-Commits sowie `docs/WORK_REPORT.md` zur unabhängigen Prüfung übergeben.
+## Codex-Abnahme vom 24.08.2026
+
+Codex hat Spielcode, Testcode und Claudes Bericht unabhängig geprüft. Als
+Review-Nacharbeit wurde der bestehende Check `weaponDamageReport` um die
+vollständige `Waffenverlauf`-Zeile mit Aufnahmezeit, aktiver Zeit, Rate,
+Evolution und Ausschluss inaktiver Waffen ergänzt.
+
+`npm test` besteht mit **45/45 Checks**, `git diff --check` ist sauber. D-036
+ist technisch abgenommen. Offen bleibt ausschließlich der im Testplan
+beschriebene vollständige Besitzerlauf; er ist kein neuer Claude-Auftrag.

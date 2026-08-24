@@ -6,325 +6,383 @@
 
 ## Steuerung
 
-- **Task-ID:** EH-2026-08-23-02
-- **Status:** **BLOCKIERT** – der gesamte freigegebene Scope ist umgesetzt und
-  geprüft, aber ein Regressionsanker (`totalPicks`) ist durch die beauftragte
-  Produktregel ungültig geworden. Über seine Neureferenzierung entscheidet
-  Codex, nicht Claude.
-- **Ausgangscommit:** `694b69557d7d69e950a84dd9f6e60db57b8fa6c1`
-- **Ausgangs-Git-Status:** sauber (`## main...origin/main`, keine fremden
-  Änderungen, keine unversionierten Dateien)
-- **Lokale Commits:**
-  - `a5d9dfc` — Laufzeitcode und Tests
-  - Doku-Commit (dieser Commit) — nur `docs/WORK_REPORT.md`
-- **Kein Push.**
+- **Task-ID:** EH-2026-08-24-01 (D-036 – Späte Progression und Waffenrollen)
+- **Status:** FERTIG, bereit für Codex-Review
+- **Ausgangscommit:** `676506ffe24b8168fc7adb614d13a89811d34bef`
+- **Ausgangsstatus:** Arbeitsbaum sauber (`## main...origin/main`), `npm test`
+  43/43 grün, Exitcode 0
+- **Endstand:** `npm test` **45/45 grün**, Exitcode 0; `git diff --check` sauber
+- **Commits:** keine. **Nicht committet, nicht gepusht** — wie beauftragt.
 
 ## Ergebnis in einem Satz
 
-Alle vier Scope-Punkte aus D-035 sind umgesetzt, fünf neue Verhaltenstests sind
-grün und per Mutation gegengeprüft, 42 von 43 Checks bestehen — der eine rote
-Check ist der Kartenzug-Anker, den die beauftragte Evolutionsänderung
-zwangsläufig verschiebt.
-
-## Warum BLOCKIERT und nicht FERTIG
-
-`totalPicks` prüft den Botanker `BOT_PICK_REF = 15,3 ± 3`, also den Korridor
-12,30 bis 18,30. Nach der Umsetzung liegt der Mittelwert bei **21,67**.
-
-Der Auftrag verbietet ausdrücklich, eine Testschwelle nur zum Grünwerden zu
-lockern, und verlangt bei einem durch die neue Produktregel entwerteten Anker
-eine Messreihe plus `BLOCKIERT`. Genau das liegt vor. Ich habe
-`BOT_PICK_REF` **nicht** angefasst.
-
-### Messreihe: woher die 21,67 kommen
-
-Vier Varianten, jeweils dieselben neun Referenzseeds, 8 Minuten, unsterblicher
-Bot. Nur die genannte Eigenschaft unterscheidet sie.
-
-| Variante | Kartenzüge | Läufe mit Evolution | Evolutionen je Lauf | Kills |
-|---|---:|---:|---:|---:|
-| A – Ausgangsstand `694b695` | 16,11 | 3/9 | 0,67 | 4.852 |
-| B – alles neu, aber Fokus zurück auf 5:30 | 17,22 | 5/9 | 0,89 | 5.060 |
-| C – alles neu, aber ohne Sofortabschluss | 18,78 | 9/9 | 1,33 | 5.663 |
-| D – vollständig (Fokus 4:00 + Sofortabschluss) | **21,67** | 9/9 | 1,89 | 6.915 |
-
-Beide Hebel sind einzeln vom Auftrag verlangt und einzeln wirksam:
-
-- Der **Fokus ab 4:00 auf dem führenden Pfad** hebt die Evolutionsläufe von
-  3/9 auf 9/9 (Variante C) und die Kartenzüge um 2,67.
-- Der **Sofortabschluss** bringt eine zweite Evolution je Lauf (1,33 → 1,89)
-  und weitere 2,89 Kartenzüge.
-
-Die Kette ist bekannt und in `CLAUDE.md` beschrieben: mehr Kartenzüge → höhere
-Stufe → stärkerer Build → mehr Kills → mehr XP. Evolutionen sind der stärkste
-Sprung in dieser Kette. Der Anker wurde vor dieser Regel kalibriert.
-
-### Was Codex entscheiden muss
-
-Drei Wege, alle drei sind Produktentscheidungen:
-
-1. **Anker neu referenzieren** auf den gemessenen Wert (21,67) — mit dem
-   Hinweis, dass der Bot damit erstmals über dem Designziel von 21 liegt.
-2. **Einen der beiden Hebel zurücknehmen** — Variante B (17,22) bliebe im
-   bestehenden Korridor, erfüllt dann aber D-035 nur halb.
-3. **Anker vorerst stehen lassen** und den nächsten Feldlauf abwarten, weil der
-   Bot laut D-026 ohnehin nicht die menschliche Kurve abbildet.
-
-Meine Einschätzung, ausdrücklich als Empfehlung und nicht als Entscheidung:
-Weg 1 ist am ehrlichsten, weil der Anker eine reine Bot-Regressionsmarke ist
-und die Regel selbst gewollt war. Bemerkenswert ist aber, dass der Bot jetzt
-genau dort landet, wo das Designziel für Menschen liegt — Menschen liegen laut
-D-026 unter dem Bot, der nächste Feldlauf sollte also gezielt die Kartenzüge
-zählen.
+Alle vier Scope-Punkte sind umgesetzt, zwei neue Verhaltenschecks sichern sie
+ab und sind per Mutation gegengeprüft; die Rundenklinge hatte tatsächlich einen
+Funktionsfehler, kein reines Abstimmungsproblem.
 
 ## Geänderte Dateien
 
-| Datei | Commit | Art |
-|---|---|---|
-| `prototype/web/index.html` | `a5d9dfc` | Laufzeit: Warden-Kampfphase, Ortung, kompaktes HUD, Pause-Detail, Evolutionsabschluss, Schadensmessung, CSS, Testexporte |
-| `tools/run-balance-suite.mjs` | `a5d9dfc` | fünf neue Checks, angepasste Quelltext-Zusicherung in `telemetrySeparated` |
-| `docs/WORK_REPORT.md` | Doku-Commit | dieser Bericht |
-
-`CHANGELOG.md`, `docs/DECISIONS.md` und `docs/TESTPLAN.md` sind **bewusst nicht
-geändert**: Der Auftrag gibt sie nur frei, „wenn Code und Tests grün sind". Das
-ist wegen `totalPicks` nicht erfüllt. Außerdem hängt der einzutragende Ist-Wert
-für die Kartenzüge an Codex' Entscheidung über den Anker — ihn jetzt zu
-schreiben, hieße die Entscheidung vorwegzunehmen.
-
-`ROADMAP.md`, `docs/CURRENT_TASK.md`, `AGENTS.md`, `CLAUDE.md` und
-`docs/WORKFLOW.md` wurden nicht angefasst.
-
-## Abnahmekriterien und Belege
-
-### Scope 1 – Warden als lesbare Kampfphase
-
-| Kriterium | Ergebnis | Beleg |
-|---|---|---|
-| Benannte Konstante `BOSS_ADD_TARGET = 90` | erfüllt | `prototype/web/index.html`, Konstante mit Begründung |
-| Nachspawnziel während lebendem Boss ≤ 90 | erfüllt | `bossCombatPocket`: ohne Boss 127 normale Gegner, mit Boss **90** |
-| Boss und Eliten zählen nicht mit, werden nicht entfernt | erfüllt | Mit 1 Boss und 5 Eliten im Feld erreichen die normalen Gegner trotzdem volle 90; `boss=1`, `elite=5` unverändert |
-| Vorhandene Gegner nicht schlagartig gelöscht | erfüllt | 127 normale Gegner vor Boss-Eintritt, **127** direkt danach |
-| Nach Boss-Tod wieder normale Kurve | erfüllt | während Boss 90 → nach Tod **135** |
-| Keine Beute, XP oder Kills für entfernte Gegner | erfüllt | Test läuft mit abgeschalteten Waffen: `S.kills` und beide Splitterzähler bleiben exakt unverändert |
-| Randpfeil außerhalb, Chevron innerhalb, beides weg nach Tod | erfüllt | `bossLocatorState`: links/rechts/oben/unten je Randpfeil, innen Chevron, nach Tod `null` |
-| Marker respektiert Safe-Area | erfüllt | Marker wird am Kampfausschnitt geklemmt; im Browser bei 1422×613 gemessen: Marker bei 466 von erlaubten 500 Welteinheiten, außerhalb der 166 px Safe-Area |
-| Unterscheidbar von Aelrics Geschossen | teilweise belegt | Pixelmessung im Browser: 1.978 rot-goldene Pixel am Randpfeil, hellster Pixel RGB(240,195,90) = Gold `#f0c45a`. Die **subjektive** Unterscheidbarkeit bleibt beim Besitzer |
-| Keine Änderung an Simulation oder Zielwahl | erfüllt | `bossLocator()` liest nur Positionen; `bossTargeting` und `bossDurability` weiterhin grün |
-| Bossleiste bleibt | erfüllt | `updateHUD` unverändert bis auf die gemeinsame Hilfsfunktion `bossIsAlive()` |
-
-### Scope 2 – Standard-HUD entschlacken
-
-| Kriterium | Ergebnis | Beleg |
-|---|---|---|
-| Links nur Waffen, Passive, ein Evolutionspfad | erfüllt | `compactCombatHud`: 7 Slots + 1 Pfad |
-| Höchstens acht Einträge beim D-035-Feldbuild | erfüllt | **8** Einträge (5 Waffen, 2 Passive, 1 Fokuspfad) |
-| Fokuspfad ist der am weitesten fortgeschrittene, deterministisch | erfüllt | Fokus = Windriss (Langbogen 5 + Sehne 3) bei 5 offenen Pfaden; bei Gleichstand Katalogreihenfolge |
-| Meta-Boni raus aus der Kampfliste | erfüllt | alle 8 Meta-Einträge fehlen im `#slots`-HTML |
-| Meta-Boni vollständig in der Pause unter `Run-Boni` | erfüllt | alle 8 im `#pausedetail`; Abschnitt heißt `Run-Boni` |
-| Pause zeigt vollständigen Build und alle Pfade | erfüllt | Build vollständig, **5 von 5** Pfaden vorhanden |
-| Kein horizontaler Überlauf bei 1422×613 | erfüllt | Browser gemessen: Slotliste 168 px breit, rechte Kante 182 px von 1422; Pause `scrollWidth === clientWidth`; `document.body` ohne Überlauf |
-| Verdeckt Bossmarker, Pause oder Stoß nicht | erfüllt | Slotliste endet bei 182 px und 605 px von 613 px Höhe; Marker wird im Weltraum gezeichnet |
-
-### Scope 3 – Evolutionsabschluss
-
-| Kriterium | Ergebnis | Beleg |
-|---|---|---|
-| `EVO_FOCUS_AT = 240` | erfüllt | `evolutionCompletion`: `fokusAb = 240` |
-| Fokus verfolgt den führenden Pfad | erfüllt | Bei Bogen 1 / Klinge 4 + Federung 2 wählt der Fokus **Klinge**, obwohl Langbogen im Katalog vorn steht |
-| Fokus greift nicht vor 4:00 | erfüllt | Bei 239 s erscheint die Fokuskarte nicht in jedem der 40 Angebote |
-| Sofortige Evolution beim letzten Waffenlevel | erfüllt | Bogen 4 + Sehne 3, Waffenkarte → `S.evo.bogen === 1` im selben Zug |
-| Sofortige Evolution beim letzten Passivlevel | erfüllt | Bogen 5 + Sehne 2, Passivkarte → sofort |
-| Keine doppelte Evolution | erfüllt | `evoTimes.length` bleibt 1 |
-| Folgender Kartenzug ist ein normales Dreierangebot | erfüllt | 3 Karten, keine `evo`-Karte |
-| Karten-Gewichte, Rerolls, übrige Plätze unverändert | erfüllt | Kein Eingriff in Pool oder Gewichte; nur die Auswahl der Fokuskarte |
-| Toast, HUD, Run-Bericht zeigen den Abschluss | erfüllt | `toast()` im selben Zug, HUD-Slot wird `EVO`, `Evolutionen:` im Bericht; `evoTimes` hält den Zeitpunkt |
-
-### Scope 4 – Waffenschaden messbar
-
-| Kriterium | Ergebnis | Beleg |
-|---|---|---|
-| Overkill nur bis verbleibende HP | erfüllt | Gegner mit 8,44 HP, Treffer mit 422 Schaden → gebucht **8,44** |
-| Getrennte Erfassung je Waffe | erfüllt | `dmgW` als `Float64Array(6)` in Katalogreihenfolge |
-| Boss-Anteil getrennt | erfüllt | Normalschaden erhöht `dmgWBoss` nicht; Bosstreffer schon, und nie mehr als der Gesamtwert |
-| Quellzuordnung Projektil | erfüllt | `P.src` je Projektil |
-| Quellzuordnung Kettenblitz | erfüllt | Schaden ausschließlich auf `blitz`, alle anderen Felder 0 |
-| Quellzuordnung Klinge | erfüllt | Schaden ausschließlich auf `klinge` |
-| Quellzuordnung Feuerboden → Feuerkugel | erfüllt | Nach Ablauf des Bodens steigt `kugel` weiter, alle anderen bleiben 0 |
-| Quellzuordnung Frostsplitter → Frostnova | erfüllt | Ein **Bogen**projektil tötet den verlangsamten Gegner; der Splitterschaden landet auf `frost`, der direkte Treffer auf `bogen` |
-| Zwei Berichtszeilen, nur aktive Waffen | erfüllt | `Schaden je Waffe:` und `Boss-Schaden je Waffe:`; inaktive Waffen fehlen |
-| Keine Allokation je Treffer oder Frame | erfüllt | Feste `Float64Array`-Felder, eine Modulvariable `DMG_SRC`, kein zusätzliches Objekt und kein zusätzliches Argument im Trefferpfad |
-| Keine Balanceänderung | erfüllt | Kein Schadenswert, keine Trefferzahl, keine Abklingzeit geändert |
-
-### Scope 5 – Todesframe-Befund nicht mitgezogen
-
-Nicht angefasst. Der Befund aus dem Vorauftrag (Splitter, die nach `endRun()`
-im selben Frame noch eingesammelt werden) bleibt unverändert offen.
-
-## Prüfungen
-
-| Befehl oder Prüfung | Ergebnis | Exitcode |
-|---|---|---:|
-| `npm test` (final) | 42 von 43 Checks grün, rot: `totalPicks` | **1** |
-| `git diff --check` | keine Ausgabe | 0 |
-| `git status --short --branch` | sauber, 2 Commits voraus | 0 |
-| `bossCombatPocket` | grün | — |
-| `bossLocatorState` | grün | — |
-| `compactCombatHud` | grün | — |
-| `evolutionCompletion` | grün | — |
-| `weaponDamageReport` | grün | — |
-
-**Ausdrücklich verlangte Kontrolle — alle grün:** `configStable`,
-`aspectIndependent`, `densityOvershoot`, `bossTargeting`, `bossDurability`,
-`evolutionReachable`, `healOrbFlow`, `holdFlow`, `holdExpansion`,
-`contractFlow`, `equipmentFlow`, `earlyLossGuard`.
-
-### Mutationstest der fünf neuen Checks
-
-Jede Korrektur einzeln zurückgenommen, jeweils die volle Suite gefahren:
-
-| Zurückgenommen | Rot geworden |
+| Datei | Art |
 |---|---|
-| `BOSS_ADD_TARGET` auf 99999 | nur `bossCombatPocket` |
-| Ortung immer als Chevron | nur `bossLocatorState` |
-| Meta-Boni wieder in die Kampfliste | nur `compactCombatHud` |
-| Sofortabschluss abgeschaltet | nur `evolutionCompletion` |
-| Overkill ungedeckelt gebucht | nur `weaponDamageReport` |
+| `prototype/web/index.html` | XP-Kurve, Pfeilregen-Faktor, Klingen-Trefferprüfung, Waffentelemetrie, zwei Testexporte |
+| `tools/run-balance-suite.mjs` | zwei neue Checks `lateProgression` und `weaponRoles` |
+| `docs/CURRENT_TASK.md` | Auftrag eingetragen, Status auf `BEREIT_FUER_CODEX_REVIEW` |
+| `docs/WORK_REPORT.md` | dieser Bericht |
 
-Kein Check ist eine Tautologie, und keiner reißt einen anderen mit.
+`ROADMAP.md`, `docs/DECISIONS.md`, `docs/TESTPLAN.md`, `CHANGELOG.md`,
+`AGENTS.md`, `CLAUDE.md` und `docs/WORKFLOW.md` sind **unverändert**.
+
+```text
+ prototype/web/index.html    |  77 +++++++++++++++---
+ tools/run-balance-suite.mjs | 185 +++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 251 insertions(+), 11 deletions(-)
+```
+
+## A. XP-Kurve
+
+### Konstanten und Formel
+
+| | vorher | nachher |
+|---|---|---|
+| Formel | `xpNeed(L) = 82 · L^0,70` | `L ≤ 20`: unverändert · `L > 20`: `82 · L^0,70 · (L/20)^3,0` |
+| neue Konstanten | – | `CFG.XP_LATE_AT = 20`, `CFG.XP_LATE_K = 3.0` |
+| `XP_C` / `XP_K` | 82 / 0,70 | **unverändert** 82 / 0,70 |
+
+Es ist dieselbe Kurvenfamilie: Oberhalb von Stufe 20 steigt nur der Exponent
+von 0,70 auf 3,70. An der Grenze ist der Zusatzfaktor exakt 1,0 — die Kurve ist
+stetig, es gibt keinen Deckel und keine Sperre.
+
+| Stufe | vorher | nachher | Faktor |
+|---:|---:|---:|---:|
+| 1 | 82,0 | 82,0 | 1,00 |
+| 20 | 667,6 | 667,6 | 1,00 |
+| 21 | 690,8 | **799,7** | 1,16 |
+| 30 | 886,7 | 2.992,8 | 3,38 |
+| 40 | 1.084,6 | 8.676,5 | 8,00 |
+
+Der Kostensprung von Stufe 20 auf 21 beträgt +19,8 % statt +3,5 %. Der
+Progressionstest deckelt ihn ausdrücklich bei 25 %, damit dort nie eine Wand
+entsteht.
+
+### Synthetischer Level-47-Budgettest
+
+| Größe | Wert |
+|---|---:|
+| XP-Budget, das die **alte** Kurve bis Stufe 47 brauchte | 32.951 |
+| Selbstkontrolle: Stufe mit diesem Budget auf der alten Kurve | **47** |
+| Stufe mit diesem Budget auf der **neuen** Kurve | **33** |
+| Zielkorridor des Auftrags | 30–34 ✓ |
+| Stufe bei zehnfachem Budget | 55 (kein Deckel) |
+
+### Warum k = 3,0
+
+Gemessen über alle neun Referenzseeds. Der Exponent hat auf den **Bot** fast
+keinen Hebel, weil der Bot ohnehin kaum über Stufe 20 hinauskommt — er
+bestimmt praktisch nur den synthetischen Budgetwert:
+
+| `XP_LATE_K` | Stufe bei Level-47-Budget | Kartenzüge Bot | Aufschlag auf Stufe 21 |
+|---:|---:|---:|---:|
+| 0 (aus) | 47 | 20,78 | 0 % |
+| 2,0 | 35 | 19,22 | +10,3 % |
+| 2,5 | 34 | 19,11 | +13,0 % |
+| 2,75 | 33 | 19,00 | +14,4 % |
+| **3,0** | **33** | **19,00** | **+15,8 %** |
+| 3,25 | 32 | 19,00 | +17,2 % |
+
+3,0 liegt mittig im geforderten Korridor 30–34 und ist weit draußen deutlich
+milder als eine Exponentialform (Stufe 47 kostet das 13-fache statt des
+25-fachen).
+
+## B. Pfeilregen
+
+Geändert wurde **genau eine** Stellschraube: der EVO-Schadensmultiplikator des
+Splitterköchers.
+
+| | vorher | nachher |
+|---|---|---|
+| Codezeile | `... * (evo?.82:1)` | `... * (evo?.68:1)` |
+| Änderung | – | **−17,1 %** |
+| Fächerbreite, Projektilzahl, Durchschlag, Feuerrate | unverändert | **unverändert** |
+| normaler Splitterköcher | unverändert | **unverändert** |
+
+## C. Rundenklinge
+
+### Diagnose: Es war ein Funktionsfehler
+
+Die Klinge war die **einzige** Waffe, die den Körperradius des getroffenen
+Gegners ignorierte. Jedes Projektil rechnet mit `r + 9` (normal), `+ 16`
+(Elite) beziehungsweise `+ 30` (Warden); die Klinge prüfte nur, ob der
+**Mittelpunkt** des Gegners innerhalb ihres Eigenradius von 17 lag.
+
+Folgen: Die effektive Trefferfläche gegen einen Normalgegner war 17² statt
+26² — Faktor 2,3. Gegen den Warden mit 30 Einheiten Körper war sie 17² statt
+47² — Faktor 7,6. Die Klinge zog sichtbar durch Gegner hindurch, ohne zu
+treffen, und war gegen den Warden praktisch wirkungslos.
+
+Korrigiert wurde ausschließlich diese Inkonsistenz. **Kein** Schadenswert,
+**keine** Klingenzahl, **kein** Radius der Umlaufbahn, **keine** Defensive und
+**keine** Rüstung wurden angefasst.
+
+### Benchmark
+
+Deterministisches Nahbereichsszenario: Spieler im Ursprung, Gegner auf einem
+gleichmäßigen Gitter (16 Einheiten Raster) im Ring von 38 bis 155
+Welteinheiten, 275 Gegner, 600 Ticks, keine Gegnerbewegung, alle Gegner
+überleben die Messung. Ein Gitter statt Ringen, weil sonst die zufällige Lage
+eines Rings relativ zur Klingenbahn das Ergebnis bestimmt.
+
+| Messung | vorher | nachher | Faktor |
+|---|---:|---:|---:|
+| Rundenklinge Stufe 2 | 35.229 | 83.392 | **2,37×** |
+| Rundenklinge Stufe 3 | 56.779 | 134.680 | **2,37×** |
+| Rundenklinge Stufe 4 | 68.234 | 159.787 | **2,34×** |
+| Rundenklinge Stufe 5 | 117.518 | 275.105 | **2,34×** |
+| Klingenzyklon Stufe 5 | 175.497 | 410.587 | **2,34×** |
+| Rundenklinge gegen Warden | 874 | 2.751 | **3,15×** |
+| Kettenblitz Stufe 4, Nahfeld | 5.236 | 5.236 | 1,00 |
+| Langbogen Stufe 4, Nahfeld | 7.096 | 7.096 | 1,00 |
+| Splitterköcher Stufe 5, Fernfeld | 11.476 | 11.476 | 1,00 |
+| **Pfeilregen Stufe 5, Fernfeld** | **37.866** | **31.401** | **0,83×** |
+| Langbogen gegen Warden | 1.774 | 1.774 | 1,00 |
+| Kettenblitz gegen Warden | 1.047 | 1.047 | 1,00 |
+
+Der Zielkorridor „ungefähr 2–3× wirksamer" ist damit getroffen, mit einer
+einzigen Korrektur statt gestapelter Buffs.
+
+**Wichtige Einordnung:** Der Benchmark misst Durchsatz gegen eine dichte,
+stehende Nahkampfmenge. Das ist der Bestfall der Klinge, nicht der Normalfall
+eines Runs — im Feldlauf kam sie auf 291 Schaden, weil Gegner sie bei einem
+dominanten Fernkampfbuild gar nicht erst erreichen. Die Zahlen sind als
+Vorher-/Nachher-Vergleich der Klinge belastbar, **nicht** als Aussage „Klinge
+stärker als Bogen".
+
+### Keine neue Schneeballkurve
+
+Die stärkere Klinge erhöht die Kartenzüge nicht, sie senkt sie sogar:
+
+| Stand | Kartenzüge Bot |
+|---|---:|
+| Ausgangscommit `676506f` | 21,67 |
+| nur Klingen-Trefferkorrektur | **21,00** |
+| nur Pfeilregen-Nerf | 21,67 (keine Wirkung auf den Bot, siehe unten) |
+| beide Waffenänderungen, XP-Bremse aus | 20,78 |
+| Endstand mit XP-Bremse | **19,00** |
+
+Auch die Feldspitze steigt nicht: `densityOvershoot` liegt unverändert bei
++3,5 % gegen die erlaubten +10 %.
+
+**Ehrliche Einschränkung:** Der Pfeilregen-Nerf ist im Botlauf **nicht**
+messbar, weil die Bot-Kartenstrategie den Splitterköcher praktisch nie
+evolviert — die Werte sind bis auf die letzte Stelle identisch mit dem
+Ausgangsstand. Belegt ist der Nerf ausschließlich über den deterministischen
+Benchmark und den neuen Check `weaponRoles`.
+
+## D. Waffentelemetrie
+
+Neue Felder im Run-State, beide als `Float64Array(6)` in Katalogreihenfolge:
+
+- `S.wFirst[i]` — Sekunde der ersten Aufnahme, `-1` = nie
+- `S.evoAt[i]` — Sekunde der Evolution, `-1` = keine
+
+Gesetzt wird jeweils einmal je Waffe, nicht pro Treffer und nicht pro Frame.
+Aktive Zeit und Schaden je Sekunde werden **erst beim Erzeugen des Berichts**
+gerechnet. Keine neuen Allokationen in Treffer- oder Schwarm-Schleifen, keine
+neuen HUD-Elemente, kein Save-Feld berührt, Save-Version unverändert bei 4.
+
+Neue Berichtszeile, gemessen im Browser bei 1422×613:
+
+```text
+Waffenverlauf: Langbogen ab 0:00 · 8:00 aktiv · 33/s,
+               Pfeilregen ab 1:01 · 6:59 aktiv · 100/s · EVO 3:34,
+               Rundenklinge ab 1:32 · 6:27 aktiv · 166/s
+```
+
+Liegt die aktive Zeit unter einer Sekunde, steht `–/s` statt einer erfundenen
+Null.
+
+## Tests und Nachweise
+
+| Befehl / Prüfung | Ergebnis | Exitcode |
+|---|---|---:|
+| `npm test` (final) | **45 von 45 Checks grün**, `pass: true` | **0** |
+| `git diff --check` | keine Ausgabe | 0 |
+| `git status --short --branch` | nur die vier oben genannten Dateien geändert | 0 |
+| `lateProgression` (neu) | grün, 5 Teilprüfungen | — |
+| `weaponRoles` (neu) | grün, 3 Teilprüfungen | — |
 
 ### Vorher / Nachher über alle neun Referenzseeds
 
-8 Minuten, unsterblicher Bot, identische Seeds. „v" = Ausgangscommit `694b695`,
-„n" = Stand `a5d9dfc`.
+| Größe | vorher (`676506f`) | nachher | Vorgabe |
+|---|---:|---:|---|
+| Erster Kartenzug, Mittelwert | 31,64 s | **31,64 s** | unverändert ✓ |
+| First-Pick-Korridor 25–45 s | grün | grün | bleibt gültig ✓ |
+| Kartenzüge, Mittelwert | 21,67 | **19,00** | Anker 21,7 ± 3 → 18,70–24,70 ✓ |
+| Läufe mit Evolution | 9 / 9 | **7 / 9** | — |
+| Evolutionen je Lauf | 1,89 | **1,44** | Ziel 1–2 typisch ✓ |
+| Kills, Mittelwert | 6.915 | 6.235 | — |
+| Endstufe Bot, Mittelwert | 22,67 | 20,00 | — |
+| Feldspitze, Maximum | 312 | **312** | unverändert ✓ |
+| Feldspitze, Mittelwert | 286 | 267 | — |
+| Dichte-Überschuss | +3,5 % | **+3,5 %** | Grenze +10 % ✓ |
+| Zieldichte 8:00 | 301 | **301** | unverändert ✓ |
 
-| Seed | 1. Zug v | 1. Zug n | Züge v | Züge n | Evo v | Evo n | Kills v | Kills n | Spitze v | Spitze n | Boss-Tötungen n |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| 1701 | 32,3 | 32,3 | 13 | 14 | 0 | 1 | 3.790 | 3.018 | 310 | **125** | 0 |
-| 1709 | 27,8 | 27,8 | 22 | 28 | 2 | 3 | 6.409 | 7.456 | 304 | 302 | 1 |
-| 1721 | 30,7 | 30,7 | 12 | 17 | 0 | 1 | 3.580 | 5.991 | 317 | 312 | 1 |
-| 1733 | 35,8 | 35,8 | 9 | 12 | 0 | 1 | 2.022 | 2.490 | 322 | 307 | 1 |
-| 1741 | 29,8 | 29,8 | 15 | 34 | 0 | 3 | 4.668 | 13.272 | 313 | 305 | 1 |
-| 1753 | 32,8 | 32,8 | 31 | 31 | 3 | 3 | 10.960 | 11.884 | 302 | 306 | 1 |
-| 1777 | 27,6 | 27,6 | 13 | 18 | 0 | 1 | 3.914 | 4.798 | 314 | 302 | 1 |
-| 1789 | 35,2 | 35,2 | 14 | 24 | 0 | 2 | 3.194 | 7.547 | 306 | 307 | 1 |
-| 2474367456 | 32,7 | 32,7 | 16 | 17 | 1 | 2 | 5.129 | 5.779 | 305 | 308 | 1 |
-| **Mittel** | **31,64** | **31,64** | **16,11** | **21,67** | **0,67** | **1,89** | **4.852** | **6.915** | — | — | **0,89** |
+### Mutationstest der beiden neuen Checks
 
-Zieldichte bei 8:00 unverändert **301**. Feldspitze im Maximum **322 → 312**,
-im Mittel **310 → 286**.
+Jede Änderung einzeln zurückgenommen, jeweils die volle Suite gefahren:
 
-**Seed 1701 ist der wichtigste Datenpunkt.** Dort stirbt der Warden nicht
-(Boss-Tötungen 0), und genau deshalb fällt die Feldspitze von 310 auf **125**:
-Der Deckel hält die gesamte Bosszeit. Das ist wörtlich die Situation, die der
-Besitzer beschrieben hat — kaum zum Boss durchkommen, während immer mehr
-Verstärkung nachrückt.
+| Zurückgenommen | Rot geworden |
+|---|---|
+| `XP_LATE_K` auf 0 (Bremse aus) | nur `lateProgression` |
+| Pfeilregen zurück auf `.82` | nur `weaponRoles` (Verhältnis 3,28 statt 2,72) |
+| Klinge wieder nur Mittelpunktprüfung | nur `weaponRoles` |
 
-Der erste Kartenzug ist auf allen neun Seeds **bitgenau identisch**. Die
-Änderung wirkt erst ab dem Fokuszeitpunkt und beim Boss, nicht auf das frühe
-Pacing.
+Kein Check ist eine Tautologie, keiner reißt einen anderen mit.
 
-## Manuelle Prüfungen und Browser-Smoke
+### Was `weaponRoles` genau prüft
 
-Ein Browser-Smoke bei **1422×613** wurde durchgeführt und hat **echte Frames
-gerendert**. Belege, alle programmatisch aus dem laufenden Canvas gelesen:
+Die Klingenbahn liegt bei Stufe 2 auf exakt 74 Welteinheiten; ein Gegner in
+radialem Abstand d hat also |d − 74| Abstand zur Bahn. Damit lassen sich die
+drei Fälle exakt stellen, ohne in die Arrays zu schreiben:
 
-- 30 `render()`-Durchläufe auf einem Canvas von 2133×920 physischen Pixeln
-  (DPR 1,5); 1.963 von 1.962 Stichproben nicht schwarz, es wurde also
-  tatsächlich gezeichnet.
-- **Randpfeil:** 1.978 rot-goldene Pixel um die erwartete Bildposition,
-  hellster Pixel RGB(240,195,90) — das ist exakt das Gold `#f0c45a`.
-- **Chevron:** 5.559 rot-goldene Pixel über dem Warden.
-- **Nach Boss-Tod:** `bossLocator()` liefert `null`, es wird nichts mehr
-  gezeichnet.
-- Beide Marker liegen außerhalb der Safe-Area (je 166 px bei 1422×613).
-- Linke Liste: 7 Slots + 1 Pfad, 168 px breit, rechte Kante bei 182 px,
-  Unterkante bei 605 von 613 px.
-- Pause: 3 Abschnitte, 13 Chips, 5 Pfade, kein horizontaler Überlauf.
+| Fall | Abstand zur Bahn | Grenze | gemessen | erwartet |
+|---|---:|---|---:|---|
+| Normalgegner knapp außerhalb des Eigenradius | 20 | 17+9 = 26 | **638** | trifft ✓ |
+| Normalgegner klar zu weit | 40 | 17+9 = 26 | **0** | trifft nicht ✓ |
+| Warden | 40 | 17+30 = 47 | **863** | trifft ✓ |
 
-**Was ich ausdrücklich NICHT behaupte.** Der Screenshot der Vorschau ist ein
-statischer Schnappschuss, auf dem eine Kartenüberlagerung liegt; er zeigt den
-Kampfzustand nicht verlässlich. Außerdem laden die PNG-Atlanten über die
-`data:`-URL nicht, es lief also der prozedurale Fallback. Eine **subjektive
-Sichtprüfung** — ob der Marker im Gefecht wirklich sofort ins Auge fällt, ob
-die linke Seite jetzt ruhig wirkt und ob sich der Marker von Aelrics Pfeilen
-klar genug abhebt — habe ich **nicht** durchgeführt. Sie bleibt beim Besitzer.
+Der mittlere Fall ist der wichtige: Er schließt aus, dass die Klinge nun
+weiter greift als erlaubt.
 
-## Einsatz eines günstigen Subagenten
+Zusätzlich: Pfeilregen gegen normalen Splitterköcher im selben Fernfeld,
+Verhältnis **2,72** (vorher 3,28). Die Decke liegt bei 3,0, der Boden bei 2,0 —
+Pfeilregen bleibt deutlich stärker als der Grundköcher, ist aber keine
+automatische Wahl mehr.
 
-Für die isolierte CSS-Aufgabe (Pausen-Detailbereich, inklusive kompakter
-Variante unter `@media (max-height:700px)`) habe ich einen Haiku-Subagenten
-eingesetzt. Ich habe seinen vollständigen Diff geprüft: Er lag korrekt im
-`<style>`-Block, hat keine bestehende Regel verändert und keine JavaScript-
-Zeile angefasst. Zwei Dinge habe ich selbst nachgezogen:
+### Bestätigung: Warden und Boss-Adds unverändert
 
-1. Einen Tippfehler in seinem deutschen Kommentar („Bonien") ersetzt und den
-   Kommentar auf den eigentlichen Zweck umgeschrieben.
-2. Seine Aussage zur Ursache des roten Checks **nicht übernommen**: Er
-   schrieb, `totalPicks` sei ein „dokumentierter Zustand gemäß D-026". Das ist
-   falsch — der Check war vor diesem Auftrag grün und ist erst durch die
-   Evolutionsänderung gekippt. Die Messreihe oben stammt von mir.
+| Prüfung | Wert vorher | Wert nachher |
+|---|---:|---:|
+| `BOSS_ADD_TARGET` | 90 | **90** |
+| normale Gegner mit lebendem Warden | 90 | **90** |
+| normale Gegner ohne Warden | 127 | **127** |
+| Warden-HP-Faktor (`kind===2` → `hp*=120`) | unverändert | unverändert |
+| `bossTargeting`, `bossDurability`, `bossCombatPocket`, `bossLocatorState` | grün | grün |
 
-Architektur, Laufzeitcode, alle fünf Verhaltenstests, die Mutationsgegenprobe,
-der Browser-Smoke und diese Abnahme stammen vom Hauptagenten.
+Im Diff ist keine Zeile der Warden-Logik, der Spawnkurve, von `targetEnemies`,
+des HUD oder der Safe-Areas enthalten.
 
-## Risiken, Nebenwirkungen und Abweichungen
+### Browser-Smoke bei 1422×613
 
-1. **Der Kartenzug-Anker ist rot** (siehe oben). Das ist der Blocker.
-2. **Der Bot erreicht jetzt 9 von 9 Evolutionen.** Das GDD reservierte
-   „zuverlässige Evolutionen" laut altem Codekommentar für den
-   15-Minuten-Tiefenzug. D-035 hebt diesen Vorbehalt für den 8-Minuten-Lauf
-   auf; ob 9/9 zu großzügig ist, ist eine Produktfrage für Codex.
-3. **Ein ehrlicher Nebeneffekt der Bossphase:** In Läufen, in denen der Warden
-   nicht stirbt, bleibt die Dichte dauerhaft bei ~90 statt ~300 (Seed 1701).
-   Das ist gewollt, verändert aber das Spielgefühl der Schlussminuten für
-   schwache Builds spürbar. Der nächste Feldlauf sollte das bewerten.
-4. **`telemetrySeparated` prüft eine umbenannte Quelltextstelle.** Die
-   Zusicherung wurde nicht gelockert, sondern erweitert: Sie verlangt jetzt
-   zusätzlich, dass `have` aus den Simulationszählern stammt, und schließt
-   Renderwerte in der Spawnentscheidung per Regex aus.
-5. **`headlessRun()` liefert drei neue Felder** (`bossKills`, `evoTimes`,
-   `dmgW`/`dmgWBoss`). `reproducible`, `contractFlow` und `holdExpansion`
-   vergleichen jeweils zwei Läufe miteinander und bleiben grün.
-6. **Sichtbare Textänderungen:** Der Run-Bericht hat zwei neue Zeilen. Die
-   linke Kampfliste ist deutlich kürzer. Die Pause hat einen neuen
-   Detailbereich. Nichts davon entfernt Information.
-7. **Kein Save-Feld berührt**, Save-Version unverändert bei 4.
-8. **Commits liegen auf `main`**, wie vom Auftrag vorgegeben. Kein Push.
+Echte Frames gerendert, programmatisch aus dem laufenden Canvas gelesen:
 
-Keine Abweichung vom freigegebenen Scope: keine Waffenwerte, keine globale
-Dichtekurve außerhalb der Bossphase, keine XP-Kurve, keine neuen Inhalte, kein
-numerisches Balancing.
+- 20 `render()`-Durchläufe, Canvas 1422×613, 872 von 871 Stichproben nicht
+  schwarz — es wurde tatsächlich gezeichnet.
+- **Die Klinge trifft den Warden jetzt:** 2.823 Bossschaden (33 % Anteil).
+  Vor der Korrektur war das praktisch nicht möglich.
+- Alle drei Waffenzeilen im Bericht korrekt gefüllt.
+- Kein horizontaler Überlauf.
 
-## Abschließender Git-Status
+**Was ich ausdrücklich nicht behaupte:** Der subjektive 8-Minuten-Test ist
+**nicht** bestanden — den fährt der Besitzer. Der Screenshot der Vorschau ist
+ein statischer Schnappschuss und taugt nicht zur Beurteilung des Spielgefühls;
+außerdem laden die PNG-Atlanten über die `data:`-URL nicht, es lief der
+prozedurale Fallback.
 
-```text
-## main...origin/main [ahead 2]
-```
+## Bekannte Risiken
 
-Arbeitsbaum sauber, keine unversionierten Dateien.
+1. **Der Bot-Anker hat nur noch 0,30 Reserve nach unten.** 19,00 gegen die
+   Untergrenze 18,70. Wichtig für die Bewertung: Der XP-Exponent ist dafür
+   **nicht** der Hebel — von `XP_LATE_K` 2,0 bis 3,25 bleiben die Kartenzüge
+   praktisch konstant (19,22 bis 19,00). Der Rückgang kommt zu etwa einem
+   Drittel aus der Klingenkorrektur und zu zwei Dritteln daraus, dass der Bot
+   die letzten Stufen nicht mehr erreicht. Eine mildere Bremse würde die
+   Reserve also nicht zurückholen. Ich habe den Anker **nicht** angefasst.
+2. **Der Pfeilregen-Nerf ist im Botlauf unsichtbar** (siehe oben). Erst der
+   nächste Feldlauf zeigt, ob −17,1 % das richtige Maß sind.
+3. **Die Klinge ist im Nahfeld-Benchmark sehr stark.** Ob sie im echten Run das
+   Risiko der Nahdistanz wert ist, entscheidet nur der Feldlauf. Wenn sie dort
+   überdreht, ist der nächste Schritt eine Senkung des Schadenswerts — die
+   Trefferkorrektur selbst sollte bestehen bleiben, sie behebt einen Fehler.
+4. **Der Zielkorridor 28–34 Kartenzüge ist am Menschen noch unbestätigt.** Der
+   synthetische Budgettest sagt Stufe 33, also 32 Kartenzüge. Die
+   Rückkopplung (weniger Stufen → weniger Schaden → weniger Erfahrung) drückt
+   den echten Wert zusätzlich nach unten, vermutlich Richtung 28–31.
 
-```text
-a5d9dfc  feat: Warden-Kampfphase, kompaktes HUD, Evolutionsabschluss, Schadensmessung
-<dieser>  docs: Arbeitsbericht EH-2026-08-23-02
-```
+## Offene Punkte
 
-Der Hash des Doku-Commits steht nicht in dieser Datei, weil sie selbst Teil
-davon ist.
+- `CHANGELOG.md`, `docs/DECISIONS.md` (D-036), `docs/TESTPLAN.md` und
+  `ROADMAP.md` sind bewusst **nicht** angefasst — laut Auftrag synchronisiert
+  Codex sie nach unabhängiger Prüfung.
+- Der vorbestehende Todesframe-Telemetriefehler bleibt unverändert offen.
 
-## Empfehlung an Codex
+## Manuelle Abnahmeschritte
 
-**Code abnehmen, Anker entscheiden.**
+**Für Codex:**
 
-Der freigegebene Scope ist vollständig umgesetzt, mit Messwerten belegt und
-durch fünf mutationsgeprüfte Verhaltenstests abgesichert. Ich sehe keinen
-Grund, am Code nachzuarbeiten.
+1. `npm test` selbst ausführen — erwartet 45/45, Exitcode 0.
+2. Den Diff auf die vier Scope-Punkte prüfen; insbesondere bestätigen, dass
+   keine Warden-, Dichte-, HUD- oder Save-Zeile enthalten ist.
+3. Die Klingenkorrektur bewerten: Ist „Körperradius mitrechnen wie bei jedem
+   Projektil" als Fehlerbehebung akzeptiert, oder soll sie als Balancewert
+   behandelt und kleiner ausfallen?
+4. Über die Reserve am Bot-Anker entscheiden (Risiko 1) — ich habe ihn
+   bewusst nicht verändert.
 
-Offen ist ausschließlich `BOT_PICK_REF`. Bitte einen der drei oben genannten
-Wege entscheiden. Sobald die Entscheidung feststeht, sind noch drei kleine
-Dokumentationsschritte offen, die dieser Auftrag an „Tests grün" gekoppelt hat
-und die ich deshalb nicht vorweggenommen habe: `CHANGELOG.md`, die belegten
-Umsetzungswerte in D-035 und die neuen Checks in `docs/TESTPLAN.md`.
+**Für den Besitzer** (nach Codex' Freigabe, ein vollständiger
+Wächterring-Lauf über 8 Minuten ohne Live-Tuning):
 
-Für den nächsten Feldlauf schlage ich zwei gezielte Fragen an den Besitzer vor:
-Ist der Warden jetzt auffindbar und erreichbar, und wirkt die linke Seite ruhig
-genug? Beides ist technisch belegt, aber subjektiv noch unbestätigt.
+1. Fühlen sich die ersten drei bis vier Minuten **genauso** an wie vorher? Bis
+   Stufe 20 wurde bewusst nichts geändert.
+2. Endet der Lauf bei ungefähr 28–34 Kartenzügen statt bei 46? Wird der
+   Fortschritt in der zweiten Hälfte spürbar langsamer, ohne blockiert zu
+   wirken?
+3. Bist du am Ende noch praktisch unbesiegbar, oder gibt es wieder brenzlige
+   Momente?
+4. Ist Pfeilregen weiterhin stark, aber nicht mehr automatisch die beste Wahl?
+5. Lohnt sich die Rundenklinge jetzt? Insbesondere: Merkst du sie im
+   Warden-Kampf?
+6. Danach den **vollständigen Run-Bericht** kopieren. Die neue Zeile
+   `Waffenverlauf` ist die Grundlage für die nächste Balance-Entscheidung.
+
+## Eingesetzter Subagent und eigene Nachprüfung
+
+Für den `lateProgression`-Testblock habe ich einen Haiku-Subagenten
+eingesetzt — eine klar abgegrenzte, rein arithmetische Aufgabe. Keine
+Produktentscheidung und keine Dokumentation wurden delegiert.
+
+Ich habe seinen vollständigen Diff geprüft und **drei Dinge selbst
+nachgebessert**:
+
+1. **Tote Variable:** `LK` (`XP_LATE_K`) wurde eingelesen, aber nie benutzt.
+   Ich habe daraus eine echte Prüfung gemacht: Der Zusatzfaktor muss exakt
+   `(L/20)^XP_LATE_K` sein. Ohne das wäre jede beliebige steigende Kurve grün
+   gewesen.
+2. **Off-by-one:** Seine Schleife zählte die *bezahlten* Stufen, nicht die
+   *erreichte* Stufe — der Korridor 30–34 wäre damit faktisch 31–35 gewesen.
+   Korrigiert auf die Semantik von `gainXP()`; der Wert lautet jetzt 33 statt
+   32.
+3. **Fehlende Selbstkontrolle:** Der Test bildete ein Referenzbudget, prüfte
+   aber nie, ob dieses Budget auf der alten Kurve wirklich Stufe 47 ergibt.
+   Ergänzt als `budgetStimmt` — jetzt fällt auf, wenn das Budget falsch
+   gebildet wurde.
+
+Anschließend habe ich die volle Suite selbst ausgeführt, den zweiten Check
+`weaponRoles` selbst geschrieben, alle Benchmarks selbst gefahren und die drei
+Mutationstests selbst durchgeführt. Analyse, Diagnose der Klinge, Wahl des
+XP-Exponenten und dieser Bericht stammen vollständig vom Hauptagenten.
+
+## Codex-Review vom 24.08.2026
+
+Codex hat den vollständigen Diff unabhängig geprüft und `npm test` selbst
+ausgeführt. Claudes vier Scope-Punkte sind akzeptiert; Warden, Dichte, Hold,
+HUD und Save-Pfad bleiben unverändert.
+
+Ein Review-Mangel wurde direkt behoben: `weaponTimelineText()` war im Browser
+geprüft, aber noch nicht automatisch gegen Regression abgesichert. Der
+bestehende Check `weaponDamageReport` prüft jetzt deterministisch Langbogen ab
+0:00 mit 4:00 Aktivzeit und 2/s sowie Sturmherz ab 1:00 mit 3:00 Aktivzeit,
+3/s und EVO 3:00; inaktive Waffen dürfen nicht erscheinen. Die erste
+Testerwartung verwendete trotz gesetzter Evolution den Namen `Kettenblitz` und
+wurde auf den korrekten Namen `Sturmherz` korrigiert. Endstand: **45/45 Checks
+grün**, `git diff --check` sauber. Empfehlung: technisch abnehmen und den
+D-036-Besitzerlauf starten.

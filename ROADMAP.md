@@ -2,7 +2,43 @@
 
 ## Aktueller Arbeitsfokus
 
-**Verbindlicher Stand 23.08.2026:** EH-2026-08-23-02 ist durch Claude
+**Verbindlicher Stand 24.08.2026:** Der vollständige Besitzerlauf nach D-035
+ist gefahren. Warden-Phase und Renderleistung sind bestätigt: Der Boss war
+gezielt erreichbar und angemessen, die reduzierte Gegnerzahl angenehm; 57 FPS
+schlechtester Wert, 60 FPS 1-%-Low und 0 % der Proben unter 55 FPS. Das
+Spielgefühl-Gate bleibt trotzdem negativ: 46 Kartenzüge, Stufe 47 und drei
+Evolutionen machten den Spieler praktisch unbesiegbar; Pfeilregen trug 55 %
+des Gesamtschadens, die Rundenklinge trotz Stufe 4 nur 291 Schaden. Die
+seitliche Safe-Area und unnötige Informationen bleiben ein eigener visueller
+Befund.
+
+EH-2026-08-24-01 ist durch Claude umgesetzt und durch Codex technisch
+abgenommen (D-036):
+
+1. [x] Frühe XP-Kurve bis einschließlich Stufe 20 unverändert.
+2. [x] Späte XP-Kosten weich erhöht; das alte Stufe-47-Budget erreicht im
+   synthetischen Vertrag jetzt Stufe 33 ohne harten Deckel.
+3. [x] Pfeilregen ausschließlich über seinen EVO-Schadensfaktor um 17,1 %
+   abgeschwächt; normaler Splitterköcher unverändert.
+4. [x] Rundenklinge berücksichtigt wie Projektile den Gegnerkörper. Der
+   reproduzierbare Nahbereichsbenchmark steigt dadurch etwa 2,3-fach, ohne
+   Schadenswert oder Defensive zu erhöhen.
+5. [x] Run-Bericht ergänzt Aufnahmezeit, aktive Zeit, Schaden je aktiver
+   Sekunde und Evolutionszeit je verwendeter Waffe.
+6. [x] Unabhängige Codex-Prüfung: `npm test` 45/45, `git diff --check` sauber.
+
+Nächste verbindliche Reihenfolge:
+
+1. [ ] Besitzer spielt einen vollständigen 8-Minuten-Wächterring-Lauf nach
+   dem D-036-Protokoll in `docs/TESTPLAN.md` und kopiert den ganzen Bericht.
+2. [ ] Codex bewertet 28–34 menschliche Kartenzüge, 1–2 typische Evolutionen,
+   späte Gefahr sowie Pfeilregen und Rundenklinge anhand der neuen Aktivzeit.
+3. [ ] Danach folgt ein eigener visueller Designschritt für Safe-Area,
+   unnötige HUD-Informationen und den allgemeinen Kampfausschnitt.
+4. [ ] Neue Inhalte und Gegneranimationen bleiben bis zum positiven
+   Spielgefühl-Gate gesperrt.
+
+**Historischer Stand 23.08.2026:** EH-2026-08-23-02 ist durch Claude
 umgesetzt und durch Codex technisch abgenommen. Der Warden hat jetzt ein
 eigenes Verstärkungsziel von 90 normalen Gegnern, eine dauerhafte Ortung,
 das Kampf-HUD ist entschlackt, erfüllte Evolutionspfade schließen sofort und
@@ -20,7 +56,7 @@ Abgeschlossen:
    Evolutionsänderung von 15,3 auf 21,7 neu referenziert; Toleranz unverändert
    bei ±3.
 
-Nächste verbindliche Reihenfolge:
+Damals vorgesehene Reihenfolge (durch den Feldlauf vom 24.08. überholt):
 
 1. [ ] Der Besitzer wiederholt den vollständigen 8-Minuten-Wächterring-Lauf
    nach dem aktualisierten Protokoll in `docs/TESTPLAN.md`.

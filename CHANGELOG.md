@@ -11,6 +11,18 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 - Kanonische Dateien für aktiven Auftrag und standardisierten Arbeitsbericht
 ### Added
 
+- Späte XP-Bremse ab Stufe 21: Der frühe Run bleibt unverändert, während das
+  bisherige Stufe-47-Rohbudget im neuen Vertrag auf Stufe 33 landet
+- Pfeilregen-EVO um 17,1 % Schaden reduziert, ohne normalen Splitterköcher,
+  Projektilzahl, Durchschlag oder Feuerrate zu verändern
+- Rundenklinge berücksichtigt nun wie Projektilwaffen den Körperradius von
+  Normalgegnern, Eliten und Warden; keine zusätzlichen Defensivwerte
+- Run-Bericht um Aufnahmezeit, aktive Zeit, Schaden je aktiver Sekunde und
+  Evolutionszeit jeder verwendeten Waffe erweitert
+- Zwei neue Verhaltenschecks `lateProgression` und `weaponRoles`; der
+  bestehende Waffenbericht-Check sichert zusätzlich den vollständigen
+  Waffenverlauf. Nach unabhängiger Codex-Review 45/45 Checks grün
+
 - Waffen-Telemetrie im kopierbaren Run-Bericht: tatsächlich abgezogener
   Gesamtschaden und Boss-Schaden je aktive Waffe; Overkill und Folgeeffekte
   werden ihrer Ursprungswaffe korrekt zugerechnet
