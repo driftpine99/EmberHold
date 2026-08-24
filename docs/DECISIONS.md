@@ -1651,3 +1651,55 @@ Aktivzeitdaten entscheiden, ob Pfeilregen und Rundenklinge weiter angepasst
 werden. Safe-Area und unnötige Kampfinformationen folgen als eigener visueller
 Designschritt; neue Inhalte und Gegneranimationen bleiben bis zum positiven
 Spielgefühl-Gate gesperrt.
+
+## D-037 – Orbitblade bleibt sichtbarer Produktname
+
+**Status:** auf ausdrücklichen Besitzerwunsch beschlossen (24.08.2026);
+kommerzielle und juristische Freigabe weiterhin offen.
+
+Die Vorproduktionsprüfung hat eine konkrete Kollision dokumentiert: Auf Steam
+existiert bereits ein veröffentlichtes Sci-Fi-Roguelite namens „Orbit Blade“,
+dessen Kernbeschreibung ebenfalls hinausgeschleuderte und zurückgerufene
+Klingen nennt. Codex empfiehlt deshalb weiterhin einen unterscheidbaren Namen.
+
+Der Besitzer entscheidet trotzdem, **Orbitblade beizubehalten**. Ab dem
+nächsten visuellen Auftrag darf dieser Name in Titel und Spieleroberfläche
+erscheinen. Das ist eine bewusste Risikoübernahme, keine Markenfreigabe und
+keine Zusage für einen späteren Store-Eintrag.
+
+Folgen:
+
+- Repository, Pages-URL, Save-Key und interne IDs bleiben zunächst Emberhold.
+- Kein Code, Asset oder Text aus dem lokalen Referenzprojekt wird importiert.
+- Vor einem monetarisierten Store-Eintrag bleibt eine gesonderte Namens-,
+  Domain- und Markenprüfung Pflicht.
+- Falls diese Prüfung einen Wechsel verlangt, muss die sichtbare
+  Präsentationsschicht einen späteren Rename ohne Save-Migration erlauben.
+
+## D-038 – Visueller Orbitblade-Slice vor dem D-036-Feldlauf
+
+**Status:** beschlossen und als EH-2026-08-24-02 für Claude freigegeben
+(24.08.2026).
+
+Der D-036-Feldlauf bleibt fachlich notwendig. Der Besitzer priorisiert jetzt
+jedoch die neue Orbitblade-Identität und möchte Claudes mehrstündige Sitzung
+produktiv dafür nutzen. Ein rein visueller und semantischer Slice darf deshalb
+vor dem Feldlauf stattfinden, sofern die Simulation bitidentisch bleibt.
+
+Der Auftrag umfasst sichtbare Namen, Kampf-HUD, dekorative Safe-Area,
+Orbitalstation Stufe A sowie einen kleinen Grafik-Slice für Orbitträger,
+Sammlerdrohne und AEGIS. Er umfasst ausdrücklich keine Rückflugmechanik,
+Balance, neue Inhalte oder neue Stationsökonomie.
+
+Die Abweichung von der bisherigen Reihenfolge ist messbar abgesichert:
+
+- 45/45 Checks sind die Baseline;
+- feste Seeds und Hold-Auszahlungen müssen vor/nachher bitidentisch sein;
+- interne IDs, RNG-Reihenfolge, Save v4 und `emberhold:hold:v1` bleiben;
+- neue Präsentation erhält eigene Verhaltenschecks;
+- der vollständige Besitzerlauf folgt nach dem Slice und bleibt Gate vor
+  Klingenmechanik, Balance und Content.
+
+Damit kann die fünfstündige Sitzung breit innerhalb eines zusammenhängenden
+Präsentationsauftrags arbeiten, ohne mehrere untrennbare Gameplaybaustellen zu
+stapeln.

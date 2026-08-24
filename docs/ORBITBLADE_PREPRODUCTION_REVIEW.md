@@ -2,7 +2,7 @@
 
 **Stand:** 24.08.2026
 
-**Status:** fachlich geprüft, noch nicht zur Implementierung freigegeben
+**Status:** Name entschieden; visueller Erstauftrag freigegeben
 
 **Gehört zu:** `docs/ORBITBLADE_CONCEPT_DRAFT.md`
 
@@ -14,19 +14,16 @@ bleibt und nicht nur umbenannt wird. Der Run braucht weiterhin bessere
 Lesbarkeit, eine markante Startwaffe, ein klares Zwischenziel und später einen
 nützlicheren Hub.
 
-Vor der ersten Codeänderung müssen drei Entscheidungen bestätigt werden:
+Der Besitzer hat den Namen entschieden: **Orbitblade bleibt** trotz der unten
+dokumentierten Kollision. Für den ersten Auftrag gelten zwei Schutzregeln:
 
-1. **„Orbitblade“ wird vorerst kein öffentlicher Produktname.** Der interne
-   Arbeitsname lautet **Project Vesper**; Repository, Save-Key und GitHub-URL
-   bleiben zunächst Emberhold.
-2. **Die Raumstation wird in Stufe A nur sauber neu inszeniert.** Laufzeiten,
-   Ressourcenflüsse und Baseline-Balance bleiben identisch. Eine tiefere
-   Stationsökonomie ist eine eigene Stufe B.
-3. **Vor dem Umbau wird ein unveränderter D-036-Referenzlauf archiviert.** So
-   bleibt messbar, ob die Neuausrichtung das Spiel tatsächlich verbessert.
+1. Die Raumstation wird in Stufe A nur neu inszeniert; Laufzeiten,
+   Ressourcenflüsse und Baseline-Balance bleiben identisch.
+2. Der erste Umbau bleibt vollständig visuell und semantisch. Der ausstehende
+   D-036-Feldlauf folgt danach und bleibt Gate vor Rückflugmechanik, neuer
+   Balance oder neuem Content.
 
-Danach ist das Konzept für kleine, einzeln abnehmbare Produktionsschritte
-ausreichend präzise.
+Damit ist der visuelle Erstauftrag klein, messbar und freigegeben.
 
 ## 1. Verbindlicher Produktkern
 
@@ -51,14 +48,14 @@ hinausschleudern und zurückrufen – liegt außerdem sehr nah an unserem neuen
 Kernangriff. Unabhängig von einer späteren juristischen Markenprüfung wäre der
 Name deshalb kommerziell schlecht unterscheidbar.
 
-Folge:
+Besitzerentscheidung und Folge:
 
-- `Orbitblade` bleibt höchstens die Bezeichnung der lokalen Designreferenz.
-- Für Dokumente und Entwicklung gilt vorläufig **Project Vesper**.
-- `Emberhold` bleibt technischer Repository-, Pages- und Save-Name, bis ein
-  eigener Naming-Sprint abgeschlossen ist.
-- Ein öffentlicher Namenswechsel erfolgt erst nach Store-, Domain-, Web- und
-  Markenrecherche. Das ist ein späteres Freigabe-Gate, keine Coding-Aufgabe.
+- **Orbitblade** bleibt sichtbarer Produktname; das Risiko ist bewusst akzeptiert.
+- Das ist keine juristische Markenfreigabe und keine Aussage, dass ein späterer
+  Store den Namen akzeptiert.
+- `Emberhold` bleibt vorerst technischer Repository-, Pages- und Save-Name.
+- Vor einem monetarisierten Store-Eintrag erfolgt trotzdem eine eigene
+  Namens-, Domain- und Markenprüfung; ein nötiger späterer Wechsel bleibt möglich.
 
 ## Geschäftsmodell- und Vertriebs-Gate
 
@@ -271,15 +268,13 @@ Konsistenzpass, Rechteprüfung und die korrekte Plattform-Offenlegung.
 Jeder Punkt erhält einen eigenen `docs/CURRENT_TASK.md`-Auftrag und eine
 separate Abnahme. Es wird nicht parallel an mehreren Punkten gearbeitet.
 
-0. **Gate:** drei Besitzerentscheidungen und D-036-Referenzlauf.
-1. **Visuelle Hülle:** Titel-Codename, HUD-Hierarchie, Palette, hellerer Boden;
-   Simulation und Waffen bleiben bitidentisch.
-2. **Orbitklinge prozedural:** nur Flug- und Treffervertrag plus DPS-Benchmark.
-3. **Grafik-Vertical-Slice:** Spieler, eine Gegnerfamilie und AEGIS.
-4. **Semantischer Pass:** restliche sichtbare Waffen-, Modul- und Gegnernamen.
-5. **Station Stufe A:** Hold-Re-Theming ohne Ökonomieänderung.
-6. **Ein Sektorziel:** „Signal sichern“, gemessen und separat abgenommen.
-7. **Station Stufe B:** erst nach eigener Produktentscheidung.
+0. **Entschieden:** Orbitblade bleibt Name; Risiko D-037 ist akzeptiert.
+1. **Visueller Erstauftrag:** Sprache, HUD, Safe-Area, Station Stufe A und
+   kleiner Grafik-Slice bei bitidentischer Simulation.
+2. **D-036-Feldlauf:** menschlicher Acht-Minuten-Lauf nach diesem Slice.
+3. **Orbitklinge mechanisch:** Rückflug und DPS-Benchmark erst danach.
+4. **Ein Sektorziel:** „Signal sichern“, separat abgenommen.
+5. **Station Stufe B:** erst nach eigener Produktentscheidung.
 
 ## 11. Abnahme pro Produktionsschritt
 
@@ -294,13 +289,11 @@ Mindestens:
 - nach spielerischen Änderungen ein menschlicher Acht-Minuten-Lauf und die
   Kernfrage: „Will ich freiwillig sofort einen zweiten Run starten?“
 
-## 12. Noch offene Besitzerfreigabe
+## 12. Freigabestand
 
-Codex empfiehlt die folgenden drei Antworten:
+- **Entschieden:** Orbitblade bleibt sichtbarer Produktname.
+- **Festgelegt durch Codex:** Station Stufe A behält die bestehende Ökonomie.
+- **Freigegeben:** visueller und semantischer Erstauftrag ohne Mechanikänderung.
+- **Weiter offen:** D-036-Feldlauf vor Rückflugmechanik, Balance oder Content.
 
-1. **Ja:** kein öffentlicher Name Orbitblade; vorläufig Project Vesper.
-2. **Ja:** Station Stufe A behält die bestehende Ökonomie vollständig bei.
-3. **Ja:** erst D-036-Referenzlauf, dann Task 1.
-
-Erst nach dieser Bestätigung schreibt Codex den nächsten Claude-Auftrag. Bis
-dahin ist kein Implementierungsschritt freigegeben.
+Der aktive Claude-Auftrag steht verbindlich in `docs/CURRENT_TASK.md`.

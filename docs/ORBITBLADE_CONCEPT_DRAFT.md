@@ -1,20 +1,20 @@
-# Project Vesper – Sci-Fantasy-Neuausrichtung auf Basis von Emberhold
+# Orbitblade – Sci-Fantasy-Neuausrichtung auf Basis von Emberhold
 
-**Status:** Konzeptentwurf zur Besitzerfreigabe, noch kein
-Implementierungsauftrag. Bei Widersprüchen gilt die
+**Status:** Konzeptgrundlage beschlossen; visueller Erstauftrag freigegeben.
+Bei Widersprüchen gilt die
 [`ORBITBLADE_PREPRODUCTION_REVIEW.md`](ORBITBLADE_PREPRODUCTION_REVIEW.md).
 
 ## Kurzfassung
 
-**Project Vesper** wird ein gut lesbares Solo-PvE-Sci-Fantasy-Roguelite für kurze
+**Orbitblade** wird ein gut lesbares Solo-PvE-Sci-Fantasy-Roguelite für kurze
 Runs. Der Spieler unternimmt achtminütige Bergungssortien, entwickelt eine
 automatisch geworfene und zurückkehrende Energieklinge sowie fünf ergänzende
 Waffensysteme und baut mit der Beute eine beschädigte Orbitalstation wieder auf.
 
 Emberhold bleibt die mechanische und technische Grundlage. Von der bisherigen
 Orbitblade-Fassung übernehmen wir kosmische Gestaltung, Hangar-Motiv,
-Orbit-Symbolik und die Klinge als sichtbare Identität – nicht den öffentlichen
-Titel. Nicht übernommen werden
+Orbit-Symbolik, die Klinge als sichtbare Identität und auf ausdrücklichen
+Besitzerwunsch auch den Produktnamen. Nicht übernommen werden
 der 19–23-Minuten-Wellenlauf, der große Orbitbaum, mehrere aktive Kampftasten,
 abstrakte Kreisgegner und die starke Text-/Effektüberladung.
 
@@ -57,7 +57,7 @@ Das Spiel soll drei unmittelbare Fragen klar beantworten:
 | Bossortung, Schadensbericht, Pause | Emberhold | bleiben und werden visuell vereinfacht |
 | Verträge, Relikte, Ausrüstung | Emberhold | bleiben als Sektoren, Artefakte und Module |
 | Meta-Ort | Emberhold + Orbitblade | Hold wird eine begehbar wirkende Orbitalstation mit Hangar |
-| Signaturmotiv | Orbitblade-Referenz | Die zurückkehrende Klinge wird Kernwaffe; der Titel wird nicht übernommen |
+| Titel und Signaturmotiv | Orbitblade-Referenz | Orbitblade bleibt Produktname und die zurückkehrende Klinge wird Kernwaffe |
 | Farb- und Formenwelt | Orbitblade | Navy, Violett, Cyan, Weißgold, leuchtende Orbitbögen |
 | Alter Orbitbaum | Orbitblade | wird nicht importiert; zu viel Verwaltung für den 8-Minuten-Run |
 | Aktive Mächte auf mehreren Tasten | Orbitblade | werden nicht importiert; Mobile und Übersicht bleiben einfach |
@@ -350,11 +350,12 @@ Marke bleiben. Im Spiel verwenden wir daher weder `Star Wars`, `Jedi`, `Sith`,
 Orbitklinge, Photonenschneide, Impulskarabiner und Fluxkräfte mit eigener
 Silhouette und eigener Hintergrundgeschichte.
 
-`Orbitblade` bleibt ausschließlich die Bezeichnung der lokalen Designreferenz.
-Der interne Arbeitsname ist **Project Vesper**; Repository, Pages-URL und
-Save-Key bleiben bis zu einer späteren Namens-, Store-, Domain- und
-Markenprüfung Emberhold. Vorhandene KI- und Konzeptgrafiken dienen als interne
-Referenz und werden in [`ASSET_PROVENANCE.md`](ASSET_PROVENANCE.md) erfasst.
+**Orbitblade** bleibt auf ausdrücklichen Besitzerwunsch der sichtbare
+Produktname. Die dokumentierte Kollision ist damit als bewusstes Produktrisiko
+akzeptiert, aber nicht rechtlich freigegeben. Repository, Pages-URL und Save-Key
+bleiben zunächst Emberhold; vor einem monetarisierten Store-Eintrag folgt eine
+separate Namens- und Markenprüfung. KI- und Konzeptgrafiken werden in
+[`ASSET_PROVENANCE.md`](ASSET_PROVENANCE.md) erfasst.
 
 ## Kosteneffiziente Umsetzung
 
@@ -365,15 +366,13 @@ getestete Emberhold-Simulation bleibt bestehen.
 
 ### Empfohlene Reihenfolge
 
-1. **Gate schließen.** Namen, Stationsstufe A und D-036-Referenzlauf bestätigen.
-2. **Nur visuelle Hülle.** HUD-Hierarchie, Palette und hellerer Boden bei
-   bitidentischer Simulation.
-3. **Orbitklinge prozedural.** Flug- und Treffervertrag mit DPS-Benchmark.
-4. **Grafik-Vertikalschnitt.** Spieler, eine Gegnerfamilie und AEGIS.
-5. **Semantischer Pass.** Restliche sichtbare Namen, noch ohne neue Ökonomie.
-6. **Station Stufe A.** Hold-Neuinszenierung mit identischem Ressourcenfluss.
-7. **Ein Sektorziel.** Erst danach „Signal sichern“ separat testen.
-8. **Station Stufe B.** Nur nach eigener Produktentscheidung.
+1. **Besitzerentscheidung:** Orbitblade bleibt Name; Risiko D-037 ist akzeptiert.
+2. **Visueller und semantischer Slice:** HUD, Safe-Area, Station Stufe A sowie
+   kleiner Figuren-Slice bei bitidentischer Simulation (D-038).
+3. **D-036-Feldlauf:** vollständiger Acht-Minuten-Lauf nach dem visuellen Slice.
+4. **Orbitklinge mechanisch:** Rückflug erst danach mit eigenem DPS-Vertrag.
+5. **Ein Sektorziel:** anschließend „Signal sichern“ separat testen.
+6. **Station Stufe B:** nur nach eigener Produktentscheidung.
 
 ### Nicht Teil des ersten Umbaus
 
@@ -386,16 +385,16 @@ getestete Emberhold-Simulation bleibt bestehen.
 
 ## Freigabeentscheidungen
 
-Für die nächste Stufe empfiehlt dieses Konzept drei Festlegungen:
+Für die nächste Stufe gelten fünf Festlegungen:
 
-1. **Produktname:** kein öffentliches Orbitblade; intern Project Vesper.
+1. **Produktname:** Orbitblade bleibt; das dokumentierte Risiko ist akzeptiert.
 2. **Signaturwaffe:** automatisch geworfene Orbitklinge mit Rückflug statt
    dauerhaft engem Nahkampforbit.
-3. **Stil:** kosmische weißgoldene Sci-Fantasy auf helleren Kampfflächen statt
-   realistischer Hard-Sci-Fi.
+3. **Stil:** kosmische weißgoldene Sci-Fantasy auf helleren Kampfflächen.
 4. **Meta-Ort:** Raumstation Stufe A mit identischem Ressourcenfluss; neue
    Stationsmechanik erst in Stufe B.
-5. **Messbasis:** ein unveränderter D-036-Referenzlauf vor dem ersten Umbau.
+5. **Messbasis:** Der erste Umbau bleibt visuell bitidentisch; der
+   D-036-Feldlauf folgt vor der echten Klingenmechanik.
 
-Erst nach dieser Freigabe werden Roadmap, verbindliche Entscheidungen,
-Testplan, Assets und Spielcode schrittweise auf Project Vesper umgestellt.
+Roadmap, Entscheidungen, Tests, Assets und Code werden in getrennten,
+prüfbaren Aufträgen auf Orbitblade umgestellt.

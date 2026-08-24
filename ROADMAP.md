@@ -2,6 +2,13 @@
 
 ## Aktueller Arbeitsfokus
 
+**Orbitblade-Neuausrichtung vom 24.08.2026:** Der Besitzer behält den Namen
+Orbitblade trotz des in D-037 dokumentierten Risikos. EH-2026-08-24-02 ist als
+bis zu fünfstündiger visueller und semantischer Slice freigegeben. Er darf HUD,
+Safe-Area, sichtbare Namen, Orbitalstation Stufe A sowie Orbitträger,
+Sammlerdrohne und AEGIS bearbeiten, muss Simulation, Save und Ökonomie aber
+bitidentisch lassen (D-038).
+
 **Verbindlicher Stand 24.08.2026:** Der vollständige Besitzerlauf nach D-035
 ist gefahren. Warden-Phase und Renderleistung sind bestätigt: Der Boss war
 gezielt erreichbar und angemessen, die reduzierte Gegnerzahl angenehm; 57 FPS
@@ -29,14 +36,14 @@ abgenommen (D-036):
 
 Nächste verbindliche Reihenfolge:
 
-1. [ ] Besitzer spielt einen vollständigen 8-Minuten-Wächterring-Lauf nach
-   dem D-036-Protokoll in `docs/TESTPLAN.md` und kopiert den ganzen Bericht.
-2. [ ] Codex bewertet 28–34 menschliche Kartenzüge, 1–2 typische Evolutionen,
-   späte Gefahr sowie Pfeilregen und Rundenklinge anhand der neuen Aktivzeit.
-3. [ ] Danach folgt ein eigener visueller Designschritt für Safe-Area,
-   unnötige HUD-Informationen und den allgemeinen Kampfausschnitt.
-4. [ ] Neue Inhalte und Gegneranimationen bleiben bis zum positiven
-   Spielgefühl-Gate gesperrt.
+1. [ ] Claude bearbeitet ausschließlich EH-2026-08-24-02 und übergibt Diff,
+   Paritätsnachweis, Tests und Arbeitsbericht an Codex; kein Push.
+2. [ ] Codex prüft den visuellen Slice unabhängig und pusht nur bei
+   bitidentischer Simulation und grünem Save-/Hold-Vertrag.
+3. [ ] Besitzer spielt danach den vollständigen D-036-Acht-Minuten-Lauf und
+   kopiert Bericht plus visuelles Feedback.
+4. [ ] Erst danach folgen Rückflugmechanik der Orbitklinge, Balance oder neue
+   Inhalte als getrennte Aufträge.
 
 **Historischer Stand 23.08.2026:** EH-2026-08-23-02 ist durch Claude
 umgesetzt und durch Codex technisch abgenommen. Der Warden hat jetzt ein
