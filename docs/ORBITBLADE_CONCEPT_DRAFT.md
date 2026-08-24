@@ -291,6 +291,24 @@ Stimmungsreferenz, kein Versprechen dieser Detaildichte im eigentlichen Spiel.
   Seitenflächen.
 - Touch-Steuerung, Karten und Station benötigen große, eindeutige Trefferflächen.
 
+## Erste Designentwürfe
+
+Die freigegebene Konzeptrichtung wurde am 24.08.2026 in zwei visuellen
+Referenzen konkretisiert:
+
+- [Kampfansicht v1](concepts/orbitblade-combat-direction-v1.png): heller
+  Asteroiden-/Stationsboden, weißgoldener Orbitträger, sichtbarer Hin- und
+  Rückflug der Orbitklinge, körperliche Drohnengegner und klarer Aegis-Boss.
+- [Stationsansicht v1](concepts/orbitblade-station-direction-v1.png): sechs
+  verbundene Stationsmodule um einen zentralen Orbitkern, sichtbarer
+  Reparaturzustand und ein hervorgehobenes nächstes Ziel.
+
+Beide Bilder sind Stil- und Layoutziele, keine fertigen Spielassets. Für den
+Webprototyp werden Figuren, Module, Effekte und UI deutlich vereinfacht. Die
+lesbare Hierarchie, Farbverteilung und räumliche Logik sollen dabei erhalten
+bleiben. Die vollständigen Generierungsvorgaben stehen in
+[`concepts/README.md`](concepts/README.md).
+
 ## Meta-Progression und Rückkehrgrund
 
 Die Station soll überwiegend **neue Möglichkeiten** öffnen:
