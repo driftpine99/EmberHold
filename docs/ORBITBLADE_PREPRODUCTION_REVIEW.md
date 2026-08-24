@@ -60,6 +60,26 @@ Folge:
 - Ein öffentlicher Namenswechsel erfolgt erst nach Store-, Domain-, Web- und
   Markenrecherche. Das ist ein späteres Freigabe-Gate, keine Coding-Aufgabe.
 
+## Geschäftsmodell- und Vertriebs-Gate
+
+Die heutige Offline-Architektur mit lokalem Spielstand passt zum Prototyp und
+später am besten zu einem einmal bezahlten Premium-Spiel. Ein Free-to-play-
+Modell mit Käufen wäre kein kleiner Zusatz: Es bräuchte Konten,
+Kaufbelegprüfung, Backend, Manipulationsschutz, Datenschutz, Support und
+laufenden Live-Betrieb.
+
+Darum gilt für die Vorproduktion:
+
+- Phase 0 bleibt vollständig ohne Monetarisierung und ohne spekulative
+  Shop-Schnittstellen.
+- Die Produktannahme lautet vorläufig **kleines Premium-Indiespiel**; der
+  konkrete Preis und die Ziel-Stores werden erst nach bestandenem Spaß-Gate
+  geprüft.
+- Kosmetik, DLC oder andere Erweiterungen sind spätere Optionen, keine
+  Voraussetzung für Save-, Stations- oder Kampfarchitektur.
+- Falls später ausdrücklich Free-to-play gewählt wird, ist das ein eigenes
+  Architektur- und Budget-Gate vor jeder Shop-Implementierung.
+
 ## 3. Exakter Run-Vertrag
 
 Die erste Sci-Fantasy-Stufe verändert die vorhandene Taktung nicht:
