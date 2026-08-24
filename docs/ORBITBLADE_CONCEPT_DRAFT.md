@@ -1,18 +1,20 @@
-# Orbitblade – Neuausrichtung auf Basis von Emberhold
+# Project Vesper – Sci-Fantasy-Neuausrichtung auf Basis von Emberhold
 
-**Status:** Konzeptentwurf zur Freigabe, noch keine Produktentscheidung und
-kein Implementierungsauftrag.
+**Status:** Konzeptentwurf zur Besitzerfreigabe, noch kein
+Implementierungsauftrag. Bei Widersprüchen gilt die
+[`ORBITBLADE_PREPRODUCTION_REVIEW.md`](ORBITBLADE_PREPRODUCTION_REVIEW.md).
 
 ## Kurzfassung
 
-**Orbitblade** wird ein gut lesbares Solo-PvE-Sci-Fantasy-Roguelite für kurze
+**Project Vesper** wird ein gut lesbares Solo-PvE-Sci-Fantasy-Roguelite für kurze
 Runs. Der Spieler unternimmt achtminütige Bergungssortien, entwickelt eine
 automatisch geworfene und zurückkehrende Energieklinge sowie fünf ergänzende
 Waffensysteme und baut mit der Beute eine beschädigte Orbitalstation wieder auf.
 
 Emberhold bleibt die mechanische und technische Grundlage. Von der bisherigen
-Orbitblade-Fassung übernehmen wir Titel, kosmische Gestaltung, Hangar-Motiv,
-Orbit-Symbolik und die Klinge als sichtbare Identität. Nicht übernommen werden
+Orbitblade-Fassung übernehmen wir kosmische Gestaltung, Hangar-Motiv,
+Orbit-Symbolik und die Klinge als sichtbare Identität – nicht den öffentlichen
+Titel. Nicht übernommen werden
 der 19–23-Minuten-Wellenlauf, der große Orbitbaum, mehrere aktive Kampftasten,
 abstrakte Kreisgegner und die starke Text-/Effektüberladung.
 
@@ -24,8 +26,8 @@ abstrakte Kreisgegner und die starke Text-/Effektüberladung.
 
 Das Spiel soll drei unmittelbare Fragen klar beantworten:
 
-1. **Was ist besonders?** Die Orbitklinge ist in jedem Run sichtbar und gibt
-   dem Spiel seinen Namen.
+1. **Was ist besonders?** Die Orbitklinge ist in jedem Run sichtbar und bildet
+   die spielerische Identität.
 2. **Warum noch ein Run?** Ein neuer Build, ein anderes Sektorziel und der
    nächste sichtbare Ausbau der Station warten.
 3. **Warum bewege ich mich?** Positionierung lenkt Flugbahn, Rückweg und
@@ -55,7 +57,7 @@ Das Spiel soll drei unmittelbare Fragen klar beantworten:
 | Bossortung, Schadensbericht, Pause | Emberhold | bleiben und werden visuell vereinfacht |
 | Verträge, Relikte, Ausrüstung | Emberhold | bleiben als Sektoren, Artefakte und Module |
 | Meta-Ort | Emberhold + Orbitblade | Hold wird eine begehbar wirkende Orbitalstation mit Hangar |
-| Titel und Signaturmotiv | Orbitblade | Orbitblade wird Arbeitstitel und Name der Kernwaffe |
+| Signaturmotiv | Orbitblade-Referenz | Die zurückkehrende Klinge wird Kernwaffe; der Titel wird nicht übernommen |
 | Farb- und Formenwelt | Orbitblade | Navy, Violett, Cyan, Weißgold, leuchtende Orbitbögen |
 | Alter Orbitbaum | Orbitblade | wird nicht importiert; zu viel Verwaltung für den 8-Minuten-Run |
 | Aktive Mächte auf mehreren Tasten | Orbitblade | werden nicht importiert; Mobile und Übersicht bleiben einfach |
@@ -131,12 +133,19 @@ neue Standardwaffe wird deshalb ein **automatischer Klingenwurf mit Rückflug**.
 
 ### Grundverhalten
 
+- Die Orbitklinge startet immer auf Rang 1 und belegt einen der sechs
+  Waffenplätze; sie läuft nicht zusätzlich zum Langbogen.
 - Die Orbitklinge wählt einen sinnvollen Gegner; ein sichtbarer Boss oder Elite
   erhält Priorität.
 - Sie schneidet auf dem Hinweg durch eine Linie von Gegnern.
-- Am Ziel beschreibt sie einen kurzen Bogen und kehrt zum Spieler zurück.
+- In der ersten Stufe wendet sie am Ziel oder an der Maximalreichweite ohne
+  zusätzlichen Zielorbit und kehrt auf einer weichen Kurve zur aktuellen
+  Spielerposition zurück.
 - Auch der Rückweg verursacht Schaden. Durch Bewegung kann der Spieler dessen
   Linie indirekt durch den Pulk lenken.
+- Jeder Gegner kann höchstens einmal auf dem Hin- und einmal auf dem Rückweg
+  getroffen werden. Stirbt das Ziel, wird die geplante Bahn ohne Teleport oder
+  Neuziel beendet.
 - Der Flug ist flüssig und gut lesbar. Die Klinge besitzt einen physischen Kern
   mit gebogener Photonenschneide – kein kopiertes Film-Lichtschwert.
 
@@ -151,9 +160,9 @@ ihren Rückweg bevorzugt durch das markierte Hauptziel. Sie übernimmt damit die
 technische Rolle von Windriss, wirkt aber wie die Kernfantasie des neuen Spiels.
 
 Die bisherige Rundenklinge wird nicht zu einer zweiten identischen Klinge. Sie
-wird als **Sentinel-Drohnen** neu interpretiert: kleine Verteidigungssatelliten,
-die in mittlerer Reichweite kreisen, nahe Gegner abfangen und dem riskanteren
-Nahbereich einen defensiven Nutzen geben.
+wird als **Sentinel-Drohnen** neu interpretiert: kleine Angriffssatelliten, die
+in mittlerer Reichweite kreisen. Sie behalten die riskante Nahbereichsrolle,
+geben aber keinen Schild, keine Schadensreduktion und keine Projektilabwehr.
 
 ## Waffen und Kräfte
 
@@ -165,20 +174,20 @@ Darstellung und teilweise ihre Rolle werden geschärft:
 | Langbogen | **Orbitklinge** | **Photonenschneise** | präzise Linie, Boss- und Hybridschaden |
 | Splitterköcher | **Impulskarabiner** | **Sternenhagel** | verlässliche Fernkampf-Flächenräumung |
 | Feuerkugel | **Plasmakern** | **Sonnenbruch** | langsamer Burst und Flächenkontrolle |
-| Kettenblitz | **Ionenbogen** | **Sturmnetz** | Ketten, Kontrolle und dichte Gruppen |
-| Rundenklinge | **Sentinel-Drohnen** | **Abwehrschwarm** | Nahbereich, Schutz und Raumgewinn |
+| Kettenblitz | **Kettenemitter** | **Sturmnetz** | Ketten, Kontrolle und dichte Gruppen |
+| Rundenklinge | **Sentinel-Drohnen** | **Orbitalschwarm** | riskanter Nahbereich und Flächenschaden |
 | Frostnova | **Kryo-Impuls** | **Nullpunkt** | Verlangsamung, Sicherheit und Setup |
 
 Die sechs Waffen sollen nicht alle denselben Schadenswettbewerb führen:
 
 - Orbitklinge und Plasmakern sind stark gegen Bossziele.
-- Impulskarabiner und Ionenbogen räumen Gruppen unterschiedlich.
-- Sentinel-Drohnen kaufen Sicherheit im Nahbereich.
+- Impulskarabiner und Kettenemitter räumen Gruppen unterschiedlich.
+- Sentinel-Drohnen belohnen riskante Nähe mit Flächenschaden.
 - Kryo-Impuls macht andere Waffen besser, indem er Gegner ordnet und Zeit
   verschafft.
 
-Der Run-Bericht misst weiter Gesamt- und Bossschaden getrennt. Kontroll- und
-Schutzwaffen benötigen später zusätzliche Nutzungswerte, damit sie nicht
+Der Run-Bericht misst weiter Gesamt- und Bossschaden getrennt. Kontrollwaffen
+benötigen später zusätzliche Nutzungswerte, damit sie nicht
 fälschlich nur nach Rohschaden bewertet werden.
 
 ### Passive Übersetzung
@@ -192,7 +201,7 @@ fälschlich nur nach Rohschaden bewertet werden.
 | Federung | Gyrostabilisator |
 | Umhang | Schildmatrix |
 | Wetzstein | Kantenresonator |
-| Glutherz | Reparaturnaniten |
+| Magnetstein | Traktorarray |
 
 Die Kartenlogik bleibt knapp: konkrete Wirkung, aktueller Rang und sichtbarer
 Evolutionspartner. Es entsteht kein zweiter großer Orbitbaum.
@@ -206,9 +215,10 @@ gestaltet. Jede Familie behält eine klare Silhouette und Bewegungsrolle:
 - Stürmer werden keilförmige **Rammjäger**.
 - Fernkämpfer werden **Emitterdrohnen** mit klarer Schussvorwarnung.
 - Splitter werden **Replikatorsonden**, deren Teilung sichtbar vorbereitet ist.
+- Wahrer werden widerstandsfähige **Bollwerkeinheiten**.
 - Eliten erhalten einen hellen Kern, einen eigenen Namen und ein Artefakt.
 
-Der bisherige Warden wird eindeutig als **SEKTORBOSS: AEGIS-WÄCHTER** bezeichnet.
+Der bisherige Warden wird eindeutig als **SEKTORBOSS: AEGIS** bezeichnet.
 Ein Boss ist nie nur ein größeres Mitglied des Pulks: eigene Leuchtsilhouette,
 Leiste oben, Richtungspfeil außerhalb des Bildes, kurze Eintrittssequenz und
 weniger gewöhnliche Gegner während seines Hauptfensters.
@@ -235,6 +245,11 @@ hinzu.
 Die Station zeigt immer **ein hervorgehobenes nächstes Ziel**. Nach jedem Run
 soll mindestens eine sichtbare Aktion möglich oder klar näher gerückt sein.
 Produktion bleibt gedeckelt und ist Unterstützung, kein Idle-Spiel.
+
+Diese erste Stationsstufe ist eine bitidentische Neuinszenierung: Timer,
+Kosten, Erträge, Freischaltungen und Baseline-Modifikatoren bleiben erhalten.
+Eine an Sortien gekoppelte Produktion und neue Modulfunktionen gehören in eine
+spätere, separat freizugebende Stufe B.
 
 ### Ressourcenmigration
 
@@ -276,6 +291,8 @@ Im **Kampf** wird diese Palette bewusst heller als im alten Prototyp:
 Die alte abstrakte Gameplaygrafik mit Dreiecken, Kreisen und übereinander
 liegenden Texten ist ausdrücklich **keine** Zielgrafik. Das Keyart ist eine
 Stimmungsreferenz, kein Versprechen dieser Detaildichte im eigentlichen Spiel.
+Kamera und Simulation bleiben flaches Top-down ohne begehbare Plattformkanten,
+Abgründe, isometrische Navigation oder neue Kollisionsphysik.
 
 ## HUD und Mobile
 
@@ -333,10 +350,11 @@ Marke bleiben. Im Spiel verwenden wir daher weder `Star Wars`, `Jedi`, `Sith`,
 Orbitklinge, Photonenschneide, Impulskarabiner und Fluxkräfte mit eigener
 Silhouette und eigener Hintergrundgeschichte.
 
-`Orbitblade` bleibt bis zu einer späteren Namens-, Store-, Domain- und
-Markenprüfung ein Arbeitstitel. Vorhandene KI- und Konzeptgrafiken dienen als
-interne Referenz; vor kommerzieller Veröffentlichung folgt ein eigener
-Asset-, Herkunfts- und Rechtepass.
+`Orbitblade` bleibt ausschließlich die Bezeichnung der lokalen Designreferenz.
+Der interne Arbeitsname ist **Project Vesper**; Repository, Pages-URL und
+Save-Key bleiben bis zu einer späteren Namens-, Store-, Domain- und
+Markenprüfung Emberhold. Vorhandene KI- und Konzeptgrafiken dienen als interne
+Referenz und werden in [`ASSET_PROVENANCE.md`](ASSET_PROVENANCE.md) erfasst.
 
 ## Kosteneffiziente Umsetzung
 
@@ -347,18 +365,15 @@ getestete Emberhold-Simulation bleibt bestehen.
 
 ### Empfohlene Reihenfolge
 
-1. **Konzept freigeben.** Klingenverhalten, Sci-Fantasy-Stil und Station als
-   Meta-Ort bestätigen.
-2. **Zwei Designentwürfe erstellen.** Ein Kampfbild und eine Stationsansicht,
-   bevor Code oder viele Assets geändert werden.
-3. **Kleiner visueller Vertikalschnitt.** Neuer Titel, eine neue Spielerfigur,
-   heller Sektorgrund, Orbitklinge, eine Gegnerfamilie und Aegis-Wächter.
-4. **Einen 8-Minuten-Run testen.** Lesbarkeit, Klingenfantasie und freiwilligen
-   zweiten Run bewerten.
-5. **Erst danach vollständig übersetzen.** Restliche Waffen, Gegner,
-   Ressourcen, Texte, Station und Save-Migration.
-6. **Danach Spieltiefe ergänzen.** Sektorziele und sichtbarer Stationsausbau,
-   jeweils in einzelnen messbaren Schritten.
+1. **Gate schließen.** Namen, Stationsstufe A und D-036-Referenzlauf bestätigen.
+2. **Nur visuelle Hülle.** HUD-Hierarchie, Palette und hellerer Boden bei
+   bitidentischer Simulation.
+3. **Orbitklinge prozedural.** Flug- und Treffervertrag mit DPS-Benchmark.
+4. **Grafik-Vertikalschnitt.** Spieler, eine Gegnerfamilie und AEGIS.
+5. **Semantischer Pass.** Restliche sichtbare Namen, noch ohne neue Ökonomie.
+6. **Station Stufe A.** Hold-Neuinszenierung mit identischem Ressourcenfluss.
+7. **Ein Sektorziel.** Erst danach „Signal sichern“ separat testen.
+8. **Station Stufe B.** Nur nach eigener Produktentscheidung.
 
 ### Nicht Teil des ersten Umbaus
 
@@ -373,12 +388,14 @@ getestete Emberhold-Simulation bleibt bestehen.
 
 Für die nächste Stufe empfiehlt dieses Konzept drei Festlegungen:
 
-1. **Signaturwaffe:** automatisch geworfene Orbitklinge mit Rückflug statt
+1. **Produktname:** kein öffentliches Orbitblade; intern Project Vesper.
+2. **Signaturwaffe:** automatisch geworfene Orbitklinge mit Rückflug statt
    dauerhaft engem Nahkampforbit.
-2. **Stil:** kosmische weißgoldene Sci-Fantasy auf helleren Kampfflächen statt
+3. **Stil:** kosmische weißgoldene Sci-Fantasy auf helleren Kampfflächen statt
    realistischer Hard-Sci-Fi.
-3. **Meta-Ort:** eine sichtbar wachsende Orbitalstation mit sechs bestehenden,
-   neu interpretierten Systemen statt eines komplett neuen Aufbauspiels.
+4. **Meta-Ort:** Raumstation Stufe A mit identischem Ressourcenfluss; neue
+   Stationsmechanik erst in Stufe B.
+5. **Messbasis:** ein unveränderter D-036-Referenzlauf vor dem ersten Umbau.
 
 Erst nach dieser Freigabe werden Roadmap, verbindliche Entscheidungen,
-Testplan, Assets und Spielcode auf Orbitblade umgestellt.
+Testplan, Assets und Spielcode schrittweise auf Project Vesper umgestellt.

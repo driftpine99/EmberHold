@@ -34,3 +34,6 @@ coverage/
 saves/
 test-results/
 screenshots/local/
+
+# Lokales Referenzprojekt (nicht importieren oder veröffentlichen)
+/orbitblade/
