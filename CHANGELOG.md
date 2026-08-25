@@ -4,6 +4,32 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 
 ## Unreleased
 
+- EH-2026-08-25-04 / D-042 — Lichthüter, Bergungssignal und Stationsring V1:
+  - Der Orbitträger trägt die Lichthüter-Silhouette der lokalen Referenz
+    (geschlossener Helm mit Goldraute, cyane V-Bahn, Goldhalo mit vier Ticks,
+    breite Schulterplatten, geteilter Mantel) — weiter 6 Idle-/8 Lauf-/8
+    Wurfphasen bei 12 FPS, aufrecht, nur gespiegelt, Pulse eingefroren
+  - Der Kastenboden weicht einer vorgerenderten Orbitalsszene: Navy-Fläche mit
+    Nebelschleier und Feinfugen, Parallax-Sternebene, große gebrochene Ring-
+    und Galaxiestrukturen in 2000er-Weltzellen, seltener Ringplanet; pro Frame
+    nur drawImage, keine Randbalken, Kampffläche bleibt mittelhell
+  - Rammjäger-Ladephase bleibt in der aktuellen Silhouette (keine alte
+    Tier-Darstellung mehr); „Nächste EVO“ sitzt links unter Gesundheit/XP
+  - Die Station ist eine Szene: Planet, Sterne, gebrochene Ringe, zentraler
+    Kern mit drei sichtbaren Stufen und sechs Hotspots mit Zustandslampen;
+    genau ein Detailpanel gleichzeitig, alle bisherigen Aktionen erreichbar
+  - Neues Sektorziel „SIGNAL SICHERN“ (nur 8 Minuten): Spawn 2:30 per Seed-
+    Hash ohne RNG-Verbrauch, kumulativ 8 s im Radius bis 4:00, Verlassen
+    pausiert; Erfolg + echter NEXUS-Kill sichern je eine Stationsdatei zur
+    Basisbergung, Gutschrift exakt einmal, todsicher gebucht
+  - Save v4→v5 verlustfrei: stationData (0–999), coreStage (0–3),
+    sortieProtocol-Whitelist; drei Kernstufen schalten Klingenfokus (legale
+    Orbitklingen-Karte im ersten Zug), Fluxreserve (+1 Start-Reroll) und
+    Bergungsscanner (5 s Laden, Fund bevorzugt neue Teile) frei
+  - Suite auf 58 Checks: combatArtV3, sectorObjectiveFlow, stationCoreFlow,
+    stationDomContract sowie baselineIsolated — 18 bitidente Fingerprints
+    gegen den Ausgangscommit belegen die Isolation von Protokoll und Kulisse
+
 - EH-2026-08-25-03 / D-041 — Kampflesbarkeit V3 und verpflichtendes
   NEXUS-Finale:
   - Der Deckboden kehrt zur dunkleren, feineren Fassung aus Commit 9190de9

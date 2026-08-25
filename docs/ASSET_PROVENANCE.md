@@ -110,6 +110,39 @@ oder die gezielte Imitation lebender Künstler verlangen.
 - **Freigabe:** Repository-Dokumentation ja; Runtime, Demo und Store nein
 - **Hinweis:** Der Besitzer wählte Entwurf 3. Das Bild ist eine Zielrichtung,
   kein Spriteatlas und wird vom Spiel nicht geladen.
+### AP-005 – Lichthüter-Adaption und Orbitalhintergrund V3 (code-native)
+
+- **Pfad:** keine Datei – prozedural in `prototype/web/index.html`
+  (`drawOrbiterPose`/`buildOrbiterSprites`, `buildArenaSprites` mit
+  `starTile`/`landmarks`/`planet`, Stationsring als CSS-Motiv im Start-Sheet)
+- **Zweck:** Runtime – Spielerfigur „Lichthüter“ (Helm, Goldraute, V-Visier,
+  Halo mit Ticks, Schulterplatten, geteilter Mantel), mehrschichtiger
+  Weltraum-/Orbitalhintergrund, Stationsring-Szene mit Kern und Hotspots
+- **Ursprung:** selbst erstellt, vollständig als Canvas-/CSS-Code; die
+  Formensprache wurde aus der LOKALEN Referenz
+  `orbitblade/Saber-Game-Projekt/konzept/game.js` adaptiert
+  (`zeichneLichthueterNeu`, Zeilen 1442–1482; `drawStarLayers`,
+  `drawNebulae`, `drawFadedGrid`, `drawLandmark`) – schreibgeschützt,
+  kein Funktionscode importiert, nichts aus `archive/`
+- **Ersteller/Werkzeug:** OpenCode im Auftrag EH-2026-08-25-04; Referenz-Audit
+  durch einen separaten Lesesubagenten (Schutzregeln der lokalen AGENTS.md/
+  CLAUDE.md eingehalten)
+- **Datum:** 25.08.2026
+- **Prompt:** keiner – kein generatives Bildmodell beteiligt
+- **Referenzen:** ausschließlich die genannten Referenzfunktionen; Puls-Werte
+  bewusst eingefroren (Halo-Alpha ≈ .82), keine Zeitquelle übernommen
+  (`Date.now()` der Referenz wurde NICHT adaptiert)
+- **Lizenz/Rechtebasis:** eigener Quellcode des Projekts; das Referenzprojekt
+  bleibt unangetastet und ist nicht Teil des Commits
+- **Bearbeitung:** Proportionen auf das 52-px-Sprite und die bestehende
+  6/8/8-Phasen-Runtime angepasst; Hintergrund als vorgerenderte Kacheln und
+  Landmark-Sprites statt Laufzeitverläufen
+- **Status:** PROTOTYP
+- **Freigabe:** Testspiel ja; kommerzielle Freigabe weiterhin offen. Ein
+  Art-/Rechte-Pass vor Store bleibt Pflicht.
+- **Hinweis:** Es wurden KEINE neuen Bilddateien hinzugefügt; der Runtime-
+  Assetstand bleibt bei den vier PNG-Atlanten.
+
 ## Vorlage
 
 ### AP-XXX – Name

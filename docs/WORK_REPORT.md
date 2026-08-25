@@ -1,228 +1,190 @@
-# OpenCode-Arbeitsbericht
+# Claude/OpenCode-Arbeitsbericht
 
-> Diese Datei wird von Claude für jeden Auftrag vollständig ersetzt. Der
-> aktuelle Auftrag steht in `docs/CURRENT_TASK.md`; ältere Berichte bleiben in
-> der Git-Historie erhalten.
+> Diese Datei wird für jeden Auftrag vollständig ersetzt. Der aktuelle
+> Auftrag steht in `docs/CURRENT_TASK.md`; ältere Berichte bleiben in der
+> Git-Historie erhalten.
 
 ## Steuerung
 
-- **Task-ID:** EH-2026-08-25-03 — Kampflesbarkeit V3 und verpflichtendes
-  NEXUS-Finale (D-041)
-- **Status:** FERTIG; anschließend durch Codex technisch abgenommen
-- **Ausgangscommit:** `dffc2e5bf7662fd89ffecf79e11e844bac4697ab`
-  („docs: NEXUS-Finale und Grafiknacharbeit planen“)
-- **Anfangsstatus:** `## main...origin/main`, Arbeitsbaum sauber, keine fremden
-  Änderungen; Baseline `npm test` **49/49 grün**, Exitcode 0
-- **Endstand:** `npm test` **53/53 grün**, Exitcode 0; `git diff --check`
-  sauber (Exitcode 0)
-- **Lokale Commits:** zwei — `ebb88c7` (feat(d041): Spielcode + Suite),
-  `7172c89` (Bericht + Changelog, direkt danach). **Nicht gepusht.**
+- **Task-ID:** EH-2026-08-25-04 — Lichthüter-Grafik, Bergungssignal und
+  Stationsring V1 (D-042)
+- **Status:** FERTIG, bereit für Codex-Review
+- **Verbindlicher Ausgangscommit laut Auftrag:** `d78fdbe`
+- **Tatsächlicher Startcommit:** `0a97b59` (= `d78fdbe` plus rein
+  dokumentarischer Commit „docs: D-042 Stations-Vertikalschnitt planen“);
+  Laufzeitcode gegenüber `d78fdbe` unverändert, alle Fingerprints daher
+  gegen `d78fdbe` gültig
+- **Anfangsstatus:** `## main...origin/main`, Arbeitsbaum sauber; Baseline
+  `npm test` **53/53 grün**, Exitcode 0
+- **Endstand:** `npm test` **58/58 grün**, Exitcode 0; `git diff --check`
+  Exitcode 0
+- **Lokale Commits:** vier — `a261165` (Gates A+B), `a2b37f7` (Gate C +
+  Save-v5-Basis), `0c289b8` (Gates D+E + fünf neue Verträge), `docs(d042)`
+  (Bericht/Changelog/Provenance, direkt danach). **Nicht gepusht.**
 
 ## Ergebnis in einem Satz
 
-Der Run hat jetzt drei erkennbare Akte — Aufbau, AEGIS-Arena mit Ziel 50 und
-das verpflichtende NEXUS-Finale bei 8:00 mit Ziel 30 und Extraktionssperre —,
-der Grafikrückschritt ist korrigiert, genau ein EVO-Hinweis ist zurück, und die
-Suite steht bei 53/53 grünen Checks inklusive vier neuen Verträgen.
+Der Kampf zeigt die weiß-goldene Lichthüter-Silhouette vor einer
+mehrschichtigen Orbital-Szene statt einer Kistenwand, die Station ist ein
+bedienbarer Ring mit Kern und sechs Hotspots, das Sektorziel SIGNAL SICHERN
+verbindet Run und Stationsausbau über Stationsdaten und drei Protokolle — und
+die serialisierte Baseline bleibt bitidentisch zum Ausgangscommit (18/18
+Fingerprints), bei **58/58** grünen Checks.
 
 ## Status je Gate
 
 | Gate | Status | Umsetzung | Beleg/Test |
 |---|---|---|---|
-| A – Hintergrund | erfüllt | Kachel aus `9190de9` wörtlich übernommen (`#39435c`, 80er-Paneele, Schattierung 62–76, 22 Leitungen); nahtlose D-040-Technik (Boden über ganze Leinwand, Tönung vor Clipping, `drawDeckEdges`) unverändert | Diff `buildArenaSprites()`; `combatUiV2` grün (`deckBisZumRand`: 77 Kacheln auf 21:9 gegen 32 auf 16:9, Safe-Area 320 px) |
-| B – Silhouetten | erfüllt | Neue eingefrorene Tabelle `FOE_PROFILE` (k/Breite/Höhe/Teile) ist die einzige Quelle für `drawFoeBody()`; Kachelgrößen `[40,56,66,60,86]`; Rammjäger lang-keilförmig, Emitter breit mit getrennten Auslegern, Replikator echte Zwillingssilhouette mit Naht, Bollwerk groß/breit/gepanzert | Neuer Check `foeSilhouettes` (paarweise verschieden, Rollen-Eigenschaften, Tabelle von der Zeichnung konsumiert, Spritegrößen paarweise); Renderpfad unverändert ein `drawImage` je Gegner |
-| C – EVO-Hinweis | erfüllt | Ein Element `#evohint` über der Waffenleiste (bottom 72 px vs. 16 px, z-index 5 unter Dialogebene 20); `updateEvoHint()` liest ausschließlich `leadingEvoPath()`, signaturbasiert ohne DOM-Schrieb pro Frame | Neuer Check `evolutionFocusHud` (genau ein Element, zeigt nur führenden Pfad, Fortschritt Waffe+Passiv, sofortiger Wechsel nach Abschluss, verschwindet ohne Pfad) |
-| D – AEGIS-Arena | erfüllt | `BOSS_ADD_TARGET` 90→50; neues Feld `E.ret`; Überschuss wird deterministisch (aufsteigende Slotreihenfolge) markiert, zieht mit ~230 u/s sichtbar ab und wird still freigegeben; `hurt()`/Zielwahl/Kontakt überspringen Rückzugende; `CFG.SURGE_AT` samt Event entfernt | Erweiterter `bossCombatPocket` (Ziele 50/30): Rückzug sichtbar, nach ≤ 9,5 s abgeschlossen, Kills 0→0, Splitter/Tropfen/XP unverändert, 5 Eliten bleiben, Wiederaufbau 50→135 |
-| E – NEXUS-Finale | erfüllt | Warnung (Toast) ab 7:45 + kontrollierte Dichtereduktion bis −40 %; Spawn bei 8:00 im sichtbaren Ausschnitt; Arena-Ziel 30; Extraktionssperre via `finaleBlocker()`/`pendingExtract`; Overtime-Multiplikator bleibt aus; eigene Silhouette `SPR.nexusA` (Trägerkreuz, drei Fangarme, cyanweißer Kern), 6 Phasen; Muster st3 Zielbomben (neu, 3 Zonen, ≥1,25 s Vorwarnung) und st4/st5 Ringsalven mit dreifach rotierender sicherer Lücke (1,15 s Vorzeichnung); dynamische Bossleiste, `FINALE +m:ss`-Uhr, Berichtszeilen | Neuer Check `finalBossFlow` (14 Teilprüfungen inkl. „Gefallen“ bei Spielertod im Finale, 3-Minuten-Modus unverändert) + neuer `nexusBenchmark` |
+| A – Lichthüter + Hintergrund | erfüllt | `drawOrbiterPose` adaptiert die Referenzgrammatik (`zeichneLichthueterNeu`, Zeilen 1442–1482): Helm-Hexagon mit Goldraute, cyan-V-Visier, Halo r≈11.8 mit vier Ticks, Schulterplatten bis ±15, Fünfeckspanzer, geteilter Mantel; Pulse eingefroren, kein Date.now. Hintergrund: Navy-Basiskachel 512 px mit weichen Schattierungen, Nebelschleiern, Feinfugen, Leitungen, Mikrosternen; Parallax-Sternebene (Faktor 0.12); Landmark-Zellen à 2000 WE mit Ring/Galaxie/Asteroiden; seltener Ringplanet; `drawDeckEdges` als No-op erhalten | Neuer Vertrag `combatArtV3` (Phasen 6/8/8 @ 12 FPS, Merkmale, Hot-Loop ohne Zeit/Zufall); `renderCostContract`: 281 sichtbar, 324 drawImage erster Frame, 2 Gradienten/Frame (nur die zwei Lichtkreise), 0 shadowBlur, 0 Canvas/Frame |
+| B – zwei Korrekturen | erfüllt | Rammjäger-Ladephase nutzt dieselbe `SPR.foe[1]`-Silhouette (Bedingung `SPR.foe&&E.kind[i]===0`); Tier-/Fallback nur noch ohne Atlas. `#evohint` links (`left:14px;top:64px`, kein translateX) | `combatArtV3.rammjaegerNeu/evoLinks`; `evolutionFocusHud` auf Links-Lage umgestellt und grün; `singlePassRendering` unverändert grün (Fallback-Pfad erhalten) |
+| C – Stationsring | erfüllt | `.holdscene`: Sterne, Planet, zwei gebrochene Ringsegmente, Leitungen; zentraler Kern-Knopf mit Orb, drei Stufenlichtern, Ausbau-Aktion; sechs Hotspots mit Zustandslampen (offline/produziert/bereit). Genau ein Detailpanel via `data-panel` (Toggle schließt). Alle bisherigen IDs/Aktionen erhalten; Sektorwahl + Protokoll + Sortiestart zusätzlich im Kartenpanel (`btnStart2/btnStart32`) | Neuer Vertrag `stationDomContract` (eindeutige IDs, Panel-Mapping, Aktionen, Toggle-Verhalten, Lampen, Kernstufe); `holdFlow/holdExpansion/equipmentFlow/presentationLayer` weiter grün |
+| D – Sektorziel | erfüllt | Nur 8 Minuten: Spawn t=150 an Hash-Position 220–300 WE (eigener visualHash aus Seed+Konstanten — null Gameplay-RNG), Fenster bis 240 (< AEGIS), kumulativ 8 s in r=110 (Scanner 5 s), Verlassen pausiert ohne Reset. Erfolg = Stationsdatei 1, echter NEXUS-Kill = Datei 2; beide in `baseReward` (+60 je Datei) und exakt einmal in `depositRunReward()` hinter dem bestehenden `rewardGranted`-Guard | Neuer Vertrag `sectorObjectiveFlow`: 17 Teilprüfungen inkl. Determinismus zweier Läufe, Kumulativ/Pause, Terminalität von „verpasst“, Doppelgutschrift-Schutz, Tod-im-Finale-Pfad |
+| E – Kern & Protokolle | erfüllt | Save v4→v5 verlustfrei; stationData 0–999, coreStage 0–3, sortieProtocol-Whitelist mit Klemmung/Bereinigung. Kernkosten [1♦+5 Erz / 2♦+1 Platte / 3♦+2 Platten], sequenziell. Klingenfokus injiziert im ERSTEN Angebot deterministisch eine legale Orbitklingen-Karte (kein Extra-RNG, kein 4. Platz, kein EVO-Bypass; bogen 0 oder 5 → unverändert), Fluxreserve = exakt +1 Start-Reroll (mit 2 vorbereiteten stapelbar → max 4), Scanner = 5 s Laden + Fund bevorzugt unbesessene Teile, sonst Duplikat-/Staubpfad. Ohne Wahl: Baseline bitidentisch | Neue Verträge `stationCoreFlow` (Sanitizing, Kosten, Sperren, drei Wirkungen inkl. Grenzfälle) und `baselineIsolated` (18/18 Fingerprints bitidentisch zu `d78fdbe`) |
 
-## Pflichtprüfungen
+## Subagenten (drei eingesetzt; jeder Befund von mir geprüft)
 
-```text
-npm test   → exit 0, "pass": true, 53/53 Checks (vorher 49/49)
-git diff --check → exit 0 (nach Entfernen eines Trailing-Whitespace)
-```
+1. **Referenz-Audit** (explore, schreibgeschützt): las zuerst AGENTS.md und
+   CLAUDE.md des Referenzprojekts (Schutzregeln zitiert: nur `konzept/`,
+   `archive/` unberührt) und lieferte Formensprache von
+   `zeichneLichthueterNeu` sowie Ebenenspezifikation der Hintergrundfunktionen
+   inklusive Determinismus-Befund (Date.now-Stellen markiert). Meine Prüfung:
+   Koordinaten/Farben 1:1 in den Sprite-Builder übersetzt, numerisch per
+   `combatArtV3` verifiziert.
+2. **Testspezifikation** (explore): Schrittlisten, Export-Vorschläge,
+   Alt→Neu-Liste legaler Bestandserwartungen (Save v5, earlyLoss-Basis,
+   EVO links) und zwölf Edgecases. Meine Prüfung: umgesetzt; Abweichung —
+   `stationInfo` nicht exportiert (Suite nutzt `H` direkt wie bisher),
+   dafür `STATION` als Konstantexport.
+3. **Unabhängige Diff-Prüfung** (explore): Save-Pfad, Hot-Loop,
+   Signal-Doppelzählung, Protokoll-Grenzen, DOM-Doppel-IDs, Canvas-Kosten.
+   Übernommene Fixes: Meta-Voll-Restore in `stationCoreFlow`,
+   Shim-`classList.remove(...)`+`className`, CSS-Typo `data-panel="arcanum"`,
+   Button-Namen für `btnStart2/32`, `#signalhud`-Abstand. Der BLOCKER-Fund
+   (HEAD rot wegen fehlender Exports) betraf den Zwischenstand und ist durch
+   Commit `0c289b8` behoben. Akzeptierte OK-Hinweise: Reroll bezieht sich auf
+   das erste ANGEBOT (Design gemäß Auftragstext), setLineDash-Mikroallokation
+   des einzelnen Markers.
 
-Neue Checks (alle verhaltensbasiert am echten Headless-Pfad bzw. DOM-Shim):
-`finalBossFlow`, erweiterter `bossCombatPocket` V2, `nexusBenchmark`,
-`evolutionFocusHud`, `foeSilhouetten` als `foeSilhouettes`. Der bestehende
-`renderCostContract` bleibt grün: 281 sichtbare Gegner, 323 drawImage im
-ersten Frame, 2 Gradienten/Frame, 0 shadowBlur, 0 neue Canvases — nichts
-skaliert mit der Gegnerzahl. Save-, Hold-, Contract-, Report-, Aspect-,
-Telemetrie- und UX-Checks laufen unverändert grün.
+## Referenzadaption (konkret, ohne Codeimport)
 
-## Botanker: Vorher-/Nachher-Messung (Anker neu referenziert)
+Übernommen wurden ausschließlich Geometrie-/Farbangaben: Helm-Sechseck und
+Goldraute, V-Visier-Bahn, Halo r=11.8 auf Kopfhöhe mit vier diagonalen Ticks,
+Fünfeckspanzer mit Chevron-Innenfläche, Schultern `(±7,-7)(±15,-5)(±12,1)`,
+Mantelkurven bis y≈18 in `rgba(92,190,255,.24)`. Hintergrund: Idee der Stern-
+schichten (deterministischer Hash, gekachelte Offscreen-Ebenen, leichte
+Parallaxe), Nebel als gebackene Radialverläufe, Ring-/Strebengrammatik von
+`drawFadedGrid` in die Landmark-Sprites, Landmark-Hash aus festen Zellindizes.
+Nicht übernommen: Biome-Zyklus, Vignette, Staubpartikel, Screenshake und
+jegliche Zeitsteuerung (`Date.now()` der Referenz wurde bewusst nicht
+adaptiert).
 
-Nach der Codex-Korrektur des Rückzugs wurde der Botanker exakt erneut
-gemessen: von 21,7 auf **19,78**, Toleranz unverändert ±3. Beide Messreihen
-vergleichen Original `dffc2e5` mit dem final geprüften Stand bei identischer
-Bot-Strategie und neun festen Seeds.
+## Save v4→v5 (Beleg)
 
-| Seed | Züge vorher | Züge nachher | Kills vorher | Kills nachher | EVO vorher→nachher | Stufe vorher→nachher |
-|---|---:|---:|---:|---:|---|---|
-| 1701 | 14 | 12 | 3018 | 3189 | 1→0 | 15→13 |
-| 1709 | 25 | 26 | 7368 | 8839 | 2→2 | 26→27 |
-| 1721 | 17 | 15 | 5991 | 4438 | 1→1 | 18→16 |
-| 1733 | 9 | 10 | 2218 | 2024 | 0→0 | 10→11 |
-| 1741 | 27 | 26 | 12169 | 10462 | 3→2 | 28→27 |
-| 1753 | 26 | 28 | 10579 | 13110 | 3→3 | 27→29 |
-| 1777 | 18 | 26 | 4798 | 10133 | 1→2 | 19→27 |
-| 1789 | 22 | 21 | 6451 | 6834 | 2→2 | 23→22 |
-| 2474367456 | 13 | 14 | 3526 | 4515 | 0→1 | 14→15 |
-| **Mittel** | **19,00** | **19,78** | — | — | **7/9 → 7/9 Läufe** | — |
+Rundlauf (presentationLayer): v4-Rohstand {ore 33, dust 14, runs 9, …} →
+loadHold → Version **5**, alle alten Felder identisch, neu {stationData:0,
+coreStage:0, sortieProtocol:'none'} → save/load → JSON bitgleich.
+Sanitizing: `stationData:"12.7"`→12, `coreStage:9`→3, gesperrtes Protokoll→
+'none' (stationCoreFlow.sanitiert/gesperrtBereinigt). Beispiel nach Ausbau:
+99♦ / 500 Erz / 500 Platten → drei Käufe → coreStage 3, 93♦, −5 Erz,
+−3 Platten; Stufe-2-Protokoll bei Kern 1 wird zu 'none' bereinigt.
 
-Erster Kartenzug 31,6 s (unverändert im Korridor), Sensitivitätsverhältnis und
-Dichteüberschuss weiter grün. `evolutionReachable` (≥2/9) bleibt mit 7/9
-erfüllt; keine Schwelle wurde gelockert.
+## Signal-/NEXUS-Datenfluss
 
-## Dichte vor/während/nach den Bossphasen
+Spawn (updateEvents, Seed-Hash) → Ladefortschritt ausschließlich in step() bei
+phase 'run' im Radius → securedData++ genau beim Erreichen von signalBedarf()
+bzw. im NEXUS-Tod-Ast von killEnemy() → baseReward identisch in showExtract
+und endRun-Fallback (+60 je Datei) → depositRunReward() bucht
+META.stationData += securedData genau einmal hinter rewardGranted. Suite:
+Doppelaufruf unverändert, Tod nach NEXUS-Kill behält beide Dateien, Abbruch
+vor Erfolg sichert nichts.
 
-Zielkurve (`targetEnemies`, formatunabhängig) und Arena-Deckel:
+## Baseline und Protokollmessungen
 
-| Zeitpunkt | Zielkurve | Effektiv im Feld (Botlauf Seed 1701) |
-|---|---:|---:|
-| 0:30 Aufbau | 42 | 44 |
-| 3:00 | 84 | 77 |
-| 4:09 vor AEGIS | 122 | 121 |
-| **während AEGIS** | Kurve egal | **Deckel 50** |
-| 5:00 nach AEGIS-Tod | 162 | Wiederaufbau 50→135 (Szenario E) |
-| 7:10 | 273 | normale Kurve |
-| 7:44 vor Warnung | 291 | normale Kurve |
-| **in Finale-Warnung 7:52** | 296 | **Reduktion auf ≈241 (−20 % steigend bis −40 %)** |
-| **während NEXUS** | Kurve egal | **Deckel 30** |
+- baselineIsolated: 9×480-s-Läufe + 9×250-s-Früherlauf, Fingerprints aus
+  Kartenzügen, Kills, Familienmischung, Build, Elite-Wahlen und Schadens-
+  verteilung — **alle 18 bitidentisch** zum Ausgangscommit (abweichend: []).
+  Beweis damit: Signal-Hash, Kulisse und Stationsfelder verbrauchen keinen
+  Gameplay-RNG und ändern die Simulation nicht.
+- Protokolle getrennt gemessen (stationCoreFlow): Injektion legal
+  (bogen lv1 an Platz 1, ≤3 Karten), zweites Angebot unauffällig; bogen 5 +
+  Sehne 3 → unverändertes EVO-Angebot; Fluxreserve rerolls 1→2, mit zwei
+  vorbereiteten → 4; Scanner lädt nach exakt ~5 s (gemessen 5,02 s Rest im
+  Kumulativtest), Fund bevorzugt neu („Deflektormantel“ im Probe-Lauf),
+  Vollbesitz → duplicate:true.
+- Botanker 19,78 ±3 bleibt unangetastet und grün (Baseline läuft ohne
+  Protokoll).
 
-Rückzug-Beleg (Szenario C, 220 Normale + 5 Eliten künstlich überfüllt):
-rueckzugSichtbar nach 1 s > 0; nach ≤ 9,5 s `retreating=0` und Bestand 220→50;
-Kills 0→0; Splitter/Tropfen 0→0; XP 0→0; Eliten 5→5. Zurückgezogene Gegner
-sind zusätzlich in `hurt()`, beiden Zielwahlen und dem Kontaktschaden
-ausgeschlossen — sie können prinzipiell keine Belohnung erzeugen.
+## Renderkosten und Performance
 
-## NEXUS-Benchmark (deterministisch, Seed 20260825)
-
-Gemessen am echten Kampf (echte Waffen-/Treffer-/KI-Pfade), Build eingefroren,
-Spieler unsterblich:
-
-| Build | Ergebnis |
-|---|---|
-| Repräsentativ (Photonenschneise-EVO + Sternenhagel 4 + Plasmakern 2) | **44,9 s** besiegt — Korridor 30–75 s ✓ |
-| Wiederholung desselben Laufs | 44,9 s — bitidentisch ✓ |
-| Schwach (Orbitklinge 2, sonst nichts) | nach 300 s **nicht besiegt** ✓ |
-
-Kalibrierung ausschließlich über den neuen Boss-Multiplikator
-(`NEXUS_HP_MULT = 120 → 660`, dokumentiert im Code); Waffen-/Passivwerte,
-XP-Kurve, Kartenlogik und Heilung wurden nicht berührt. NEXUS-HP im
-Vertragslauf: 74.199.
-
-## Dynamische Präsentation
-
-- Bossleiste: `BOSS: AEGIS` während des Mittelbosses, `BOSS: NEXUS` im Finale
-  (behavioral geprüft über `updateHUD()` im Shim).
-- Uhr zeigt im Finale `FINALE +m:ss` (cyan), getrennt von der orangen
-  Overtime-Kennung; `S.otActive` bleibt während des gesamten Finales false.
-- Run-Bericht ergänzt `Finalboss:` mit Status, Spawnzeit, Tötungszeit und
-  Finaldauer; im 3-Minuten-Modus `keiner · kurze Sortie`.
-
-## Subagenten
-
-Keine eingesetzt. Begründung: Alle Änderungen liegen in einer monolithischen
-Datei mit eng verzahnten Zustandsmaschinen (Spawn, Rückzug, Boss-KI, HUD);
-eine sichere Paralleledition mehrerer Agenten wäre gegen die Vorgabe
-„niemals dieselben Bereiche gleichzeitig“ auf fast jeden Diff gefallen. Alle
-Diffs stammen daher aus einer Hand und sind vollständig selbst geprüft; jede
-Integration wurde unmittelbar per `npm test` verifiziert (insgesamt 10 Suite-
-Läufe während der Entwicklung).
+- renderCostContract (300 Gegner, 281 sichtbar): drawImage erster Frame 324,
+  Gradienten/Frame 2 (unverändert), shadowBlur/Frame 0, Canvas/Frame 0 —
+  nichts skaliert mit der Gegnerzahl. Der neue Hintergrund fällt als
+  zusätzliche drawImage-Kacheln an, keine teuren Operationen.
+- combatUiV2-Verhaltensbeleg: 33 Boden-Zeichnungen bei 1280×720 gegen 35 bei
+  2560×1080 (Safe-Area 320 px) — das Deck reicht bis an den Rand.
+- Echte FPS: in dieser Umgebung NICHT messbar (kein sichtbarer Browser);
+  Referenz des Besitzers 56/58/0,0 % bleibt Maßstab der manuellen Abnahme.
 
 ## Manuelle Prüfung / Browser
 
-**Nicht möglich — ehrlich dokumentiert:** In dieser Umgebung steht kein
-sichtbarer Browser zur Verfügung (bekannter Zustand seit 22.08.2026: die Seite
-komponiert keine Frames, `requestAnimationFrame` feuert nicht). Deshalb wurden
-NICHT manuell geprüft und werden auch nicht behauptet:
+**Nicht möglich — ehrlich dokumentiert:** Es steht kein sichtbarer Browser
+zur Verfügung (bekannter Zustand: die Seite komponiert keine Frames). Nicht
+geprüft und nicht behauptet: visuelle Wirkung von Lichthüter-Posen
+(Idle/Lauf/Wurf/Impuls), Richtungswechsel, Hintergrund-Tiefe, Lesbarkeit des
+Gegnerpulks, Stationslayout bei 1280×720/844×390 inklusive Touch-Zielen,
+Signal-Marker im Bewegtbild, FPS/1-%-Low. Automatisiert abgesichert:
+Phasen-/Merkmalsverträge, Renderkostenvertrag, DOM-/UX-Vertrag (IDs, Panels,
+Lampen, Kernstufen), Simulationsisolation. Die visuelle Abnahme gehört in den
+Besitzerlauf.
 
-- visuelle Bodewirkung gegenüber `9190de9` und Screenshots,
-- Lesbarkeit aller fünf Silhouetten im echten Pulk bei hoher Dichte,
-- Anmutung der NEXUS-Silhouette, Lesbarkeit beider Mustertelegraphen,
-- Überlappungsfreiheit des EVO-Hinweises im echten Layout bei 1280×720 und
-  844×390 (nur geometrische CSS-Verträge sind automatisiert geprüft),
-- FPS, 1-%-Low und Anteil unter 55 FPS.
+## Risiken, Abweichungen, offene Punkte
 
-Stattdessen absichert: `renderCostContract` (Renderkosten unverändert),
-`combatUiV2` (Deck bis zum Rand, Phasenzahlen 6/8/8/6), `foeSilhouettes`,
-`evolutionFocusHud` (Lage bottom 72 > 16, z-index 5 < 20) sowie alle
-Simulationsverträge. Die visuelle Abnahme ist — wie im Auftrag vorgesehen —
-Sache des Besitzerlaufs durch Codex/Besitzer.
-
-## Risiken, Nebenwirkungen, offene Punkte
-
-1. **Botanker-Neureferenz:** fachlich begründet und vollständig tabelliert;
-   wer den alten Wert 21,7 wiederherstellt, macht die Suite bewusst rot.
-2. **Wegfall Bergungsflut:** Der Run endet jetzt im Finale statt in einer
-   Beuteflut; das späte Gefüge hat sich je Seed verschoben, während weiterhin
-   7/9 Botläufe mindestens eine Evolution erreichen. Der folgende
-   Waffenrollenpass sollte die Telemetrie am neuen Finale neu messen.
-3. **NEXUS-Zähigkeit ist bewusst hoch (×660).** Der Korridor wird mit einem
-   Photonenschneise-lastigen Referenzbuild erreicht; Builds ohne Fernschaden
-   könnten länger brauchen. Der Benchmark macht das reproduzierbar prüfbar;
-   Feinkalibrierung wäre eine eigene, kleine Entscheidung.
-4. **Elite im Finale-Szenario:** Der Test nutzt für den Todespfad bewusst eine
-   Elite, weil Normale in der Arena laufend in den belohnungsfreien Rückzug
-   gezwungen werden — dort tragen sie keinen Kontaktschaden mehr (gewollt).
-5. Kleinere Konsolenduplikate: `damagePlayer`/`newRun`/`endRun`/
-   `updateHUD`/`updateEvoHint` sind zusätzlich über `window.__EH` exportiert —
-   ausschließlich für die Verträge.
+1. **Klingenfokus = erstes Angebot:** Wer den ersten Zug sofort rerollt,
+   verliert die Garantie (Auftragstext „erster legaler Kartenzug“; bewusst so
+   implementiert und im Code kommentiert).
+2. **Signal-Randszenarien:** Solange Bewegung ungebunden ist, ist jede
+   Hash-Position erreichbar; kämen später Arena-Grenzen hinzu, müsste der
+   Spawn-Hash das berücksichtigen (Hinweis aus dem Diff-Review).
+3. **Suite-Umfang:** +18 vollständige Headless-Läufe für die Isolation;
+   Laufzeit von npm test steigt merklich (akzeptiert für die Beweiskraft).
+4. **combatArtV3 ist teilweise quelltextbasiert** (Sprite-Grammatik-Merkmale).
+   Verhalten wird durch renderCostContract/baselineIsolated flankiert; ein
+   rein pixelbasierter Nachweis ist im Node-Shim ohne getImageData nicht
+   möglich.
+5. **Keine Balanceänderung:** NEXUS-HP, Waffen, XP, Dichte unberührt; der
+   Besitzerlauf (1:35 auf NEXUS) bleibt alleinige Grundlage eines späteren
+   Boss-Balanceauftrags.
 
 ## Dateien und Commits
 
 | Datei | Änderung |
 |---|---|
-| `prototype/web/index.html` | Gates A–E: Boden, FOE_PROFILE-Sprites, evohint (CSS/HTML/JS), Arena/Rückzug, Surge-Entfernung, NEXUS (Konstanten, KI, Sprites, Telegraphen, HUD, Bericht, Exporte) |
-| `tools/run-balance-suite.mjs` | bossCombatPocket V2, finalBossFlow, nexusBenchmark, evolutionFocusHud, foeSilhouettes, Shim-Härtung (children/style-Stummel), Verdrahtung |
-| `CHANGELOG.md` | Unreleased-Eintrag D-041 |
+| `prototype/web/index.html` | Gates A–E: Lichthüter-Sprites, Orbitalhintergrund, Rammjäger/EVO-Fix, Stationsring-DOM+CSS+JS, Signal (Konstanten, Spawn/Laden, Marker, HUD, Bericht), Save v5, Kern/Protokolle |
+| `tools/run-balance-suite.mjs` | combatArtV3, sectorObjectiveFlow, stationCoreFlow, stationDomContract, baselineIsolated (18 Fingerprints), evolutionFocusHud Links-Vertrag, v5-Erwartungen, Shim-Härtung (children/style/removeAttribute/className/Multi-remove) |
+| `CHANGELOG.md` | Unreleased-Eintrag D-042 |
+| `docs/ASSET_PROVENANCE.md` | AP-005 (PROTOTYP, Adaption aus lokaler Referenz) |
 | `docs/WORK_REPORT.md` | dieser Bericht |
 
-Geschützte Dateien (ROADMAP, README, DECISIONS, TESTPLAN, CURRENT_TASK,
-AGENTS, CLAUDE, WORKFLOW, Konzeptbilder) wurden nicht verändert.
+Geschützte Dateien (ROADMAP, README, AGENTS, CLAUDE, DECISIONS, TESTPLAN,
+CURRENT_TASK, WORKFLOW, Konzeptbilder, Referenzordner) wurden nicht verändert;
+das Referenzprojekt blieb ausschließlich lesend offen.
 
 ## Abschließender Git-Status
 
 ```text
-## main...origin/main [ahead 2]
+## main...origin/main [ahead 4]
 ```
 
-Arbeitsbaum sauber; lokale Commits `ebb88c7` (Implementierung + Suite) und
-`7172c89` (dieser Bericht + Changelog). **Nicht gepusht** — der Push liegt
-bei Codex.
+Lokale Commits: a261165 → a2b37f7 → 0c289b8 → docs(d042). Nicht gepusht.
 
 ## Empfehlung an Codex
 
-**Abnehmen** — mit zwei Vorbehalten für die nächste Station:
-1. Sichtbare Abnahme im Browser (Boden, Silhouetten, EVO-Hinweis-Lage,
-   NEXUS-Muster, FPS-Fenster 6:00–8:00+) kann hier nicht erfolgen und gehört
-   in den Besitzerlauf.
-2. Der neue Botanker 19,78 ist Messwert, kein Designziel; bitte beim Push
-   zusammen mit dem Vorher-/Nachher-Tabelle in TESTPLAN/DECISIONS konservieren.
+**Abnehmen** mit drei Hinweisen:
+1. Sichtbare Abnahme (Posen, Hintergrund, Station bei beiden Größen,
+   Signal-Marker, FPS gegen 56/58/0,0 %) bleibt dem Besitzerlauf vorbehalten.
+2. „Erster Kartenzug“ ist als erstes ANGEBOT umgesetzt (Reroll verbraucht die
+   Garantie); falls das anders gemeint war, ist es ein Einzeiler.
+3. baselineIsolated friert die d78fdbe-Simulationsfingerprints ein — künftige
+   Balanceaufträge müssen diesen Vertrag bewusst neu referenzieren, nicht
+   lockern.
 
-## Codex-Review und technische Abnahme
-
-**Status:** technisch abgenommen; Besitzerlauf offen.
-
-Codex hat OpenCodes Diff und Tests unabhängig geprüft. Dabei wurden vier
-Randfälle korrigiert:
-
-- Der Rückzug markiert exakt den Überschuss im Simulationsradius statt in
-  Folgeticks auch die verbleibende Arenabelegung.
-- Rückzügler verbrauchen keine Projektile und beeinflussen keine Ketten-,
-  Klingen-, Frost-, Sog- oder Flächeneffekte.
-- Gesamtdauer und Run-Bericht behalten die Finaldauer beim Overtime-Start.
-- NEXUS-Zielzonen und feindliche Projektile werden beim Bosskill entfernt.
-
-Die Regressionen prüfen Kaskadenrückzug, Projektilverbrauch, aktive
-Bossgefahren, Gesamtdauer und Overtime-Erhalt verhaltensbasiert.
-
-Abschlussbelege:
-
-- npm test: 53/53 Checks grün, Exitcode 0.
-- git diff --check: sauber.
-- Browser-Smoke: wegen Windows-Sandbox-Verbindungsfehler nicht möglich.
-
-Ergebnis: technisch freigegeben. Der Besitzerlauf nach docs/TESTPLAN.md bleibt
-das Gate vor dem getrennten Waffenrollenpass; bis dahin nichts weiter stapeln.
