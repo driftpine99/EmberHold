@@ -9,14 +9,28 @@ import { fileURLToPath } from "node:url";
 // Rendering; geprüft wird ausschließlich der integrierte Headless-Spielpfad.
 const noop = () => {};
 const gradient = { addColorStop: noop };
+// Zaehler fuer teure Zeichenoperationen. Der Shim verschluckt die Befehle,
+// aber er kann sie mitzaehlen -- damit laesst sich die Renderlast messen
+// statt sie aus dem Quelltext zu erraten (EH-2026-08-24-02).
+const zaehler = {
+  gradients: 0, shadowBlur: 0, drawImage: 0, createElement: 0,
+  reset(){ this.gradients = 0; this.shadowBlur = 0; this.drawImage = 0; this.createElement = 0; },
+  werte(){ return { gradients: this.gradients, shadowBlur: this.shadowBlur,
+                    drawImage: this.drawImage, createElement: this.createElement }; },
+};
 const context = new Proxy({}, {
   get(target, property) {
-    if (property === "createLinearGradient" || property === "createRadialGradient") return () => gradient;
+    if (property === "createLinearGradient" || property === "createRadialGradient")
+      return () => { zaehler.gradients++; return gradient; };
     if (property === "measureText") return () => ({ width: 0 });
+    if (property === "drawImage") return () => { zaehler.drawImage++; };
     if (!(property in target)) target[property] = noop;
     return target[property];
   },
-  set(target, property, value) { target[property] = value; return true; },
+  set(target, property, value) {
+    if (property === "shadowBlur" && value) zaehler.shadowBlur++;
+    target[property] = value; return true;
+  },
 });
 
 const elements = new Map();
@@ -69,7 +83,7 @@ globalThis.localStorage = {
 };
 globalThis.document = {
   body: makeElement("body"),
-  createElement: (tag) => makeElement(tag),
+  createElement: (tag) => { zaehler.createElement++; return makeElement(tag); },
   getElementById: (id) => {
     if (!elements.has(id)) elements.set(id, makeElement(id));
     return elements.get(id);
@@ -1693,9 +1707,64 @@ try {
   presentationError = error instanceof Error ? error.message : String(error);
 }
 
+// --- EH-2026-08-24-02 / D-038: Kosten im Massenrenderpfad ------------------
+// Die neuen Figuren sind vorgerendert. Dieser Check misst das, statt es zu
+// behaupten: Der Kontextstub zaehlt teure Aufrufe waehrend eines echten
+// render()-Durchlaufs mit vielen Gegnern. Eine reine Quelltextsuche waere
+// hier wertlos -- sie saehe nicht, wie oft etwas wirklich passiert.
+let renderCostContract = false;
+let renderCostError = "";
+let renderCostDiagnostics = null;
+try {
+  canvasElement.clientWidth = 1280;
+  canvasElement.clientHeight = 720;
+  engine.resize();
+  engine.begin(480, "ring");
+  const S = engine.S;
+  S.x = 0; S.y = 0; S.level = 900;
+  S.W = { bogen:4, splitter:3, klinge:3 }; S.cool = { bogen:0, splitter:0, klinge:0 };
+  // Dichter Pulk plus AEGIS, also der teuerste realistische Fall.
+  let gegner = 0;
+  for (let k=0;k<300;k++){
+    const a=(k/300)*Math.PI*2, r=40+(k%9)*46;
+    if (engine.spawnEnemy(480, k%5, 0, Math.cos(a)*r, Math.sin(a)*r) >= 0) gegner++;
+  }
+  engine.spawnEnemy(480, 4, 2, 150, 40);
+  engine.rebuildGrid();
+  engine.fireWeapons(engine.CFG.TICK);   // Projektile ins Feld bringen
+
+  zaehler.reset();
+  engine.render();
+  const einFrame = zaehler.werte();
+  zaehler.reset();
+  for (let f=0; f<10; f++) engine.render();
+  const zehnFrames = zaehler.werte();
+
+  const sichtbar = S.visibleEnemies;
+  // Pro Einheit darf nichts Teures entstehen. Grosszuegige, aber harte Decke:
+  // hoechstens ein Gradient und ein shadowBlur-Setzen je Frame und keinesfalls
+  // eine Zahl, die mit der Gegnerzahl waechst.
+  const gradientenProFrame = zehnFrames.gradients / 10;
+  const schattenProFrame = zehnFrames.shadowBlur / 10;
+  const canvasProFrame = zehnFrames.createElement / 10;
+  const skaliertNichtMitGegnern = sichtbar > 60 &&
+    gradientenProFrame <= 3 && schattenProFrame <= 4;
+  const keineNeuenSprites = canvasProFrame === 0;
+  // Zeichnen selbst muss stattfinden, sonst misst der Check nichts.
+  const wirklichGezeichnet = einFrame.drawImage > sichtbar;
+
+  renderCostContract = skaliertNichtMitGegnern && keineNeuenSprites && wirklichGezeichnet;
+  renderCostDiagnostics = { gegner, sichtbar,
+    drawImageErsterFrame: einFrame.drawImage,
+    gradientenProFrame, schattenProFrame, canvasProFrame,
+    skaliertNichtMitGegnern, keineNeuenSprites, wirklichGezeichnet };
+} catch (error) {
+  renderCostError = error instanceof Error ? error.message : String(error);
+}
+
 const output = {
-  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && slotLayout && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && contractFlow && holdExpansion && equipmentFlow && evolutionCatalog && eliteChoices && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling && fpsMetrics && reportHardened && healOrbFlow && holdGoalLadder && oreCurve && earlyLossGuard && bossCombatPocket && bossLocatorState && compactCombatHud && evolutionCompletion && weaponDamageReport && lateProgression && weaponRoles && presentationLayer,
-  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, slotLayout, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, contractFlow, holdExpansion, equipmentFlow, evolutionCatalog, eliteChoices, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling, fpsMetrics, reportHardened, healOrbFlow, holdGoalLadder, oreCurve, earlyLossGuard, bossCombatPocket, bossLocatorState, compactCombatHud, evolutionCompletion, weaponDamageReport, lateProgression, weaponRoles, presentationLayer },
+  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && slotLayout && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && contractFlow && holdExpansion && equipmentFlow && evolutionCatalog && eliteChoices && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling && fpsMetrics && reportHardened && healOrbFlow && holdGoalLadder && oreCurve && earlyLossGuard && bossCombatPocket && bossLocatorState && compactCombatHud && evolutionCompletion && weaponDamageReport && lateProgression && weaponRoles && presentationLayer && renderCostContract,
+  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, slotLayout, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, contractFlow, holdExpansion, equipmentFlow, evolutionCatalog, eliteChoices, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling, fpsMetrics, reportHardened, healOrbFlow, holdGoalLadder, oreCurve, earlyLossGuard, bossCombatPocket, bossLocatorState, compactCombatHud, evolutionCompletion, weaponDamageReport, lateProgression, weaponRoles, presentationLayer, renderCostContract },
   targets: report.targets,
   ueberschuss: report.ueberschuss,
   seeds: report.seeds,
@@ -1722,6 +1791,8 @@ if (weaponDamageError) output.weaponDamageError = weaponDamageError;
 if (lateProgressionError) output.lateProgressionError = lateProgressionError;
 if (weaponRolesError) output.weaponRolesError = weaponRolesError;
 if (presentationError) output.presentationError = presentationError;
+if (renderCostError) output.renderCostError = renderCostError;
+if (renderCostDiagnostics) output.summary.renderCost = renderCostDiagnostics;
 if (presentationDiagnostics) output.summary.presentation = presentationDiagnostics;
 if (weaponRolesDiagnostics) output.summary.weaponRoles = weaponRolesDiagnostics;
 if (lateProgressionDiagnostics) output.summary.lateProgression = lateProgressionDiagnostics;

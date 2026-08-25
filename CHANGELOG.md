@@ -11,6 +11,13 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 - Kanonische Dateien für aktiven Auftrag und standardisierten Arbeitsbericht
 ### Added
 
+- Zwei neue Verhaltenschecks: `presentationLayer` prüft die Vollständigkeit der
+  Namensabbildung gegen die Laufzeitarrays, unveränderte interne IDs, den
+  Save-Key, einen verlustfreien v4-Rundlauf und einen Run-Bericht ohne interne
+  IDs. `renderCostContract` misst am echten `render()`-Aufruf mit 281
+  sichtbaren Gegnern, dass pro Frame nur zwei Gradienten, kein `shadowBlur`
+  und kein neues Canvas entstehen
+
 - Späte XP-Bremse ab Stufe 21: Der frühe Run bleibt unverändert, während das
   bisherige Stufe-47-Rohbudget im neuen Vertrag auf Stufe 33 landet
 - Pfeilregen-EVO um 17,1 % Schaden reduziert, ohne normalen Splitterköcher,
@@ -121,6 +128,26 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 - Automatische Prüfung der aktiven lokalen RGBA-Assets und des Bogen-Animationszustands
 
 ### Changed
+
+- **Orbitblade-Vertikalschnitt (D-038):** Der Prototyp trägt sichtbar die neue
+  Sci-Fantasy-Identität, ohne dass sich ein Run mechanisch ändert. Eine
+  zentrale eingefrorene Abbildung `LEX` bildet interne IDs auf sichtbare Namen
+  ab; IDs, Save-Key `emberhold:hold:v1` und Save-Version 4 bleiben unverändert
+- Umbenannt sind Titel, Station, Sektoren, alle sechs Waffen samt Evolutionen,
+  alle acht Passivmodule, alle fünf Gegnerfamilien, alle sechs Stationsmodule
+  sowie Ressourcen, Bossanzeige, Ergebnis und Run-Bericht
+- Kampfoberfläche auf Navy, Violett, Cyan und Weißgold umgestellt; der
+  Kampfboden ist ein mittelhelles Stationsdeck statt dunklem Basalt
+- Seitliche Safe-Area ist eine ruhige dekorative Weltfortsetzung mit
+  vorgerendertem Sternenfeld statt eines leeren Balkens
+- HUD neu geordnet: links Stufe, Erfahrung und Leben; mittig entweder Sektor
+  oder Bossleiste; rechts Pause plus Uhr als einziger Kontextindikator. Kills
+  sind in die Pause gewandert
+- Station Stufe A: nur noch drei Kernressourcen im Kopf, Nebenressourcen in
+  ihrem Modul, Sortien als Statistik. Timer, Kappen, Kosten und Erträge sind
+  unverändert
+- Orbitträger, Sammlerdrohne, AEGIS und das Klingenprojektil sind neue
+  code-native Canvas-Figuren; die früheren Kreisplatzhalter entfallen
 
 - Der Warden bildet eine lesbare Kampfphase: höchstens 90 nachspawnende
   normale Gegner, keine künstliche Entfernung, danach schrittweiser

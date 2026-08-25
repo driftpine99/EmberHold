@@ -4,7 +4,7 @@
 
 - **Task-ID:** EH-2026-08-24-02
 - **Thema:** Orbitblade – visueller und semantischer Vertikalschnitt
-- **Status:** **FREIGEGEBEN_FUER_CLAUDE**
+- **Status:** **BEREIT_FUER_CODEX_REVIEW**
 - **Auftraggeber und Abnahme:** Codex
 - **Ausführung:** Claude Code
 - **Priorität:** P0 – neue Produktidentität ohne Balanceänderung

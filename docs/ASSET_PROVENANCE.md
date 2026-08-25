@@ -68,6 +68,30 @@ oder die gezielte Imitation lebender Künstler verlangen.
 - **Hinweis:** Die isometrische Wirkung ist reine Stimmungsvorlage; das Spiel
   bleibt ein flacher 2D-Hub.
 
+### AP-003 – Orbitblade-Laufzeitfiguren V1 (code-native)
+
+- **Pfad:** keine Datei – prozedural in `prototype/web/index.html`
+  (`buildOrbiterSprites`, `buildDroneSprites`, `buildAegisSprite` sowie die
+  Klingen-, Boden- und Sternenfeldsprites in `buildArenaSprites`)
+- **Zweck:** Runtime – Orbitträger, Sammlerdrohne, SEKTORBOSS AEGIS,
+  Klingenprojektil, Stationsdeck und Sternenfeld der Safe-Area
+- **Ursprung:** selbst erstellt, vollständig als Canvas-Code
+- **Ersteller/Werkzeug:** Claude Code im Auftrag EH-2026-08-24-02
+- **Datum:** 25.08.2026
+- **Prompt:** keiner – kein generatives Bildmodell beteiligt
+- **Referenzen:** ausschließlich die textliche Richtung aus
+  `ORBITBLADE_CONCEPT_DRAFT.md`. Aus den Konzeptillustrationen AP-001 und
+  AP-002 wurde **kein** Bildinhalt ausgeschnitten oder nachgezeichnet
+- **Lizenz/Rechtebasis:** eigener Quellcode des Projekts; keine Fremdinhalte,
+  keine Franchise-Designs, nichts aus dem Ordner `orbitblade/`
+- **Bearbeitung:** entfällt – die Figuren entstehen zur Laufzeit einmalig und
+  werden danach nur kopiert
+- **Status:** PROTOTYP
+- **Hinweis:** Es wurde **keine neue Bilddatei** hinzugefügt. Der
+  Runtime-Assetstand bleibt bei den vier bestehenden PNG-Atlanten mit
+  zusammen 5,8 MB und damit unter der 10-MB-Grenze. Ein Art-Konsistenz- und
+  Rechtepass vor Veröffentlichung bleibt offen.
+
 ## Vorlage
 
 ### AP-XXX – Name

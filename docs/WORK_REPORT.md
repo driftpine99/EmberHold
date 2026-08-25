@@ -6,383 +6,250 @@
 
 ## Steuerung
 
-- **Task-ID:** EH-2026-08-24-01 (D-036 – Späte Progression und Waffenrollen)
+- **Task-ID:** EH-2026-08-24-02 — Orbitblade, visueller und semantischer
+  Vertikalschnitt (D-038)
 - **Status:** FERTIG, bereit für Codex-Review
-- **Ausgangscommit:** `676506ffe24b8168fc7adb614d13a89811d34bef`
-- **Ausgangsstatus:** Arbeitsbaum sauber (`## main...origin/main`), `npm test`
-  43/43 grün, Exitcode 0
-- **Endstand:** `npm test` **45/45 grün**, Exitcode 0; `git diff --check` sauber
-- **Commits:** keine. **Nicht committet, nicht gepusht** — wie beauftragt.
+- **Ausgangscommit:** `dd68982fbb2a048004cd082d78beb18292aeec77`
+- **Anfangsstatus:** `## main...origin/main`, Arbeitsbaum sauber, keine fremden
+  Änderungen; `npm test` 45/45 grün, Exitcode 0
+- **Endstand:** `npm test` **47/47 grün**, Exitcode 0; `git diff --check` sauber
+- **Lokale Commits:** vier Gate-Commits, **nicht gepusht**
 
 ## Ergebnis in einem Satz
 
-Alle vier Scope-Punkte sind umgesetzt, zwei neue Verhaltenschecks sichern sie
-ab und sind per Mutation gegengeprüft; die Rundenklinge hatte tatsächlich einen
-Funktionsfehler, kein reines Abstimmungsproblem.
+Der Prototyp heißt, klingt und sieht auf allen sichtbaren Flächen nach
+Orbitblade, während neun serialisierte Referenzläufe mit Runs, Toden,
+Hold-Auszahlung, XP-Kurve, Dichte und `CFG` **bitidentisch** geblieben sind.
 
-## Geänderte Dateien
+## Zeitnutzung je Gate
 
-| Datei | Art |
+Grobe Aufteilung der Sitzung, nicht gestoppt, sondern nach Arbeitsschritten
+geschätzt:
+
+| Gate | Anteil | Schwerpunkt |
+|---|---|---|
+| 0 – Baseline und Plan | ~10 % | Dokumente lesen, Paritäts-Harness bauen, Inventur |
+| 1 – Präsentationsschicht | ~30 % | `LEX`, alle Umbenennungen, neuer Check, Testabgleich |
+| 2 – Kampfoberfläche | ~25 % | Palette, Boden, Safe-Area, HUD, zwei Browserfunde |
+| 3 – Orbitalstation | ~12 % | Kopfressourcen, Modulzustände, Browserdurchlauf |
+| 4 – Grafik-Slice | ~18 % | Figuren, Klingenprojektil, Renderkosten-Check |
+| Bericht und Doku | ~5 % | Changelog, Provenienz, dieser Bericht |
+
+## Ergebnis je Gate
+
+| Gate | Status | Beleg |
+|---|---|---|
+| 0 – Baseline | erfüllt | 45/45 grün vor der ersten Änderung; Referenzlauf serialisiert, SHA256 `978beffd…` |
+| 1 – Präsentationsschicht | erfüllt | `presentationLayer` grün; Parität unverändert |
+| 2 – Kampfoberfläche | erfüllt | Beide Pflichtformate kollisionsfrei gemessen; zwei echte Überlagerungen behoben |
+| 3 – Orbitalstation A | erfüllt | Alle zehn Stationsaktionen im Browser durchgespielt, Kosten und Erträge unverändert |
+| 4 – Grafik-Slice | erfüllt | Vier Kernelemente code-native; `renderCostContract` grün |
+
+## Dateien und lokale Commits
+
+| Commit | Inhalt |
 |---|---|
-| `prototype/web/index.html` | XP-Kurve, Pfeilregen-Faktor, Klingen-Trefferprüfung, Waffentelemetrie, zwei Testexporte |
-| `tools/run-balance-suite.mjs` | zwei neue Checks `lateProgression` und `weaponRoles` |
-| `docs/CURRENT_TASK.md` | Auftrag eingetragen, Status auf `BEREIT_FUER_CODEX_REVIEW` |
-| `docs/WORK_REPORT.md` | dieser Bericht |
+| `d3cdd3b` | Gate 1 – Präsentationsschicht `LEX`, alle Umbenennungen, Check `presentationLayer` |
+| `39a22f6` | Gate 2 – Palette, Stationsdeck, Safe-Area, HUD-Hierarchie |
+| `5ada6ab` | Gate 3 – Orbitalstation Stufe A |
+| Gate-4-Commit | Figuren, Klingenprojektil, `renderCostContract`, Changelog, Provenienz, dieser Bericht, Statuswechsel |
 
-`ROADMAP.md`, `docs/DECISIONS.md`, `docs/TESTPLAN.md`, `CHANGELOG.md`,
-`AGENTS.md`, `CLAUDE.md` und `docs/WORKFLOW.md` sind **unverändert**.
+Geändert wurden ausschließlich erlaubte Dateien: `prototype/web/index.html`,
+`tools/run-balance-suite.mjs`, `CHANGELOG.md`, `docs/ASSET_PROVENANCE.md`,
+`docs/WORK_REPORT.md` und der Status in `docs/CURRENT_TASK.md`.
+`ROADMAP.md`, `docs/DECISIONS.md`, `docs/TESTPLAN.md`, `README.md`,
+`AGENTS.md`, `CLAUDE.md` und `docs/WORKFLOW.md` sind unverändert.
 
-```text
- prototype/web/index.html    |  77 +++++++++++++++---
- tools/run-balance-suite.mjs | 185 +++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 251 insertions(+), 11 deletions(-)
-```
+## Subagent: Auftrag, Ergebnis und eigene Prüfung
 
-## A. XP-Kurve
+**Auftrag.** Ein günstiger Haiku-Subagent sollte eine reine Lese-Inventur aller
+sichtbaren deutschen Begriffe in `prototype/web/index.html` erstellen: eine
+Tabelle mit Zeilennummer, Kategorie, Text und Fundort, plus eine getrennte
+Liste der nicht sichtbaren Treffer (IDs, Save-Key, Kommentare). Ausdrücklich
+verboten: jede Dateiänderung, jede Produktentscheidung, jeder Umbenennungs-
+vorschlag, Commit und Push.
 
-### Konstanten und Formel
+**Ergebnis.** Der Subagent hat korrekt nichts verändert und keine
+Produktentscheidung getroffen. Die Inventur selbst war jedoch **nicht
+verwendbar**: Statt der verlangten Zeilentabelle kamen nur Aggregatzahlen; die
+Kategorie „HTML-Markup 227+" zählte offensichtlich Kommentare mit, und die
+Bossleiste in Zeile 402 wurde als „nicht sichtbar (aria-hidden)" eingestuft,
+obwohl genau dort `Warden`/`Aschenhüter` für den Spieler stehen.
 
-| | vorher | nachher |
-|---|---|---|
-| Formel | `xpNeed(L) = 82 · L^0,70` | `L ≤ 20`: unverändert · `L > 20`: `82 · L^0,70 · (L/20)^3,0` |
-| neue Konstanten | – | `CFG.XP_LATE_AT = 20`, `CFG.XP_LATE_K = 3.0` |
-| `XP_C` / `XP_K` | 82 / 0,70 | **unverändert** 82 / 0,70 |
+**Meine Prüfung und Konsequenz.** Ich habe die Einstufung stichprobenartig
+gegen den Quelltext geprüft, den Widerspruch bei Zeile 402 gefunden und die
+Inventur daraufhin **selbst** mit gezielten Greps über alle Begriffe der
+Mandatsliste erstellt. Aus dem Subagentenergebnis habe ich nur zwei Hinweise
+übernommen und beide selbst verifiziert: die Toast-Zeilen und die
+Berichtszeilen. Es wurde **kein Subagentencode** in das Repository übernommen.
 
-Es ist dieselbe Kurvenfamilie: Oberhalb von Stufe 20 steigt nur der Exponent
-von 0,70 auf 3,70. An der Grenze ist der Zusatzfaktor exakt 1,0 — die Kurve ist
-stetig, es gibt keinen Deckel und keine Sperre.
+## Vorher-/Nachher-Parität
 
-| Stufe | vorher | nachher | Faktor |
-|---:|---:|---:|---:|
-| 1 | 82,0 | 82,0 | 1,00 |
-| 20 | 667,6 | 667,6 | 1,00 |
-| 21 | 690,8 | **799,7** | 1,16 |
-| 30 | 886,7 | 2.992,8 | 3,38 |
-| 40 | 1.084,6 | 8.676,5 | 8,00 |
+Serialisiert werden neun Referenzseeds in drei Varianten (8-Minuten-Lauf,
+3-Minuten-Lauf mit `breach`, absichtlicher Frühverlust), dazu vier
+Hold-Auszahlungen über den echten Weg, die XP-Kurve an acht Stufen, die
+Zieldichte an fünf Zeitpunkten sowie `CFG`, `HOLD_CFG`, Vertragswerte,
+Waffen-, Passiv- und Ausrüstungs-IDs.
 
-Der Kostensprung von Stufe 20 auf 21 beträgt +19,8 % statt +3,5 %. Der
-Progressionstest deckelt ihn ausdrücklich bei 25 %, damit dort nie eine Wand
-entsteht.
+| Messpunkt | vorher | nach Gate 1 | nach Gate 2 | nach Gate 4 |
+|---|---|---|---|---|
+| SHA256 der Serialisierung | `978beffd…b6f9` | identisch | identisch | **identisch** |
+| Bytes | 30.808 | 30.808 | 30.808 | 30.808 |
+| Vertragswerte `reward`/`hp`/`bias` | — | unverändert | unverändert | unverändert |
 
-### Synthetischer Level-47-Budgettest
+Nur die **Namen** der drei Verträge unterscheiden sich; alle Zahlen sind
+gleich. Damit sind Seeds, RNG-Reihenfolge, Kartenzüge, Evolutionen, Kills,
+Beute, Dichte, Boss und Hold-Auszahlung nachweislich unberührt.
 
-| Größe | Wert |
-|---|---:|
-| XP-Budget, das die **alte** Kurve bis Stufe 47 brauchte | 32.951 |
-| Selbstkontrolle: Stufe mit diesem Budget auf der alten Kurve | **47** |
-| Stufe mit diesem Budget auf der **neuen** Kurve | **33** |
-| Zielkorridor des Auftrags | 30–34 ✓ |
-| Stufe bei zehnfachem Budget | 55 (kein Deckel) |
+## Befehle, Exitcodes und grüne Checks
 
-### Warum k = 3,0
-
-Gemessen über alle neun Referenzseeds. Der Exponent hat auf den **Bot** fast
-keinen Hebel, weil der Bot ohnehin kaum über Stufe 20 hinauskommt — er
-bestimmt praktisch nur den synthetischen Budgetwert:
-
-| `XP_LATE_K` | Stufe bei Level-47-Budget | Kartenzüge Bot | Aufschlag auf Stufe 21 |
-|---:|---:|---:|---:|
-| 0 (aus) | 47 | 20,78 | 0 % |
-| 2,0 | 35 | 19,22 | +10,3 % |
-| 2,5 | 34 | 19,11 | +13,0 % |
-| 2,75 | 33 | 19,00 | +14,4 % |
-| **3,0** | **33** | **19,00** | **+15,8 %** |
-| 3,25 | 32 | 19,00 | +17,2 % |
-
-3,0 liegt mittig im geforderten Korridor 30–34 und ist weit draußen deutlich
-milder als eine Exponentialform (Stufe 47 kostet das 13-fache statt des
-25-fachen).
-
-## B. Pfeilregen
-
-Geändert wurde **genau eine** Stellschraube: der EVO-Schadensmultiplikator des
-Splitterköchers.
-
-| | vorher | nachher |
-|---|---|---|
-| Codezeile | `... * (evo?.82:1)` | `... * (evo?.68:1)` |
-| Änderung | – | **−17,1 %** |
-| Fächerbreite, Projektilzahl, Durchschlag, Feuerrate | unverändert | **unverändert** |
-| normaler Splitterköcher | unverändert | **unverändert** |
-
-## C. Rundenklinge
-
-### Diagnose: Es war ein Funktionsfehler
-
-Die Klinge war die **einzige** Waffe, die den Körperradius des getroffenen
-Gegners ignorierte. Jedes Projektil rechnet mit `r + 9` (normal), `+ 16`
-(Elite) beziehungsweise `+ 30` (Warden); die Klinge prüfte nur, ob der
-**Mittelpunkt** des Gegners innerhalb ihres Eigenradius von 17 lag.
-
-Folgen: Die effektive Trefferfläche gegen einen Normalgegner war 17² statt
-26² — Faktor 2,3. Gegen den Warden mit 30 Einheiten Körper war sie 17² statt
-47² — Faktor 7,6. Die Klinge zog sichtbar durch Gegner hindurch, ohne zu
-treffen, und war gegen den Warden praktisch wirkungslos.
-
-Korrigiert wurde ausschließlich diese Inkonsistenz. **Kein** Schadenswert,
-**keine** Klingenzahl, **kein** Radius der Umlaufbahn, **keine** Defensive und
-**keine** Rüstung wurden angefasst.
-
-### Benchmark
-
-Deterministisches Nahbereichsszenario: Spieler im Ursprung, Gegner auf einem
-gleichmäßigen Gitter (16 Einheiten Raster) im Ring von 38 bis 155
-Welteinheiten, 275 Gegner, 600 Ticks, keine Gegnerbewegung, alle Gegner
-überleben die Messung. Ein Gitter statt Ringen, weil sonst die zufällige Lage
-eines Rings relativ zur Klingenbahn das Ergebnis bestimmt.
-
-| Messung | vorher | nachher | Faktor |
-|---|---:|---:|---:|
-| Rundenklinge Stufe 2 | 35.229 | 83.392 | **2,37×** |
-| Rundenklinge Stufe 3 | 56.779 | 134.680 | **2,37×** |
-| Rundenklinge Stufe 4 | 68.234 | 159.787 | **2,34×** |
-| Rundenklinge Stufe 5 | 117.518 | 275.105 | **2,34×** |
-| Klingenzyklon Stufe 5 | 175.497 | 410.587 | **2,34×** |
-| Rundenklinge gegen Warden | 874 | 2.751 | **3,15×** |
-| Kettenblitz Stufe 4, Nahfeld | 5.236 | 5.236 | 1,00 |
-| Langbogen Stufe 4, Nahfeld | 7.096 | 7.096 | 1,00 |
-| Splitterköcher Stufe 5, Fernfeld | 11.476 | 11.476 | 1,00 |
-| **Pfeilregen Stufe 5, Fernfeld** | **37.866** | **31.401** | **0,83×** |
-| Langbogen gegen Warden | 1.774 | 1.774 | 1,00 |
-| Kettenblitz gegen Warden | 1.047 | 1.047 | 1,00 |
-
-Der Zielkorridor „ungefähr 2–3× wirksamer" ist damit getroffen, mit einer
-einzigen Korrektur statt gestapelter Buffs.
-
-**Wichtige Einordnung:** Der Benchmark misst Durchsatz gegen eine dichte,
-stehende Nahkampfmenge. Das ist der Bestfall der Klinge, nicht der Normalfall
-eines Runs — im Feldlauf kam sie auf 291 Schaden, weil Gegner sie bei einem
-dominanten Fernkampfbuild gar nicht erst erreichen. Die Zahlen sind als
-Vorher-/Nachher-Vergleich der Klinge belastbar, **nicht** als Aussage „Klinge
-stärker als Bogen".
-
-### Keine neue Schneeballkurve
-
-Die stärkere Klinge erhöht die Kartenzüge nicht, sie senkt sie sogar:
-
-| Stand | Kartenzüge Bot |
-|---|---:|
-| Ausgangscommit `676506f` | 21,67 |
-| nur Klingen-Trefferkorrektur | **21,00** |
-| nur Pfeilregen-Nerf | 21,67 (keine Wirkung auf den Bot, siehe unten) |
-| beide Waffenänderungen, XP-Bremse aus | 20,78 |
-| Endstand mit XP-Bremse | **19,00** |
-
-Auch die Feldspitze steigt nicht: `densityOvershoot` liegt unverändert bei
-+3,5 % gegen die erlaubten +10 %.
-
-**Ehrliche Einschränkung:** Der Pfeilregen-Nerf ist im Botlauf **nicht**
-messbar, weil die Bot-Kartenstrategie den Splitterköcher praktisch nie
-evolviert — die Werte sind bis auf die letzte Stelle identisch mit dem
-Ausgangsstand. Belegt ist der Nerf ausschließlich über den deterministischen
-Benchmark und den neuen Check `weaponRoles`.
-
-## D. Waffentelemetrie
-
-Neue Felder im Run-State, beide als `Float64Array(6)` in Katalogreihenfolge:
-
-- `S.wFirst[i]` — Sekunde der ersten Aufnahme, `-1` = nie
-- `S.evoAt[i]` — Sekunde der Evolution, `-1` = keine
-
-Gesetzt wird jeweils einmal je Waffe, nicht pro Treffer und nicht pro Frame.
-Aktive Zeit und Schaden je Sekunde werden **erst beim Erzeugen des Berichts**
-gerechnet. Keine neuen Allokationen in Treffer- oder Schwarm-Schleifen, keine
-neuen HUD-Elemente, kein Save-Feld berührt, Save-Version unverändert bei 4.
-
-Neue Berichtszeile, gemessen im Browser bei 1422×613:
-
-```text
-Waffenverlauf: Langbogen ab 0:00 · 8:00 aktiv · 33/s,
-               Pfeilregen ab 1:01 · 6:59 aktiv · 100/s · EVO 3:34,
-               Rundenklinge ab 1:32 · 6:27 aktiv · 166/s
-```
-
-Liegt die aktive Zeit unter einer Sekunde, steht `–/s` statt einer erfundenen
-Null.
-
-## Tests und Nachweise
-
-| Befehl / Prüfung | Ergebnis | Exitcode |
+| Befehl | Ergebnis | Exitcode |
 |---|---|---:|
-| `npm test` (final) | **45 von 45 Checks grün**, `pass: true` | **0** |
+| `npm test` (Baseline vor Gate 1) | 45/45 grün | 0 |
+| `npm test` (final) | **47/47 grün** | **0** |
 | `git diff --check` | keine Ausgabe | 0 |
-| `git status --short --branch` | nur die vier oben genannten Dateien geändert | 0 |
-| `lateProgression` (neu) | grün, 5 Teilprüfungen | — |
-| `weaponRoles` (neu) | grün, 3 Teilprüfungen | — |
+| Paritätsvergleich nach jedem Gate | Hash unverändert | 0 |
 
-### Vorher / Nachher über alle neun Referenzseeds
+Neu hinzugekommen sind zwei Checks:
 
-| Größe | vorher (`676506f`) | nachher | Vorgabe |
-|---|---:|---:|---|
-| Erster Kartenzug, Mittelwert | 31,64 s | **31,64 s** | unverändert ✓ |
-| First-Pick-Korridor 25–45 s | grün | grün | bleibt gültig ✓ |
-| Kartenzüge, Mittelwert | 21,67 | **19,00** | Anker 21,7 ± 3 → 18,70–24,70 ✓ |
-| Läufe mit Evolution | 9 / 9 | **7 / 9** | — |
-| Evolutionen je Lauf | 1,89 | **1,44** | Ziel 1–2 typisch ✓ |
-| Kills, Mittelwert | 6.915 | 6.235 | — |
-| Endstufe Bot, Mittelwert | 22,67 | 20,00 | — |
-| Feldspitze, Maximum | 312 | **312** | unverändert ✓ |
-| Feldspitze, Mittelwert | 286 | 267 | — |
-| Dichte-Überschuss | +3,5 % | **+3,5 %** | Grenze +10 % ✓ |
-| Zieldichte 8:00 | 301 | **301** | unverändert ✓ |
+**`presentationLayer`** — prüft die Abbildung als Verhalten, nicht als
+Quelltext: Vollständigkeit gegen die Laufzeitarrays, tatsächliche Anwendung der
+Namen, unveränderte interne IDs, den Save-Key `emberhold:hold:v1`, einen
+verlustfreien v4-Rundlauf durch `localStorage`, einen Run-Bericht mit neuen
+Namen und **ohne** interne IDs sowie dass `LEX` eingefroren ist.
 
-### Mutationstest der beiden neuen Checks
+**`renderCostContract`** — misst am echten `render()`-Aufruf mit 300 gespawnten
+und 281 sichtbaren Gegnern plus AEGIS:
 
-Jede Änderung einzeln zurückgenommen, jeweils die volle Suite gefahren:
+| Größe | gemessen | Bedeutung |
+|---|---:|---|
+| `drawImage` im ersten Frame | 308 | es wird wirklich gezeichnet |
+| Gradienten je Frame | **2** | konstant, wächst nicht mit der Gegnerzahl |
+| `shadowBlur`-Setzungen je Frame | **0** | keine teure Weichzeichnung im Pulk |
+| neue Canvas je Frame | **0** | alle Sprites sind vorgerendert |
 
-| Zurückgenommen | Rot geworden |
+Bestehende Paritäts-, Boss-, HUD-, Hold-, Vertrags-, Ausrüstungs- und
+Save-Checks sind unverändert grün: `configStable`, `aspectIndependent`,
+`densityOvershoot`, `bossTargeting`, `bossDurability`, `bossCombatPocket`,
+`bossLocatorState`, `compactCombatHud`, `holdFlow`, `holdExpansion`,
+`contractFlow`, `equipmentFlow`, `earlyLossGuard`, `lateProgression`,
+`weaponRoles`, `evolutionCompletion`, `weaponDamageReport`.
+
+Drei bestehende Checks leiten ihre Namenserwartung jetzt aus `LEX` ab statt aus
+fest eingetippten Begriffen: `holdGoalLadder`, `compactCombatHud` und
+`weaponDamageReport`. Keine Schwelle wurde gelockert, kein Anker neu
+referenziert.
+
+## Browserprüfungen
+
+Der sichtbare Browser rendert in dieser Umgebung **echte Frames**. Alle
+folgenden Zahlen stammen aus `getImageData` am laufenden Canvas, nicht aus
+einem Screenshot.
+
+**1280×720** — Canvas 1920×1080, 24 Frames gezeichnet:
+
+- keine einzige Überlagerung zwischen `topbar`, `sectorhud`, `clock`,
+  `pausebtn`, `slots`, `dash`, `bossbar`, `hpwrap`, `xpwrap`, `devbtn`,
+  `tunebtn`; nichts außerhalb des Fensters, kein horizontaler Überlauf
+- **94 %** der Stichproben heller als Schwellwert 60; mittlere Bodenfarbe
+  RGB(77, 73, 78) mit Blaustich — der Kampfboden ist messbar mittelhell
+- Spielerbereich: 289 goldene, 520 weiße und 28 cyanfarbene Bildpunkte —
+  eine weißgoldene Figur, kein Kreis
+
+**844×390** — Canvas 1266×585, Safe-Area 75 px je Seite:
+
+- keine Überlagerung, weder mit noch ohne aktive Bossleiste
+- Kampfausschnitt unverändert 1000×563 Welteinheiten
+- Safe-Area-Farbe RGB(20, 26, 42) mit gekacheltem Sternenfeld
+
+**Sichtbar bestätigt im Screenshot:** Bossleiste „AEGIS", Warnung
+„SEKTORBOSS: AEGIS", Toast „Elite-Einheit nähert sich", Kartennamen
+„Munitionsmatrix", „Fokussierlinse", „Orbitklinge", Stationsdeck mit
+Panelfugen, Bossmarker-Chevron, kompaktes linkes HUD.
+
+**Stationsdurchlauf im Browser:** Sonde reparieren, Asterit einsammeln,
+Fabrikator reparieren, Legierungsplatten einsammeln, Orbitklinge verstärken,
+Fluxlabor reparieren, Reroll vorbereiten, Simulationsdeck reparieren,
+Meisterschaft lernen, Sektor wählen — alle zehn Aktionen mit unveränderten
+Kosten und Erträgen.
+
+### Nicht durchgeführte Prüfungen
+
+- **Kein Save-Neuladen im Browser.** Die Vorschau lädt die Datei als
+  `data:`-URL; `localStorage` ist dort gesperrt (`SecurityError`). Der
+  v4-Rundlauf ist stattdessen im Node-Check `presentationLayer` sowie in
+  `holdFlow`, `holdExpansion`, `contractFlow` und `equipmentFlow` abgedeckt.
+- **Keine subjektive Grafikfreigabe.** Ich habe gemessen, dass gezeichnet wird
+  und womit — ob die Figuren im Gefecht *gut aussehen*, ob der Boden angenehm
+  ist und ob AEGIS im Pulk wirklich sofort auffällt, ist nicht gemessen und
+  bleibt beim Besitzer.
+- **Kein achtminütiger Spiellauf**, keine echte FPS-Messung auf Zielgeräten.
+
+## Assetgrößen und Provenienz
+
+**Es wurde keine einzige neue Bilddatei hinzugefügt.** Alle vier Kernelemente
+sind code-native Canvas-Grafik, einmal vorgerendert:
+
+| Element | Umsetzung |
 |---|---|
-| `XP_LATE_K` auf 0 (Bremse aus) | nur `lateProgression` |
-| Pfeilregen zurück auf `.82` | nur `weaponRoles` (Verhältnis 3,28 statt 2,72) |
-| Klinge wieder nur Mittelpunktprüfung | nur `weaponRoles` |
+| Orbitträger | 16 Posen (4 Idle, 6 Lauf, 6 Wurf), aufrecht, nur horizontal gespiegelt |
+| Sammlerdrohne | 6 asynchrone Phasen, sechseckiger Körper, heller Kern, Sammelarme |
+| AEGIS | eine große mechanische Silhouette mit Ring, Schultern und hellem Kern |
+| Klingenprojektil | 24 vorgedrehte Sicheln mit physischem Kern |
 
-Kein Check ist eine Tautologie, keiner reißt einen anderen mit.
+Runtime-Assetstand unverändert: vier PNG-Atlanten mit zusammen **5,8 MB**,
+größte Einzeldatei 1,87 MB. Beide Grenzen (rund 2 MB je Atlas, unter 10 MB
+gesamt) sind eingehalten. Neuer Provenienzeintrag **AP-003**, Status PROTOTYP;
+aus AP-001 und AP-002 wurde nichts ausgeschnitten.
 
-### Was `weaponRoles` genau prüft
+## Risiken und offene Punkte
 
-Die Klingenbahn liegt bei Stufe 2 auf exakt 74 Welteinheiten; ein Gegner in
-radialem Abstand d hat also |d − 74| Abstand zur Bahn. Damit lassen sich die
-drei Fälle exakt stellen, ohne in die Arrays zu schreiben:
+1. **Nicht umbenannt, weil nicht im Mandat:** die sechs Ausrüstungsteile
+   (Glutsehne, Krähenbogen, Sammlersiegel, Runenfibel, Pfadstiefel,
+   Rußmantel), die vier Elite-Relikte (Glutkern, Schrittzeichen, Sammlerauge,
+   Aschenhaut), die Kartensaat Runenfunke und die drei Meisterschaftsnamen
+   (Pfadkunde, Reichgriff, Stoßschule). Sie tragen weiterhin Fantasy-Vokabular
+   und sind damit die einzige verbliebene Bruchstelle im Ziel „konsistent
+   Sci-Fantasy". **Das ist eine Produktentscheidung für Codex.**
+2. **Abgeleitete Namen, die Codex bestätigen sollte:** Klingenverstärkung
+   (Stationsausbau), Impulsstoß (früher Ember-Stoß), Reparaturzelle (früher
+   Glutherz), Flux neu ausrichten (früher Schicksal neu deuten), Aufklärung
+   (früher Scharmützel) sowie die Überschriften „Systeme angehalten",
+   „Bergung sichern?" und „Signal verloren". Sie folgen direkt aus dem
+   Mandat, stehen aber nicht wörtlich darin.
+3. **Ein echter Namenskonflikt wurde behoben:** Der dauerhafte Stationsausbau
+   hieß zunächst exakt wie die Waffe „Orbitklinge" und war im HUD nicht mehr
+   von einem Waffenslot zu unterscheiden. Er heißt jetzt Klingenverstärkung.
+4. **Zwei echte Layoutfehler wurden nur durch Messung gefunden**, nicht durch
+   Ansehen: die Bossleiste über der linken HUD-Spalte bei 844×390 und die Uhr
+   auf dem Entwickler-Button bei 1280×720. Beide sind behoben — das ist ein
+   Hinweis darauf, dass weitere Formate ebenfalls gemessen werden sollten.
+5. **Die alten PNG-Atlanten zeigen weiterhin Fantasy-Figuren.** Sobald sie
+   laden, überschreiben sie Orbitträger und Sammlerdrohne. Die neuen
+   code-nativen Figuren greifen deshalb heute vor allem dort, wo die Atlanten
+   fehlen. AEGIS und das Klingenprojektil sind davon **nicht** betroffen — sie
+   haben Vorrang. Eine Ablösung der Atlanten ist ein eigener Auftrag.
+6. **Die Frostnova-Farbe** bleibt cyan wie die Orbittechnik. Bei dichtem Pulk
+   könnte das mit den Kernen der Sammlerdrohnen verschwimmen; das ist eine
+   Sichtfrage für den Feldlauf.
 
-| Fall | Abstand zur Bahn | Grenze | gemessen | erwartet |
-|---|---:|---|---:|---|
-| Normalgegner knapp außerhalb des Eigenradius | 20 | 17+9 = 26 | **638** | trifft ✓ |
-| Normalgegner klar zu weit | 40 | 17+9 = 26 | **0** | trifft nicht ✓ |
-| Warden | 40 | 17+30 = 47 | **863** | trifft ✓ |
+## Empfehlung an Codex
 
-Der mittlere Fall ist der wichtige: Er schließt aus, dass die Klinge nun
-weiter greift als erlaubt.
+**Abnehmen und den D-036-Feldlauf ansetzen.**
 
-Zusätzlich: Pfeilregen gegen normalen Splitterköcher im selben Fernfeld,
-Verhältnis **2,72** (vorher 3,28). Die Decke liegt bei 3,0, der Boden bei 2,0 —
-Pfeilregen bleibt deutlich stärker als der Grundköcher, ist aber keine
-automatische Wahl mehr.
+Alle vier Gates sind umgesetzt, 47/47 Checks sind grün, die Simulation ist über
+neun Seeds bitidentisch geblieben, und beide Pflichtformate sind messbar
+kollisionsfrei. Zwei neue Checks sichern genau das ab, was dieser Auftrag
+verspricht: die Namensabbildung ohne ID-Bruch und die Renderkosten im Pulk.
 
-### Bestätigung: Warden und Boss-Adds unverändert
+Vor dem Push bitte drei Dinge entscheiden:
 
-| Prüfung | Wert vorher | Wert nachher |
-|---|---:|---:|
-| `BOSS_ADD_TARGET` | 90 | **90** |
-| normale Gegner mit lebendem Warden | 90 | **90** |
-| normale Gegner ohne Warden | 127 | **127** |
-| Warden-HP-Faktor (`kind===2` → `hp*=120`) | unverändert | unverändert |
-| `bossTargeting`, `bossDurability`, `bossCombatPocket`, `bossLocatorState` | grün | grün |
+1. Sollen Ausrüstung, Relikte und Meisterschaften ebenfalls umbenannt werden
+   (Risiko 1)? Solange nicht, ist „konsistent Sci-Fantasy" nur teilweise
+   erreicht.
+2. Sind die abgeleiteten Namen aus Risiko 2 so in Ordnung?
+3. Soll ein eigener Auftrag die alten Fantasy-Atlanten ablösen (Risiko 5)?
 
-Im Diff ist keine Zeile der Warden-Logik, der Spawnkurve, von `targetEnemies`,
-des HUD oder der Safe-Areas enthalten.
-
-### Browser-Smoke bei 1422×613
-
-Echte Frames gerendert, programmatisch aus dem laufenden Canvas gelesen:
-
-- 20 `render()`-Durchläufe, Canvas 1422×613, 872 von 871 Stichproben nicht
-  schwarz — es wurde tatsächlich gezeichnet.
-- **Die Klinge trifft den Warden jetzt:** 2.823 Bossschaden (33 % Anteil).
-  Vor der Korrektur war das praktisch nicht möglich.
-- Alle drei Waffenzeilen im Bericht korrekt gefüllt.
-- Kein horizontaler Überlauf.
-
-**Was ich ausdrücklich nicht behaupte:** Der subjektive 8-Minuten-Test ist
-**nicht** bestanden — den fährt der Besitzer. Der Screenshot der Vorschau ist
-ein statischer Schnappschuss und taugt nicht zur Beurteilung des Spielgefühls;
-außerdem laden die PNG-Atlanten über die `data:`-URL nicht, es lief der
-prozedurale Fallback.
-
-## Bekannte Risiken
-
-1. **Der Bot-Anker hat nur noch 0,30 Reserve nach unten.** 19,00 gegen die
-   Untergrenze 18,70. Wichtig für die Bewertung: Der XP-Exponent ist dafür
-   **nicht** der Hebel — von `XP_LATE_K` 2,0 bis 3,25 bleiben die Kartenzüge
-   praktisch konstant (19,22 bis 19,00). Der Rückgang kommt zu etwa einem
-   Drittel aus der Klingenkorrektur und zu zwei Dritteln daraus, dass der Bot
-   die letzten Stufen nicht mehr erreicht. Eine mildere Bremse würde die
-   Reserve also nicht zurückholen. Ich habe den Anker **nicht** angefasst.
-2. **Der Pfeilregen-Nerf ist im Botlauf unsichtbar** (siehe oben). Erst der
-   nächste Feldlauf zeigt, ob −17,1 % das richtige Maß sind.
-3. **Die Klinge ist im Nahfeld-Benchmark sehr stark.** Ob sie im echten Run das
-   Risiko der Nahdistanz wert ist, entscheidet nur der Feldlauf. Wenn sie dort
-   überdreht, ist der nächste Schritt eine Senkung des Schadenswerts — die
-   Trefferkorrektur selbst sollte bestehen bleiben, sie behebt einen Fehler.
-4. **Der Zielkorridor 28–34 Kartenzüge ist am Menschen noch unbestätigt.** Der
-   synthetische Budgettest sagt Stufe 33, also 32 Kartenzüge. Die
-   Rückkopplung (weniger Stufen → weniger Schaden → weniger Erfahrung) drückt
-   den echten Wert zusätzlich nach unten, vermutlich Richtung 28–31.
-
-## Offene Punkte
-
-- `CHANGELOG.md`, `docs/DECISIONS.md` (D-036), `docs/TESTPLAN.md` und
-  `ROADMAP.md` sind bewusst **nicht** angefasst — laut Auftrag synchronisiert
-  Codex sie nach unabhängiger Prüfung.
-- Der vorbestehende Todesframe-Telemetriefehler bleibt unverändert offen.
-
-## Manuelle Abnahmeschritte
-
-**Für Codex:**
-
-1. `npm test` selbst ausführen — erwartet 45/45, Exitcode 0.
-2. Den Diff auf die vier Scope-Punkte prüfen; insbesondere bestätigen, dass
-   keine Warden-, Dichte-, HUD- oder Save-Zeile enthalten ist.
-3. Die Klingenkorrektur bewerten: Ist „Körperradius mitrechnen wie bei jedem
-   Projektil" als Fehlerbehebung akzeptiert, oder soll sie als Balancewert
-   behandelt und kleiner ausfallen?
-4. Über die Reserve am Bot-Anker entscheiden (Risiko 1) — ich habe ihn
-   bewusst nicht verändert.
-
-**Für den Besitzer** (nach Codex' Freigabe, ein vollständiger
-Wächterring-Lauf über 8 Minuten ohne Live-Tuning):
-
-1. Fühlen sich die ersten drei bis vier Minuten **genauso** an wie vorher? Bis
-   Stufe 20 wurde bewusst nichts geändert.
-2. Endet der Lauf bei ungefähr 28–34 Kartenzügen statt bei 46? Wird der
-   Fortschritt in der zweiten Hälfte spürbar langsamer, ohne blockiert zu
-   wirken?
-3. Bist du am Ende noch praktisch unbesiegbar, oder gibt es wieder brenzlige
-   Momente?
-4. Ist Pfeilregen weiterhin stark, aber nicht mehr automatisch die beste Wahl?
-5. Lohnt sich die Rundenklinge jetzt? Insbesondere: Merkst du sie im
-   Warden-Kampf?
-6. Danach den **vollständigen Run-Bericht** kopieren. Die neue Zeile
-   `Waffenverlauf` ist die Grundlage für die nächste Balance-Entscheidung.
-
-## Eingesetzter Subagent und eigene Nachprüfung
-
-Für den `lateProgression`-Testblock habe ich einen Haiku-Subagenten
-eingesetzt — eine klar abgegrenzte, rein arithmetische Aufgabe. Keine
-Produktentscheidung und keine Dokumentation wurden delegiert.
-
-Ich habe seinen vollständigen Diff geprüft und **drei Dinge selbst
-nachgebessert**:
-
-1. **Tote Variable:** `LK` (`XP_LATE_K`) wurde eingelesen, aber nie benutzt.
-   Ich habe daraus eine echte Prüfung gemacht: Der Zusatzfaktor muss exakt
-   `(L/20)^XP_LATE_K` sein. Ohne das wäre jede beliebige steigende Kurve grün
-   gewesen.
-2. **Off-by-one:** Seine Schleife zählte die *bezahlten* Stufen, nicht die
-   *erreichte* Stufe — der Korridor 30–34 wäre damit faktisch 31–35 gewesen.
-   Korrigiert auf die Semantik von `gainXP()`; der Wert lautet jetzt 33 statt
-   32.
-3. **Fehlende Selbstkontrolle:** Der Test bildete ein Referenzbudget, prüfte
-   aber nie, ob dieses Budget auf der alten Kurve wirklich Stufe 47 ergibt.
-   Ergänzt als `budgetStimmt` — jetzt fällt auf, wenn das Budget falsch
-   gebildet wurde.
-
-Anschließend habe ich die volle Suite selbst ausgeführt, den zweiten Check
-`weaponRoles` selbst geschrieben, alle Benchmarks selbst gefahren und die drei
-Mutationstests selbst durchgeführt. Analyse, Diagnose der Klinge, Wahl des
-XP-Exponenten und dieser Bericht stammen vollständig vom Hauptagenten.
-
-## Codex-Review vom 24.08.2026
-
-Codex hat den vollständigen Diff unabhängig geprüft und `npm test` selbst
-ausgeführt. Claudes vier Scope-Punkte sind akzeptiert; Warden, Dichte, Hold,
-HUD und Save-Pfad bleiben unverändert.
-
-Ein Review-Mangel wurde direkt behoben: `weaponTimelineText()` war im Browser
-geprüft, aber noch nicht automatisch gegen Regression abgesichert. Der
-bestehende Check `weaponDamageReport` prüft jetzt deterministisch Langbogen ab
-0:00 mit 4:00 Aktivzeit und 2/s sowie Sturmherz ab 1:00 mit 3:00 Aktivzeit,
-3/s und EVO 3:00; inaktive Waffen dürfen nicht erscheinen. Die erste
-Testerwartung verwendete trotz gesetzter Evolution den Namen `Kettenblitz` und
-wurde auf den korrekten Namen `Sturmherz` korrigiert. Endstand: **45/45 Checks
-grün**, `git diff --check` sauber. Empfehlung: technisch abnehmen und den
-D-036-Besitzerlauf starten.
+Danach ist der nächste Schritt laut Produktionsreihenfolge der menschliche
+Acht-Minuten-Lauf — und erst danach die echte Rückflugmechanik der
+Orbitklinge.

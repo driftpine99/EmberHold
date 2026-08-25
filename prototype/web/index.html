@@ -767,8 +767,9 @@ function famSprite(fam, color, size, glow){
 
 const ENEMY_NORMAL_TIER=2, ENEMY_TELEGRAPH_TIER=3;
 const SPR = { enemy:[], elite:null, boss:null, gem:null, gemBig:null,
-              arrow:[], orb:null, blade:null, frost:null, eproj:null,
-              floorTile:null, emberVent:null, wardPillar:null, starField:null };
+              arrow:[], orbBlade:[], orb:null, blade:null, frost:null, eproj:null,
+              floorTile:null, emberVent:null, wardPillar:null, starField:null,
+              orbiter:null, drone:null, aegis:null };
 const ART = { hero:[], enemy:[], swarmer:[], elite:null, boss:null,
               heroReady:false, enemyReady:false, swarmerReady:false };
 const HERO_ANIM = Object.freeze({
@@ -870,8 +871,161 @@ function buildArenaSprites(){
   SPR.starField=sky;
 }
 
+
+// ===========================================================================
+//  ORBITBLADE-FIGUREN (D-038, Gate 4)
+//  Vollstaendig code-native und einmalig vorgerendert. Keine
+//  Konzeptillustration wurde ausgeschnitten, kein zusaetzliches PNG geladen.
+//  Der Node-Testpfad ohne `Image` erzeugt exakt dieselben Figuren.
+// ===========================================================================
+const ORBITER_ANIM = Object.freeze({IDLE:4, WALK:6, THROW:6, FPS:11});
+const DRONE_ANIM   = Object.freeze({FRAMES:6, FPS:11});
+
+/** Eine aufrechte Figur: Kopf, Rumpf, zwei Arme, zwei Beine. Sie wird nie
+ *  frei rotiert -- die Blickrichtung entsteht allein durch horizontales
+ *  Spiegeln beim Zeichnen. */
+function drawOrbiterPose(g, modus, t){
+  // t laeuft von 0 bis 1 innerhalb der jeweiligen Phase.
+  const schwung = Math.sin(t*6.2832);
+  const gold='#f0c45a', weiss='#fff3d0', schatten='#b8935a', visier='#7fd4e8';
+  let beinA=0, beinB=0, armA=0, armB=0, neigung=0, huefte=0;
+  if(modus==='walk'){
+    beinA= schwung*5.0; beinB=-schwung*5.0;
+    armA =-schwung*3.4; armB = schwung*3.4;
+    huefte= Math.abs(schwung)*0.9; neigung=0.05;
+  } else if(modus==='throw'){
+    // Ausholen, Wurf, Nachschwung -- der Wurfarm fuehrt die Bewegung.
+    const w = t<0.45 ? -t/0.45 : (t-0.45)/0.55;
+    armA = w*9.5; armB = -w*2.2; neigung = w*0.09;
+    beinA = 1.6; beinB = -1.6;
+  } else {
+    const atem = Math.sin(t*6.2832)*0.7;
+    armA = atem*0.8; armB = -atem*0.8; huefte = atem*0.35;
+  }
+
+  g.save();
+  g.translate(0, huefte);
+  g.rotate(neigung*0.12);
+
+  // Beine
+  g.strokeStyle=schatten; g.lineWidth=4.6; g.lineCap='round';
+  g.beginPath(); g.moveTo(-2.2, 6); g.lineTo(-3.4+beinA, 15.5); g.stroke();
+  g.beginPath(); g.moveTo( 2.2, 6); g.lineTo( 3.4+beinB, 15.5); g.stroke();
+
+  // Rumpf: schmale Taille, breite Schultern
+  g.fillStyle=weiss;
+  g.beginPath();
+  g.moveTo(-5.4,-6); g.lineTo(5.4,-6); g.lineTo(3.4,7); g.lineTo(-3.4,7);
+  g.closePath(); g.fill();
+  g.fillStyle=gold;
+  g.beginPath();
+  g.moveTo(-6.6,-7.2); g.lineTo(6.6,-7.2); g.lineTo(5.0,-2.4); g.lineTo(-5.0,-2.4);
+  g.closePath(); g.fill();
+
+  // Arme
+  g.strokeStyle=weiss; g.lineWidth=3.6;
+  g.beginPath(); g.moveTo(-5.6,-5); g.lineTo(-8.2+armA*0.6, 3.2+armA*0.5); g.stroke();
+  g.beginPath(); g.moveTo( 5.6,-5); g.lineTo( 8.2+armB*0.6, 3.2+armB*0.5); g.stroke();
+
+  // Kopf mit Cyan-Visier
+  g.fillStyle=weiss;
+  g.beginPath(); g.arc(0,-11.6,4.5,0,6.2832); g.fill();
+  g.fillStyle=gold;
+  g.beginPath(); g.arc(0,-13.0,4.5,3.34,6.08); g.fill();
+  g.fillStyle=visier;
+  g.fillRect(-2.6,-12.2,5.2,1.9);
+  g.restore();
+}
+
+/** Vier Idle-, sechs Lauf- und sechs Wurfposen. */
+function buildOrbiterSprites(){
+  const A=ORBITER_ANIM, out=[];
+  const mach=(modus,n)=>{
+    for(let k=0;k<n;k++){
+      const S2=48, cv=mkCanvas(S2), g=cv.getContext('2d');
+      g.translate(S2/2,S2/2+3);
+      // Kontaktschatten gehoert ins Sprite, damit er nicht pro Frame kostet.
+      g.fillStyle='rgba(10,14,26,.42)';
+      g.beginPath(); g.ellipse(0,17,9,3.2,0,0,6.2832); g.fill();
+      drawOrbiterPose(g, modus, k/n);
+      out.push(cv);
+    }
+  };
+  mach('idle',A.IDLE); mach('walk',A.WALK); mach('throw',A.THROW);
+  SPR.orbiter=out;
+}
+
+/** Sammlerdrohne: koerperliche Maschine mit hellem Kern, sechs asynchrone
+ *  Phasen. Bewusst kein Kreis und keine Schattenfigur. */
+function buildDroneSprites(){
+  const out=[];
+  for(let k=0;k<DRONE_ANIM.FRAMES;k++){
+    const t=k/DRONE_ANIM.FRAMES, puls=Math.sin(t*6.2832);
+    const S2=34, cv=mkCanvas(S2), g=cv.getContext('2d'), c=S2/2;
+    g.translate(c,c);
+    g.fillStyle='rgba(10,14,26,.34)';
+    g.beginPath(); g.ellipse(0,8,7,2.4,0,0,6.2832); g.fill();
+    // Zwei Sammelarme, gegenlaeufig
+    g.strokeStyle='#5d7398'; g.lineWidth=2.2; g.lineCap='round';
+    const arm=2.6+puls*1.7;
+    g.beginPath(); g.moveTo(-4.5,1); g.lineTo(-7.5-arm, 4+arm*0.4); g.stroke();
+    g.beginPath(); g.moveTo( 4.5,1); g.lineTo( 7.5+arm, 4+arm*0.4); g.stroke();
+    // Sechseckiger Rumpf
+    g.fillStyle='#8fa8c8';
+    g.beginPath();
+    for(let i=0;i<6;i++){ const a=i*1.0472-0.5236, x=Math.cos(a)*7.4, y=Math.sin(a)*6.2;
+      i?g.lineTo(x,y):g.moveTo(x,y); }
+    g.closePath(); g.fill();
+    g.strokeStyle='#c9dcf2'; g.lineWidth=1.1; g.stroke();
+    // Heller Kern, pulsierend
+    g.fillStyle='#b8f0ff';
+    g.beginPath(); g.arc(0,0,2.4+puls*0.5,0,6.2832); g.fill();
+    // Antriebsmarke hinten
+    g.fillStyle='rgba(127,212,232,'+(0.45+puls*0.25).toFixed(2)+')';
+    g.fillRect(-1.6,5.4,3.2,2.0);
+    out.push(cv);
+  }
+  SPR.drone=out;
+}
+
+/** AEGIS: klare mechanische Bosssilhouette mit hellem Kern. Deutlich groesser
+ *  als jede normale Einheit, damit er auch im Pulk sofort auffaellt. */
+function buildAegisSprite(){
+  const S2=104, cv=mkCanvas(S2), g=cv.getContext('2d'), c=S2/2;
+  g.translate(c,c);
+  g.fillStyle='rgba(8,10,20,.44)';
+  g.beginPath(); g.ellipse(0,26,26,8,0,0,6.2832); g.fill();
+  // Aeusserer Ring
+  g.strokeStyle='#6a4a78'; g.lineWidth=4;
+  g.beginPath(); g.arc(0,0,33,0,6.2832); g.stroke();
+  g.strokeStyle='#ff5a8a'; g.lineWidth=1.6;
+  for(let i=0;i<8;i++){ const a=i*0.7854;
+    g.beginPath(); g.moveTo(Math.cos(a)*29,Math.sin(a)*29);
+    g.lineTo(Math.cos(a)*37,Math.sin(a)*37); g.stroke(); }
+  // Schultern
+  g.fillStyle='#3d4a6b';
+  g.beginPath(); g.moveTo(-27,-6); g.lineTo(-15,-17); g.lineTo(-11,-2); g.lineTo(-22,7); g.closePath(); g.fill();
+  g.beginPath(); g.moveTo( 27,-6); g.lineTo( 15,-17); g.lineTo( 11,-2); g.lineTo( 22,7); g.closePath(); g.fill();
+  // Achteckiger Rumpf
+  g.fillStyle='#55628a';
+  g.beginPath();
+  for(let i=0;i<8;i++){ const a=i*0.7854+0.3927, x=Math.cos(a)*17, y=Math.sin(a)*19;
+    i?g.lineTo(x,y):g.moveTo(x,y); }
+  g.closePath(); g.fill();
+  g.strokeStyle='#9fb4d8'; g.lineWidth=2; g.stroke();
+  // Heller Kern
+  g.fillStyle='#fff3d0';
+  g.beginPath(); g.arc(0,-2,7.2,0,6.2832); g.fill();
+  g.fillStyle='#ff5a8a';
+  g.beginPath(); g.arc(0,-2,3.4,0,6.2832); g.fill();
+  SPR.aegis=cv;
+}
+
 function buildSprites(){
   buildArenaSprites();
+  buildOrbiterSprites();
+  buildDroneSprites();
+  buildAegisSprite();
   const sizes=[7,8,8,7,9];
   for (let f=0; f<5; f++){
     SPR.enemy[f]=[];
@@ -898,12 +1052,31 @@ function buildSprites(){
   for (let i=0;i<24;i++){
     const a=i/24*6.2832, S=30, cv=mkCanvas(S), g=cv.getContext('2d');
     g.translate(S/2,S/2); g.rotate(a);
-    g.shadowColor='#ffc48a'; g.shadowBlur=7;
-    g.strokeStyle='#ffd9ae'; g.lineWidth=2.4; g.lineCap='round';
+    g.shadowColor='#d4a94a'; g.shadowBlur=7;
+    g.strokeStyle='#f5e6b8'; g.lineWidth=2.4; g.lineCap='round';
     g.beginPath(); g.moveTo(-8,0); g.lineTo(7,0); g.stroke();
-    g.fillStyle='#ffd9ae'; g.beginPath();
+    g.fillStyle='#f5e6b8'; g.beginPath();
     g.moveTo(10,0); g.lineTo(4,-3.2); g.lineTo(4,3.2); g.closePath(); g.fill();
     SPR.arrow[i]=cv;
+  }
+  // Orbitklinge: gebogene Photonenschneide mit physischem Kern. Ebenfalls in
+  // 24 Richtungen vorgedreht, damit im Flug nur ein drawImage anfaellt.
+  for (let i=0;i<24;i++){
+    const a=i/24*6.2832, S=34, cv=mkCanvas(S), g=cv.getContext('2d');
+    g.translate(S/2,S/2); g.rotate(a);
+    // Schneide: zwei gegenlaeufige Boegen bilden eine schlanke Sichel.
+    g.fillStyle='rgba(127,212,232,.30)';
+    g.beginPath(); g.arc(0,0,13,-0.95,0.95); g.arc(6,0,9.5,0.95,-0.95,true);
+    g.closePath(); g.fill();
+    g.strokeStyle='#e6fcff'; g.lineWidth=1.7; g.lineJoin='round';
+    g.beginPath(); g.arc(0,0,13,-0.95,0.95); g.stroke();
+    // Kern: der physische Teil der Waffe, klar vom Leuchten getrennt.
+    g.fillStyle='#f0c45a';
+    g.beginPath(); g.moveTo(-7,0); g.lineTo(-1,-3.1); g.lineTo(3,0); g.lineTo(-1,3.1);
+    g.closePath(); g.fill();
+    g.fillStyle='#fff3d0';
+    g.beginPath(); g.arc(-1,0,1.7,0,6.2832); g.fill();
+    SPR.orbBlade[i]=cv;
   }
 }
 
@@ -2505,9 +2678,9 @@ function drawAelric(){
   // Ein kuehler Aschefleck und ein kleiner Kontaktschatten trennen die dunkle
   // Ruestung vom Basalt. Die Markierung bleibt Teil der Beleuchtung, nicht UI.
   const aura=ctx.createRadialGradient(S.x,S.y+7,2,S.x,S.y+7,38);
-  aura.addColorStop(0,'rgba(151,161,172,.16)'); aura.addColorStop(1,'rgba(151,161,172,0)');
+  aura.addColorStop(0,'rgba(240,196,90,.16)'); aura.addColorStop(1,'rgba(240,196,90,0)');
   ctx.fillStyle=aura; ctx.beginPath(); ctx.arc(S.x,S.y+7,38,0,6.2832); ctx.fill();
-  ctx.fillStyle='rgba(3,4,7,.48)';
+  ctx.fillStyle='rgba(10,14,26,.40)';
   ctx.beginPath(); ctx.ellipse(S.x,S.y+16,19,7,0,0,6.2832); ctx.fill();
   if(blink) return;
 
@@ -2553,15 +2726,35 @@ function drawAelric(){
     return;
   }
 
-  // Offline-/Fehler-Fallback, damit die HTML-Datei immer spielbar bleibt.
-  ctx.fillStyle='rgba(13,13,19,0.85)';
-  ctx.beginPath(); ctx.arc(S.x,S.y,15,0,6.2832); ctx.fill();
-  ctx.shadowColor=COL.playerCore; ctx.shadowBlur=26; ctx.fillStyle=COL.player;
-  ctx.beginPath(); ctx.arc(S.x,S.y,11,0,6.2832); ctx.fill(); ctx.shadowBlur=0;
-  ctx.fillStyle=COL.playerCore; ctx.beginPath(); ctx.arc(S.x,S.y,5.5,0,6.2832); ctx.fill();
-  ctx.strokeStyle='rgba(255,196,138,.55)'; ctx.lineWidth=2.4; ctx.lineCap='round';
-  ctx.beginPath(); ctx.moveTo(S.x+S.aimx*13,S.y+S.aimy*13);
-  ctx.lineTo(S.x+S.aimx*21,S.y+S.aimy*21); ctx.stroke();
+  // Orbittraeger: aufrechte weissgoldene Figur mit Kopf, Rumpf, Armen und
+  // Beinen. Sie wird ausschliesslich horizontal gespiegelt, nie frei rotiert.
+  // Alle Posen sind vorgerendert -- hier faellt nur ein drawImage an.
+  if(SPR.orbiter){
+    const A=ORBITER_ANIM;
+    let idx;
+    if(S.bowKick>0){
+      const rel=Math.max(0,Math.min(.999,1-S.bowKick/HERO_ANIM.SHOT_SEC));
+      idx=A.IDLE+A.WALK+((rel*A.THROW)|0);
+    } else if(S.moveBlend>.24){
+      idx=A.IDLE+Math.min(A.WALK-1,(S.walkPhase*A.WALK)|0);
+    } else {
+      idx=((S.visualT*3)|0)%A.IDLE;
+    }
+    const spr=SPR.orbiter[idx];
+    const bob=Math.sin(S.walkPhase*6.2832)*.45*S.moveBlend*(1-S.dashBlend);
+    ctx.save(); ctx.translate(S.x,S.y-6-bob); ctx.scale(S.heroFacing,1);
+    if(S.dashBlend>.04){
+      ctx.globalAlpha=.12*S.dashBlend;
+      ctx.drawImage(spr,-spr.width/2-14,-spr.height/2);
+      ctx.globalAlpha=1;
+    }
+    ctx.drawImage(spr,-spr.width/2,-spr.height/2);
+    ctx.restore();
+    return;
+  }
+  // Letzter Notfallpfad, damit die Datei immer spielbar bleibt.
+  ctx.fillStyle=COL.player;
+  ctx.beginPath(); ctx.arc(S.x,S.y,11,0,6.2832); ctx.fill();
 }
 
 function render(){
@@ -2589,13 +2782,13 @@ function render(){
 
   // --- Lichtkreis: die Farbe kehrt mit deiner Macht zurück ---------------
   const grd = ctx.createRadialGradient(S.x,S.y,0,S.x,S.y,lr);
-  grd.addColorStop(0,   'rgba(224,122,63,0.135)');
-  grd.addColorStop(0.42,'rgba(224,122,63,0.072)');
-  grd.addColorStop(0.78,'rgba(224,122,63,0.028)');
-  grd.addColorStop(1,   'rgba(224,122,63,0)');
+  grd.addColorStop(0,   'rgba(240,196,90,0.115)');
+  grd.addColorStop(0.42,'rgba(150,200,235,0.062)');
+  grd.addColorStop(0.78,'rgba(120,170,225,0.026)');
+  grd.addColorStop(1,   'rgba(120,170,225,0)');
   ctx.fillStyle=grd;
   ctx.beginPath(); ctx.arc(S.x,S.y,lr,0,6.2832); ctx.fill();
-  ctx.strokeStyle='rgba(224,122,63,0.045)'; ctx.lineWidth=8/SCALE;
+  ctx.strokeStyle='rgba(127,212,232,0.05)'; ctx.lineWidth=8/SCALE;
   ctx.beginPath(); ctx.arc(S.x,S.y,lr*0.985,0,6.2832); ctx.stroke();
 
   // Boss-Vorschauen liegen unter Figuren und Projektilen, aber ueber dem Boden.
@@ -2650,11 +2843,16 @@ function render(){
       if(f===0&&ART.swarmerReady){
         const frame=((S.visualT*SWARMER_ANIM.FPS+i*.73)|0)%SWARMER_ANIM.FRAMES;
         spr=ART.swarmer[frame][dir];
+      } else if(f===0&&SPR.drone){
+        // Sammlerdrohne, code-native: sechs Phasen, durch den Index versetzt,
+        // damit der Pulk nicht im Gleichschritt pulsiert.
+        spr=SPR.drone[((S.visualT*DRONE_ANIM.FPS+i*.61)|0)%DRONE_ANIM.FRAMES];
       } else {
         spr=artSet?artSet[dir]:SPR.enemy[f][tier];
         if(artSet){ const phase=(S.visualT*(f===1?112:71))|0; bob=ENEMY_BOB[(phase+i*8)&63]; }
       }
-    } else if(ART.enemyReady) spr=E.kind[i]===2?ART.boss[dir]:ART.elite[dir];
+    } else if(E.kind[i]===2&&SPR.aegis) spr=SPR.aegis;
+    else if(ART.enemyReady) spr=E.kind[i]===2?ART.boss[dir]:ART.elite[dir];
     else spr=E.kind[i]===2?SPR.boss:SPR.elite;
     const hw=spr.width/2;
     ctx.drawImage(spr,x-hw,y-hw+bob);
@@ -2681,7 +2879,11 @@ function render(){
     else {
       let a = Math.atan2(P.vy[i],P.vx[i]); if (a<0) a+=6.2832;
       const idx = ((a/6.2832*24)|0)%24;
-      ctx.drawImage(SPR.arrow[idx], P.x[i]-15, P.y[i]-15);
+      // Nur die Orbitklinge fliegt als Klinge; alles andere bleibt Geschoss.
+      // Reine Darstellung: P.src aendert weder Flug noch Treffer.
+      if (P.src[i]===W_IDX.bogen && SPR.orbBlade.length)
+        ctx.drawImage(SPR.orbBlade[idx], P.x[i]-17, P.y[i]-17);
+      else ctx.drawImage(SPR.arrow[idx], P.x[i]-15, P.y[i]-15);
     }
   }
   // --- Rundenklingen ------------------------------------------------------
