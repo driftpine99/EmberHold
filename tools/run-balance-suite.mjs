@@ -837,11 +837,14 @@ try {
                 ore:0,bars:0,essence:0,marks:0,preparedRerolls:0,
                 masteries:{path:0,reach:0,dash:0}};
   const stufen = [
-    ["frisch",        {},                                                  "Tiefmine"],
-    ["nach Mine",     {mineLevel:1, ore:6},                                "Emberschmiede"],
-    ["nach Schmiede", {mineLevel:1, forgeLevel:1, bars:1},                 "Wächterbogen"],
-    ["nach Bogen",    {mineLevel:1, forgeLevel:1, bowUpgrade:1, ore:9},    "Arkanum"],
-    ["nach Arkanum",  {mineLevel:1, forgeLevel:1, bowUpgrade:1, arcanumLevel:1, bars:2}, "Übungshof"],
+    // Erwartungen kommen aus der Praesentationsschicht, nicht aus fest
+    // eingetippten Namen: Eine spaetere Umbenennung darf diesen Check nicht
+    // brechen, solange die Leiter selbst stimmt.
+    ["frisch",        {},                                                  engine.LEX.modul.mine],
+    ["nach Mine",     {mineLevel:1, ore:6},                                engine.LEX.modul.forge],
+    ["nach Schmiede", {mineLevel:1, forgeLevel:1, bars:1},                 engine.LEX.w.bogen],
+    ["nach Bogen",    {mineLevel:1, forgeLevel:1, bowUpgrade:1, ore:9},    engine.LEX.modul.arcanum],
+    ["nach Arkanum",  {mineLevel:1, forgeLevel:1, bowUpgrade:1, arcanumLevel:1, bars:2}, engine.LEX.modul.yard],
     ["alles gebaut",  {mineLevel:1, forgeLevel:1, bowUpgrade:1, arcanumLevel:1, yardLevel:1,
                        preparedRerolls:C.REROLL_CAP, masteries:{path:2,reach:2,dash:2}}, "Sortie"],
   ];
@@ -1400,14 +1403,15 @@ try {
   engine.S.dmgW[IDX.bogen] = 480;
   engine.S.dmgW[IDX.blitz] = 540;
   const zeile = engine.weaponDamageText("dmgW");
-  const berichtNurAktive = zeile.includes("Langbogen") && zeile.includes("Sturmherz") &&
-    !zeile.includes("Frostnova") && !zeile.includes("Rundenklinge");
+  const L = engine.LEX;
+  const berichtNurAktive = zeile.includes(L.w.bogen) && zeile.includes(L.evo.blitz) &&
+    !zeile.includes(L.w.frost) && !zeile.includes(L.w.klinge);
   const verlauf = engine.weaponTimelineText();
-  const verlaufStimmt = verlauf.includes("Langbogen ab 0:00") &&
+  const verlaufStimmt = verlauf.includes(L.w.bogen+" ab 0:00") &&
     verlauf.includes("4:00 aktiv") && verlauf.includes("2/s") &&
-    verlauf.includes("Sturmherz ab 1:00") && verlauf.includes("3:00 aktiv") &&
+    verlauf.includes(L.evo.blitz+" ab 1:00") && verlauf.includes("3:00 aktiv") &&
     verlauf.includes("3/s") && verlauf.includes("EVO 3:00") &&
-    !verlauf.includes("Frostnova") && !verlauf.includes("Rundenklinge");
+    !verlauf.includes(L.w.frost) && !verlauf.includes(L.w.klinge);
   const bericht = engine.runReportText();
   const berichtZeilen = bericht.includes("Schaden je Waffe:") &&
     bericht.includes("Boss-Schaden je Waffe:") &&
@@ -1600,9 +1604,98 @@ try {
   weaponRolesError = error instanceof Error ? error.message : String(error);
 }
 
+// --- EH-2026-08-24-02 / D-038: Praesentationsschicht ------------------------
+// Sichtbare Namen sind Sci-Fantasy, interne IDs und der Save-Key bleiben
+// Emberhold. Geprueft wird beides gleichzeitig: Ein naiver Test, der das
+// Verschwinden alter Begriffe aus dem Quelltext verlangt, waere falsch --
+// genau diese Begriffe muessen in IDs und Migrationen erhalten bleiben.
+let presentationLayer = false;
+let presentationError = "";
+let presentationDiagnostics = null;
+try {
+  const L = engine.LEX;
+
+  // 1. Die Abbildung ist vollstaendig -- abgeleitet aus den Laufzeitarrays,
+  //    nicht aus einer zweiten handgepflegten Liste.
+  const alleWaffen = engine.WEAPONS.every(w => !!L.w[w.id] && !!L.evo[w.id]);
+  const allePassive = engine.PASSIVES.every(p => !!L.p[p.id]);
+  const alleSektoren = engine.CONTRACTS.every(c => !!L.sektor[c.id]);
+  const abbildungVollstaendig = alleWaffen && allePassive && alleSektoren;
+
+  // 2. Die Abbildung wird auch wirklich benutzt.
+  const namenGesetzt = engine.WEAPONS.every(w => w.name === L.w[w.id] && w.evo.name === L.evo[w.id]) &&
+    engine.PASSIVES.every(p => p.name === L.p[p.id]) &&
+    engine.CONTRACTS.every(c => c.name === L.sektor[c.id]);
+  const familienUmbenannt = engine.FAMNAME.length === 5 &&
+    engine.FAMNAME.every(n => typeof n === "string" && n.length > 3) &&
+    !engine.FAMNAME.includes("Schwärmer") && !engine.FAMNAME.includes("Wahrer");
+
+  // 3. Interne IDs sind unveraendert. Das ist die Save-Kompatibilitaet.
+  const idsUnveraendert =
+    engine.WEAPONS.map(w => w.id).join(",") === "bogen,splitter,kugel,blitz,klinge,frost" &&
+    engine.PASSIVES.map(p => p.id).join(",") === "sehne,koecher,federung,wetz,linse,magnet,amulett,umhang" &&
+    engine.CONTRACTS.map(c => c.id).join(",") === "ring,breach,hollow" &&
+    engine.WEAPONS.every(w => !!engine.W_IDX[w.id] || w.id === "bogen");
+
+  // 4. Der Save-Key bleibt emberhold:hold:v1 und ein v4-Stand ueberlebt
+  //    Speichern und Neuladen verlustfrei. Kein Quelltextvergleich, sondern
+  //    ein echter Rundlauf durch localStorage.
+  localStorage.setItem("emberhold:hold:v1", JSON.stringify({
+    version: 4, ore: 33, bars: 7, essence: 2, marks: 1, dust: 14, runs: 9,
+    mineLevel: 1, forgeLevel: 1, bowUpgrade: 1, arcanumLevel: 1, yardLevel: 1,
+    selectedContract: "hollow", preparedRerolls: 1,
+    masteries: { path: 1, reach: 2, dash: 0 },
+    gearOwned: { glutsehne: 2 }, gearEquipped: { weapon: "glutsehne", charm: null, mantle: null },
+    lastAt: 1000,
+  }));
+  engine.loadHold(1000);
+  const geladen = JSON.stringify(engine.H);
+  engine.saveHold();
+  engine.loadHold(1000);
+  // Bewusst NICHT gegen den Rohwert 33 pruefen: Der Materiefabrikator
+  // verbraucht beim Laden planmaessig 5 Asterit fuer die naechste Charge.
+  // Entscheidend ist, dass der Rundlauf nichts verliert oder veraendert.
+  const roundtripVerlustfrei = JSON.stringify(engine.H) === geladen &&
+    engine.H.version === 4 && engine.H.dust === 14 &&
+    engine.H.selectedContract === "hollow" && engine.H.gearOwned.glutsehne === 2 &&
+    engine.H.masteries.reach === 2 && engine.H.bowUpgrade === 1 &&
+    engine.H.preparedRerolls === 1 && engine.H.runs === 9;
+  const keyUnveraendert = !!localStorage.getItem("emberhold:hold:v1");
+
+  // 5. Der Run-Bericht zeigt sichtbare Namen, keine internen IDs.
+  engine.begin(480, "ring");
+  engine.S.W = { bogen: 3, frost: 1 }; engine.S.Pa = { sehne: 2 }; engine.S.evo = {};
+  engine.S.t = 480; engine.S.result = "Extrahiert";
+  const bericht = engine.runReportText();
+  const berichtZeigtNeueNamen = bericht.includes(L.produkt.toUpperCase()) &&
+    bericht.includes(L.w.bogen) && bericht.includes(L.w.frost) &&
+    bericht.includes(L.res.ore) && bericht.includes(L.res.loot) && bericht.includes(L.heal);
+  const berichtOhneAlteNamen = ["Langbogen", "Frostnova", "Eisenerz", "Basis-Beute",
+    "Gluttropfen", "EMBERHOLD"].every(alt => !bericht.includes(alt));
+  // Interne IDs duerfen nie im sichtbaren Bericht stehen.
+  const berichtOhneIds = !/\b(bogen|splitter|kugel|blitz|klinge|frost|koecher|wetz)\b/.test(bericht);
+
+  // 6. LEX ist eingefroren: Es kann im Renderpfad nicht versehentlich
+  //    beschrieben werden und erzeugt beim Lesen keine Allokation.
+  const eingefroren = Object.isFrozen(L) && Object.isFrozen(L.w) &&
+    Object.isFrozen(L.evo) && Object.isFrozen(L.p) && Object.isFrozen(L.sektor) &&
+    Object.isFrozen(L.res) && Object.isFrozen(L.modul);
+
+  presentationLayer = abbildungVollstaendig && namenGesetzt && familienUmbenannt &&
+    idsUnveraendert && roundtripVerlustfrei && keyUnveraendert &&
+    berichtZeigtNeueNamen && berichtOhneAlteNamen && berichtOhneIds && eingefroren;
+  presentationDiagnostics = { abbildungVollstaendig, namenGesetzt, familienUmbenannt,
+    idsUnveraendert, roundtripVerlustfrei, keyUnveraendert, berichtZeigtNeueNamen,
+    berichtOhneAlteNamen, berichtOhneIds, eingefroren,
+    produkt: L.produkt, boss: L.bossRolle + ": " + L.boss,
+    familien: engine.FAMNAME.slice() };
+} catch (error) {
+  presentationError = error instanceof Error ? error.message : String(error);
+}
+
 const output = {
-  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && slotLayout && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && contractFlow && holdExpansion && equipmentFlow && evolutionCatalog && eliteChoices && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling && fpsMetrics && reportHardened && healOrbFlow && holdGoalLadder && oreCurve && earlyLossGuard && bossCombatPocket && bossLocatorState && compactCombatHud && evolutionCompletion && weaponDamageReport && lateProgression && weaponRoles,
-  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, slotLayout, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, contractFlow, holdExpansion, equipmentFlow, evolutionCatalog, eliteChoices, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling, fpsMetrics, reportHardened, healOrbFlow, holdGoalLadder, oreCurve, earlyLossGuard, bossCombatPocket, bossLocatorState, compactCombatHud, evolutionCompletion, weaponDamageReport, lateProgression, weaponRoles },
+  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && slotLayout && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && contractFlow && holdExpansion && equipmentFlow && evolutionCatalog && eliteChoices && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling && fpsMetrics && reportHardened && healOrbFlow && holdGoalLadder && oreCurve && earlyLossGuard && bossCombatPocket && bossLocatorState && compactCombatHud && evolutionCompletion && weaponDamageReport && lateProgression && weaponRoles && presentationLayer,
+  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, slotLayout, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, contractFlow, holdExpansion, equipmentFlow, evolutionCatalog, eliteChoices, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling, fpsMetrics, reportHardened, healOrbFlow, holdGoalLadder, oreCurve, earlyLossGuard, bossCombatPocket, bossLocatorState, compactCombatHud, evolutionCompletion, weaponDamageReport, lateProgression, weaponRoles, presentationLayer },
   targets: report.targets,
   ueberschuss: report.ueberschuss,
   seeds: report.seeds,
@@ -1628,6 +1721,8 @@ if (evolutionCompletionError) output.evolutionCompletionError = evolutionComplet
 if (weaponDamageError) output.weaponDamageError = weaponDamageError;
 if (lateProgressionError) output.lateProgressionError = lateProgressionError;
 if (weaponRolesError) output.weaponRolesError = weaponRolesError;
+if (presentationError) output.presentationError = presentationError;
+if (presentationDiagnostics) output.summary.presentation = presentationDiagnostics;
 if (weaponRolesDiagnostics) output.summary.weaponRoles = weaponRolesDiagnostics;
 if (lateProgressionDiagnostics) output.summary.lateProgression = lateProgressionDiagnostics;
 if (bossPocketDiagnostics) output.summary.bossPocket = bossPocketDiagnostics;

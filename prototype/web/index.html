@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0d0d13">
-<title>EMBERHOLD — Prototyp Phase 0</title>
+<title>ORBITBLADE — Prototyp Phase 0</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{width:100%;height:100%;overflow:hidden;background:#0d0d13;
@@ -379,7 +379,7 @@ button.b.danger{background:#c9402e;color:#fff}
     <div id="topbar">
       <div id="clock">0:00</div>
       <div id="lvl">Stufe <b>1</b></div>
-      <div id="contracthud">Wächterring</div>
+      <div id="contracthud">Trümmerring</div>
       <div id="kills">0 Kills</div>
     </div>
     <div id="xpwrap"><div id="xpbar"></div></div>
@@ -393,13 +393,13 @@ button.b.danger{background:#c9402e;color:#fff}
   <div id="tune"><h4>Live-Tuning</h4><div id="tunerows"></div><div class="note">Wirkt sofort, auch mitten im Run. Taste <b style="color:#8b8577">T</b> blendet um. Nichts hiervon wird gespeichert — Neuladen setzt zurück.</div></div>
   <div id="dev"></div>
 
-  <div id="dash"><span>Stoß</span><canvas id="dashfill" width="78" height="78"></canvas></div>
+  <div id="dash"><span>Impuls</span><canvas id="dashfill" width="78" height="78"></canvas></div>
   <div id="joyring"></div><div id="joynub"></div>
   <div id="coach" role="status" aria-live="polite" aria-hidden="true">
     <span id="coachstep">1 / 3</span><div id="coachcopy"><b id="coachtitle">Bewegen</b><span id="coachtext"></span></div>
   </div>
   <div id="bossalert" role="alert" aria-live="assertive" aria-hidden="true"><b id="bossalerttitle"></b><span id="bossalerttext"></span></div>
-  <div id="bossbar" aria-hidden="true"><div id="bossbarhead"><span>Warden</span><b>Aschenhüter</b></div><div id="bosshp"><span id="bossfill"></span></div></div>
+  <div id="bossbar" aria-hidden="true"><div id="bossbarhead"><span>SEKTORBOSS</span><b>AEGIS</b></div><div id="bosshp"><span id="bossfill"></span></div></div>
   <div id="toast" role="status" aria-live="polite"></div>
 
   <!-- Kartenzug -->
@@ -412,52 +412,52 @@ button.b.danger{background:#c9402e;color:#fff}
   <!-- Hold / Start -->
   <div id="start" class="sheet holdsheet on" role="dialog" aria-modal="true" aria-hidden="false">
     <div class="holdhead">
-      <div><p class="kick">Kraterhold · Innerer Produktionsring</p><h1>Die letzte <span>Glut</span></h1></div>
+      <div><p class="kick">Orbitalstation · Innerer Ring</p><h1>Orbit<span>blade</span></h1></div>
       <div class="holdresources" aria-label="Ressourcen">
-        <div class="holdres"><b id="holdore">0</b><span>Eisenerz</span></div>
-        <div class="holdres"><b id="holdbars">0</b><span>Barren</span></div>
-        <div class="holdres"><b id="holdessence">0</b><span>Essenz</span></div>
-        <div class="holdres"><b id="holdmarks">0</b><span>Trainingsmarken</span></div>
-        <div class="holdres"><b id="holddust">0</b><span>Runenstaub</span></div>
+        <div class="holdres"><b id="holdore">0</b><span>Asterit</span></div>
+        <div class="holdres"><b id="holdbars">0</b><span>Legierungsplatten</span></div>
+        <div class="holdres"><b id="holdessence">0</b><span>Fluxkondensat</span></div>
+        <div class="holdres"><b id="holdmarks">0</b><span>Sim-Daten</span></div>
+        <div class="holdres"><b id="holddust">0</b><span>Modulfragmente</span></div>
         <div class="holdres"><b id="holdruns">0</b><span>Sortien</span></div>
       </div>
     </div>
     <div class="holdstage">
       <div class="crater" aria-hidden="true"></div><div class="embercore" aria-hidden="true"></div>
-      <div class="holdstatus" id="holdstatus">Der innere Ring wartet auf Reparaturen.</div>
+      <div class="holdstatus" id="holdstatus">Die Station wartet auf Reparaturen.</div>
       <div class="holdgoal" id="holdgoal"></div>
       <div class="holdgrid">
         <section class="holdbuilding" id="minecard">
-          <div class="buildingtop"><b>Tiefmine</b><span id="minelevel">Ruine</span></div>
-          <p>Fördert 1 Eisenerz alle 15 Sekunden. Lagerkapazität: 20.</p>
+          <div class="buildingtop"><b>Asteroidensonde</b><span id="minelevel">Offline</span></div>
+          <p>Fördert 1 Asterit alle 15 Sekunden. Lagerkapazität: 20.</p>
           <div class="prodbar"><i id="minebar"></i></div>
           <div class="buildingfoot"><span class="buildingstate" id="minestate">Noch nicht repariert</span><button class="smallaction" id="btnMine">Kostenlos reparieren</button></div>
         </section>
         <section class="holdbuilding" id="forgecard">
-          <div class="buildingtop"><b>Emberschmiede</b><span id="forgelevel">Ruine</span></div>
-          <p>Verarbeitet automatisch 5 Eisenerz in 30 Sekunden zu 1 Barren.</p>
+          <div class="buildingtop"><b>Materiefabrikator</b><span id="forgelevel">Offline</span></div>
+          <p>Verarbeitet automatisch 5 Asterit in 30 Sekunden zu 1 Legierungsplatte.</p>
           <div class="prodbar"><i id="forgebar"></i></div>
-          <div class="buildingfoot"><span class="buildingstate" id="forgestate">Benötigt 10 Eisenerz</span><button class="smallaction" id="btnForge">Reparieren · 10</button></div>
+          <div class="buildingfoot"><span class="buildingstate" id="forgestate">Benötigt 10 Asterit</span><button class="smallaction" id="btnForge">Reparieren · 10</button></div>
         </section>
         <section class="holdbuilding" id="arcanumcard">
-          <div class="buildingtop"><b>Arkanum</b><span id="arcanumlevel">Ruine</span></div>
-          <p>Verdichtet alle 45 Sekunden 1 Essenz. Lagerkapazität: 6.</p>
+          <div class="buildingtop"><b>Fluxlabor</b><span id="arcanumlevel">Offline</span></div>
+          <p>Verdichtet alle 45 Sekunden 1 Fluxkondensat. Lagerkapazität: 6.</p>
           <div class="prodbar"><i id="arcanumbar"></i></div>
-          <div class="buildingfoot"><span class="buildingstate" id="arcanumstate">Benötigt 15 Eisenerz</span><button class="smallaction" id="btnArcanum">Reparieren · 15</button></div>
+          <div class="buildingfoot"><span class="buildingstate" id="arcanumstate">Benötigt 15 Asterit</span><button class="smallaction" id="btnArcanum">Reparieren · 15</button></div>
         </section>
         <section class="holdbuilding" id="yardcard">
-          <div class="buildingtop"><b>Übungshof</b><span id="yardlevel">Ruine</span></div>
-          <p>Erzeugt alle 60 Sekunden 1 Trainingsmarke. Lagerkapazität: 4.</p>
+          <div class="buildingtop"><b>Simulationsdeck</b><span id="yardlevel">Offline</span></div>
+          <p>Erzeugt alle 60 Sekunden 1 Sim-Datensatz. Lagerkapazität: 4.</p>
           <div class="prodbar"><i id="yardbar"></i></div>
-          <div class="buildingfoot"><span class="buildingstate" id="yardstate">Benötigt 3 Barren</span><button class="smallaction" id="btnYard">Reparieren · 3</button></div>
+          <div class="buildingfoot"><span class="buildingstate" id="yardstate">Benötigt 3 Legierungsplatten</span><button class="smallaction" id="btnYard">Reparieren · 3</button></div>
         </section>
       </div>
       <div class="holdlower">
-        <section class="holdupgrade" id="bowupgrade"><div><b>Wächterbogen verstärken</b><p>2 Barren · dauerhaft +10 % Schaden in Sortien</p></div><button class="smallaction" id="btnBowUpgrade">Verstärken</button></section>
-        <section class="holdupgrade" id="rerollprep"><div><b>Schicksal neu deuten</b><p>2 Essenz · +1 Reroll im nächsten Run · maximal 2</p></div><button class="smallaction" id="btnPrepareReroll">Vorbereiten</button></section>
+        <section class="holdupgrade" id="bowupgrade"><div><b>Orbitklinge verstärken</b><p>2 Legierungsplatten · dauerhaft +10 % Schaden in Sortien</p></div><button class="smallaction" id="btnBowUpgrade">Verstärken</button></section>
+        <section class="holdupgrade" id="rerollprep"><div><b>Flux neu ausrichten</b><p>2 Fluxkondensat · +1 Reroll im nächsten Run · maximal 2</p></div><button class="smallaction" id="btnPrepareReroll">Vorbereiten</button></section>
       </div>
       <section class="masterybox" id="masterybox">
-        <div class="masteryhead"><b>Aelrics Übungspfad</b><span>Utility · maximal Stufe 2</span></div>
+        <div class="masteryhead"><b>Simulationsdeck</b><span>Utility · maximal Stufe 2</span></div>
         <div class="masterygrid">
           <div class="masterytile"><div><b>Pfadkunde <em id="masterypath">0/2</em></b><span>+5 % Lauftempo je Stufe</span></div><button class="smallaction" id="btnMasteryPath">Lernen</button></div>
           <div class="masterytile"><div><b>Reichgriff <em id="masteryreach">0/2</em></b><span>+10 % Aufsammelradius je Stufe</span></div><button class="smallaction" id="btnMasteryReach">Lernen</button></div>
@@ -465,24 +465,24 @@ button.b.danger{background:#c9402e;color:#fff}
         </div>
       </section>
       <section class="armorybox">
-        <div class="masteryhead"><b>Rüstkammer</b><span>3 Slots · Duplikate werden Staub</span></div>
+        <div class="masteryhead"><b>Ausrüstungsbucht</b><span>3 Slots · Duplikate werden Modulfragmente</span></div>
         <div class="geargrid" id="geargrid"></div>
       </section>
     </div>
     <div class="holdsortie">
       <div class="contractboard">
-        <div><h2>Sortietafel</h2><span>Wähle Risiko und Ertrag</span></div>
+        <div><h2>Sternenkarte</h2><span>Wähle Sektor und Risiko</span></div>
         <div class="contractgrid" id="contractgrid"></div>
       </div>
-      <div class="btnrow"><button class="b" id="btnStart">Sortie · 8 Min</button><button class="b ghost" id="btnStart3">Scharmützel · 3 Min</button></div>
-      <p class="holdnote">Lokaler Prototyp · Offline-Produktion bis maximal 24 Stunden · Ton und weitere Ringe folgen später</p>
+      <div class="btnrow"><button class="b" id="btnStart">Sortie · 8 Min</button><button class="b ghost" id="btnStart3">Aufklärung · 3 Min</button></div>
+      <p class="holdnote">Lokaler Prototyp · Offline-Produktion bis maximal 24 Stunden · Ton und weitere Sektoren folgen später</p>
     </div>
   </div>
 
   <!-- Pause -->
   <div id="pause" class="sheet" role="dialog" aria-modal="true" aria-hidden="true">
     <p class="kick" id="pausekick">Run pausiert</p>
-    <h1>Die Glut wartet</h1>
+    <h1>Systeme angehalten</h1>
     <p class="sub">Kampf, Gegner und Timer stehen vollständig still.</p>
     <div class="statgrid" id="pausestats"></div>
     <div id="pausedetail"></div>
@@ -494,7 +494,7 @@ button.b.danger{background:#c9402e;color:#fff}
   <!-- Extraktion -->
   <div id="extract" class="sheet" role="dialog" aria-modal="true" aria-hidden="true">
     <p class="kick" id="extractkick">Extraktionsfenster offen</p>
-    <h1>Beute sichern?</h1>
+    <h1>Bergung sichern?</h1>
     <p class="sub">Deine Belohnung ist gebucht. Im Overtime steigt der Gegnerschaden
     alle 10 Sekunden um 15 %, die Belohnung um 50 % pro Minute.
     <b style="color:#e8e4dc">Ein Tod kostet nur den Overtime-Bonus — nie die Basis.</b></p>
@@ -508,12 +508,12 @@ button.b.danger{background:#c9402e;color:#fff}
   <!-- Ende -->
   <div id="over" class="sheet" role="dialog" aria-modal="true" aria-hidden="true">
     <p class="kick" id="overkick">Gefallen</p>
-    <h1 id="overtitle">Die Aschung hält</h1>
+    <h1 id="overtitle">Signal verloren</h1>
     <p class="sub" id="oversub"></p>
     <div class="statgrid" id="ovstats"></div>
     <div class="holdgoal" id="ovgoal"></div>
     <div class="btnrow">
-      <button class="b" id="btnMenu">Zum Hold</button>
+      <button class="b" id="btnMenu">Zur Station</button>
       <button class="b ghost" id="btnAgain">Gleichen Run wiederholen</button>
     </div>
     <button class="copyline" id="btnCopy">Run-Bericht kopieren</button>
@@ -668,7 +668,42 @@ const COL = {
   fam:['#6b7b8c','#c9402e','#9b7fb8','#7d9463','#d4a94a'],
   elite:'#ff8a4a', boss:'#e05038',
 };
-const FAMNAME = ['Schwärmer','Stürmer','Speier','Teiler','Wahrer'];
+// ===========================================================================
+//  PRÄSENTATIONSSCHICHT (D-038)
+//  Genau eine Stelle bildet interne IDs auf sichtbare Namen ab. Die IDs selbst
+//  ('bogen', 'ore', 'ring', der Save-Key emberhold:hold:v1) bleiben absichtlich
+//  unverändert -- ein Spielstand darf durch eine Umbenennung nie brechen.
+//  LEX ist eingefroren und wird nur gelesen: Im Renderpfad entsteht daraus
+//  keine einzige neue Allokation.
+// ===========================================================================
+const LEX = Object.freeze({
+  produkt:'Orbitblade',
+  hold:'Orbitalstation',
+  boss:'AEGIS',
+  bossRolle:'SEKTORBOSS',
+  held:'Orbitträger',
+  // Waffen: interne ID -> sichtbarer Name / Name der Evolution
+  w:Object.freeze({bogen:'Orbitklinge', splitter:'Impulskarabiner', kugel:'Plasmakern',
+                   blitz:'Kettenemitter', klinge:'Sentinel-Drohnen', frost:'Kryo-Impuls'}),
+  evo:Object.freeze({bogen:'Photonenschneise', splitter:'Sternenhagel', kugel:'Sonnenbruch',
+                     blitz:'Sturmnetz', klinge:'Orbitalschwarm', frost:'Nullpunkt'}),
+  // Passive Module
+  p:Object.freeze({sehne:'Vektorspule', koecher:'Munitionsmatrix', federung:'Gyrostabilisator',
+                   wetz:'Kantenresonator', linse:'Fokussierlinse', magnet:'Traktorarray',
+                   amulett:'Fluxrelais', umhang:'Schildmatrix'}),
+  // Sektoren (intern weiterhin Verträge)
+  sektor:Object.freeze({ring:'Trümmerring', breach:'Ionensturm', hollow:'Nullwrack'}),
+  // Ressourcen
+  res:Object.freeze({ore:'Asterit', bars:'Legierungsplatten', essence:'Fluxkondensat',
+                     marks:'Sim-Daten', dust:'Modulfragmente', loot:'Bergungswert'}),
+  // Stationsmodule
+  modul:Object.freeze({mine:'Asteroidensonde', forge:'Materiefabrikator', arcanum:'Fluxlabor',
+                       yard:'Simulationsdeck', armory:'Ausrüstungsbucht', map:'Sternenkarte'}),
+  heal:'Nanokapseln',
+});
+/** Sichtbarer Waffenname, Evolution eingeschlossen. Kein Objekt, nur ein String. */
+function weaponLabel(id, evolved){ return evolved ? LEX.evo[id] : LEX.w[id]; }
+const FAMNAME = ['Sammlerdrohnen','Rammjäger','Emitterdrohnen','Replikatorsonden','Bollwerkeinheiten'];
 
 // ===========================================================================
 //  SPRITE-ATLAS  (vorgerendert, dann per drawImage gezeichnet = schnell)
@@ -1015,14 +1050,14 @@ function nearEnemies(x,y,r,cb){
 //  WAFFEN & PASSIVE
 // ===========================================================================
 const CONTRACTS = Object.freeze([
-  {id:'ring',name:'Wächterring',tag:'Ausgewogen',col:'#e07a3f',
-   desc:'Die bekannte Warden-Sortie ohne zusätzliche Modifikatoren.',
+  {id:'ring',name:LEX.sektor.ring,tag:'Ausgewogen',col:'#7fd4e8',
+   desc:'Die bekannte AEGIS-Sortie ohne zusätzliche Modifikatoren.',
    reward:1,hp:1,speed:1,bias:[1,1,1,1,1],tint:'rgba(224,122,63,.018)'},
-  {id:'breach',name:'Sturmbruch',tag:'Schnell und offensiv',col:'#c85e49',
-   desc:'Mehr Stürmer und Speier. Gegner bewegen sich 8 % schneller.',
+  {id:'breach',name:LEX.sektor.breach,tag:'Schnell und offensiv',col:'#e08a3f',
+   desc:'Mehr Rammjäger und Emitterdrohnen. Gegner bewegen sich 8 % schneller.',
    reward:1.35,hp:1.08,speed:1.08,bias:[.65,2.3,1.55,.75,.8],tint:'rgba(172,55,48,.045)'},
-  {id:'hollow',name:'Aschengruft',tag:'Zäh und wertvoll',col:'#9b7fb8',
-   desc:'Mehr Teiler und Wahrer. Gegner besitzen 18 % mehr Leben.',
+  {id:'hollow',name:LEX.sektor.hollow,tag:'Zäh und wertvoll',col:'#9b7fb8',
+   desc:'Mehr Replikatorsonden und Bollwerkeinheiten. Gegner besitzen 18 % mehr Leben.',
    reward:1.55,hp:1.18,speed:1.03,bias:[1.15,.7,.75,1.9,2.2],tint:'rgba(108,76,145,.045)'},
 ]);
 const CONTRACT_BY_ID=Object.freeze(Object.fromEntries(CONTRACTS.map(c=>[c.id,c])));
@@ -1030,52 +1065,52 @@ function contractById(id){ return CONTRACT_BY_ID[id]||CONTRACTS[0]; }
 
 const BOONS=Object.freeze([
   {id:'fury',name:'Glutkern',col:'#e56f45',desc:'+18 % Schaden für diesen Run.'},
-  {id:'stride',name:'Schrittzeichen',col:'#8fa879',desc:'+12 % Lauftempo und 10 % kürzerer Ember-Stoß.'},
+  {id:'stride',name:'Schrittzeichen',col:'#8fa879',desc:'+12 % Lauftempo und 10 % kürzerer Impulsstoß.'},
   {id:'harvest',name:'Sammlerauge',col:'#6bb8d4',desc:'+25 % Aufsammelradius und +12 % Splitterwert.'},
   {id:'guard',name:'Aschenhaut',col:'#a5a1b2',desc:'+25 Max-HP, sofort geheilt, und 8 % Schadensschutz.'},
 ]);
 
 const WEAPONS = [
-  { id:'bogen', name:'Langbogen', col:'#e07a3f',
-    desc:'Priorisiert <b>Boss und Elite</b>, sonst das nächste Ziel. Durchbohrt.',
-    up:['+1 Durchbohrung','+40 % Schaden','+1 Durchbohrung','+35 % Tempo','+50 % Schaden'],
-    evo:{need:'sehne', name:'Windriss', col:'#ffb870',
-         desc:'Unbegrenzte Durchbohrung. Der Pfeil zieht eine Sogschneise, die Gegner hineinreißt.'} },
-  { id:'splitter', name:'Splitterköcher', col:'#d4a94a',
-    desc:'Fächer aus drei Pfeilen auf den nächsten Gegner.',
-    up:['+1 Pfeil','+35 % Schaden','+1 Pfeil','breiterer Fächer','+2 Pfeile'],
-    evo:{need:'koecher', name:'Pfeilregen', col:'#f0c45a',
-         desc:'Ein breiter 180°-Fächer deckt die gesamte Front mit durchbohrenden Pfeilen ein.'} },
-  { id:'kugel', name:'Feuerkugel', col:'#c9502e',
+  { id:'bogen', name:LEX.w.bogen, col:'#f0e0b8',
+    desc:'Priorisiert <b>Boss und Elite</b>, sonst das nächste Ziel. Durchschneidet.',
+    up:['+1 Durchschlag','+40 % Schaden','+1 Durchschlag','+35 % Tempo','+50 % Schaden'],
+    evo:{need:'sehne', name:LEX.evo.bogen, col:'#fff3d0',
+         desc:'Unbegrenzter Durchschlag. Die Klinge zieht eine Sogschneise, die Gegner hineinreißt.'} },
+  { id:'splitter', name:LEX.w.splitter, col:'#d4a94a',
+    desc:'Fächer aus drei Impulsgeschossen auf den nächsten Gegner.',
+    up:['+1 Geschoss','+35 % Schaden','+1 Geschoss','breiterer Fächer','+2 Geschosse'],
+    evo:{need:'koecher', name:LEX.evo.splitter, col:'#f0c45a',
+         desc:'Ein breiter 180°-Fächer deckt die gesamte Front mit durchschlagenden Impulsen ein.'} },
+  { id:'kugel', name:LEX.w.kugel, col:'#ff7a3f',
     desc:'Langsam, explodiert. Schaden steigt mit der <b>Zahl der Gegner</b> im Radius.',
-    up:['+30 % Radius','+40 % Schaden','+1 Kugel','+30 % Radius','+60 % Schaden'],
-    evo:{need:'linse', name:'Höllenschlund', col:'#ff6a3a',
-         desc:'Die Explosion hinterlässt brennenden Boden, der weiter Schaden verursacht.'} },
-  { id:'blitz', name:'Kettenblitz', col:'#9b7fb8',
+    up:['+30 % Radius','+40 % Schaden','+1 Kern','+30 % Radius','+60 % Schaden'],
+    evo:{need:'linse', name:LEX.evo.kugel, col:'#ff6a3a',
+         desc:'Die Detonation hinterlässt Plasmaglut, die weiter Schaden verursacht.'} },
+  { id:'blitz', name:LEX.w.blitz, col:'#b98fe0',
     desc:'Springt vom nächsten Gegner auf weitere über.',
     up:['+1 Sprung','+40 % Schaden','+1 Sprung','+30 % Tempo','+2 Sprünge'],
-    evo:{need:'amulett', name:'Sturmherz', col:'#c8a7e8',
+    evo:{need:'amulett', name:LEX.evo.blitz, col:'#c8a7e8',
          desc:'Schnelle Entladungen halten bis zu acht verschiedene Gegner unter Strom.'} },
-  { id:'klinge', name:'Rundenklinge', col:'#cfd8e3',
-    desc:'Klingen kreisen um dich und schneiden alles, was sie berühren.',
-    up:['+1 Klinge','+35 % Schaden','+1 Klinge','größerer Radius','+2 Klingen'],
-    evo:{need:'federung', name:'Klingenzyklon', col:'#f1f4f8',
-         desc:'Zwei zusätzliche Klingen. Bewegung beschleunigt den Ring und seinen Schaden.'} },
-  { id:'frost', name:'Frostnova', col:'#8fd4e8',
-    desc:'Pulsierender Ring um dich. Verlangsamt getroffene Gegner stark.',
+  { id:'klinge', name:LEX.w.klinge, col:'#8fe8d4',
+    desc:'Drohnen kreisen um dich und schneiden alles, was sie berühren.',
+    up:['+1 Drohne','+35 % Schaden','+1 Drohne','größerer Radius','+2 Drohnen'],
+    evo:{need:'federung', name:LEX.evo.klinge, col:'#c6fff0',
+         desc:'Zwei zusätzliche Drohnen. Bewegung beschleunigt den Ring und seinen Schaden.'} },
+  { id:'frost', name:LEX.w.frost, col:'#8fd4e8',
+    desc:'Pulsierender Stasisring um dich. Verlangsamt getroffene Gegner stark.',
     up:['+30 % Radius','+40 % Schaden','+30 % Tempo','längere Verlangsamung','+50 % Radius'],
-    evo:{need:'umhang', name:'Ewiger Winter', col:'#bdefff',
-         desc:'Schnelle Frostaura. Gefrorene Gegner zerspringen beim Tod und treffen ihre Nachbarn.'} },
+    evo:{need:'umhang', name:LEX.evo.frost, col:'#bdefff',
+         desc:'Schnelle Stasisaura. Erstarrte Gegner zerspringen beim Tod und treffen ihre Nachbarn.'} },
 ];
 const PASSIVES = [
-  { id:'sehne',  name:'Sehne',       col:'#e07a3f', desc:'+12 % Angriffstempo je Stufe.' },
-  { id:'koecher',name:'Köcher',      col:'#d4a94a', desc:'+1 Projektil je Stufe bei Mehrfachschuss-Waffen.' },
-  { id:'federung',name:'Federung',   col:'#7d9463', desc:'+8 % Lauftempo je Stufe.' },
-  { id:'wetz',   name:'Wetzstein',   col:'#c9402e', desc:'+15 % Schaden je Stufe.' },
-  { id:'linse',  name:'Linse',       col:'#9b7fb8', desc:'+18 % Wirkungsfläche je Stufe.' },
-  { id:'magnet', name:'Magnetstein', col:'#6bb8d4', desc:'+40 % Aufsammelradius je Stufe.' },
-  { id:'amulett',name:'Amulett',     col:'#b58fd1', desc:'+10 % Abklingtempo je Stufe.' },
-  { id:'umhang', name:'Umhang',      col:'#7893a5', desc:'−8 % erlittener Schaden je Stufe.' },
+  { id:'sehne',  name:LEX.p.sehne,   col:'#f0e0b8', desc:'+12 % Angriffstempo je Stufe.' },
+  { id:'koecher',name:LEX.p.koecher, col:'#d4a94a', desc:'+1 Projektil je Stufe bei Mehrfachschuss-Waffen.' },
+  { id:'federung',name:LEX.p.federung, col:'#8fe8d4', desc:'+8 % Lauftempo je Stufe.' },
+  { id:'wetz',   name:LEX.p.wetz,    col:'#ff7a3f', desc:'+15 % Schaden je Stufe.' },
+  { id:'linse',  name:LEX.p.linse,   col:'#b98fe0', desc:'+18 % Wirkungsfläche je Stufe.' },
+  { id:'magnet', name:LEX.p.magnet,  col:'#6bb8d4', desc:'+40 % Aufsammelradius je Stufe.' },
+  { id:'amulett',name:LEX.p.amulett, col:'#b58fd1', desc:'+10 % Abklingtempo je Stufe.' },
+  { id:'umhang', name:LEX.p.umhang,  col:'#7893a5', desc:'−8 % erlittener Schaden je Stufe.' },
 ];
 const GEAR=Object.freeze([
   {id:'glutsehne',slot:'weapon',slotName:'Waffe',name:'Glutsehne',rarity:'Gewöhnlich',
@@ -1592,7 +1627,7 @@ function killEnemy(i){
     S.bossIndex=-1; S.bossKills++;
     fx(x,y,150,0.7,COL.boss,1);
     for(let k=0;k<30;k++) spawnGem(x+(rand()-.5)*260, y+(rand()-.5)*260, 5);
-    toast('Mittelboss gefallen');
+    toast(LEX.bossRolle+' zerstört');
   } else if (kind===1){                            // Elite
     fx(x,y,80,0.5,COL.elite,1);
     for(let k=0;k<14;k++) spawnGem(x+(rand()-.5)*60, y+(rand()-.5)*60, 6);
@@ -1852,7 +1887,7 @@ function updateGems(dt){
       if (heal){
         S.hp = Math.min(S.maxhp, S.hp + S.maxhp*CFG.HEAL_ORB_PCT);
         S.healOrbs++;
-        if (!HEADLESS){ fx(S.x,S.y,42,.3,COL.heal,0); toast('Gluttropfen'); }
+        if (!HEADLESS){ fx(S.x,S.y,42,.3,COL.heal,0); toast(LEX.heal); }
       } else {
         gainXP(G.val[i]); S.gemsTaken++;
       }
@@ -1980,7 +2015,7 @@ function showCards(mode){
       lvtxt=o.w.name+' 5 + '+PASSIVES.find(p=>p.id===o.w.evo.need).name+' '+EVO_PASSIVE_LV;
       desc=o.w.evo.desc;
     } else if (o.type==='heal'){
-      col='#7d9463'; kind='Erholung'; name='Glutherz'; lvtxt='—';
+      col='#7d9463'; kind='Erholung'; name='Reparaturzelle'; lvtxt='—';
       desc='Stellt 45 % deiner Lebenspunkte wieder her.';
     } else if (o.type==='w'){
       col=o.w.col; kind=o.lv===0?'Neue Waffe':'Waffe'; name=o.w.name;
@@ -2082,14 +2117,14 @@ function updateEvents(){
   if (S.events.elite < CFG.ELITE_AT.length && S.t >= CFG.ELITE_AT[S.events.elite]){
     S.events.elite++;
     spawnEnemy(S.t, 1, 1);
-    toast('Elite nähert sich');
+    toast('Elite-Einheit nähert sich');
   }
   if (!S.events.boss && S.t >= CFG.BOSS_AT){
     S.events.boss = true;
     // Innerhalb des sichtbaren Kampfraums statt auf dem normalen Spawnring.
     const i = spawnEnemy(S.t, 4, 2,S.x+S.aimx*BOSS_ENTRY,S.y+S.aimy*BOSS_ENTRY);
     if (i>=0){ E.tm[i]=1.4; S.bossIndex=i; }
-    bossAlert('WARDEN ERWACHT','Goldene Lücke suchen · roten Korridor meiden');
+    bossAlert(LEX.bossRolle+': '+LEX.boss,'Goldene Lücke suchen · roten Korridor meiden');
   }
   if (!S.events.surge && S.t >= CFG.SURGE_AT){
     S.events.surge = true;
@@ -2104,7 +2139,7 @@ function updateEvents(){
       G.vx[i]=dx/d*420; G.vy[i]=dy/d*420;
     }
     fx(S.x,S.y,520,0.8,'#6bb8d4',1);
-    toast('Schatzflut');
+    toast('Bergungsflut');
   }
 }
 
@@ -2876,21 +2911,21 @@ function holdGoal(){
   const g=(titel,warum,haben,brauchen,einheit)=>
     ({titel,warum,haben:Math.floor(haben),brauchen,einheit});
   if(!META.mineLevel)
-    return g('Tiefmine reparieren','Sie liefert das Eisenerz, aus dem alles Weitere entsteht. Kostenlos.',0,0,'');
+    return g(LEX.modul.mine+' reparieren','Sie liefert das Asterit, aus dem alles Weitere entsteht. Kostenlos.',0,0,'');
   if(!META.forgeLevel)
-    return g('Emberschmiede reparieren','Sie macht aus Eisenerz Barren — die Grundlage jeder dauerhaften Verbesserung.',META.ore,HOLD_CFG.FORGE_COST,'Eisenerz');
+    return g(LEX.modul.forge+' reparieren','Er macht aus Asterit Legierungsplatten — die Grundlage jeder dauerhaften Verbesserung.',META.ore,HOLD_CFG.FORGE_COST,LEX.res.ore);
   if(!META.bowUpgrade)
-    return g('Wächterbogen verstärken','Dauerhaft +10 % Schaden in jeder Sortie. Die erste echte Hold→Run-Verbesserung.',META.bars,HOLD_CFG.BOW_COST,'Barren');
+    return g('Orbitklinge verstärken','Dauerhaft +10 % Schaden in jeder Sortie. Die erste echte Station→Run-Verbesserung.',META.bars,HOLD_CFG.BOW_COST,LEX.res.bars);
   if(!META.arcanumLevel)
-    return g('Arkanum reparieren','Aus Essenz werden vorbereitete Rerolls — mehr Auswahl bei den Karten.',META.ore,HOLD_CFG.ARCANUM_COST,'Eisenerz');
+    return g(LEX.modul.arcanum+' reparieren','Aus Fluxkondensat werden vorbereitete Rerolls — mehr Auswahl bei den Karten.',META.ore,HOLD_CFG.ARCANUM_COST,LEX.res.ore);
   if(!META.yardLevel)
-    return g('Übungshof reparieren','Schaltet dauerhafte Meisterschaften frei.',META.bars,HOLD_CFG.YARD_COST,'Barren');
+    return g(LEX.modul.yard+' reparieren','Schaltet dauerhafte Meisterschaften frei.',META.bars,HOLD_CFG.YARD_COST,LEX.res.bars);
   if(META.preparedRerolls<HOLD_CFG.REROLL_CAP)
-    return g('Reroll vorbereiten','Ein zusätzlicher Kartenzug in der nächsten Sortie.',META.essence,HOLD_CFG.REROLL_COST,'Essenz');
+    return g('Reroll vorbereiten','Ein zusätzlicher Kartenzug in der nächsten Sortie.',META.essence,HOLD_CFG.REROLL_COST,LEX.res.essence);
   const gelernt=Object.values(META.masteries||{}).reduce((a,b)=>a+b,0);
   if(gelernt<3*HOLD_CFG.MASTERY_MAX && META.marks>0)
-    return g('Meisterschaft lernen','Dauerhafte Verbesserung am Übungshof.',META.marks,1,'Trainingsmarken');
-  return g('Die nächste Sortie fahren','Der innere Ring arbeitet. Produktion, Vorbereitung und Training sind bereit.',0,0,'');
+    return g('Meisterschaft lernen','Dauerhafte Verbesserung am '+LEX.modul.yard+'.',META.marks,1,LEX.res.marks);
+  return g('Die nächste Sortie fliegen','Die Station arbeitet. Produktion, Vorbereitung und Training sind bereit.',0,0,'');
 }
 function goalHTML(goal,vorspann){
   const offen = goal.brauchen>0;
@@ -2904,13 +2939,13 @@ function goalHTML(goal,vorspann){
     '<p>'+goal.warum+'</p>';
 }
 function holdMessage(){
-  if(!META.mineLevel) return 'Der innere Ring wartet auf die Reparatur der Tiefmine.';
+  if(!META.mineLevel) return 'Die Station wartet auf die Reparatur der Asteroidensonde.';
   if(!META.forgeLevel) return 'Sammle 10 Eisenerz, um die Emberschmiede zu reparieren.';
-  if(!META.bowUpgrade) return 'Erz wird zu Barren. Der Wächterbogen wartet auf Verstärkung.';
+  if(!META.bowUpgrade) return 'Asterit wird zu Legierungsplatten. Die Orbitklinge wartet auf Verstärkung.';
   if(!META.arcanumLevel) return 'Das Arkanum kann Essenz für zusätzliche Kartenzüge vorbereiten.';
   if(!META.yardLevel) return 'Der Übungshof schaltet kleine, dauerhafte Utility-Meisterschaften frei.';
   if(META.preparedRerolls) return META.preparedRerolls+' zusätzliche Rerolls warten auf die nächste Sortie.';
-  return 'Der innere Ring arbeitet. Produktion, Vorbereitung und Training sind bereit.';
+  return 'Die Station arbeitet. Produktion, Vorbereitung und Training sind bereit.';
 }
 let contractSig='';
 function selectContract(id){
@@ -3076,7 +3111,7 @@ function upgradeBow(){
   advanceHold(Date.now());
   if(META.bowUpgrade||META.bars<HOLD_CFG.BOW_COST) return;
   META.bars-=HOLD_CFG.BOW_COST; META.bowUpgrade=1; saveHold();
-  renderHold('Wächterbogen verstärkt: dauerhaft +10 % Schaden.');
+  renderHold('Orbitklinge verstärkt: dauerhaft +10 % Schaden.');
 }
 function arcanumAction(){
   advanceHold(Date.now());
@@ -3109,7 +3144,7 @@ function trainMastery(id){
   const lv=META.masteries[id], cost=lv+1;
   if(lv>=HOLD_CFG.MASTERY_MAX||META.marks<cost) return;
   META.marks-=cost; META.masteries[id]++; saveHold();
-  renderHold('Aelric hat '+({path:'Pfadkunde',reach:'Reichgriff',dash:'Stoßschule'}[id])+' trainiert.');
+  renderHold('Der '+LEX.held+' hat '+({path:'Pfadkunde',reach:'Reichgriff',dash:'Stoßschule'}[id])+' trainiert.');
 }
 
 // Die linke Kampfanzeige zeigte alles gleichzeitig: Meta-Bonus, Ausruestung,
@@ -3138,7 +3173,10 @@ function combatSlots(){
  *  aus einer Elitewahl entstanden. Nur in der Pause sichtbar. */
 function metaBoni(){
   const parts=[];
-  if(S.holdDmg>1) parts.push({c:'#e07a3f',n:'Wächterbogen',l:'+10%',e:true});
+    // Der dauerhafte Stationsausbau darf NICHT genauso heissen wie die Waffe
+  // selbst -- sonst sind Meta-Bonus und Waffenslot in der Anzeige nicht mehr
+  // unterscheidbar.
+  if(S.holdDmg>1) parts.push({c:'#f0e0b8',n:'Klingenverstärkung',l:'+10%',e:true});
   for(const slot of ['weapon','charm','mantle']){
     const id=S.gearEquipped?.[slot],item=GEAR_BY_ID[id];
     if(item) parts.push({c:item.col,n:item.name,l:'R'+(S.gearRanks[id]||1),e:true});
@@ -3289,7 +3327,7 @@ function updateOnboarding(){
   if(!coachStep||!S||!S.running||S.phase!=='run') return;
   if(coachStep===1 && Math.hypot(input.x,input.y)>.12){
     const touch=!!(window.matchMedia&&window.matchMedia('(pointer:coarse)').matches);
-    showCoach(2,'Ember-Stoß',touch?'Rechts tippen: sprinten und kurz unverwundbar.':'Leertaste: sprinten und kurz unverwundbar.');
+    showCoach(2,'Impulsstoß',touch?'Rechts tippen: sprinten und kurz unverwundbar.':'Leertaste: sprinten und kurz unverwundbar.');
   } else if(coachStep===2 && S.dashCd>0){
     showCoach(3,'Macht sammeln','Aelric schießt automatisch. Blaue Splitter öffnen neue Karten.');
     coachUntil=S.t+4;
@@ -3345,7 +3383,7 @@ function showExtract(){
     statTile(S.kills.toLocaleString('de-DE'),'Kills') +
     statTile(S.level,'Stufe') +
     statTile(S.pickTimes.length,'Kartenzüge') +
-    statTile(S.baseReward.toLocaleString('de-DE'),'Basis-Beute');
+    statTile(S.baseReward.toLocaleString('de-DE'),LEX.res.loot);
   setSheet('extract',true,'btnLeave');
 }
 function startOvertime(){
@@ -3373,16 +3411,16 @@ function endRun(survived){
 
   if (survived){
     el('overkick').textContent='Ausgerückt';
-    el('overtitle').innerHTML='Die Glut <span style="color:#e07a3f">hält</span>';
+    el('overtitle').innerHTML='Extraktion <span style="color:#7fd4e8">gesichert</span>';
     el('oversub').textContent = S.otActive
       ? `Overtime überlebt: ${fmtTime(S.ot)}. Bonus ×${otMul.toFixed(2)} gesichert.`
-      : 'Basis-Beute gesichert.';
+      : LEX.res.loot+' gesichert.';
   } else {
     el('overkick').textContent='Gefallen';
-    el('overtitle').textContent='Die Aschung hält';
+    el('overtitle').textContent='Signal verloren';
     el('oversub').innerHTML = S.otActive
-      ? `Der Overtime-Bonus ist verloren — <b style="color:#e8e4dc">die Basis-Beute nicht.</b> Regel 1.`
-      : `Du hast ${fmtTime(S.t)} durchgehalten. <b style="color:#e8e4dc">Die Beute ist trotzdem gebucht.</b> Regel 1.`;
+      ? `Der Overtime-Bonus ist verloren — <b style="color:#e8e4dc">der ${LEX.res.loot} nicht.</b> Regel 1.`
+      : `Du hast ${fmtTime(S.t)} durchgehalten. <b style="color:#e8e4dc">Die Bergung ist trotzdem gebucht.</b> Regel 1.`;
   }
   el('ovstats').innerHTML =
     statTile(S.kills.toLocaleString('de-DE'),'Kills') +
@@ -3392,10 +3430,10 @@ function endRun(survived){
     statTile(S.eliteChoices,'Elite-Relikte') +
     statTile(gearLootText(),'Ausrüstungsfund') +
     statTile(S.reward.toLocaleString('de-DE'),'Beute gesamt') +
-    statTile('+'+S.holdOre,'Eisenerz · '+S.contract.name);
+    statTile('+'+S.holdOre,LEX.res.ore+' · '+S.contract.name);
   // Der Run endet nicht mit einer Zahl, sondern mit dem, was sie bewirkt.
   el('ovgoal').innerHTML=goalHTML(holdGoal(),'Damit als Nächstes');
-  const mode=S.runLen===180?'3-Minuten-Scharmützel':Math.round(S.runLen/60)+'-Minuten-Run';
+  const mode=S.runLen===180?'3-Minuten-Aufklärung':Math.round(S.runLen/60)+'-Minuten-Sortie';
   el('btnAgain').textContent=mode+' wiederholen';
   setSheet('over',true,'btnMenu');
 }
@@ -3485,7 +3523,7 @@ function runReportText(){
   const bonus=S.otActive?(S.result==='Extrahiert'?(S.reward-S.baseReward).toLocaleString('de-DE'):'verloren'):'–';
   const st=fpsStats(), tune=tuningDeviations();
   return [
-    'EMBERHOLD RUN-BERICHT',
+    LEX.produkt.toUpperCase()+' RUN-BERICHT',
     'Seed: '+S.seed,
     'Modus: '+Math.round(S.runLen/60)+' Minuten',
     'Ergebnis: '+(S.result||'Beendet'),
@@ -3494,10 +3532,10 @@ function runReportText(){
     'Stufe: '+S.level,
     'Kartenzüge: '+S.pickTimes.length,
     'Erster Kartenzug: '+(S.pickTimes.length?S.pickTimes[0].toFixed(1)+' s':'–'),
-    'Basis-Beute: '+S.baseReward,
+    LEX.res.loot+': '+S.baseReward,
     'Overtime-Bonus: '+bonus,
-    'Sortievertrag: '+S.contract.name+' · Erz ×'+S.contract.reward.toFixed(2),
-    'Eisenerz für Hold: '+(S.holdOre||0),
+    'Sektor: '+S.contract.name+' · '+LEX.res.ore+' ×'+S.contract.reward.toFixed(2),
+    LEX.res.ore+' für '+LEX.hold+': '+(S.holdOre||0),
     'Build: '+buildText(),
     'Schaden je Waffe: '+weaponDamageText('dmgW'),
     'Boss-Schaden je Waffe: '+weaponDamageText('dmgWBoss'),
@@ -3508,7 +3546,7 @@ function runReportText(){
     'Ausrüstungsfund: '+gearLootText(),
     'Hold-Vorbereitung: '+(S.preparedRerollsUsed?('+'+S.preparedRerollsUsed+' Rerolls'):'keine')+
       ' · Training '+Object.values(S.holdUtility||{}).join('/'),
-    'Gluttropfen eingesammelt: '+S.healOrbs,
+    LEX.heal+' eingesammelt: '+S.healOrbs,
     'Spitze im SIM-Radius: '+S.peakNearbyEnemies,
     'Spitze sichtbar gezeichnet: '+S.peakVisibleEnemies,
     'Kampfausschnitt: '+(VIEW_W|0)+'×'+(VIEW_H|0)+' Welteinheiten',
@@ -3542,7 +3580,7 @@ function showStartMenu(){
   S.running=false; setSheet('over',false); setSheet('extract',false); setSheet('pause',false);
   hideBossAlert(); if(coachStep) hideCoach(false);
   holdOpen=true;
-  const gained=S.holdOre?('Sortiebeute eingelagert: +'+S.holdOre+' Eisenerz.'):'';
+  const gained=S.holdOre?('Bergung eingelagert: +'+S.holdOre+' '+LEX.res.ore+'.'):'';
   advanceHold(Date.now()); saveHold(); renderHold(gained);
   setSheet('start',true,'btnStart');
 }
@@ -4040,6 +4078,7 @@ window.__EH = { get S(){return S;}, get H(){return META;}, CFG, HOLD_CFG, CONTRA
                 bossIsAlive, bossLocator, evoPaths, leadingEvoPath, completeEvolutions,
                 combatSlots, metaBoni, renderSlots, renderPauseDetail, togglePause,
                 weaponDamageText, weaponTimelineText, xpNeed, hurt, W_IDX, GROUND,
+                LEX, FAMNAME, weaponLabel,
                 BOSS: {BOSS_ADD_TARGET, EVO_FOCUS_AT, MAXLV, EVO_PASSIVE_LV,
                        BOSS_MARK_PAD, BOSS_CHEV_HALF},
                 targetEnemies, resize, render, spawnGem, updateGems, killEnemy,
