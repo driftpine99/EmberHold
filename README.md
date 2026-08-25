@@ -19,19 +19,23 @@ Asteroidensonde, Materiefabrikator, Fluxlabor, Simulationsdeck,
 Ausrüstungsbucht und Sternenkarte mit lokalem Save v4 und begrenzter
 Offline-Produktion.
 
-D-040 setzt die gewählte Kampfrichtung V2 technisch um:
-durchgehendes mittelhelles Orbitaldeck, minimale Rand-UI, sechs eigene
-Waffenpiktogramme sowie code-native Animationen für Orbitträger, alle fünf
-Gegnerfamilien, Elite und AEGIS. Simulation und Spielmechanik bleiben dabei
-unverändert; eine echte zurückkehrende Klinge ist ein späteres eigenes Gate.
+D-040 hat den Sci-Fantasy-Stil, flüssigere code-native Animationen und eine
+reduzierte Rand-UI eingeführt. Der Besitzerlauf bestätigt Bewegung,
+AEGIS-Erkennung und eine erheblich angenehmere Gegnerflut. Der aufgehellte
+grobe Deckboden, zu ähnliche Gegnerfamilien und der fehlende kompakte
+Evolutionshinweis werden jedoch in D-041 nachgebessert.
 
-Die technische Abnahme steht bei **49/49 grünen Checks**. Der letzte
+Der nächste freigegebene Auftrag EH-2026-08-25-03 macht AEGIS zum klaren
+Mittelboss und ergänzt nach der achtminütigen Aufbauphase den verpflichtenden
+Endboss NEXUS. Extraktion ist erst nach seinem Tod möglich. Der alte
+70-Gegner-Schub bei 7:00 entfällt; Bossarenen reduzieren die normalen
+Begleiter kontrolliert. Waffenwerte bleiben bis zum anschließenden getrennten
+Waffenrollenpass unverändert.
+
+Die technische Baseline steht bei **49/49 grünen Checks**. Der letzte
 abgeschlossene Run-Bericht wird getrennt von Save v4 lokal gesichert und kann
-in der Orbitalstation erneut kopiert werden. Der D-036-Feldlauf ist negativ
-ausgewertet: Gegnerflut, Bossdruck und Waffenrollen bleiben offen. Vor diesen
-getrennten Balancepässen nimmt der Besitzer zunächst Grafik, UI und Animation
-im vollständigen Lauf ab. Backend, Ton und Monetarisierung bleiben außerhalb
-des Scopes.
+in der Orbitalstation erneut kopiert werden. Backend, Ton und Monetarisierung
+bleiben außerhalb des Scopes.
 
 Die Produktfrage der Phase 0 lautet:
 

@@ -207,7 +207,7 @@ Sentinel-Drohnen kamen nicht vor und sind mit diesem Lauf nicht bewertbar.
 Numerische Änderungen sind fachlich freigegeben, werden aber bewusst erst nach
 dem Grafik-/UI-Pass und getrennt nach Boss/Dichte sowie Waffenrollen umgesetzt.
 
-### Besitzerabnahme für EH-2026-08-25-02
+### Historisches Abnahmeprotokoll EH-2026-08-25-02 (abgeschlossen)
 
 Bitte nach dem Pages-Update einen vollständigen **Acht-Minuten-Lauf im
 Trümmerring** spielen. Dieser Lauf entscheidet nur über Grafik, UI und
@@ -236,6 +236,69 @@ Danach bitte den vollständigen Run-Bericht kopieren und kurz beantworten:
 - Sind einzelne Gegner oder Angriffe weiterhin schlecht lesbar?
 - Ist der Grafikpass gut genug, damit als Nächstes Boss und Gegnerdichte
   bearbeitet werden dürfen?
+
+### Ergebnis der Besitzerabnahme EH-2026-08-25-02
+
+Der Trümmerring-Lauf mit Seed 2395647195 wurde am 25.08.2026 bei 8:00
+extrahiert.
+
+| Kennzahl | Ergebnis |
+|---|---:|
+| Kills / Stufe / Kartenzüge | 19.176 / 28 / 27 |
+| Erster Kartenzug | 28,5 s |
+| Evolutionen | Sternenhagel, Sonnenbruch |
+| Spitze im SIM-Radius / sichtbar | 295 / 170 |
+| FPS Minimum / 1-%-Low / unter 55 | 44 / 54 / 2,0 % |
+
+Subjektiver Befund:
+
+- Grafikstil grundsätzlich richtig, Hintergrund gegenüber D-038 erheblich
+  schlechter;
+- Bewegung vorerst gut;
+- Gegnerfamilien im Pulk kaum unterscheidbar;
+- AEGIS und Angriffe lesbar, aber weiterhin zu viele Begleiter;
+- reduzierte UI besser, der führende Evolutionspfad fehlt;
+- allgemeine Gegnerflut erheblich besser;
+- Bosskampf interessanter;
+- ein zweiter, verpflichtender Abschlussboss wird gewünscht.
+
+Der Grafik-/UI-Pass ist damit teilweise, nicht vollständig freigegeben.
+Animation und Grundstil bleiben; EH-2026-08-25-03 korrigiert Hintergrund,
+Familienlesbarkeit und Evolutionshinweis gemeinsam mit dem Boss-/Dichtepass.
+
+### Besitzerabnahme für EH-2026-08-25-03
+
+Nach Codex-Review und Pages-Update bitte einen vollständigen
+Acht-Minuten-Trümmerring-Lauf **bis zum Tod von NEXUS** spielen. Bei 8:00 darf
+noch keine Extraktion erscheinen.
+
+Während des Laufs prüfen:
+
+1. Ist der dunklere, feinere Hintergrund wieder klar besser, ohne dass
+   abgeschnittene Seiten oder harte Balken zurückkehren?
+2. Lassen sich Sammlerdrohne, Rammjäger, Emitterdrohne,
+   Replikatorsonde und Bollwerkeinheit im Pulk anhand ihrer Form
+   unterscheiden?
+3. Zeigt „Nächste EVO“ genau einen hilfreichen Pfad, ohne die UI erneut zu
+   überladen?
+4. Sinkt die Begleiterzahl beim AEGIS-Kampf sichtbar und kontrolliert, ohne
+   belohntes plötzliches Verschwinden?
+5. Bleibt die Zeit zwischen AEGIS und Finale spannend, obwohl der alte
+   70-Gegner-Schub entfällt?
+6. Erscheint NEXUS erst bei 8:00, sperrt die Extraktion und besitzt zwei
+   verständlich vermeidbare Muster?
+7. Öffnet der echte NEXUS-Tod unmittelbar Extraktion/Overtime?
+8. Bleiben schlechteste FPS und 1-%-Low mindestens ungefähr im Bereich des
+   letzten Feldlaufs 44/54?
+
+Danach den vollständigen Run-Bericht kopieren und kurz beantworten:
+
+- Hintergrund jetzt besser, gleich oder schlechter?
+- Welche Gegnerfamilien sind weiterhin verwechselbar?
+- AEGIS: zu leer, passend oder noch zu voll?
+- NEXUS: zu leicht, passend oder zu zäh?
+- Waren beide NEXUS-Muster verständlich und fair?
+- Hattest du nach dem Finale eher Lust auf einen weiteren Run?
 
 ### Historisches D-035-Protokoll (am 24.08.2026 erledigt)
 

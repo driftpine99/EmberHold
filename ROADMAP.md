@@ -2,34 +2,37 @@
 
 ## Aktueller Arbeitsfokus
 
-**Verbindlicher Stand 25.08.2026:** EH-2026-08-25-02 ist durch Claude
-umgesetzt und durch Codex technisch abgenommen (D-040). Der Kampf folgt jetzt
-Entwurf 3: durchgehendes mittelhelles Orbitaldeck, keine permanente linke
-Textliste, `BOSS: AEGIS`, Waffenleiste unten und eine gemeinsame
-weißgolden-violett-cyane Figurensprache.
+**Verbindlicher Stand 25.08.2026:** Der Besitzerlauf für D-040 ist ausgewertet
+(D-041). Stil, Bewegung, AEGIS-Erkennung und die reduzierte Gegnerflut sind
+grundsätzlich besser. Nicht freigegeben sind der erheblich schlechtere helle
+Deckboden, zu ähnliche Gegnerfamilien, der fehlende Evolutionshinweis und die
+weiterhin hohe Begleitdichte während AEGIS.
 
-Orbitträger, fünf normale Gegnerfamilien, Elite und AEGIS besitzen zusammen 64
-aktive vorgerenderte Phasen statt 28. Codex hat in der Review sechs eigene
-Waffenpiktogramme ergänzt und die Sektortönung über das gesamte Deck gezogen,
-damit an der technischen Clip-Grenze keine neue Seitennaht entsteht. Der
-Sektorname bleibt bewusst nur als Start-Toast sowie in Pause und Run-Bericht.
+Der nächste freigegebene Auftrag ist **EH-2026-08-25-03**. Er verbindet den
+notwendigen sichtbaren Reparaturpass mit dem bereits geplanten Boss-/
+Dichtepass: dunklerer D-038-Deckboden bei erhaltener nahtloser Randabdeckung,
+fünf klar getrennte Silhouetten, genau ein kompakter Hinweis „Nächste EVO“
+und AEGIS mit nur 50 normalen Begleitern.
 
-Die unabhängige Suite steht bei **49/49** grünen Checks. Neun feste Seeds,
-Simulation, Balance, RNG, Save v4 und Ökonomie sind unverändert; der
-Rendervertrag bleibt grün. Claudes Browsermessungen bei 1280×720 und 844×390
-sind plausibel. Codex konnte den sichtbaren Browser-Smoke lokal nicht
-wiederholen, daher bleibt die subjektive Freigabe beim Besitzer.
+Die Sortie erhält außerdem ein echtes Finale. Der alte 70-Gegner-Schub bei
+7:00 entfällt. Ab 7:45 bereitet sich die Arena vor; bei 8:00 erscheint
+**NEXUS** mit höchstens 30 normalen Begleitern. Erst sein Tod schaltet
+Extraktion beziehungsweise freiwillige Overtime frei. Waffenwerte bleiben in
+diesem Auftrag unverändert.
+
+Aktuelle technische Baseline: **49/49** Checks, sauberer main bei c5f11a3.
+Der letzte Feldlauf erreichte 19.176 Kills, Stufe 28, 27 Kartenzüge, zwei
+Evolutionen sowie 44 FPS Minimum und 54 FPS im 1-%-Low.
 
 Nächste verbindliche Reihenfolge:
 
-1. [x] D-036-Besitzerlauf und subjektive Antworten auswerten.
-2. [x] Visuelle Zielrichtung auswählen: taktisches Sci-Fantasy, Entwurf 3.
-3. [x] EH-2026-08-25-02 umsetzen und technisch durch Codex abnehmen.
-4. [ ] Besitzer spielt einen vollständigen Acht-Minuten-Lauf und bewertet
-   Lesbarkeit, Animation, Piktogramme, AEGIS und Renderleistung.
-5. [ ] Danach Boss-/Dichtepass getrennt umsetzen.
-6. [ ] Danach Waffenrollen einschließlich Sternenhagel und Kettenemitter
-   anhand kontrollierter Telemetrie bearbeiten.
+1. [x] D-040-Besitzerlauf und subjektive Antworten auswerten.
+2. [x] D-041 und EH-2026-08-25-03 technisch planen und freigeben.
+3. [ ] Claude setzt Hintergrundkorrektur, Familienlesbarkeit,
+   Evolutionshinweis, AEGIS-Arena und NEXUS-Finale um.
+4. [ ] Codex prüft Code, Balancevertrag, Bosszustände und Performance.
+5. [ ] Besitzer spielt den vollständigen Run bis NEXUS und nimmt das Finale ab.
+6. [ ] Danach Waffenrollen anhand kontrollierter Telemetrie bearbeiten.
 
 **Historischer Stand 23.08.2026:** EH-2026-08-23-02 ist durch Claude
 umgesetzt und durch Codex technisch abgenommen. Der Warden hat jetzt ein

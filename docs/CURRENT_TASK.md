@@ -2,209 +2,199 @@
 
 ## Steuerung
 
-- **Task-ID:** EH-2026-08-25-02
-- **Thema:** Kampf-Grafik und UI nach Entwurf 3
-- **Status:** **TECHNISCH_ABGENOMMEN_DURCH_CODEX** (25.08.2026)
+- **Task-ID:** EH-2026-08-25-03
+- **Thema:** Kampflesbarkeit V3 und verpflichtendes NEXUS-Finale
+- **Status:** **FREIGEGEBEN_FUER_CLAUDE**
 - **Auftraggeber:** Besitzer
 - **Projektleitung und Abnahme:** Codex
 - **Ausführung:** Claude Code
-- **Priorität:** P0 – sichtbarer Spielspaß und Kampflesbarkeit
-- **Startstand:** sauberer `main` nach der Codex-Übergabe; den tatsächlichen
-  Ausgangscommit und den anfänglichen Git-Status vor jeder Änderung selbst
-  prüfen und in `docs/WORK_REPORT.md` festhalten
-- **Timebox:** bis zu fünf Stunden produktiv ausschöpfen; nicht nach dem ersten
-  kosmetischen Teilergebnis stoppen
+- **Priorität:** P0 – sichtbarer Spielspaß und klares Run-Finale
+- **Startstand:** sauberer main nach der Codex-Planungsübergabe; tatsächlichen
+  Ausgangscommit und anfänglichen Git-Status im Arbeitsbericht festhalten
+- **Timebox:** bis zu fünf Stunden produktiv nutzen; Gates in Reihenfolge
+  abschließen und nicht nach einem kosmetischen Teilergebnis stoppen
+
+## Verbindlicher Besitzerbefund
+
+Der Besitzerlauf mit Seed 2395647195 wurde bei 8:00 extrahiert: 19.176 Kills,
+Stufe 28, 27 Kartenzüge, zwei Evolutionen, schlechteste FPS 44 und 1-%-Low 54.
+Gegnerflut, Animation, AEGIS-Erkennung und Bosskampf sind erheblich besser.
+
+Nicht freigegeben sind: der gegenüber D-038 erheblich schlechtere helle
+Hintergrund, zu ähnliche Gegnerfamilien, der verschwundene Hinweis auf die
+nächste Evolution und weiterhin zu viele Begleiter während AEGIS. Zusätzlich
+entscheidet der Besitzer: Eine Acht-Minuten-Sortie ist erst gemeistert, wenn
+nach der Aufbauphase ein zweiter Boss besiegt wurde.
 
 ## Produktentscheidung
 
-Der Besitzer hat Entwurf 3 ausdrücklich ausgewählt. Die verbindliche interne
-Referenz ist `docs/concepts/orbitblade-combat-ui-direction-v2.png`.
+AEGIS bleibt der Mittelboss bei 4:10. Der neue Endboss heißt sichtbar
+**NEXUS** und erscheint bei 8:00. Solange NEXUS lebt, gibt es keine Extraktion.
+Nach seinem Tod erscheint sofort die bestehende Extraktions-/Overtime-
+Entscheidung. Der bisherige 70-Gegner-Schub bei 7:00 entfällt.
 
-Sie ist eine Zielrichtung, kein Runtime-Asset und keine pixelgenaue Vorlage.
-Verbindlich sind D-040 und AP-004: taktisches Sci-Fantasy, durchgehendes
-mittelhelles Orbitaldeck, minimale Rand-UI, klarer weiß-goldener Orbitträger,
-dunkle Gegner mit Leuchtkernen, großer violetter AEGIS und geometrische
-Warnflächen.
-
-Der Feldlauf hat zugleich Balanceprobleme bestätigt. Diese werden **nicht** in
-diesem Auftrag gelöst. Die geringe Gegnerzahl und die dargestellte Bossphase
-des Konzeptbilds dürfen nicht als Freigabe für Spawn- oder Mechanikänderungen
-missverstanden werden.
+Bossphasen sind lesbare Arenen, keine normalen Schwarmphasen mit zusätzlichem
+Boss. Überschüssige Gegner ziehen sich kontrolliert und ohne Kills, Erfahrung,
+Bergungswert oder Beute zurück. Waffenwerte bleiben unangetastet.
 
 ## Ziel
 
-Der reale Kampf soll auf Desktop und Mobil sichtbar näher an Entwurf 3 rücken:
-
-1. abgeschnitten wirkende Seiten und harte Sternenbalken verschwinden;
-2. die permanente Informationslast wird auf eine kleine Rand-UI reduziert;
-3. Orbitträger, alle fünf normalen Gegnerfamilien und AEGIS bilden eine
-   einheitliche, animationsfreundliche Sci-Fantasy-Figurensprache;
-4. Boss und Gefahren sind im Pulk schneller lesbar;
-5. Simulation und Balance bleiben bitgenau unverändert.
+Der Run besitzt drei erkennbare Akte: Build-Aufbau, AEGIS-Mittelboss und das
+verpflichtende NEXUS-Finale. Gleichzeitig werden Hintergrund,
+Gegnerunterscheidung und Evolutionsanzeige korrigiert.
 
 ## Verbindlicher Umsetzungsscope
 
-### Gate A – bestehende Darstellung aufnehmen
+### Gate A – bekannten guten Hintergrund wiederherstellen
 
-- Den echten Renderpfad, `renderCostContract`, `presentationLayer` und die
-  responsive HUD-Struktur vollständig prüfen.
-- Wenn ein sichtbarer Browser verfügbar ist, Ausgangsscreenshots bei 1280×720
-  und 844×390 erstellen; andernfalls die Grenze ehrlich dokumentieren.
-- Keine neue Architektur und keine Engine einführen.
+- Commit 9190de9 ist die konkrete Referenz für Bodenfarbe, Panelgröße,
+  Leitungs- und Dekodichte: dunklere blau-graue 80er-Paneele statt der
+  aktuellen hellen 160er-Flächen.
+- D-040 bleibt erhalten: nahtlos bis an alle Ränder, keine abgeschnittene
+  Arena, harte Safe-Area, Randvignette oder dominanten Sternenbalken.
+- Sektortönung bleibt nahtlos. Boden weiterhin vorgerendert/gekachelt; keine
+  zusätzliche Per-Frame-Erzeugung.
 
-### Gate B – minimale Kampf-UI
+### Gate B – fünf Gegnerfamilien aus der Silhouette unterscheiden
 
-- Oben links bleiben nur kompakte Gesundheit und Erfahrung sowie höchstens
-  unmittelbar notwendige Kurzwerte wie Stufe oder Zeit.
-- Während AEGIS lebt steht oben mittig exakt **BOSS: AEGIS** mit einer klaren
-  Lebensleiste; höchstens zwei rein visuelle Phasenmarker sind erlaubt, ohne
-  neue Bossmechanik vorzutäuschen.
-- Pause bleibt allein oben rechts.
-- Aktive Waffen werden als maximal sechs kompakte Symbole mit Stufe und
-  verständlichem Abklingzustand unten mittig dargestellt.
-- Passive, Relikte, Ausrüstung, Kills, Sektorvertrag und Detailwerte werden
-  nicht mehr als permanente linke Textliste gezeigt. Vorhandene wichtige
-  Informationen bleiben über Pause und Run-Bericht erreichbar.
-- Kartenwahl, Dialoge, Toasts und mobile Touch-Zonen dürfen nicht überlappen.
+- Gemeinsame D-040-Sprache behalten: dunkler Maschinenkörper, helle Kontur,
+  Leuchtkern und sechs asynchrone Phasen.
+- Sammlerdrohne klein/kompakt; Rammjäger lang und keilförmig;
+  Emitterdrohne breit mit Auslegern; Replikatorsonde als geteilte
+  Zwillingssilhouette; Bollwerkeinheit groß, breit und schwer gepanzert.
+- Außenkontur, Proportion und Größe müssen unterscheiden; Farbe allein reicht
+  nicht. Auch ohne Farbe müssen mindestens vier Familien sofort erkennbar sein.
+- Trefferflächen, Geschwindigkeit, KI, Schaden und Spawnwahrscheinlichkeit
+  bleiben unverändert.
+- Pro Gegner und Frame weiter im Wesentlichen ein drawImage; keine Allokation,
+  Gradienten oder shadowBlur im Schwarm-Hot-Loop.
 
-### Gate C – durchgehendes Orbitaldeck
+### Gate C – genau ein kompakter Evolutionshinweis
 
-- Der Kampfhintergrund reicht optisch bis an alle Bildschirmränder. Die
-  bisherige Safe-Area darf technisch bestehen, muss aber als ruhige, nahtlose
-  Deckfortsetzung erscheinen; keine harten Cyan-Trennlinien und keine
-  dominanten Sternenbalken.
-- Große blau-graue Paneele, wenige Fugen, dezente Kreisgeometrie und höchstens
-  kleine periphere Weltraumbrüche ersetzen den abgeschnittenen Arena-Rahmen.
-- Kampfelemente bleiben auf den festen Simulationsausschnitt geclippt.
-  `SCALE`, `VIEW_W`, `VIEW_H`, Culling und D-017 dürfen nicht in die
-  Simulation zurückwirken.
-- Boden vorgerendert oder gekachelt; keine neuen teuren Per-Frame-Verläufe oder
-  Canvas-Erzeugungen.
+- leadingEvoPath() bleibt die einzige fachliche Quelle.
+- Oberhalb der unteren Waffenleiste erscheint genau ein schmaler Hinweis
+  „Nächste EVO“ mit Evolutionsname sowie Waffen- und Passivfortschritt.
+- Er zeigt nur den bestehenden Pfad und ändert Kartenmechanik oder
+  EVO_FOCUS_AT nicht. Nach Abschluss wechselt er sofort; ohne Pfad verschwindet
+  er.
+- Bei 1280×720 und 844×390 keine Überlappung mit Waffen, Impuls, Karten,
+  Toast oder Dialog. Linke Textliste bleibt ausgeblendet.
 
-### Gate D – einheitliche Figuren und Animation
+### Gate D – AEGIS als echte Bossarena
 
-- Code-native, einmal vorgerenderte Canvas-Sprites sind der bevorzugte
-  kosteneffiziente Weg. Keine Dateien aus dem lokalen Referenzprojekt und keine
-  Franchise-Anleihen.
-- Orbitträger: weiß-goldene klare Silhouette mit cyanem Energiekern; mindestens
-  sechs Idle-, acht Bewegungs- und acht Wurfphasen oder eine technisch
-  gleichwertig flüssige Lösung. Nur horizontal spiegeln, nie frei rotieren.
-- Alle fünf normalen Gegnerfamilien: eigenständige Maschinenkörper in einer
-  gemeinsamen Formsprache. Jede Familie erhält mindestens sechs asynchron
-  versetzte Bewegungs-/Schwebephasen oder eine gleichwertige vorgerenderte
-  Animation. Dunkle Körper brauchen klare Leuchtkerne/Randlichter, ohne
-  Warnfarben zu verwischen.
-- Elite bleibt als hochwertige Variante sofort erkennbar.
-- AEGIS: deutlich größer, violetter Kern, zwei visuell getrennte Seitenpanzer
-  und mindestens sechs ruhige Animationsphasen. Die Seitenpanzer sind nicht
-  verwundbar.
-- Pro Gegner und Frame im Wesentlichen ein `drawImage`. Keine Gradienten,
-  Pfadobjekte, Arrays oder temporären Canvas pro Gegner im Schwarmpfad.
-- Weltbewegung bleibt am Browser-Frame. Keine Figur kippt oder steht Kopf.
+- AEGIS bleibt bei CFG.BOSS_AT = 250 Sekunden mit seinen aktuellen Mustern,
+  Ortung und Grundwerten.
+- Während AEGIS lebt gilt ein Ziel von **50 normalen Gegnern** statt 90.
+- Überschuss zieht sich innerhalb höchstens acht Sekunden sichtbar,
+  deterministisch und allokationsfrei aus dem Simulationsradius zurück.
+- Rückzug erzeugt niemals Kill, XP, Splitter, Nanokapsel, Bergungswert,
+  Ausrüstung oder andere Belohnung. Eliten dürfen nicht als künstliche Beute
+  verschwinden; ihre Behandlung ist zu dokumentieren.
+- Nach AEGIS baut sich die Dichte sanft wieder auf. Der 70er-SURGE bei 7:00
+  wird entfernt.
 
-### Gate E – Gefahren und Bosslesbarkeit
+### Gate E – verpflichtender Endboss NEXUS
 
-- Bestehende Bossmuster nur visuell neu zeichnen: flache violette Segmente,
-  deutlich sichtbare sichere Lücke und klare rot-orange Laufbahn.
-- Bossmarker weiß-golden/violett und klar getrennt von cyanfarbenen
-  Spielerprojektilen.
-- Familienwarnungen geometrisch, zurückhaltend und unter den Figuren. Kein
-  Partikelnebel und kein dauerhafter Vollbild-Glow.
-- Keine neue Kreuzattacke, Bossphase, Kollisionsfläche oder Schadensregel.
+- Nur die Acht-Minuten-Sortie erhält NEXUS. Drei-Minuten-Scharmützel behalten
+  ihr bisheriges Ende.
+- Ab 7:45 kurze nicht blockierende Warnung und kontrollierte Dichtereduktion;
+  bei 8:00 Spawn innerhalb des sichtbaren Kampfausschnitts.
+- Während NEXUS lebt Ziel von **30 normalen Gegnern**, kein Massen-Spawn.
+- Nach 8:00 zeigt die Uhr verständlich die Finaldauer. Das ist noch keine
+  freiwillige Overtime; deren Schadensmultiplikator bleibt aus.
+- Bei 8:00 keine Extraktionsansicht. Erst der echte NEXUS-Tod öffnet sie.
+  Spielertod im Finale bleibt „Gefallen“; ohne NEXUS-Kill niemals
+  „Extrahiert“ oder gemeistert.
+- NEXUS braucht eine von AEGIS klar verschiedene Silhouette, eigene
+  Animationsphasen und mindestens zwei klar telegraphierte Angriffsmuster.
+  Mindestens eines ist spielerisch neu; keine bloße Umfärbung.
+- Jeder Angriff hat eine sichere Reaktion und mindestens eine Sekunde
+  Vorwarnung; keine unvermeidbaren Vollbildtreffer oder Franchise-Anleihen.
+- Zielkorridor mit repräsentativem Ein- bis Zwei-EVO-Build: ungefähr
+  30–75 Sekunden. Nicht in zwei bis drei Treffern und nicht minutenlang.
+  Deterministischen Benchmark liefern.
+- Bossleiste und Ortung dynamisch BOSS: AEGIS bzw. BOSS: NEXUS.
+- Run-Bericht ergänzt Finalboss-Status, Spawn-, Tötungszeit und Finaldauer.
+- Keine neue Meta-Währung, Stationsstufe oder Gebäudeänderung.
 
 ## Unverhandelbare Grenzen
 
-- Keine Änderung an Gegnerzahl, Spawnziel, Bossverstärkung, Post-Boss-Rampe,
-  XP, Kartenangebot, Schaden, Waffenwerten, Zielwahl, Kollision oder RNG.
-- Sternenhagel, Kettenemitter und alle anderen Waffen bleiben unverändert.
-- Keine Änderung an Save v4, Save-Key, Run-Bericht, Station oder Ökonomie.
-- Keine Rückflugmechanik, kein neuer Inhalt, kein Ton.
-- Keine neue Engine, Bibliothek, Buildkette oder Netzabhängigkeit.
-- Keine Fremdassets aus `orbitblade/` und keine erkennbaren Franchise-Designs.
-- Node- und Bildlade-Fallbacks bleiben spielbar.
-- Neue Rasterdateien nur, wenn Code-native Umsetzung objektiv scheitert. Dann
-  vor dem Import stoppen und den Blocker dokumentieren.
-- Claude pusht nicht und beginnt keinen Folgeauftrag.
+- Keine Änderung an Waffen/Passivwerten, Evolutionsvoraussetzungen,
+  Kartenwahrscheinlichkeiten, XP-Kurve, Magnetradius oder Heilung.
+- Sternenhagel, Sonnenbruch, Orbitklinge, Kettenemitter und Sentinel-Drohnen
+  nur messen, nicht balancen.
+- Save v4, Save-Key, Stationskosten und Offline-Produktion unverändert.
+- Keine neue Engine, Bibliothek, Buildkette, Netzabhängigkeit, Fremdassets,
+  lokalen Referenzspiel-Dateien oder erkennbaren Franchise-Designs.
+- D-017 bleibt erhalten; keine Seitenverhältnis-Abhängigkeit.
+- Kein Waffen-, Stations-, Audio- oder Monetarisierungs-Folgeauftrag. Kein Push.
 
 ## Kosten- und Agentenregel
 
-Claude soll die Fünf-Stunden-Timebox produktiv nutzen. Günstige kleinere
-Coding-Subagenten sind für isolierte Aufgaben wie CSS/DOM, Sprite-Builder,
-Tests oder statische Diff-Prüfung ausdrücklich erwünscht. Claude behält
-Art-Direction, Architektur und Zusammenführung selbst, gibt enge Dateibereiche
-vor, prüft jeden fremden Diff vollständig und lässt nach jeder Integration die
-Suite laufen. Keine parallelen Änderungen an denselben Zeilen der monolithischen
-`index.html`.
+Claude soll die fünf Stunden produktiv nutzen. Günstige einfachere
+Coding-Subagenten sind für getrennte Aufgaben wie CSS/EVO-Anzeige,
+Sprite-Silhouetten oder Tests erwünscht. Wegen der monolithischen index.html
+nie gleichzeitig dieselben Zeilenbereiche bearbeiten. Claude behält
+Bosszustandsmaschine, Architektur, Integration und Review selbst, prüft jeden
+fremden Diff vollständig und testet nach jeder Integration.
 
 ## Automatische Abnahme
 
-1. Vorher-/Nachher-Balanceausgabe der neun festen Seeds bleibt vollständig
-   identisch; Korridore werden nicht gelockert.
-2. `npm test` vollständig grün. Für V2 entsteht mindestens ein gezielter
-   Check oder eine belastbare Erweiterung von `presentationLayer`.
-3. `renderCostContract` bleibt grün; keine neuen Allokationen oder Gradienten
-   im Gegner-Schwarmpfad.
-4. Node-Fallback ohne `Image` bleibt spielbar und getestet.
-5. `git diff --check` sauber.
-6. Keine Browserfehler bei Start, Run, Pause, Kartenwahl, Ergebnis und Rückkehr.
+1. Aktuelle 49 Checks und neun Seeds vorher messen und dokumentieren.
+2. npm test grün; keine Schwelle zum Verdecken eines Fehlers lockern.
+3. Neuer finalBossFlow: 3-Minuten-Ende unverändert; NEXUS bei 8:00; keine
+   Extraktion/Overtime solange er lebt; Bosskill öffnet Extraktion;
+   Spielertod bleibt Niederlage.
+4. bossCombatPocket V2: Ziele 50/30, Rückzug in höchstens acht Sekunden,
+   keine Kunstkills/Belohnungen, Wiederaufbau nach AEGIS, kein 70er-Surge.
+5. Neuer evolutionFocusHud-Check für genau einen aktuellen Pfad.
+6. Präsentationscheck für fünf unterschiedliche Silhouetten/Abmessungen und
+   dynamischen Bossnamen; Farbe allein darf nicht bestehen.
+7. renderCostContract grün; keine gegnerlinear zusätzlichen Zeichenoperationen.
+8. Erwartete Seed-Abweichungen ab geändertem Boss-/Dichtezeitpunkt mit
+   vollständiger Vorher-/Nachher-Tabelle dokumentieren. Frühphase bis 4:10 und
+   nicht betroffene Systeme stabil. Botanker nur nach Messung neu
+   referenzieren, nie durch breitere Toleranz.
+9. Save-, Hold-, Contract-, Report- und Aspect-Checks grün.
+10. git diff --check sauber; keine Browserfehler.
 
 ## Manuelle Abnahme durch Claude
 
 Wenn ein sichtbarer Browser verfügbar ist:
 
-1. 1280×720 und 844×390 in Bewegung, Kartenwahl und Pause prüfen.
-2. Bei hoher Dichte alle fünf Familien, asynchrone Animation und UI-Überlappung
-   prüfen.
-3. AEGIS prüfen: Bezeichnung, Marker, Größe, Seitenpanzer, Lebensleiste,
-   sichere Lücke und Laufbahn.
-4. Schnelle Richtungswechsel und Impulsstoß prüfen; keine Figur kippt/springt.
-5. Schlechteste FPS und 1-%-Low eines späten Laufabschnitts festhalten.
-6. Nach Möglichkeit Nachher-Screenshots beider Größen erzeugen und Pfade im
-   Bericht nennen; Bilder nicht ungefragt committen.
+1. 1280×720 und 844×390 mit Kartenwahl, Pause und EVO-Hinweis prüfen.
+2. Hintergrund gegen 9190de9 und Ausgangsstand vergleichen; Screenshots nennen.
+3. Bei hoher Dichte alle fünf Familien visuell identifizieren.
+4. AEGIS-Rückzug ohne belohntes Verschwinden prüfen.
+5. Vollständigen Run bis NEXUS: Warnung, Spawn, zwei Muster,
+   Extraktionssperre, Tod und anschließende Extraktion.
+6. Schlechteste FPS, 1-%-Low und Anteil unter 55 messen; gegenüber
+   44/54/2,0 % nicht erkennbar schlechter.
 
-Ist kein sichtbarer Browser möglich, bleibt der Auftrag nach grünen Tests
-**TEILWEISE**. Keine visuelle Freigabe erfinden.
+Ohne sichtbaren Browser Grenzen ehrlich dokumentieren, keine Freigabe erfinden.
 
 ## Erlaubte Dateien
 
-- `prototype/web/index.html`
-- `tools/run-balance-suite.mjs` nur für echte zusätzliche Präsentations- oder
-  Performancechecks, nie zum Lockern von Balanceankern
-- `CHANGELOG.md`
-- `docs/WORK_REPORT.md`
-- `docs/ASSET_PROVENANCE.md` nur bei einem neuen Runtime-Asset
+- prototype/web/index.html
+- tools/run-balance-suite.mjs nur für echte neue Verträge/Messungen
+- CHANGELOG.md
+- docs/WORK_REPORT.md
+- docs/ASSET_PROVENANCE.md nur bei unerwartetem neuem Runtime-Asset; vor
+  Import stoppen
 
-Alle anderen Dateien sind geschützt. Insbesondere nicht ändern:
-`ROADMAP.md`, `docs/DECISIONS.md`, `docs/TESTPLAN.md`,
-`docs/CURRENT_TASK.md` und die Konzeptbilder.
+Geschützt: ROADMAP.md, README.md, AGENTS.md, CLAUDE.md,
+docs/DECISIONS.md, docs/TESTPLAN.md, docs/CURRENT_TASK.md und Konzeptbilder.
 
 ## Rückgabe
 
-`docs/WORK_REPORT.md` vollständig nach `docs/WORKFLOW.md` ersetzen, samt:
+docs/WORK_REPORT.md vollständig nach docs/WORKFLOW.md ersetzen, zusätzlich:
 
-- tatsächlich erreichten sichtbaren Unterschieden gegenüber D-038;
-- bewusst nur angenäherten Elementen aus Entwurf 3 und Begründung;
-- Vorher-/Nachher-Zahl der vorgerenderten Phasen und Runtime-Assets;
-- Beleg für unveränderte Simulation, feste Seeds, Save und RNG;
-- Browsergrößen, FPS-Werte und nicht mögliche Sichtprüfungen;
-- Subagenten je Teilauftrag sowie Claudes eigene Diff-/Testprüfung;
-- abschließendem Git-Status und Empfehlung an Codex.
+- Gates mit Diff/Test, Subagenten und eigene Diffprüfung;
+- neun Seeds vorher/nachher;
+- Dichte vor/während/nach AEGIS sowie vor/während NEXUS;
+- Beleg: Rückzug ohne Kills/Belohnung;
+- NEXUS-Benchmark für schwachen und repräsentativen Build;
+- Renderkosten, Browsergrößen/FPS, Risiken und nicht mögliche Prüfungen;
+- lokale Commits, finaler Git-Status und Empfehlung an Codex.
 
-Lokale kleine Commits sind nach grünen Tests erlaubt. Kein Push.
-
-## Codex-Abnahme
-
-**Technisch abgenommen am 25.08.2026.** Claude hat den Auftrag in zwei lokalen
-Commits umgesetzt. Codex hat beide Diffs unabhängig geprüft, die UI-Fragen
-entschieden und als kleine Review-Nacharbeit sechs eigene Waffenpiktogramme
-sowie eine nahtlose Sektortönung über dem gesamten Deck ergänzt.
-
-- `npm test`: 49/49 Checks grün;
-- `git diff --check`: sauber;
-- neun feste Seeds und alle Balancekennzahlen unverändert;
-- Rendervertrag weiter bei zwei Gradienten, keinem `shadowBlur` und keinem
-  neuen Canvas pro Frame im gemessenen Pfad;
-- Sektorname nur als Start-Toast sowie in Pause und Run-Bericht, nicht dauerhaft;
-- subjektive Sicht- und Performancefreigabe bleibt beim Besitzerlauf.
-
-Bis zu diesem Besitzerlauf wird kein Boss-/Dichte- oder Waffenpass gestapelt.
+Lokale kleine Commits nach grünen Tests erlaubt. Kein Push, kein Folgeauftrag.

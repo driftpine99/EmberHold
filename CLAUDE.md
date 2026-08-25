@@ -45,27 +45,24 @@ Leitung. Der vollständige Ablauf steht in docs/WORKFLOW.md.
 
 ## Verbindliche aktuelle Grafikrichtung
 
-- Sichtbarer Produktname und Art Direction sind seit D-037/D-040
+- Sichtbarer Produktname und Art Direction sind seit D-037/D-041
   **Orbitblade**. Repository, Pages-URL, Save-Key und interne IDs bleiben
   vorerst Emberhold.
-- Verbindliche Referenz ist
-  `docs/concepts/orbitblade-combat-ui-direction-v2.png`: taktisches flaches
-  2D-Sci-Fantasy in Navy, Violett, Cyan und Weißgold.
-- Das mittelhelle Orbitaldeck läuft optisch bis an alle Bildschirmränder.
-  Keine sichtbaren Safe-Area-Balken, harten Trennlinien oder Randabdunklung
-  wieder einführen. Simulationsclip und D-017 bleiben technisch unverändert.
-- Der Orbitträger nutzt `SPR.orbiter` mit 6 Idle-, 8 Bewegungs- und 8
-  Wurfphasen. Er bleibt aufrecht, wird nur horizontal gespiegelt und niemals
-  frei rotiert.
-- Alle fünf normalen Familien nutzen `SPR.foe[f][phase]` mit je sechs
-  asynchronen Phasen. Elite und AEGIS nutzen `SPR.eliteA` beziehungsweise
-  `SPR.aegisA` mit je sechs Phasen. Alte PNG-Atlanten sind keine aktive
-  visuelle Referenz.
+- Referenz bleibt docs/concepts/orbitblade-combat-ui-direction-v2.png:
+  taktisches flaches 2D-Sci-Fantasy in Navy, Violett, Cyan und Weißgold.
+- Der feinere, dunklere Deckboden aus Commit 9190de9 ist die D-041-Referenz,
+  läuft aber mit der nahtlosen D-040-Technik bis an alle Bildschirmränder.
+  Keine Safe-Area-Balken, harten Trennlinien oder Randabdunklung.
+- Der Orbitträger nutzt SPR.orbiter mit 6 Idle-, 8 Bewegungs- und 8
+  Wurfphasen; aufrecht, nur horizontal gespiegelt, nie frei rotiert.
+- Alle fünf Familien behalten sechs asynchrone Phasen, müssen sich nach D-041
+  aber klar durch Außenkontur, Proportion und Größe unterscheiden. Farbe allein
+  reicht nicht. Elite, AEGIS und der neue NEXUS bleiben sofort eigenständig.
 - Gegner bleiben vollständige Figuren mit klaren Leuchtkernen. Keine
-  Kreisplatzhalter, abstrakten Schattenfiguren oder synchronen Pulkphasen.
-- Dauerhafte Kampf-UI: Gesundheit/Erfahrung links oben, Uhr und Pause am Rand,
-  `BOSS: AEGIS` bei lebendem Boss sowie höchstens sechs eigene
-  Waffenpiktogramme unten. Sektorname nur als Start-Toast, in Pause und Bericht.
+  Kreisplatzhalter, Schattenfiguren oder synchronen Pulkphasen.
+- Kampf-UI: Gesundheit/Erfahrung, Uhr, Pause, dynamische Bossleiste, höchstens
+  sechs Waffenpiktogramme und genau ein kompakter Hinweis „Nächste EVO“.
+  Sektorname nur als Start-Toast, in Pause und Bericht.
 - Weltbewegung läuft am Browser-Frame; Posen wechseln ungefähr mit 10–12 FPS
   ohne Crossfade. Keine Gradienten, `shadowBlur` oder Objektallokationen pro
   Einheit und Frame.
@@ -78,21 +75,16 @@ Leitung. Der vollständige Ablauf steht in docs/WORKFLOW.md.
 Dieser Abschnitt ist kein Arbeitsauftrag. Priorität und Scope stehen nur in
 `docs/CURRENT_TASK.md`.
 
-**Stand 25.08.2026, nach D-040.** Der vollständige D-036-Besitzerlauf ist
-negativ ausgewertet: Die Progressionsbremse wirkt und die Performance ist gut,
-aber Gegnerflut, Fluchtgefühl, ereignisarmer AEGIS-Kampf und die Dominanz von
-Sternenhagel verhindern weiterhin die Spielgefühl-Freigabe. D-039 sichert den
-letzten Abschlussbericht lokal.
+**Stand 25.08.2026, nach D-041.** Der D-040-Besitzerlauf hat Stil,
+Animation, AEGIS-Lesbarkeit und die erheblich angenehmere Gegnerflut bestätigt.
+Nicht freigegeben sind der helle grobe Hintergrund, zu ähnliche Gegner und der
+fehlende Evolutionshinweis. AEGIS besitzt außerdem noch zu viele Begleiter.
 
-D-040 priorisiert auf Besitzerwunsch zunächst den sichtbaren Kampf. Der
-Grafik-/UI-Pass ist technisch abgenommen: 64 aktive vorgerenderte Phasen,
-durchgehendes Deck, minimale UI, eigene Waffenpiktogramme und 49/49 Checks bei
-bitidentischer Neun-Seed-Simulation.
-
-Der nächste verbindliche Schritt ist genau ein vollständiger Besitzerlauf zur
-Abnahme von Grafik, Animation, AEGIS-Lesbarkeit und Renderleistung. Bis dahin
-keinen weiteren Balancepass stapeln. Danach folgt zuerst Boss/Dichte und erst
-danach der getrennte Waffenrollenpass.
+EH-2026-08-25-03 ist freigegeben: sichtbare Korrekturen, AEGIS mit Ziel 50
+und ein verpflichtender Endboss NEXUS nach der achtminütigen Aufbauphase mit
+Ziel 30. Erst NEXUS' Tod schaltet Extraktion/Overtime frei. Waffenwerte bleiben
+bis zum folgenden separaten Waffenrollenpass unverändert. Baseline: 49/49
+Checks; Feldlauf 19.176 Kills, 27 Kartenzüge, zwei Evolutionen, FPS 44/54.
 
 ### Drei Dinge, die eine neue Sitzung wissen muss
 
@@ -101,10 +93,10 @@ danach der getrennte Waffenrollenpass.
 „zurück auf 21 repariert“, macht den Vertrag kaputt. Der Besitzerlauf nach
 D-036 soll 28–34 Kartenzüge erreichen.
 
-**2. Vor der Besitzerabnahme keine weitere Balance stapeln.**
-Der Lauf prüft zuerst Grafik, Animation, AEGIS-Lesbarkeit und echte
-Renderleistung. Danach folgt Boss/Dichte und erst anschließend der
-Waffenrollenpass; Rückflugmechanik und neuer Content bleiben getrennte Gates.
+**2. EH-2026-08-25-03 verändert nur Boss/Dichte und Darstellung.**
+Waffenrollen trotz auffälliger Telemetrie nicht gleichzeitig anfassen. Erst
+der Besitzerlauf bis NEXUS trennt Finale und Waffenwirkung sauber; danach
+folgt der Waffenpass. Station, Audio und Monetarisierung bleiben eigene Gates.
 
 **3. Sichtbare Namen sind eine Präsentationsschicht.** `LEX` darf Bezeichnungen
 ändern; IDs wie `bogen`, `glutsehne`, `ring` und der Save-Key

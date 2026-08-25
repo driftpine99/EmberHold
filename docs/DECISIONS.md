@@ -1756,8 +1756,8 @@ führen zur Reihenfolge aus D-040.
 
 ## D-040 – Taktisches Sci-Fantasy ist die verbindliche Kampfrichtung V2
 
-**Status:** technisch umgesetzt und durch Codex abgenommen (25.08.2026);
-subjektive Besitzerabnahme steht aus.
+**Status:** technisch umgesetzt; Besitzerabnahme am 25.08.2026 nur teilweise
+erteilt und durch D-041 fortgeführt.
 
 Der D-036-Besitzerlauf ist spielbar und technisch performant, trägt aber noch
 keinen freiwilligen zweiten Run. Der Besitzer beschreibt weiterhin eine zu
@@ -1815,3 +1815,68 @@ Codex konnte den sichtbaren Browser-Smoke wegen der lokalen Browserverbindung
 nicht wiederholen. Claudes Messung bei 1280×720 und 844×390 ist technisch
 plausibel, ersetzt aber weder den Besitzerlauf noch dessen subjektive
 Freigabe.
+
+## D-041 – AEGIS wird Mittelboss, NEXUS das verpflichtende Run-Finale
+
+**Status:** auf Grundlage des Besitzerlaufs beschlossen und als
+EH-2026-08-25-03 für Claude freigegeben (25.08.2026).
+
+Der D-040-Abnahmelauf mit Seed 2395647195 endete bei 8:00 erfolgreich:
+19.176 Kills, Stufe 28, 27 Kartenzüge, zwei Evolutionen, schlechteste FPS 44,
+1-%-Low 54 und 2,0 Prozent der Proben unter 55 FPS. Der Besitzer bewertet
+Bewegung, AEGIS-Erkennung und Bosskampf positiv; die Gegnerflut fühlt sich
+erheblich besser an.
+
+Die visuelle Freigabe ist trotzdem nur teilweise:
+
+- Der Sci-Fantasy-Stil passt, der in D-040 aufgehellte und vergröberte
+  Deckboden ist gegenüber D-038 jedoch erheblich schlechter.
+- Die fünf Gegnerfamilien besitzen zu ähnliche Körper und sind im Pulk kaum
+  auseinanderzuhalten.
+- Die minimale UI funktioniert, aber der frühere Hinweis auf die am nächsten
+  erreichbare Evolution war hilfreich und soll als genau ein kompakter
+  Hinweis zurückkehren.
+- Die Waffenpiktogramme sind verständlich, derzeit aber kein eigener
+  Produktgrund für weitere Arbeit.
+- Während AEGIS befinden sich weiterhin zu viele normale Gegner im Kampf.
+
+Die Telemetrie bestätigt außerdem den späteren Waffenrollenpass:
+Sternenhagel und Sonnenbruch erzeugten zusammen 89 Prozent des Gesamtschadens.
+Orbitklinge, Kettenemitter und Sentinel-Drohnen bleiben auffällig schwach.
+Diese Werte werden in EH-2026-08-25-03 ausdrücklich noch nicht verändert,
+damit das neue Run-Finale getrennt bewertet werden kann.
+
+### Verbindliche Run-Struktur
+
+AEGIS bleibt bei 4:10 als Mittelboss. Sein normales Begleiterziel sinkt von
+90 auf 50. Überschüssige Gegner ziehen sich kontrolliert und ohne Kills,
+Erfahrung oder Beute zurück. Der bisherige einmalige Schub von 70 Gegnern bei
+7:00 entfällt; danach baut sich die normale Dichte nur sanft wieder auf.
+
+Bei 7:45 beginnt die sichtbare Vorbereitung des Finales. Bei 8:00 erscheint
+der neue Endboss **NEXUS** innerhalb des Kampfausschnitts. Während NEXUS lebt,
+bleiben höchstens 30 normale Begleiter als Druck erhalten. Die Acht-Minuten-
+Aufbauphase ist damit beendet, der Run selbst aber noch nicht gemeistert.
+
+Extraktion ist erst nach dem echten Tod von NEXUS möglich. Das verpflichtende
+Finale ist keine freiwillige Overtime und verwendet deshalb noch nicht deren
+Schadenseskalation. Nach dem Bosskill öffnet die bestehende
+Extraktions-/Overtime-Entscheidung. Ein Spielertod im Finale bleibt eine
+Niederlage.
+
+NEXUS ist kein umgefärbter AEGIS: eigene Silhouette, eigene Animationsphasen
+und mindestens zwei klar telegraphierte Angriffsmuster sind Pflicht. Ein
+repräsentativer Build mit ein bis zwei Evolutionen soll ungefähr 30 bis
+75 Sekunden benötigen. Der Run-Bericht hält Spawn, Tod und Finaldauer fest.
+
+### Sichtbare Korrekturen
+
+Der Deckboden nimmt die dunklere, feinere D-038-Fassung aus Commit 9190de9 als
+Referenz, behält aber die nahtlose D-040-Randabdeckung. Die Gegnerfamilien
+werden über Silhouette, Proportion und Größe statt nur über Kernfarbe
+getrennt. Genau ein Hinweis „Nächste EVO“ kehrt oberhalb der Waffenleiste
+zurück.
+
+Waffenwerte, XP-Kurve, Kartenlogik, Save v4, Station und Ökonomie bleiben in
+diesem Auftrag unverändert. Nach dem Besitzerlauf des neuen Finales folgt der
+bereits beschlossene getrennte Waffenrollenpass.
