@@ -1,4 +1,4 @@
-# Emberhold – Projektanweisungen für Codex
+# Orbitblade – Projektanweisungen für Codex
 
 Diese Datei ist die kurze Übergabe für jede neue Codex-Sitzung. Das
 Projekt wird kosteneffizient und in kleinen, prüfbaren Schritten gebaut. Der
@@ -41,81 +41,71 @@ und Testplan und entscheidet über den Push.
 
 ## Verbindliche aktuelle Grafikrichtung
 
-- Gemalte, bewusst niedrig aufgelöste Fantasy-Figuren mit klaren Silhouetten
-  auf einem mittelhellen, ruhigen Basaltboden; siehe D-014 bis D-016.
-- Aelric nutzt `assets/aelric-atlas-v2.png`: 4×3 Zellen für Idle, Lauf und
-  Bogen. Er bleibt aufrecht und wird nur horizontal gespiegelt, nie frei
-  rotiert.
-- Gegner bleiben unabhängig von Entfernung vollständig sichtbar. Keine
-  Kreisplatzhalter, abstrakten Schattenfiguren oder zusätzliche
-  Randabdunklung wieder einführen.
-- `assets/enemy-atlas-v1.png` enthält die statischen Gegnerfamilien.
-  `assets/enemy-swarmer-atlas-v2.png` enthält den ersten asynchronen
-  Vier-Phasen-Laufzyklus. Weitere Familien werden einzeln ergänzt, nicht als
-  neuer großer Sammelatlas.
-- Die Weltbewegung läuft am Browser-Frame; Rasterposen wechseln bewusst mit
-  ungefähr 9–10 FPS ohne Crossfade-Doppelbilder.
-- KI-generierte Grafiken sind Prototyp-Assets, nicht automatisch
-  store-fertig oder rechtlich freigegeben. Ein finaler Art-/Rechte-Pass ist
-  ein späteres eigenes Gate.
+- Sichtbarer Produktname und Art Direction sind seit D-037/D-038 **Orbitblade**.
+  Repository, Pages-URL, Save-Key und interne IDs bleiben vorerst Emberhold.
+- Flaches 2D-Sci-Fantasy in Navy, Violett, Cyan und Weißgold auf einem
+  mittelhellen Stationsdeck. Seitliche Sternenflächen sind rein dekorativ und
+  müssen exakt auf die Safe-Area geclippt bleiben.
+- Der Orbitträger nutzt die code-native Posefolge `SPR.orbiter`: aufrecht,
+  horizontal gespiegelt, niemals frei rotiert. Der alte Aelric-Atlas ist nur
+  noch historische Projektdatei und wird zur Laufzeit nicht geladen.
+- Sammlerdrohnen nutzen `SPR.drone` mit sechs asynchronen Phasen. AEGIS und
+  das Orbitklingenprojektil sind ebenfalls code-native. Der allgemeine
+  `enemy-atlas-v1.png` bleibt vorläufig für die noch nicht konvertierten
+  Familien aktiv.
+- Gegner bleiben unabhängig von Entfernung vollständige Figuren. Keine
+  Kreisplatzhalter, abstrakten Schattenfiguren oder Randabdunklung einführen.
+- Weltbewegung läuft am Browser-Frame; Posen wechseln ungefähr mit 10–12 FPS
+  ohne Crossfade. Keine Gradienten, `shadowBlur` oder Objektallokationen pro
+  Einheit und Frame.
+- Code-native und KI-generierte Prototypgrafik ist nicht automatisch
+  store-fertig oder rechtlich freigegeben. Ein finaler Art-/Rechte-Pass bleibt
+  ein eigenes Gate.
 
 ## Historischer Produktkontext
 
 Dieser Abschnitt ist kein Arbeitsauftrag. Priorität und Scope stehen nur in
-docs/CURRENT_TASK.md.
+`docs/CURRENT_TASK.md`.
 
-**Stand 22.08.2026, nach D-034.** Phase 0.5 ist umgesetzt (D-019 bis D-023).
-Danach hat der Besitzer zum ersten Mal selbst gespielt und bewertet — das
-Ergebnis steht in **D-027** und ist das Dokument, an dem sich gerade alles
-ausrichtet: *„Lust ja, aber so funktioniert der Run nicht."* Der Schwärmer ist
-**nicht freigegeben**, der Stürmer bleibt gesperrt.
+**Stand 25.08.2026, nach D-038.** Der Besitzerlauf nach D-035 bestätigte
+Bossphase und Leistung, aber nicht das Spielgefühl: 46 Kartenzüge, Stufe 47,
+drei Evolutionen und stark auseinanderlaufende Waffenrollen machten den
+späten Run praktisch ungefährlich. D-036 bremst deshalb nur die späte
+Progression, schwächt Sternenhagel gezielt ab, verbessert die
+Sentinel-Drohnen-Hitgeometrie und erweitert die Waffentelemetrie.
 
-Aus D-027 sind Rang 1 bis 4 abgearbeitet:
-
-| Rang | Was | Entscheidung |
-|---|---|---|
-| 1 | Bewegungsüberschuss beseitigt, Feld verstopft nicht mehr | D-028 bis D-030 |
-| 2 | Slotanzeige läuft nicht mehr aus dem Bild | — |
-| 3 | Evolutionen wieder erreichbar; Gluttropfen als einsammelbare Heilung | D-031, D-032 |
-| 4 | Zweck sichtbar: ein Ziel im Hold und am Run-Ende; Erzkurve korrigiert | D-033, D-034 |
-
-**Offen bleiben Rang 5 und 6:** Die Animation wirkt für den Besitzer ruckelig,
-er würde Detailqualität gegen mehr Phasen tauschen — das **kehrt D-015 und
-D-016 um** und braucht neue Assets sowie eine eigene bewusste Entscheidung.
-Die seitliche Safe-Area gefällt ihm nicht, das ist rein kosmetisch.
+D-038 ist technisch abgenommen: sichtbare Sprache, HUD, Orbitalstation,
+Safe-Area sowie Orbitträger, Sammlerdrohne, AEGIS und Klingenprojektil bilden
+den ersten Orbitblade-Slice. Die Simulation, Save v4, interne IDs und
+Hold-Ökonomie blieben unverändert. Der nächste verbindliche Schritt ist ein
+vollständiger menschlicher Acht-Minuten-Lauf nach dem aktuellen Protokoll in
+`docs/TESTPLAN.md`.
 
 ### Drei Dinge, die eine neue Sitzung wissen muss
 
-**1. Der Kartenzug-Korridor ist kein Designziel mehr.** Seit D-026 ist belegt,
-dass der Testbot die menschliche Kurve nicht abbildet: Menschen erreichen den
-ersten Kartenzug nach 34,9 / 35,2 / 33,9 Sekunden, der Bot nach 26,5 bei einer
-Streuung von 21,0 bis 30,7. `totalPicks` prüft deshalb gegen den
-Regressionsanker `BOT_PICK_REF`, nicht gegen `CFG.PICK_TARGETS`. Beide Zahlen
-stehen getrennt in der Testausgabe als `botRef` und `designTotal`. **Wer den
-Anker „zurück auf 21 repariert", macht es kaputt.** Das Designziel wird an
-Menschenläufen geprüft, siehe die Feldlauf-Tabelle in `docs/TESTPLAN.md`.
+**1. Der Botwert ist nur ein Regressionsanker.** `totalPicks` prüft gegen
+`BOT_PICK_REF = 21.7`, nicht gegen das menschliche Designziel. Wer den Anker
+„zurück auf 21 repariert“, macht den Vertrag kaputt. Der Besitzerlauf nach
+D-036 soll 28–34 Kartenzüge erreichen.
 
-**2. Sechs Änderungen warten auf einen Feldlauf.** D-030 bis D-034 sind
-gemessen und getestet, aber keine ist im Spiel bestätigt. **Keine weiteren
-Balanceänderungen stapeln**, bevor der Besitzer einen sauberen 8-Minuten-Lauf
-gefahren hat — sonst lässt sich nicht mehr zuordnen, was gewirkt hat. Das
-Prüfprotokoll mit sechs gezielten Fragen steht in `docs/TESTPLAN.md`.
+**2. Vor dem Feldlauf keine weitere Balance oder neuen Content stapeln.**
+Der Lauf muss zuerst zeigen, ob späte Gefahr, Waffenrollen, Übersicht und Lust
+auf einen zweiten Run wirklich besser sind. Rückflugmechanik der Orbitklinge,
+weitere Gegneranimationen und Stationsausbau bleiben bis dahin getrennte
+Folgeaufträge.
 
-**3. Die Reserve beim Dichte-Überschuss ist halbiert.** `densityOvershoot`
-erlaubt 10 %, aktuell liegen wir bei 6,8 % (vorher 3,9 %). Ursache ist eine
-Kette: mehr Kartenzüge → höhere Stufe → zähere Gegner → langsameres Sterben.
-Jede Änderung, die die Kartenzüge weiter hebt, kann den Check reißen. Das ist
-kein Fehler, sondern genau die Warnung, für die er gebaut wurde.
+**3. Sichtbare Namen sind eine Präsentationsschicht.** `LEX` darf Bezeichnungen
+ändern; IDs wie `bogen`, `glutsehne`, `ring` und der Save-Key
+`emberhold:hold:v1` bleiben für Spielstände und Tests erhalten. Alte Begriffe
+in Migrationen sind deshalb kein sichtbarer Rückfall.
 
 ### Was weiterhin unverhandelbar ist
 
-Neue Hold-Boni und Vertragsmodifikatoren dürfen nicht unbemerkt in die
-Baseline-Seed-Suite gelangen; `baselineIsolated` prüft das in drei Checks.
-Bestehende lokale Spielstände immer migrieren, niemals durch eine neue
-Save-Version still löschen. Und Erwartungswerte in Tests nicht hart verdrahten:
-`holdFlow` und `contractFlow` sind an D-034 zerbrochen, weil sie Erzwerte fest
-eingetragen hatten, obwohl an dem was sie prüfen nichts falsch war. Beide leiten
-ihre Erwartung jetzt aus der Laufzeit ab.
+Neue Stationsboni und Sektormodifikatoren dürfen nicht unbemerkt in die
+Baseline-Seed-Suite gelangen. Bestehende lokale Spielstände immer migrieren,
+niemals durch eine neue Save-Version still löschen. Erwartungswerte in Tests
+aus der Laufzeit ableiten, wenn der Test nicht gerade den konkreten Wert
+absichern soll.
 
 ## Prüfen und dokumentieren
 

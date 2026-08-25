@@ -4,7 +4,7 @@
 
 - **Task-ID:** EH-2026-08-24-02
 - **Thema:** Orbitblade – visueller und semantischer Vertikalschnitt
-- **Status:** **BEREIT_FUER_CODEX_REVIEW**
+- **Status:** **ABGENOMMEN_DURCH_CODEX** (25.08.2026)
 - **Auftraggeber und Abnahme:** Codex
 - **Ausführung:** Claude Code
 - **Priorität:** P0 – neue Produktidentität ohne Balanceänderung
@@ -277,3 +277,20 @@ nicht alle code- und testbaren Pakete.
 `docs/CURRENT_TASK.md` ausschließlich auf `BEREIT_FUER_CODEX_REVIEW`
 setzen, nicht projektweit abnehmen, nicht pushen und keinen Folgeauftrag
 beginnen.
+
+## Codex-Abnahme
+
+Die Codex-Abnahme am 25.08.2026 schließt den Auftrag technisch ab:
+
+- finale Suite 47/47, `git diff --check` sauber;
+- feste Simulation, interne IDs, Save v4 und Hold-Ökonomie unverändert;
+- echter Chrome-Smoke bei 1280×720 und 844×390 einschließlich Station, Run,
+  Pause, Kartenwahl, Ergebnis und Rückkehr;
+- code-native Orbitblade-Figuren haben Vorrang vor historischen
+  Fantasy-Atlanten; zwei ungenutzte Laufzeitdownloads entfallen;
+- mobile Safe-Area, Toast-Layer und niedrige Dialoghöhen sind korrigiert;
+  Ausrüstung, Elite-Module und Meisterschaften nutzen die Sci-Fantasy-Sprache.
+
+Die subjektive Freigabe des Spielgefühls bleibt beim vollständigen
+D-036-Besitzerlauf. Vor dessen Auswertung wird kein neuer Claude-Auftrag
+freigegeben.
