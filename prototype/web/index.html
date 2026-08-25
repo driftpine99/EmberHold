@@ -113,7 +113,7 @@ canvas{display:block;position:absolute;inset:0;width:100%;height:100%}
 #evohint.ready{border-color:#e07a3f;box-shadow:0 0 12px rgba(224,122,63,.20)}
 #evohint.ready .ehname{color:#ffb870}
 /* D-042 / Gate D: kompakter Signal-Status unter dem EVO-Hinweis. */
-#signalhud{position:absolute;left:14px;top:124px;padding:4px 10px;border-radius:8px;
+#signalhud{position:absolute;left:14px;top:132px;padding:4px 10px;border-radius:8px;
   background:rgba(13,18,30,.78);border:1px solid #2c4a58;
   font-size:10px;letter-spacing:.06em;color:#8fd8e8;white-space:nowrap;
   opacity:0;transition:opacity .18s ease;pointer-events:none;z-index:5;
@@ -315,7 +315,6 @@ button.b.danger{background:#c9402e;color:#fff}
 #start[data-panel="core"]   .dpanel[data-panel="core"],
 #start[data-panel="mine"]   .dpanel[data-panel="mine"],
 #start[data-panel="forge"]  .dpanel[data-panel="forge"],
-#start[data-panel="arcanum"].dpanel[data-panel="arcanum"],
 #start[data-panel="arcanum"] .dpanel[data-panel="arcanum"],
 #start[data-panel="yard"]   .dpanel[data-panel="yard"],
 #start[data-panel="armory"] .dpanel[data-panel="armory"],
@@ -4450,6 +4449,8 @@ function renderContracts(){
   });
   el('btnStart').textContent=selected.name+' · 8 Min';
   el('btnStart3').textContent=selected.name+' · 3 Min';
+  el('btnStart2').textContent=selected.name+' · 8 Min';
+  el('btnStart32').textContent=selected.name+' · 3 Min';
 }
 // ===========================================================================
 //  D-042 / Gate C: Stationsring — Hotspots, genau ein Detailpanel, Kern
@@ -5821,6 +5822,7 @@ window.__EH = { get S(){return S;}, get H(){return META;}, CFG, HOLD_CFG, CONTRA
                 grantGear, equipGear, upgradeGear, salvageGear, gearUpgradeCost,
                 endRun, startOvertime, damagePlayer,
                 contractById, showHold:showStartMenu,
+                showExtract, showStartMenu,
                 tick:(d)=>{HEADLESS=true; step(d);
                   while(pendingPicks>0){currentOffer=buildOffer(); applyOffer(currentOffer[0]); pendingPicks--;}
                   while(S.pendingEliteRewards>0){currentOffer=buildEliteOffer(); applyOffer(currentOffer[0]); S.pendingEliteRewards--; S.eliteChoices++;}

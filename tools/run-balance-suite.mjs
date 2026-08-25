@@ -44,8 +44,8 @@ function makeElement(id = "") {
     style: { setProperty: noop, removeProperty: noop },
     children: [],
     classList: {
-      add: (name) => classes.add(name),
-      remove: (name) => classes.delete(name),
+      add: (...names) => names.forEach(n => classes.add(n)),
+      remove: (...names) => names.forEach(n => classes.delete(n)),
       toggle: (name, force) => {
         const next = force === undefined ? !classes.has(name) : !!force;
         if (next) classes.add(name); else classes.delete(name);
@@ -55,6 +55,7 @@ function makeElement(id = "") {
     setAttribute: (name, value) => attributes.set(name, String(value)),
     getAttribute: (name) => attributes.get(name),
     removeAttribute: (name) => { attributes.delete(name); },
+    get className() { return [...classes].join(" "); },
     addEventListener: noop,
     appendChild: (child) => { node.firstElementChild ||= child; },
     getContext: () => context,
@@ -2277,9 +2278,382 @@ try {
   foeSilhouetteError = error instanceof Error ? error.message : String(error);
 }
 
+// --- EH-2026-08-25-04 / D-042 Gate A+B: Kampfgrafik V3 ----------------------
+// Lichthueter-Merkmale im vorgerenderten Pfad, Phasenzahlen 6/8/8 bei ~12 FPS,
+// Rammjaeger-Aufladphase in derselben aktuellen Silhouette (keine alte Tier-
+// Darstellung mehr), EVO-Hinweis links, Hot-Loop ohne Zeitquelle/Zufall und
+// der neue Orbitalhintergrund als einmal gebackene Ebenen.
+let combatArtV3 = false;
+let artV3Error = "";
+let artV3Diagnostics = null;
+try {
+  const pose = html.slice(html.indexOf("function drawOrbiterPose"),
+                          html.indexOf("function buildOrbiterSprites"));
+  const spriteBau = html.slice(html.indexOf("function buildArenaSprites"),
+                               html.indexOf("const ENEMY_DIRECTIONS"));
+  const orbiterMatch = html.match(/ORBITER_ANIM = Object\.freeze\(\{IDLE:(\d+), WALK:(\d+), THROW:(\d+), FPS:(\d+)/);
+  const phasenOk = orbiterMatch && +orbiterMatch[1] >= 6 && +orbiterMatch[2] >= 8 &&
+    +orbiterMatch[3] >= 8 && +orbiterMatch[4] >= 10 && +orbiterMatch[4] <= 12;
+  // Lichthueter-Grammatik (adaptiert aus zeichneLichthueterNeu): Goldhalo mit
+  // Ticks, Goldraute, V-Visier, breite Schultern, geteilter Mantel,
+  // Helm in Weiss-Gold.
+  const haloRing = pose.includes("g.arc(0,-14,11.8") &&
+    pose.includes("0.7854+") && pose.includes("1.5708");
+  const krone = pose.includes("g.moveTo(0,-26)") && pose.includes("g.lineTo(-2,-21)");
+  const visier = pose.includes("#7fd4e8") && pose.includes("(0,-14.5)");
+  const schultern = pose.includes("s*15,-5");
+  const mantel = pose.includes("rgba(92,190,255,.24)");
+  const helmGold = pose.includes("#d9b45a") && pose.includes("(-6,-11)");
+  // Hot-Loop-Disziplin: keine Zeitquelle, kein Zufall.
+  const heissSauber = !pose.includes("Date.now()") && !pose.includes("Math.random()") &&
+    !spriteBau.includes("Date.now()") && !spriteBau.includes("Math.random()");
+  // Rammjaeger-Aufladphase bleibt aktuell; Tier-/Fallback nur ohne Atlas.
+  const rammjaegerNeu = html.includes("SPR.foe&&E.kind[i]===0") &&
+    !html.includes("SPR.foe&&tier===ENEMY_NORMAL_TIER") &&
+    html.includes("ENEMY_TELEGRAPH_TIER=3");
+  // EVO-Hinweis links unter Gesundheit/Erfahrung.
+  const evoLinks = /#evohint\{[^}]*left:14px/.test(html) &&
+    /#evohint\{[^}]*top:64px/.test(html) &&
+    !/#evohint\{[^}]*translateX\(-50%\)/.test(html);
+  // Orbitalhintergrund: einmalige Ebenen statt Kastenwand.
+  const orbitSzene = html.includes("SPR.starTile=skyT") &&
+    html.includes("SPR.landmarks=") && html.includes("SPR.planet=pl") &&
+    html.includes("function drawDeckEdges()");
+  combatArtV3 = phasenOk && haloRing && krone && visier && schultern && mantel &&
+    helmGold && heissSauber && rammjaegerNeu && evoLinks && orbitSzene;
+  artV3Diagnostics = { phasenOk,
+    phasen: orbiterMatch ? {idle:+orbiterMatch[1],walk:+orbiterMatch[2],
+                            wurf:+orbiterMatch[3],fps:+orbiterMatch[4]} : null,
+    haloRing, krone, visier, schultern, mantel, helmGold,
+    heissSauber, rammjaegerNeu, evoLinks, orbitSzene };
+} catch (error) {
+  artV3Error = error instanceof Error ? error.message : String(error);
+}
+
+// --- EH-2026-08-25-04 / D-042 Gate D: Sektorziel SIGNAL SICHERN -------------
+let sectorObjectiveFlow = false;
+let sectorError = "";
+let sectorDiagnostics = null;
+try {
+  const TICK = engine.CFG.TICK;
+  const stillLegen = () => {
+    engine.S.W = {}; engine.S.hp = engine.S.maxhp = 1e9;
+    engine.S.events.boss = true;
+    engine.S.events.elite = engine.CFG.ELITE_AT.length;
+  };
+  const startRun = () => {
+    engine.newRun(480, 20260826, "ring");
+    engine.S.running = true; engine.S.phase = "run";
+  };
+  const laufenSek = (sek) => { for (let i=0,n=Math.round(sek/TICK);i<n;i++) engine.tick(TICK); };
+
+  // 1) Nur der Acht-Minuten-Modus erhaelt das Ziel.
+  engine.newRun(180, 20260826, "ring"); engine.S.running=true; engine.S.phase="run";
+  stillLegen(); laufenSek(160);
+  const kurzOhneSignal = engine.signalStatus().status === "keiner" && !engine.S.signal;
+
+  // 2) Spawn bei 2:30, deterministisch, Abstand 220–300.
+  startRun(); stillLegen();
+  laufenSek(149.5);
+  const vorherNichtDa = engine.signalStatus().status === "wartet";
+  laufenSek(1);
+  const sigOffen = engine.signalStatus().status === "offen";
+  const s1x = engine.S.signal.x, s1y = engine.S.signal.y;
+  const dist = Math.hypot(s1x - engine.S.x, s1y - engine.S.y);
+  const distanzOk = dist >= 220 - 1e-6 && dist <= 300 + 1e-6;
+  startRun(); stillLegen(); laufenSek(150.5);
+  const positionDeterministisch = engine.S.signal &&
+    Math.abs(engine.S.signal.x - s1x) < 1e-9 &&
+    Math.abs(engine.S.signal.y - s1y) < 1e-9;
+
+  // 3) Kumulativ 8 Sekunden; Verlassen pausiert ohne Reset.
+  startRun(); stillLegen(); laufenSek(150.5);
+  const s2x = engine.S.signal.x, s2y = engine.S.signal.y;
+  const hin = () => { engine.S.x = s2x; engine.S.y = s2y; engine.rebuildGrid(); };
+  const weg = () => { engine.S.x = s2x + 400; engine.S.y = s2y; engine.rebuildGrid(); };
+  hin(); laufenSek(3);
+  const geladenNach3 = engine.signalStatus().geladen;
+  weg(); laufenSek(2);
+  const pauseOhneReset = Math.abs(engine.signalStatus().geladen - geladenNach3) < 1e-9;
+  hin();
+  const t0 = engine.S.t;
+  while (engine.signalStatus().status === "offen" && engine.S.t - t0 < 20)
+    engine.tick(TICK);
+  const ladezeit = engine.S.t - t0;
+  const kumuliertOk = engine.signalStatus().status === "gesichert" &&
+    Math.abs(ladezeit - (8 - geladenNach3)) < 0.06;
+  const ersteDatei = engine.S.securedData === 1;
+
+  // 4) NEXUS-Kill sichert die zweite Datei; Gutschrift genau einmal.
+  const bossIdx = engine.spawnEnemy(engine.S.t, 4, 2, 260, 0, "nexus");
+  engine.S.bossIndex = bossIdx; engine.S.bossId = "nexus";
+  engine.killEnemy(bossIdx);
+  const zweiteDatei = engine.S.securedData === 2;
+  engine.showExtract();
+  const basisFormel = Math.abs(engine.S.baseReward -
+    Math.round(engine.S.kills*1.0 + engine.S.gemsTaken*0.6) - 2*60) < 1e-6;
+  engine.depositRunReward();
+  const gutschriftEinmal = engine.H.stationData === 2;
+  engine.depositRunReward();
+  const keineDoppelteGutschrift = engine.H.stationData === 2;
+
+  // 5) Tod im Finale behaelt gesicherte Dateien.
+  startRun(); stillLegen(); laufenSek(151);
+  const sigTod = engine.S.signal;
+  engine.S.x = sigTod.x; engine.S.y = sigTod.y; engine.rebuildGrid();
+  laufenSek(8.05);
+  const gesichertVorTod = engine.S.securedData === 1;
+  engine.S.hp = 1; engine.S.iframe = 0; engine.S.dashIf = 0;
+  engine.damagePlayer(50);
+  const todBehaelt = engine.S.result === "Gefallen" && engine.S.rewardGranted &&
+    engine.H.stationData === 3;
+  engine.depositRunReward();
+  const todKeinZweitesMal = engine.H.stationData === 3;
+
+  // 6) Verpassen ist terminal.
+  let verpasstTerminal = false;
+  startRun(); stillLegen(); laufenSek(241);
+  const verpasst = engine.signalStatus().status === "verpasst" &&
+    engine.S.securedData === 0;
+  if (engine.S.signal){
+    engine.S.x = engine.S.signal.x; engine.S.y = engine.S.signal.y;
+    engine.rebuildGrid();
+  }
+  laufenSek(10);
+  verpasstTerminal = engine.signalStatus().status === "verpasst" &&
+    engine.S.securedData === 0;
+
+  sectorObjectiveFlow = kurzOhneSignal && vorherNichtDa && sigOffen && distanzOk &&
+    positionDeterministisch && kumuliertOk && ersteDatei && pauseOhneReset &&
+    zweiteDatei && basisFormel && gutschriftEinmal && keineDoppelteGutschrift &&
+    gesichertVorTod && todBehaelt && todKeinZweitesMal && verpasst && verpasstTerminal;
+  sectorDiagnostics = { kurzOhneSignal, vorherNichtDa, sigOffen,
+    distanz: +dist.toFixed(2), distanzOk, positionDeterministisch,
+    geladenNach3: +geladenNach3.toFixed(3), pauseOhneReset,
+    ladezeitRest: +ladezeit.toFixed(2), kumuliertOk, ersteDatei, zweiteDatei,
+    basisFormel, gutschriftEinmal, keineDoppelteGutschrift,
+    gesichertVorTod, todBehaelt, todKeinZweitesMal, verpasst, verpasstTerminal };
+} catch (error) {
+  sectorError = error instanceof Error ? error.message : String(error);
+}
+
+// --- EH-2026-08-25-04 / D-042 Gate E: Stationskern, Protokolle, Save v5 -----
+let stationCoreFlow = false;
+let stationError = "";
+let stationCoreDiagnostics = null;
+try {
+  const TICK = engine.CFG.TICK;
+  // Voll-Snapshot von META: Gate D hinterlaesst absichtlich Spuren (Runs,
+  // Erz, Saves); der Restore unten darf NICHTS davon in Folgeberichte tragen.
+  const metaSnapshot = JSON.stringify(engine.H);
+
+  // Sanitizing: Unsinn wird sicher bereinigt.
+  localStorage.setItem("emberhold:hold:v1", JSON.stringify({
+    version: 5, ore: 10, bars: 1, essence: 0, marks: 0, dust: 0, runs: 0,
+    mineLevel: 0, forgeLevel: 0, bowUpgrade: 0, arcanumLevel: 0, yardLevel: 0,
+    selectedContract: "ring", preparedRerolls: 0,
+    masteries: { path: 0, reach: 0, dash: 0 },
+    gearOwned: {}, gearEquipped: { weapon: null, charm: null, mantle: null },
+    stationData: "12.7", coreStage: 9, sortieProtocol: "bergungsscanner",
+    lastAt: 1000 }));
+  engine.loadHold(1000);
+  const sanitiert = engine.H.stationData === 12 && engine.H.coreStage === 3 &&
+    engine.H.sortieProtocol === "bergungsscanner";
+  localStorage.setItem("emberhold:hold:v1", JSON.stringify({
+    version: 5, ore: 10, bars: 1, essence: 0, marks: 0, dust: 0, runs: 0,
+    mineLevel: 0, forgeLevel: 0, bowUpgrade: 0, arcanumLevel: 0, yardLevel: 0,
+    selectedContract: "ring", preparedRerolls: 0,
+    masteries: { path: 0, reach: 0, dash: 0 },
+    gearOwned: {}, gearEquipped: { weapon: null, charm: null, mantle: null },
+    stationData: 5, coreStage: 1, sortieProtocol: "fluxreserve",
+    lastAt: 1000 }));
+  engine.loadHold(1000);
+  const gesperrtBereinigt = engine.H.sortieProtocol === "none" &&
+    engine.H.coreStage === 1 && engine.H.stationData === 5;
+
+  // Kosten und Sequenz der drei Stufen.
+  Object.assign(engine.H, { stationData: 99, ore: 500, bars: 500, coreStage: 0 });
+  const kostenVorher = { o: engine.H.ore, b: engine.H.bars, sd: engine.H.stationData };
+  const kauf1 = engine.upgradeCore(), kauf2 = engine.upgradeCore(),
+        kauf3 = engine.upgradeCore(), kauf4 = engine.upgradeCore();
+  const c = engine.STATION.CORE_COSTS;
+  const kostenStimmen = engine.H.coreStage === 3 && kauf1 && kauf2 && kauf3 && !kauf4 &&
+    engine.H.ore === kostenVorher.o - (c[0].ore||0) &&
+    engine.H.bars === kostenVorher.b - (c[1].bars||0) - (c[2].bars||0) &&
+    engine.H.stationData === kostenVorher.sd - (c[0].daten + c[1].daten + c[2].daten);
+  const alleFreigeschaltet = engine.STATION.PROTOCOLS.every(
+    p => p.stufe <= engine.H.coreStage);
+
+  // Wahl nur aus Freigeschaltetem; nie waehrend eines Laufs.
+  const sperreLaufend = (() => {
+    engine.newRun(180, 1, "ring"); engine.S.running = true;
+    const ok = engine.setProtocol("klingenfokus") === false;
+    engine.S.running = false; return ok; })();
+  const wahlNone = engine.setProtocol("none") === true;
+  const unbekanntAbgelehnt = engine.setProtocol("nexusmodus") === false;
+
+  // Klingenfokus: erster Zug enthaelt LEGALE Orbitklingen-Aufwertung.
+  engine.newRun(480, 20260827, "ring", { protocol: "klingenfokus" });
+  engine.S.running = true; engine.S.W = { bogen: 1 }; engine.S.Pa = {};
+  engine.rebuildGrid();
+  const angebot1 = engine.buildOffer();
+  const injektionLegal = !!angebot1[0] && angebot1[0].type === "w" &&
+    angebot1[0].w.id === "bogen" && angebot1[0].lv === 1 && angebot1.length <= 3;
+  const zweitesErste = engine.buildOffer()[0];
+  const nurErsterZug = !(zweitesErste.type === "w" && zweitesErste.w.id === "bogen");
+  engine.newRun(480, 20260827, "ring", { protocol: "klingenfokus" });
+  engine.S.running = true; engine.S.W = { bogen: 5 }; engine.S.Pa = { sehne: 3 };
+  const evoAngebot = engine.buildOffer();
+  const keinEvoBypass = evoAngebot[0].type === "evo" && evoAngebot[0].w.id === "bogen";
+
+  // Fluxreserve: exakt +1 Start-Reroll; stapelt mit zwei vorbereiteten.
+  engine.newRun(180, 20260827, "ring", { protocol: "fluxreserve" });
+  const fluxreservePlusEins = engine.S.rerolls === 2;
+  Object.assign(engine.H, { sortieProtocol: "fluxreserve", preparedRerolls: 2 });
+  engine.begin(180);
+  const stapelGesamt = engine.S.rerolls === 4;
+  engine.H.sortieProtocol = "none"; engine.H.preparedRerolls = 0; engine.saveHold();
+
+  // Bergungsscanner: Laden in 5 s; Fund bevorzugt Unbesessenes; Vollbesitz ->
+  // Duplikatpfad.
+  engine.newRun(480, 20260828, "ring", { protocol: "bergungsscanner" });
+  engine.S.running = true; engine.S.hp = engine.S.maxhp = 1e9;
+  engine.S.events.boss = true;
+  engine.S.events.elite = engine.CFG.ELITE_AT.length;
+  engine.S.W = {};
+  for (let i=0,n=Math.round(150.5/TICK);i<n;i++) engine.tick(TICK);
+  engine.S.x = engine.S.signal.x; engine.S.y = engine.S.signal.y;
+  engine.rebuildGrid();
+  for (let i=0,n=Math.round(5.05/TICK);i<n && engine.S.signal.status==="offen";i++)
+    engine.tick(TICK);
+  const scannerLaedtFuenf = Math.abs(engine.signalStatus().geladen - 5) < 0.06 ||
+    engine.signalStatus().status === "gesichert";
+  const besitzVorher = JSON.stringify(engine.H.gearOwned);
+  const fundNeu = engine.grantGear(null, true);
+  const bevorzugtUnbesessen = fundNeu && !fundNeu.duplicate;
+  for(const g of engine.GEAR) engine.H.gearOwned[g.id] = 1;
+  const fundDuplikat = engine.grantGear(null, true);
+  const vollbesitzDuplikatPfad = fundDuplikat && fundDuplikat.duplicate === true;
+  engine.H.gearOwned = JSON.parse(besitzVorher);
+
+  stationCoreFlow = sanitiert && gesperrtBereinigt && kauf1 && kauf2 && kauf3 &&
+    kostenStimmen && alleFreigeschaltet && sperreLaufend && wahlNone &&
+    unbekanntAbgelehnt && injektionLegal && nurErsterZug && keinEvoBypass &&
+    fluxreservePlusEins && stapelGesamt && scannerLaedtFuenf &&
+    bevorzugtUnbesessen && vollbesitzDuplikatPfad;
+  stationCoreDiagnostics = { sanitiert, gesperrtBereinigt, kostenStimmen,
+    alleFreigeschaltet, sperreLaufend, wahlNone, unbekanntAbgelehnt,
+    injektionLegal, nurErsterZug, keinEvoBypass, fluxreservePlusEins,
+    stapelGesamt, scannerLaedtFuenf, bevorzugtUnbesessen, vollbesitzDuplikatPfad,
+    fund: fundNeu ? fundNeu.name : null };
+  const snap = JSON.parse(metaSnapshot);
+  for (const k of Object.keys(snap)) engine.H[k] = snap[k];
+  engine.saveHold();
+} catch (error) {
+  stationError = error instanceof Error ? error.message : String(error);
+}
+
+// --- EH-2026-08-25-04 / D-042 Gate C: Stations-DOM/UX-Vertrag ---------------
+let stationDomContract = false;
+let stationDomError = "";
+let stationDomDiagnostics = null;
+try {
+  const hotspots = ["hsMine","hsForge","hsArcanum","hsYard","hsArmory","hsMap"];
+  const sechsHotspots = hotspots.every(id =>
+    (html.match(new RegExp('id="'+id+'"',"g"))||[]).length === 1) &&
+    (html.match(/id="hsCore"/g)||[]).length === 1;
+  const panels = ["core","mine","forge","arcanum","yard","armory","map"];
+  const panelVorhanden = panels.every(p => html.includes('data-panel="'+p+'"'));
+  const aktionen = ["btnMine","btnForge","btnArcanum","btnYard","btnBowUpgrade",
+    "btnPrepareReroll","btnMasteryPath","btnMasteryReach","btnMasteryDash",
+    "btnStart","btnStart3","btnCopyLast","btnCoreUpgrade","contractgrid"]
+    .every(id => html.includes('id="'+id+'"'));
+  engine.showStartMenu();
+  const startEl = globalThis.document.getElementById("start");
+  const panelAttr = () => startEl.getAttribute("data-panel") ?? null;
+  const zuBegin = panelAttr() === null;
+  engine.openPanel("mine");
+  const offenMine = panelAttr() === "mine";
+  engine.openPanel("yard");
+  const wechselt = panelAttr() === "yard";
+  engine.openPanel("yard");
+  const toggleZu = panelAttr() === null;
+  const lampenKlassen = hotspots.every(id => {
+    const n = globalThis.document.getElementById(id);
+    return /st-(off|run|ready)/.test(n.className || "");
+  });
+  const kernStufen = /class="core st-\d"/.test(html);
+  const protokollZeile = html.includes('id="protocolchips"') &&
+    html.includes('id="protocolnote"');
+  stationDomContract = sechsHotspots && panelVorhanden && aktionen &&
+    zuBegin && offenMine && wechselt && toggleZu && lampenKlassen &&
+    kernStufen && protokollZeile;
+  stationDomDiagnostics = { sechsHotspots, panelVorhanden, aktionen,
+    zuBegin, offenMine, wechselt, toggleZu, lampenKlassen, kernStufen,
+    protokollZeile };
+} catch (error) {
+  stationDomError = error instanceof Error ? error.message : String(error);
+}
+
+
+
+// --- EH-2026-08-25-04: Baseline-Isolation -----------------------------------
+// Ohne gewaehltes Protokoll muessen die serialisierten neun Seed-Laeufe UND
+// der fruehe Lauf bis 4:10 bitidentisch zum Ausgangscommit d78fdbe bleiben.
+// Die Fingerprints wurden dort erfasst (Kartenzuege, Kills,
+// Familienmischung, Build, Elite-Wahlen, Schadensverteilung) und belegen,
+// dass Signal-Spawn (Hash statt RNG), Hintergrund und Stationsfelder
+// keinerlei Simulationsrueckwirkung haben.
+const BASELINE_FP = Object.freeze([
+  Object.freeze({seed:1701, fp:"{\"p\":[32.316666666666116,77.38333333333023,113.88333333332815,143.2000000000061,185.68333333337324,226.38333333340563,299.7666666667227,355.9333333333383,374.599999999988,390.7499999999733,428.43333333327234,465.41666666657204],\"k\":3189,\"f\":[2979,1037,542,554,283],\"W\":{\"bogen\":3,\"kugel\":3,\"frost\":4},\"Pa\":{\"umhang\":2},\"e\":[],\"b\":{\"fury\":2,\"stride\":0,\"harvest\":0,\"guard\":0},\"d\":[42653.0691,0,35331.2924,0,0,14228.1909]}"}),
+  Object.freeze({seed:1709, fp:"{\"p\":[27.76666666666637,75.499999999997,112.19999999999492,138.3833333333356,164.5500000000231,187.33333333337455,213.75000000006224,239.26666666674922,276.3333333334107,312.7833333333775,337.7833333333548,358.28333333333615,364.5499999999971,369.9166666666589,380.76666666664903,387.49999999997624,397.46666666663384,406.5166666666256,415.88333333328376,419.9999999999467,426.68333333327394,432.4999999999353,440.6166666665946,450.01666666658605,460.18333333324347,471.04999999990025],\"k\":8839,\"f\":[5849,1846,1012,1074,574],\"W\":{\"bogen\":5,\"blitz\":5,\"frost\":5},\"Pa\":{\"magnet\":1,\"sehne\":4,\"amulett\":3,\"umhang\":2},\"e\":[\"bogen\",\"blitz\"],\"b\":{\"fury\":0,\"stride\":0,\"harvest\":2,\"guard\":0},\"d\":[209333.1319,0,0,126861.5482,0,11960.8681]}"}),
+  Object.freeze({seed:1721, fp:"{\"p\":[30.68333333333287,57.36666666666469,101.54999999999552,133.58333333333178,174.5833333333644,223.80000000007024,291.4166666667303,352.0000000000085,363.3833333333315,384.1833333333126,410.99999999995487,441.14999999992745,451.5833333332513,461.399999999909,473.7833333332311],\"k\":4438,\"f\":[3689,1222,674,716,373],\"W\":{\"bogen\":5,\"kugel\":5,\"frost\":2},\"Pa\":{\"sehne\":3,\"linse\":1},\"e\":[\"bogen\"],\"b\":{\"fury\":1,\"stride\":0,\"harvest\":1,\"guard\":0},\"d\":[88717.3336,0,36078.7956,0,0,13145.9482]}"}),
+  Object.freeze({seed:1733, fp:"{\"p\":[35.81666666666592,86.24999999999639,125.58333333332749,152.18333333334658,210.86666666672662,279.0666666667415,363.8666666666644,408.28333333329067,418.2333333332816,468.766666666569],\"k\":2024,\"f\":[2121,649,362,414,185],\"W\":{\"bogen\":5,\"frost\":1,\"klinge\":2},\"Pa\":{\"wetz\":1,\"sehne\":2},\"e\":[],\"b\":{\"fury\":2,\"stride\":0,\"harvest\":0,\"guard\":0},\"d\":[48031.315,0,0,0,4180.0387,6891.0176]}"}),
+  Object.freeze({seed:1741, fp:"{\"p\":[29.83333333333292,55.81666666666478,81.01666666666335,106.93333333332855,140.0500000000036,161.85000000002094,202.60000000005337,237.66666666674794,252.5666666667598,293.7166666667282,313.3500000000437,340.68333333335215,366.66666666666185,381.13333333331536,388.6499999999752,395.23333333330254,400.4333333332978,408.1999999999574,414.2833333332852,420.2999999999464,426.7999999999405,433.949999999934,442.69999999992604,451.6833333332512,462.7166666665745,473.4666666665647],\"k\":10462,\"f\":[6951,2191,1253,1288,691],\"W\":{\"bogen\":5,\"kugel\":5,\"blitz\":5},\"Pa\":{\"federung\":1,\"umhang\":1,\"wetz\":1,\"linse\":3,\"amulett\":3,\"sehne\":2},\"e\":[\"kugel\",\"blitz\"],\"b\":{\"fury\":1,\"stride\":0,\"harvest\":0,\"guard\":1},\"d\":[48914.5538,0,269782.2018,92506.1053,0,0]}"}),
+  Object.freeze({seed:1753, fp:"{\"p\":[32.76666666666609,51.549999999998356,77.14999999999691,106.38333333332858,135.16666666666637,159.7166666666859,188.00000000004175,216.56666666673115,236.6166666667471,266.0166666667534,297.75000000005787,320.71666666670365,349.16666666667777,359.8833333333347,374.6999999999879,391.96666666663884,397.2833333333007,400.8833333332974,406.5166666666256,412.333333333287,419.4499999999472,426.33333333327425,434.5333333332668,444.16666666659137,451.0333333332518,458.7333333332448,467.68333333323665,477.6333333332276],\"k\":13110,\"f\":[8452,2832,1534,1601,877],\"W\":{\"bogen\":5,\"blitz\":5,\"kugel\":5},\"Pa\":{\"sehne\":3,\"amulett\":3,\"linse\":4,\"wetz\":2,\"federung\":2},\"e\":[\"bogen\",\"blitz\",\"kugel\"],\"b\":{\"fury\":1,\"stride\":0,\"harvest\":0,\"guard\":1},\"d\":[192398.4039,0,197579.5063,147177.1432,0,0]}"}),
+  Object.freeze({seed:1777, fp:"{\"p\":[27.64999999999971,64.53333333333096,98.04999999999572,130.06666666666231,178.88333333336783,227.3166666667397,273.3000000000801,333.183333333359,350.3000000000101,366.9666666666616,372.4999999999899,381.8333333333147,387.66666666664275,393.0833333333045,397.7166666666336,404.71666666662725,409.3999999999563,415.16666666661774,420.4499999999463,426.36666666660756,433.68333333326757,440.28333333326157,448.0833333332545,455.8666666665807,465.54999999990525,477.3999999998945],\"k\":10133,\"f\":[6709,2258,1202,1305,669],\"W\":{\"bogen\":3,\"frost\":5,\"kugel\":5},\"Pa\":{\"wetz\":5,\"linse\":3,\"umhang\":3},\"e\":[\"kugel\",\"frost\"],\"b\":{\"fury\":1,\"stride\":0,\"harvest\":0,\"guard\":1},\"d\":[38733.2131,0,223029.1818,0,0,138873.6456]}"}),
+  Object.freeze({seed:1789, fp:"{\"p\":[35.18333333333262,52.799999999998285,80.24999999999673,115.33333333332807,145.3666666666745,180.9000000000361,210.36666666672622,244.11666666675308,287.41666666673393,318.4333333333724,342.1500000000175,370.31666666665853,386.39999999997724,401.2333333332971,415.61666666661733,429.76666666660446,443.1166666665923,454.2333333332489,459.4499999999108,465.7333333332384,472.76666666656536],\"k\":6834,\"f\":[5045,1644,882,960,481],\"W\":{\"bogen\":5,\"blitz\":5,\"klinge\":3},\"Pa\":{\"wetz\":1,\"magnet\":1,\"sehne\":3,\"amulett\":3},\"e\":[\"bogen\",\"blitz\"],\"b\":{\"fury\":1,\"stride\":0,\"harvest\":1,\"guard\":0},\"d\":[155102.4869,0,0,75590.9465,3111.5178,0]}"}),
+  Object.freeze({seed:2474367456, fp:"{\"p\":[32.749999999999424,75.79999999999698,129.96666666666223,159.70000000001923,180.80000000003602,222.5000000000692,239.7833333334163,280.33333333340704,330.16666666669505,351.65000000000884,384.8999999999786,429.39999999993813,456.66666666658,476.8166666665617],\"k\":4515,\"f\":[3607,1114,636,662,331],\"W\":{\"bogen\":5,\"blitz\":1,\"klinge\":4},\"Pa\":{\"linse\":2,\"sehne\":3},\"e\":[\"bogen\"],\"b\":{\"fury\":1,\"stride\":0,\"harvest\":0,\"guard\":1},\"d\":[96390.2286,0,0,28179.7452,16294.1061,0]}"}),
+]);
+const EARLY_FP = Object.freeze([
+  Object.freeze({seed:1701, fp:"{\"p\":[32.316666666666116,77.38333333333023,113.88333333332815,143.2000000000061,185.68333333337324,226.38333333340563],\"k\":1057,\"f\":[1104,209,102,104,43],\"W\":{\"bogen\":2,\"kugel\":2,\"frost\":1},\"Pa\":{\"umhang\":2},\"e\":[],\"b\":{\"fury\":1,\"stride\":0,\"harvest\":0,\"guard\":0},\"d\":[11297.3214,0,5145.1471,0,0,1057.5411]}"}),
+  Object.freeze({seed:1709, fp:"{\"p\":[27.76666666666637,75.499999999997,112.19999999999492,138.3833333333356,164.5500000000231,187.33333333337455,213.75000000006224,239.26666666674922],\"k\":1412,\"f\":[1368,245,108,145,56],\"W\":{\"bogen\":4,\"blitz\":3,\"frost\":1},\"Pa\":{\"magnet\":1},\"e\":[],\"b\":{\"fury\":0,\"stride\":0,\"harvest\":1,\"guard\":0},\"d\":[16258.3495,0,0,7848.3268,0,943.2429]}"}),
+  Object.freeze({seed:1721, fp:"{\"p\":[30.68333333333287,57.36666666666469,101.54999999999552,133.58333333333178,174.5833333333644,223.80000000007024],\"k\":1220,\"f\":[1203,247,116,127,50],\"W\":{\"bogen\":3,\"kugel\":2,\"frost\":2},\"Pa\":{},\"e\":[],\"b\":{\"fury\":1,\"stride\":0,\"harvest\":0,\"guard\":0},\"d\":[13195.7733,0,5440.0879,0,0,1352.3635]}"}),
+  Object.freeze({seed:1733, fp:"{\"p\":[35.81666666666592,86.24999999999639,125.58333333332749,152.18333333334658,210.86666666672662],\"k\":868,\"f\":[936,150,70,104,26],\"W\":{\"bogen\":2,\"frost\":1,\"klinge\":2},\"Pa\":{\"wetz\":1},\"e\":[],\"b\":{\"fury\":1,\"stride\":0,\"harvest\":0,\"guard\":0},\"d\":[11460.8261,0,0,0,618.4401,1613.595]}"}),
+  Object.freeze({seed:1741, fp:"{\"p\":[29.83333333333292,55.81666666666478,81.01666666666335,106.93333333332855,140.0500000000036,161.85000000002094,202.60000000005337,237.66666666674794],\"k\":1666,\"f\":[1555,302,137,134,55],\"W\":{\"bogen\":1,\"kugel\":3,\"blitz\":2},\"Pa\":{\"federung\":1,\"umhang\":1,\"wetz\":1},\"e\":[],\"b\":{\"fury\":1,\"stride\":0,\"harvest\":0,\"guard\":0},\"d\":[11934.7947,0,6648.0366,10718.9987,0,0]}"}),
+  Object.freeze({seed:1753, fp:"{\"p\":[32.76666666666609,51.549999999998356,77.14999999999691,106.38333333332858,135.16666666666637,159.7166666666859,188.00000000004175,216.56666666673115,236.6166666667471],\"k\":1805,\"f\":[1579,297,142,151,56],\"W\":{\"bogen\":2,\"blitz\":3,\"kugel\":2},\"Pa\":{\"sehne\":2,\"amulett\":1},\"e\":[],\"b\":{\"fury\":1,\"stride\":0,\"harvest\":0,\"guard\":0},\"d\":[13326.8603,0,5806.5894,13863.3519,0,0]}"}),
+  Object.freeze({seed:1777, fp:"{\"p\":[27.64999999999971,64.53333333333096,98.04999999999572,130.06666666666231,178.88333333336783,227.3166666667397],\"k\":1244,\"f\":[1319,261,112,131,54],\"W\":{\"bogen\":1,\"frost\":1,\"kugel\":3},\"Pa\":{\"wetz\":2},\"e\":[],\"b\":{\"fury\":1,\"stride\":0,\"harvest\":0,\"guard\":0},\"d\":[11723.5616,0,6526.3177,0,0,2678.5164]}"}),
+  Object.freeze({seed:1789, fp:"{\"p\":[35.18333333333262,52.799999999998285,80.24999999999673,115.33333333332807,145.3666666666745,180.9000000000361,210.36666666672622,244.11666666675308],\"k\":1466,\"f\":[1382,284,105,137,53],\"W\":{\"bogen\":4,\"blitz\":2,\"klinge\":1},\"Pa\":{\"wetz\":1,\"magnet\":1},\"e\":[],\"b\":{\"fury\":0,\"stride\":0,\"harvest\":1,\"guard\":0},\"d\":[14143.5197,0,0,10557.0125,264.7701,0]}"}),
+  Object.freeze({seed:2474367456, fp:"{\"p\":[32.749999999999424,75.79999999999698,129.96666666666223,159.70000000001923,180.80000000003602,222.5000000000692,239.7833333334163],\"k\":1299,\"f\":[1261,238,117,113,50],\"W\":{\"bogen\":3,\"blitz\":1,\"klinge\":2},\"Pa\":{\"linse\":2},\"e\":[],\"b\":{\"fury\":1,\"stride\":0,\"harvest\":0,\"guard\":0},\"d\":[14247.1149,0,0,6463.9749,1746.4894,0]}"}),
+]);
+let baselineIsolated = false;
+let baselineIsoError = "";
+let baselineIsoDiagnostics = null;
+try {
+  const fpOf = (r) => JSON.stringify({ p:r.picks, k:r.kills, f:r.famSpawns,
+    W:r.W, Pa:r.Pa, e:r.evo, b:r.boons, d:r.dmgW.map(x=>+x.toFixed(4)) });
+  const abweichend = [];
+  for (const ref of BASELINE_FP){
+    const r = engine.headlessRun(480, { seed:ref.seed, xpC:engine.CFG.XP_C,
+      xpK:engine.CFG.XP_K, smart:true, immortal:true });
+    if (fpOf(r) !== ref.fp) abweichend.push("480/" + ref.seed);
+  }
+  for (const ref of EARLY_FP){
+    const r = engine.headlessRun(250, { seed:ref.seed, xpC:engine.CFG.XP_C,
+      xpK:engine.CFG.XP_K, smart:true, immortal:true });
+    if (fpOf(r) !== ref.fp) abweichend.push("250/" + ref.seed);
+  }
+  baselineIsolated = abweichend.length === 0 &&
+    BASELINE_FP.length === 9 && EARLY_FP.length === 9;
+  baselineIsoDiagnostics = { laeufe: BASELINE_FP.length + EARLY_FP.length,
+    ok: abweichend.length === 0, abweichend };
+} catch (error) {
+  baselineIsoError = error instanceof Error ? error.message : String(error);
+}
+
 const output = {
-  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && slotLayout && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && contractFlow && holdExpansion && equipmentFlow && evolutionCatalog && eliteChoices && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling && fpsMetrics && reportHardened && lastRunReportFlow && healOrbFlow && holdGoalLadder && oreCurve && earlyLossGuard && bossCombatPocket && bossLocatorState && compactCombatHud && evolutionCompletion && weaponDamageReport && lateProgression && weaponRoles && presentationLayer && renderCostContract && combatUiV2 && finalBossFlow && evolutionFocusHud && foeSilhouettes && nexusBenchmark,
-  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, slotLayout, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, contractFlow, holdExpansion, equipmentFlow, evolutionCatalog, eliteChoices, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling, fpsMetrics, reportHardened, lastRunReportFlow, healOrbFlow, holdGoalLadder, oreCurve, earlyLossGuard, bossCombatPocket, bossLocatorState, compactCombatHud, evolutionCompletion, weaponDamageReport, lateProgression, weaponRoles, presentationLayer, renderCostContract, combatUiV2, finalBossFlow, evolutionFocusHud, foeSilhouettes, nexusBenchmark },
+  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && slotLayout && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && contractFlow && holdExpansion && equipmentFlow && evolutionCatalog && eliteChoices && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling && fpsMetrics && reportHardened && lastRunReportFlow && healOrbFlow && holdGoalLadder && oreCurve && earlyLossGuard && bossCombatPocket && bossLocatorState && compactCombatHud && evolutionCompletion && weaponDamageReport && lateProgression && weaponRoles && presentationLayer && renderCostContract && combatUiV2 && finalBossFlow && evolutionFocusHud && foeSilhouettes && nexusBenchmark && combatArtV3 && sectorObjectiveFlow && stationCoreFlow && stationDomContract && baselineIsolated,
+  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, slotLayout, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, contractFlow, holdExpansion, equipmentFlow, evolutionCatalog, eliteChoices, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling, fpsMetrics, reportHardened, lastRunReportFlow, healOrbFlow, holdGoalLadder, oreCurve, earlyLossGuard, bossCombatPocket, bossLocatorState, compactCombatHud, evolutionCompletion, weaponDamageReport, lateProgression, weaponRoles, presentationLayer, renderCostContract, combatUiV2, finalBossFlow, evolutionFocusHud, foeSilhouettes, nexusBenchmark, combatArtV3, sectorObjectiveFlow, stationCoreFlow, stationDomContract, baselineIsolated },
   targets: report.targets,
   ueberschuss: report.ueberschuss,
   seeds: report.seeds,
@@ -2307,6 +2681,11 @@ if (finalBossError) output.finalBossError = finalBossError;
 if (nexusBenchError) output.nexusBenchError = nexusBenchError;
 if (evoFocusError) output.evoFocusError = evoFocusError;
 if (foeSilhouetteError) output.foeSilhouetteError = foeSilhouetteError;
+if (artV3Error) output.artV3Error = artV3Error;
+if (sectorError) output.sectorError = sectorError;
+if (stationError) output.stationCoreError = stationError;
+if (stationDomError) output.stationDomError = stationDomError;
+if (baselineIsoError) output.baselineIsoError = baselineIsoError;
 if (compactHudError) output.compactHudError = compactHudError;
 if (evolutionCompletionError) output.evolutionCompletionError = evolutionCompletionError;
 if (weaponDamageError) output.weaponDamageError = weaponDamageError;
@@ -2326,6 +2705,11 @@ if (finalBossDiagnostics) output.summary.finalBoss = finalBossDiagnostics;
 if (nexusBenchDiagnostics) output.summary.nexusBenchmark = nexusBenchDiagnostics;
 if (evoFocusDiagnostics) output.summary.evoFocus = evoFocusDiagnostics;
 if (foeSilhouetteDiagnostics) output.summary.foeSilhouettes = foeSilhouetteDiagnostics;
+if (artV3Diagnostics) output.summary.combatArtV3 = artV3Diagnostics;
+if (sectorDiagnostics) output.summary.sectorObjective = sectorDiagnostics;
+if (stationCoreDiagnostics) output.summary.stationCore = stationCoreDiagnostics;
+if (stationDomDiagnostics) output.summary.stationDom = stationDomDiagnostics;
+if (baselineIsoDiagnostics) output.summary.baselineIsolated = baselineIsoDiagnostics;
 if (bossLocatorDiagnostics) output.summary.bossLocator = bossLocatorDiagnostics;
 if (compactHudDiagnostics) output.summary.compactHud = compactHudDiagnostics;
 if (evolutionCompletionDiagnostics) output.summary.evolutionCompletion = evolutionCompletionDiagnostics;
