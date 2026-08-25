@@ -132,6 +132,19 @@ button.b.ghost{background:none;border:1px solid #2e2e3c;color:#a8a396}
 button.b.ghost:hover{border-color:#e07a3f;color:#e07a3f}
 button.b.danger{background:#c9402e;color:#fff}
 
+/* Sortien sind eine Statistik, keine Waehrung -- deshalb bewusst anders
+   gesetzt als die drei Kernressourcen im Kopf. */
+.holdstat{display:flex;flex-direction:column;justify-content:center;padding:5px 11px;
+  border-left:1px solid #2b3448;margin-left:4px}
+.holdstat b{font-size:15px;color:#8fa0bd;font-weight:600;font-variant-numeric:tabular-nums}
+.holdstat span{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#5d6a83}
+/* Nebenressourcen stehen nur in ihrem eigenen Modul. */
+.modulres{margin-left:auto;font-style:normal;font-size:10px;letter-spacing:.1em;
+  text-transform:uppercase;color:#7fd4e8;white-space:nowrap}
+.modulres b{color:#b8f0ff;font-weight:600;font-variant-numeric:tabular-nums}
+.stationkick{position:absolute;left:0;right:0;top:6px;text-align:center;font-size:9px;
+  letter-spacing:.24em;text-transform:uppercase;color:#4e5c78;pointer-events:none}
+.masteryhead{align-items:baseline}
 .statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:9px;
   margin-top:26px;max-width:620px;width:100%}
 .statgrid div{background:#171721;border:1px solid #262633;border-radius:9px;padding:12px}
@@ -424,13 +437,12 @@ button.b.danger{background:#c9402e;color:#fff}
         <div class="holdres"><b id="holdore">0</b><span>Asterit</span></div>
         <div class="holdres"><b id="holdbars">0</b><span>Legierungsplatten</span></div>
         <div class="holdres"><b id="holdessence">0</b><span>Fluxkondensat</span></div>
-        <div class="holdres"><b id="holdmarks">0</b><span>Sim-Daten</span></div>
-        <div class="holdres"><b id="holddust">0</b><span>Modulfragmente</span></div>
-        <div class="holdres"><b id="holdruns">0</b><span>Sortien</span></div>
+        <div class="holdstat"><b id="holdruns">0</b><span>Sortien geflogen</span></div>
       </div>
     </div>
     <div class="holdstage">
       <div class="crater" aria-hidden="true"></div><div class="embercore" aria-hidden="true"></div>
+      <p class="stationkick" aria-hidden="true">Innerer Ring · sechs Module</p>
       <div class="holdstatus" id="holdstatus">Die Station wartet auf Reparaturen.</div>
       <div class="holdgoal" id="holdgoal"></div>
       <div class="holdgrid">
@@ -464,7 +476,8 @@ button.b.danger{background:#c9402e;color:#fff}
         <section class="holdupgrade" id="rerollprep"><div><b>Flux neu ausrichten</b><p>2 Fluxkondensat · +1 Reroll im nächsten Run · maximal 2</p></div><button class="smallaction" id="btnPrepareReroll">Vorbereiten</button></section>
       </div>
       <section class="masterybox" id="masterybox">
-        <div class="masteryhead"><b>Simulationsdeck</b><span>Utility · maximal Stufe 2</span></div>
+        <div class="masteryhead"><b>Simulationsdeck</b><span>Utility · maximal Stufe 2</span>
+          <em class="modulres"><b id="holdmarks">0</b> Sim-Daten</em></div>
         <div class="masterygrid">
           <div class="masterytile"><div><b>Pfadkunde <em id="masterypath">0/2</em></b><span>+5 % Lauftempo je Stufe</span></div><button class="smallaction" id="btnMasteryPath">Lernen</button></div>
           <div class="masterytile"><div><b>Reichgriff <em id="masteryreach">0/2</em></b><span>+10 % Aufsammelradius je Stufe</span></div><button class="smallaction" id="btnMasteryReach">Lernen</button></div>
@@ -472,7 +485,8 @@ button.b.danger{background:#c9402e;color:#fff}
         </div>
       </section>
       <section class="armorybox">
-        <div class="masteryhead"><b>Ausrüstungsbucht</b><span>3 Slots · Duplikate werden Modulfragmente</span></div>
+        <div class="masteryhead"><b>Ausrüstungsbucht</b><span>3 Slots · Duplikate werden Modulfragmente</span>
+          <em class="modulres"><b id="holddust">0</b> Modulfragmente</em></div>
         <div class="geargrid" id="geargrid"></div>
       </section>
     </div>
@@ -2992,10 +3006,10 @@ function goalHTML(goal,vorspann){
 }
 function holdMessage(){
   if(!META.mineLevel) return 'Die Station wartet auf die Reparatur der Asteroidensonde.';
-  if(!META.forgeLevel) return 'Sammle 10 Eisenerz, um die Emberschmiede zu reparieren.';
+  if(!META.forgeLevel) return 'Sammle 10 '+LEX.res.ore+', um den '+LEX.modul.forge+' zu reparieren.';
   if(!META.bowUpgrade) return 'Asterit wird zu Legierungsplatten. Die Orbitklinge wartet auf Verstärkung.';
-  if(!META.arcanumLevel) return 'Das Arkanum kann Essenz für zusätzliche Kartenzüge vorbereiten.';
-  if(!META.yardLevel) return 'Der Übungshof schaltet kleine, dauerhafte Utility-Meisterschaften frei.';
+  if(!META.arcanumLevel) return 'Das '+LEX.modul.arcanum+' kann '+LEX.res.essence+' für zusätzliche Kartenzüge vorbereiten.';
+  if(!META.yardLevel) return 'Das '+LEX.modul.yard+' schaltet kleine, dauerhafte Utility-Meisterschaften frei.';
   if(META.preparedRerolls) return META.preparedRerolls+' zusätzliche Rerolls warten auf die nächste Sortie.';
   return 'Die Station arbeitet. Produktion, Vorbereitung und Training sind bereit.';
 }
@@ -3035,48 +3049,48 @@ function renderHold(message){
   renderContracts();
 
   const mineN=Math.floor(META.mineStored), mineOn=META.mineLevel>0, mb=el('btnMine');
-  el('minelevel').textContent=mineOn?'Stufe 1':'Ruine';
-  el('minestate').textContent=mineOn?(mineN+' / '+HOLD_CFG.MINE_CAP+' Erz im Lager'):'Noch nicht repariert';
+  el('minelevel').textContent=mineOn?'Online':'Offline';
+  el('minestate').textContent=mineOn?(mineN+' / '+HOLD_CFG.MINE_CAP+' '+LEX.res.ore+' im Lager'):'Noch nicht repariert';
   el('minebar').style.width=(mineOn?META.mineStored/HOLD_CFG.MINE_CAP*100:0)+'%';
   mb.textContent=mineOn?(mineN?'Einsammeln · '+mineN:'Produziert…'):'Kostenlos reparieren';
   mb.disabled=mineOn&&!mineN; el('minecard').classList.toggle('ready',mineN>0);
 
   const forgeN=META.forgeStored, forgeOn=META.forgeLevel>0, fb=el('btnForge');
-  el('forgelevel').textContent=forgeOn?'Stufe 1':'Ruine';
+  el('forgelevel').textContent=forgeOn?'Online':'Offline';
   el('forgebar').style.width=(forgeOn&&META.forgeWorking?META.forgeProgress/HOLD_CFG.FORGE_SEC*100:0)+'%';
   if(!forgeOn){
-    el('forgestate').textContent=META.mineLevel?('Benötigt '+HOLD_CFG.FORGE_COST+' Eisenerz'):'Zuerst die Tiefmine reparieren';
+    el('forgestate').textContent=META.mineLevel?('Benötigt '+HOLD_CFG.FORGE_COST+' '+LEX.res.ore):'Zuerst die '+LEX.modul.mine+' reparieren';
     fb.textContent='Reparieren · '+HOLD_CFG.FORGE_COST;
     fb.disabled=!META.mineLevel||META.ore<HOLD_CFG.FORGE_COST;
   } else {
-    el('forgestate').textContent=forgeN?(forgeN+' / '+HOLD_CFG.FORGE_CAP+' Barren bereit'):
-      (META.forgeWorking?('Schmelzt · '+Math.floor(META.forgeProgress/HOLD_CFG.FORGE_SEC*100)+' %'):'Benötigt 5 Eisenerz');
-    fb.textContent=forgeN?'Einsammeln · '+forgeN:(META.forgeWorking?'Schmilzt…':'Wartet auf Erz'); fb.disabled=!forgeN;
+    el('forgestate').textContent=forgeN?(forgeN+' / '+HOLD_CFG.FORGE_CAP+' '+LEX.res.bars+' bereit'):
+      (META.forgeWorking?('Fabriziert · '+Math.floor(META.forgeProgress/HOLD_CFG.FORGE_SEC*100)+' %'):'Benötigt 5 '+LEX.res.ore);
+    fb.textContent=forgeN?'Einsammeln · '+forgeN:(META.forgeWorking?'Fabriziert…':'Wartet auf '+LEX.res.ore); fb.disabled=!forgeN;
   }
   el('forgecard').classList.toggle('ready',forgeN>0);
 
   const arcN=Math.floor(META.arcanumStored), arcOn=META.arcanumLevel>0, ab=el('btnArcanum');
-  el('arcanumlevel').textContent=arcOn?'Stufe 1':'Ruine';
+  el('arcanumlevel').textContent=arcOn?'Online':'Offline';
   el('arcanumbar').style.width=(arcOn?META.arcanumStored/HOLD_CFG.ARCANUM_CAP*100:0)+'%';
   if(!arcOn){
-    el('arcanumstate').textContent=META.forgeLevel?'Benötigt '+HOLD_CFG.ARCANUM_COST+' Eisenerz':'Zuerst die Emberschmiede reparieren';
+    el('arcanumstate').textContent=META.forgeLevel?'Benötigt '+HOLD_CFG.ARCANUM_COST+' '+LEX.res.ore:'Zuerst den '+LEX.modul.forge+' reparieren';
     ab.textContent='Reparieren · '+HOLD_CFG.ARCANUM_COST;
     ab.disabled=!META.forgeLevel||META.ore<HOLD_CFG.ARCANUM_COST;
   } else {
-    el('arcanumstate').textContent=arcN?(arcN+' / '+HOLD_CFG.ARCANUM_CAP+' Essenz bereit'):'Verdichtet Essenz…';
+    el('arcanumstate').textContent=arcN?(arcN+' / '+HOLD_CFG.ARCANUM_CAP+' '+LEX.res.essence+' bereit'):'Verdichtet '+LEX.res.essence+'…';
     ab.textContent=arcN?'Einsammeln · '+arcN:'Produziert…'; ab.disabled=!arcN;
   }
   el('arcanumcard').classList.toggle('ready',arcN>0);
 
   const yardN=Math.floor(META.yardStored), yardOn=META.yardLevel>0, yb=el('btnYard');
-  el('yardlevel').textContent=yardOn?'Stufe 1':'Ruine';
+  el('yardlevel').textContent=yardOn?'Online':'Offline';
   el('yardbar').style.width=(yardOn?META.yardStored/HOLD_CFG.YARD_CAP*100:0)+'%';
   if(!yardOn){
-    el('yardstate').textContent=META.forgeLevel?'Benötigt '+HOLD_CFG.YARD_COST+' Barren':'Zuerst die Emberschmiede reparieren';
+    el('yardstate').textContent=META.forgeLevel?'Benötigt '+HOLD_CFG.YARD_COST+' '+LEX.res.bars:'Zuerst den '+LEX.modul.forge+' reparieren';
     yb.textContent='Reparieren · '+HOLD_CFG.YARD_COST;
     yb.disabled=!META.forgeLevel||META.bars<HOLD_CFG.YARD_COST;
   } else {
-    el('yardstate').textContent=yardN?(yardN+' / '+HOLD_CFG.YARD_CAP+' Marken bereit'):'Trainiert Rekruten…';
+    el('yardstate').textContent=yardN?(yardN+' / '+HOLD_CFG.YARD_CAP+' '+LEX.res.marks+' bereit'):'Rechnet Simulationen…';
     yb.textContent=yardN?'Einsammeln · '+yardN:'Produziert…'; yb.disabled=!yardN;
   }
   el('yardcard').classList.toggle('ready',yardN>0);
@@ -3141,23 +3155,23 @@ function salvageGear(id){
   if(!item||!META.gearOwned[id]) return 0;
   if(META.gearEquipped[item.slot]===id) META.gearEquipped[item.slot]=null;
   delete META.gearOwned[id]; META.dust+=item.salvage; gearSig=''; saveHold();
-  renderHold(item.name+' zerlegt: +'+item.salvage+' Runenstaub.'); return item.salvage;
+  renderHold(item.name+' zerlegt: +'+item.salvage+' '+LEX.res.dust+'.'); return item.salvage;
 }
 function mineAction(){
   advanceHold(Date.now());
-  if(!META.mineLevel){ META.mineLevel=1; META.lastAt=Date.now(); saveHold(); renderHold('Die Tiefmine ist repariert. Die erste Förderung beginnt.'); return; }
+  if(!META.mineLevel){ META.mineLevel=1; META.lastAt=Date.now(); saveHold(); renderHold('Die '+LEX.modul.mine+' ist online. Die erste Förderung beginnt.'); return; }
   const n=Math.floor(META.mineStored); if(!n) return;
-  META.mineStored-=n; META.ore+=n; advanceHold(Date.now()); saveHold(); renderHold(n+' Eisenerz eingesammelt.');
+  META.mineStored-=n; META.ore+=n; advanceHold(Date.now()); saveHold(); renderHold(n+' '+LEX.res.ore+' eingesammelt.');
 }
 function forgeAction(){
   advanceHold(Date.now());
   if(!META.forgeLevel){
     if(!META.mineLevel||META.ore<HOLD_CFG.FORGE_COST) return;
     META.ore-=HOLD_CFG.FORGE_COST; META.forgeLevel=1; advanceHold(Date.now()); saveHold();
-    renderHold('Die Emberschmiede brennt wieder.'); return;
+    renderHold('Der '+LEX.modul.forge+' läuft wieder.'); return;
   }
   const n=META.forgeStored; if(!n) return;
-  META.forgeStored=0; META.bars+=n; advanceHold(Date.now()); saveHold(); renderHold(n+' Barren eingesammelt.');
+  META.forgeStored=0; META.bars+=n; advanceHold(Date.now()); saveHold(); renderHold(n+' '+LEX.res.bars+' eingesammelt.');
 }
 function upgradeBow(){
   advanceHold(Date.now());
@@ -3170,20 +3184,20 @@ function arcanumAction(){
   if(!META.arcanumLevel){
     if(!META.forgeLevel||META.ore<HOLD_CFG.ARCANUM_COST) return;
     META.ore-=HOLD_CFG.ARCANUM_COST; META.arcanumLevel=1; META.lastAt=Date.now();
-    saveHold(); renderHold('Das Arkanum bündelt wieder Essenz.'); return;
+    saveHold(); renderHold('Das '+LEX.modul.arcanum+' bündelt wieder '+LEX.res.essence+'.'); return;
   }
   const n=Math.floor(META.arcanumStored); if(!n) return;
-  META.arcanumStored-=n; META.essence+=n; saveHold(); renderHold(n+' Essenz eingesammelt.');
+  META.arcanumStored-=n; META.essence+=n; saveHold(); renderHold(n+' '+LEX.res.essence+' eingesammelt.');
 }
 function yardAction(){
   advanceHold(Date.now());
   if(!META.yardLevel){
     if(!META.forgeLevel||META.bars<HOLD_CFG.YARD_COST) return;
     META.bars-=HOLD_CFG.YARD_COST; META.yardLevel=1; META.lastAt=Date.now();
-    saveHold(); renderHold('Der Übungshof ist wieder besetzt.'); return;
+    saveHold(); renderHold('Das '+LEX.modul.yard+' rechnet wieder.'); return;
   }
   const n=Math.floor(META.yardStored); if(!n) return;
-  META.yardStored-=n; META.marks+=n; saveHold(); renderHold(n+' Trainingsmarken eingesammelt.');
+  META.yardStored-=n; META.marks+=n; saveHold(); renderHold(n+' '+LEX.res.marks+' eingesammelt.');
 }
 function prepareReroll(){
   advanceHold(Date.now());
