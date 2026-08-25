@@ -325,7 +325,7 @@ button.b.danger{background:#c9402e;color:#fff}
   pointer-events:none;transform:translate(-50%,-50%)}
 #toast{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);
   font-size:clamp(22px,5vw,34px);font-weight:600;letter-spacing:.02em;opacity:0;
-  pointer-events:none;text-shadow:0 2px 24px rgba(0,0,0,.9);text-align:center;z-index:40}
+  pointer-events:none;text-shadow:0 2px 24px rgba(0,0,0,.9);text-align:center;z-index:10}
 
 /* ---------- Nicht blockierende Spielhinweise ---------- */
 #coach{position:absolute;left:50%;bottom:max(24px,env(safe-area-inset-bottom));
@@ -389,6 +389,30 @@ button.b.danger{background:#c9402e;color:#fff}
   .pausesec h2{margin-bottom:5px;padding-bottom:4px}
   .chiprow{gap:4px 6px}
   .pathrow{gap:6px}
+}
+
+/* Dialoge in typischer Handy-Landschaft: Kopf und Aktionen bleiben erreichbar,
+   lange Inhalte scrollen ab oben statt durch vertikale Zentrierung abzuschneiden. */
+@media (max-height:480px){
+  #cards{justify-content:flex-start;padding:8px 20px;gap:6px;overflow-y:auto}
+  #cardhead h2{font-size:10px}
+  #cardhead p{font-size:21px;margin-top:1px}
+  #cardhint{font-size:11px;margin-top:1px}
+  #cardrow{gap:8px;flex-wrap:nowrap}
+  .card{min-height:0;max-width:none;padding:10px 12px 8px}
+  .card h3{font-size:17px;margin:4px 0 2px}
+  .card p{font-size:12px;line-height:1.35;margin-top:6px}
+  .card .key{margin-top:5px}
+  .evolink{margin-top:5px;padding-top:5px;font-size:9.5px}
+  #reroll{padding:5px 15px}
+  .sheet:not(.holdsheet){justify-content:flex-start;padding:10px 20px}
+  .sheet:not(.holdsheet) .kick{margin-bottom:4px}
+  .sheet:not(.holdsheet) h1{font-size:28px}
+  .sheet:not(.holdsheet) .sub{margin-top:4px;font-size:12.5px}
+  .sheet:not(.holdsheet) .statgrid{margin-top:8px}
+  .sheet:not(.holdsheet) .statgrid div{padding:7px}
+  .sheet:not(.holdsheet) .statgrid b{font-size:18px}
+  .sheet:not(.holdsheet) .btnrow{margin-top:12px}
 }
 </style>
 </head>
@@ -479,9 +503,9 @@ button.b.danger{background:#c9402e;color:#fff}
         <div class="masteryhead"><b>Simulationsdeck</b><span>Utility · maximal Stufe 2</span>
           <em class="modulres"><b id="holdmarks">0</b> Sim-Daten</em></div>
         <div class="masterygrid">
-          <div class="masterytile"><div><b>Pfadkunde <em id="masterypath">0/2</em></b><span>+5 % Lauftempo je Stufe</span></div><button class="smallaction" id="btnMasteryPath">Lernen</button></div>
-          <div class="masterytile"><div><b>Reichgriff <em id="masteryreach">0/2</em></b><span>+10 % Aufsammelradius je Stufe</span></div><button class="smallaction" id="btnMasteryReach">Lernen</button></div>
-          <div class="masterytile"><div><b>Stoßschule <em id="masterydash">0/2</em></b><span>−8 % Stoß-Abklingzeit je Stufe</span></div><button class="smallaction" id="btnMasteryDash">Lernen</button></div>
+          <div class="masterytile"><div><b>Vektornavigation <em id="masterypath">0/2</em></b><span>+5 % Lauftempo je Stufe</span></div><button class="smallaction" id="btnMasteryPath">Lernen</button></div>
+          <div class="masterytile"><div><b>Traktorkontrolle <em id="masteryreach">0/2</em></b><span>+10 % Aufsammelradius je Stufe</span></div><button class="smallaction" id="btnMasteryReach">Lernen</button></div>
+          <div class="masterytile"><div><b>Impulsdrill <em id="masterydash">0/2</em></b><span>−8 % Stoß-Abklingzeit je Stufe</span></div><button class="smallaction" id="btnMasteryDash">Lernen</button></div>
         </div>
       </section>
       <section class="armorybox">
@@ -724,6 +748,13 @@ const LEX = Object.freeze({
   // Stationsmodule
   modul:Object.freeze({mine:'Asteroidensonde', forge:'Materiefabrikator', arcanum:'Fluxlabor',
                        yard:'Simulationsdeck', armory:'Ausrüstungsbucht', map:'Sternenkarte'}),
+  boon:Object.freeze({fury:'Überladung', stride:'Vektorschub', harvest:'Bergungssensor', guard:'Nanopanzerung'}),
+  gear:Object.freeze({glutsehne:'Impulsverstärker', kraehenbogen:'Klingenresonator',
+                      sammlersiegel:'Traktorsensor', runenfibel:'Fluxprotokoll',
+                      pfadstiefel:'Vektortriebwerk', russmantel:'Deflektormantel',
+                      runenfunke:'Gefechtsprotokoll'}),
+  slot:Object.freeze({weapon:'Primärmodul', charm:'Hilfsmodul', mantle:'Schutzmodul'}),
+  mastery:Object.freeze({path:'Vektornavigation', reach:'Traktorkontrolle', dash:'Impulsdrill'}),
   heal:'Nanokapseln',
 });
 /** Sichtbarer Waffenname, Evolution eingeschlossen. Kein Objekt, nur ein String. */
@@ -1166,18 +1197,13 @@ function buildSwarmerArt(image){
 
 function loadRasterArt(){
   if(typeof Image==='undefined') return; // Node-Balancing hat absichtlich keinen Bildlader
-  const hero=new Image(); hero.decoding='async';
-  hero.onload=()=>buildHeroArt(hero);
-  hero.onerror=()=>console.warn('Aelric-Atlas nicht geladen; nutze Grafik-Fallback.');
-  hero.src='assets/aelric-atlas-v2.png';
+  // Orbitträger und Sammlerdrohne sind im Orbitblade-Slice code-native. Die
+  // alten Fantasy-Atlanten bleiben als historische Projektdateien erhalten,
+  // werden im ausgelieferten Prototyp aber nicht mehr unnötig heruntergeladen.
   const enemy=new Image(); enemy.decoding='async';
   enemy.onload=()=>buildEnemyArt(enemy);
   enemy.onerror=()=>console.warn('Gegner-Atlas nicht geladen; nutze Grafik-Fallback.');
   enemy.src='assets/enemy-atlas-v1.png';
-  const swarmer=new Image(); swarmer.decoding='async';
-  swarmer.onload=()=>buildSwarmerArt(swarmer);
-  swarmer.onerror=()=>console.warn('Schwärmer-Animation nicht geladen; nutze statische Figur.');
-  swarmer.src='assets/enemy-swarmer-atlas-v2.png';
 }
 
 // ===========================================================================
@@ -1291,10 +1317,10 @@ const CONTRACT_BY_ID=Object.freeze(Object.fromEntries(CONTRACTS.map(c=>[c.id,c])
 function contractById(id){ return CONTRACT_BY_ID[id]||CONTRACTS[0]; }
 
 const BOONS=Object.freeze([
-  {id:'fury',name:'Glutkern',col:'#e56f45',desc:'+18 % Schaden für diesen Run.'},
-  {id:'stride',name:'Schrittzeichen',col:'#8fa879',desc:'+12 % Lauftempo und 10 % kürzerer Impulsstoß.'},
-  {id:'harvest',name:'Sammlerauge',col:'#6bb8d4',desc:'+25 % Aufsammelradius und +12 % Splitterwert.'},
-  {id:'guard',name:'Aschenhaut',col:'#a5a1b2',desc:'+25 Max-HP, sofort geheilt, und 8 % Schadensschutz.'},
+  {id:'fury',name:LEX.boon.fury,col:'#e56f45',desc:'+18 % Schaden für diesen Run.'},
+  {id:'stride',name:LEX.boon.stride,col:'#8fa879',desc:'+12 % Lauftempo und 10 % kürzerer Impulsstoß.'},
+  {id:'harvest',name:LEX.boon.harvest,col:'#6bb8d4',desc:'+25 % Aufsammelradius und +12 % Splitterwert.'},
+  {id:'guard',name:LEX.boon.guard,col:'#a5a1b2',desc:'+25 Max-HP, sofort geheilt, und 8 % Schadensschutz.'},
 ]);
 
 const WEAPONS = [
@@ -1340,21 +1366,21 @@ const PASSIVES = [
   { id:'umhang', name:LEX.p.umhang,  col:'#7893a5', desc:'−8 % erlittener Schaden je Stufe.' },
 ];
 const GEAR=Object.freeze([
-  {id:'glutsehne',slot:'weapon',slotName:'Waffe',name:'Glutsehne',rarity:'Gewöhnlich',
+  {id:'glutsehne',slot:'weapon',slotName:LEX.slot.weapon,name:LEX.gear.glutsehne,rarity:'Gewöhnlich',
    col:'#d58a55',salvage:4,effect:'aspd',per:.04,desc:'+4 % Angriffstempo je Rang.'},
-  {id:'kraehenbogen',slot:'weapon',slotName:'Waffe',name:'Krähenbogen',rarity:'Gewöhnlich',
+  {id:'kraehenbogen',slot:'weapon',slotName:LEX.slot.weapon,name:LEX.gear.kraehenbogen,rarity:'Gewöhnlich',
    col:'#a96c56',salvage:4,effect:'dmg',per:.035,desc:'+3,5 % Schaden je Rang.'},
-  {id:'sammlersiegel',slot:'charm',slotName:'Talisman',name:'Sammlersiegel',rarity:'Gewöhnlich',
+  {id:'sammlersiegel',slot:'charm',slotName:LEX.slot.charm,name:LEX.gear.sammlersiegel,rarity:'Gewöhnlich',
    col:'#6bb8d4',salvage:4,effect:'magnet',per:.08,desc:'+8 % Aufsammelradius je Rang.'},
-  {id:'runenfibel',slot:'charm',slotName:'Talisman',name:'Runenfibel',rarity:'Selten',
-   col:'#b997dd',salvage:10,seed:'runenfunke',desc:'Sät Runenfunke als garantierte Run-Karte.'},
-  {id:'pfadstiefel',slot:'mantle',slotName:'Gewand',name:'Pfadstiefel',rarity:'Gewöhnlich',
+  {id:'runenfibel',slot:'charm',slotName:LEX.slot.charm,name:LEX.gear.runenfibel,rarity:'Selten',
+   col:'#b997dd',salvage:10,seed:'runenfunke',desc:'Speist das Gefechtsprotokoll als garantierte Run-Karte ein.'},
+  {id:'pfadstiefel',slot:'mantle',slotName:LEX.slot.mantle,name:LEX.gear.pfadstiefel,rarity:'Gewöhnlich',
    col:'#8fa879',salvage:4,effect:'speed',per:.03,desc:'+3 % Lauftempo je Rang.'},
-  {id:'russmantel',slot:'mantle',slotName:'Gewand',name:'Rußmantel',rarity:'Gewöhnlich',
+  {id:'russmantel',slot:'mantle',slotName:LEX.slot.mantle,name:LEX.gear.russmantel,rarity:'Gewöhnlich',
    col:'#9296a5',salvage:4,effect:'armor',per:.03,desc:'+3 % Schadensschutz je Rang.'},
 ]);
 const GEAR_BY_ID=Object.freeze(Object.fromEntries(GEAR.map(item=>[item.id,item])));
-const GEAR_CARD=Object.freeze({id:'runenfunke',name:'Runenfunke',col:'#c8a7e8',
+const GEAR_CARD=Object.freeze({id:'runenfunke',name:LEX.gear.runenfunke,col:'#c8a7e8',
   desc:'+1 Projektil für Mehrfachschuss-Waffen und +20 % Angriffstempo für diesen Run.'});
 function equippedGearBonuses(meta){
   const out={dmg:0,aspd:0,magnet:0,speed:0,armor:0,seed:null};
@@ -1859,7 +1885,7 @@ function killEnemy(i){
     fx(x,y,80,0.5,COL.elite,1);
     for(let k=0;k<14;k++) spawnGem(x+(rand()-.5)*60, y+(rand()-.5)*60, 6);
     S.pendingEliteRewards++;
-    if(!HEADLESS) toast('Elite gebrochen · Relikt bereit');
+    if(!HEADLESS) toast('Elite neutralisiert · Modul bereit');
   } else {
     spawnGem(x,y,FAM_GEM[fam]);
     if (fam===3){                                  // Teiler zerfällt
@@ -2221,7 +2247,7 @@ function showCards(mode){
   const row=document.getElementById('cardrow'); row.innerHTML='';
   document.getElementById('cardtitle').textContent=cardMode==='elite'?'Elite gebrochen':'Stufe erreicht';
   document.getElementById('cardlvl').textContent=cardMode==='elite'
-    ?'Reliktwahl '+(S.eliteChoices+1):'Stufe '+S.level;
+    ?'Modulwahl '+(S.eliteChoices+1):'Stufe '+S.level;
   document.getElementById('cardhint').textContent=cardMode==='elite'
     ?'Spiel pausiert — wähle eine Kraft für diesen Run'
     :'Spiel pausiert — wähle eine Verstärkung';
@@ -2233,9 +2259,9 @@ function showCards(mode){
     let kind,name,lvtxt,desc,col;
     if(o.type==='gearcard'){
       col=o.card.col; kind='Ausrüstungssaat'; name=o.card.name;
-      lvtxt='Runenfibel'; desc=o.card.desc;
+      lvtxt=LEX.gear.runenfibel; desc=o.card.desc;
     } else if (o.type==='boon'){
-      col=o.boon.col; kind='Elite-Relikt'; name=o.boon.name;
+      col=o.boon.col; kind='Elite-Modul'; name=o.boon.name;
       lvtxt='Nur dieser Run'; desc=o.boon.desc;
     } else if (o.type==='evo'){
       col=o.w.evo.col; kind='Evolution'; name=o.w.evo.name;
@@ -2684,7 +2710,7 @@ function drawAelric(){
   ctx.beginPath(); ctx.ellipse(S.x,S.y+16,19,7,0,0,6.2832); ctx.fill();
   if(blink) return;
 
-  if(ART.heroReady){
+  if(!SPR.orbiter&&ART.heroReady){
     const angle=S.heroAngle;
     const bowCool=S.cool.bogen??1;
     const charge=S.W.bogen&&S.bowKick<=0?Math.max(0,Math.min(1,(.30-bowCool)/.30)):0;
@@ -2840,7 +2866,7 @@ function render(){
       const f=E.fam[i], artSet=ART.enemyReady?ART.enemy[f][tier]:null;
       // Sichtbare Gegner bleiben immer vollstaendige Figuren. Nur die kurze
       // Stuermer-Warnphase darf eine alternative Darstellung verwenden.
-      if(f===0&&ART.swarmerReady){
+      if(f===0&&!SPR.drone&&ART.swarmerReady){
         const frame=((S.visualT*SWARMER_ANIM.FPS+i*.73)|0)%SWARMER_ANIM.FRAMES;
         spr=ART.swarmer[frame][dir];
       } else if(f===0&&SPR.drone){
@@ -2944,11 +2970,20 @@ function render(){
     ctx.fillRect(CLIP_X+CLIP_W,0,W-CLIP_X-CLIP_W,H);
     const sky=SPR.starField;
     if(sky){
+      // Kacheln duerfen nicht ueber die schmale Safe-Area hinausragen. Bei
+      // 844×390 ist eine Kachel breiter als der Rand; ohne Clip uebermalte sie
+      // links 181 Pixel des eigentlichen Kampfausschnitts.
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(0,0,CLIP_X,H);
+      ctx.rect(CLIP_X+CLIP_W,0,W-CLIP_X-CLIP_W,H);
+      ctx.clip();
       const ST=sky.width;
       for(let y=0;y<H;y+=ST){
         for(let x=0;x<CLIP_X;x+=ST) ctx.drawImage(sky,x,y);
         for(let x=CLIP_X+CLIP_W;x<W;x+=ST) ctx.drawImage(sky,x,y);
       }
+      ctx.restore();
     }
     // Ruhige Rahmenkante in Cyan statt hartem Schnitt.
     ctx.fillStyle = 'rgba(127,212,232,0.16)';
@@ -3412,7 +3447,7 @@ function trainMastery(id){
   const lv=META.masteries[id], cost=lv+1;
   if(lv>=HOLD_CFG.MASTERY_MAX||META.marks<cost) return;
   META.marks-=cost; META.masteries[id]++; saveHold();
-  renderHold('Der '+LEX.held+' hat '+({path:'Pfadkunde',reach:'Reichgriff',dash:'Stoßschule'}[id])+' trainiert.');
+  renderHold('Der '+LEX.held+' hat '+LEX.mastery[id]+' trainiert.');
 }
 
 // Die linke Kampfanzeige zeigte alles gleichzeitig: Meta-Bonus, Ausruestung,
@@ -3449,14 +3484,14 @@ function metaBoni(){
     const id=S.gearEquipped?.[slot],item=GEAR_BY_ID[id];
     if(item) parts.push({c:item.col,n:item.name,l:'R'+(S.gearRanks[id]||1),e:true});
   }
-  const utilityLabels={path:'Pfadkunde',reach:'Reichgriff',dash:'Stoßschule'};
+  const utilityLabels=LEX.mastery;
   for(const id of Object.keys(utilityLabels)){
     const lv=S.holdUtility?.[id]||0;
     if(lv) parts.push({c:'#8fa879',n:utilityLabels[id],l:lv,e:true});
   }
   for(const boon of BOONS){
     const n=S.boons?.[boon.id]||0;
-    if(n) parts.push({c:boon.col,n:boon.name,l:n>1?'×'+n:'Relikt',e:true});
+    if(n) parts.push({c:boon.col,n:boon.name,l:n>1?'×'+n:'Modul',e:true});
   }
   return parts;
 }
@@ -3488,8 +3523,8 @@ function renderPauseDetail(){
     : `<p class="pauseleer">${leer}</p>`;
   const paths=evoPaths();
   el('pausedetail').innerHTML =
-    abschnitt('Run-Boni', reihe(metaBoni(),'keine – Hold-Ausbau, Ausrüstung und Relikte fehlen noch')) +
-    abschnitt('Build', reihe(combatSlots(),'nur der Startbogen')) +
+    abschnitt('Run-Boni', reihe(metaBoni(),'keine – Stationsausbau, Ausrüstung und Elite-Module fehlen noch')) +
+    abschnitt('Build', reihe(combatSlots(),'nur '+LEX.w.bogen)) +
     abschnitt('Evolutionspfade', paths.length
       ? `<div class="pathrow">${paths.map(pathHTML).join('')}</div>`
       : '<p class="pauseleer">kein Pfad begonnen</p>');
@@ -3593,7 +3628,7 @@ function startOnboarding(){
   if(HEADLESS) return;
   if(onboardingSeen || storedOnboarding()) { onboardingSeen=true; return; }
   const touch=!!(window.matchMedia&&window.matchMedia('(pointer:coarse)').matches);
-  showCoach(1,'In Bewegung bleiben',touch?'Links wischen, um Aelric zu bewegen.':'Mit WASD oder den Pfeiltasten bewegen.');
+  showCoach(1,'In Bewegung bleiben',touch?'Links wischen, um den '+LEX.held+' zu bewegen.':'Mit WASD oder den Pfeiltasten bewegen.');
 }
 function updateOnboarding(){
   if(!coachStep||!S||!S.running||S.phase!=='run') return;
@@ -3601,7 +3636,7 @@ function updateOnboarding(){
     const touch=!!(window.matchMedia&&window.matchMedia('(pointer:coarse)').matches);
     showCoach(2,'Impulsstoß',touch?'Rechts tippen: sprinten und kurz unverwundbar.':'Leertaste: sprinten und kurz unverwundbar.');
   } else if(coachStep===2 && S.dashCd>0){
-    showCoach(3,'Macht sammeln','Aelric schießt automatisch. Blaue Splitter öffnen neue Karten.');
+    showCoach(3,'Macht sammeln',LEX.held+' greift automatisch an. Blaue Splitter öffnen neue Karten.');
     coachUntil=S.t+4;
   } else if(coachStep===3 && S.t>=coachUntil){ hideCoach(true); }
 }
@@ -3699,7 +3734,7 @@ function endRun(survived){
     statTile(S.level,'Stufe') +
     statTile(fmtTime(S.otActive?S.runLen+S.ot:S.t),'Zeit') +
     statTile(S.pickTimes.length,'Kartenzüge') +
-    statTile(S.eliteChoices,'Elite-Relikte') +
+    statTile(S.eliteChoices,'Elite-Module') +
     statTile(gearLootText(),'Ausrüstungsfund') +
     statTile(S.reward.toLocaleString('de-DE'),'Beute gesamt') +
     statTile('+'+S.holdOre,LEX.res.ore+' · '+S.contract.name);
@@ -3739,7 +3774,7 @@ function displayInfo(){
 function buildText(){
   const w=WEAPONS.filter(x=>S.W[x.id]).map(x=>(S.evo[x.id]?x.evo.name:x.name)+' '+(S.evo[x.id]?'EVO':S.W[x.id]));
   const p=PASSIVES.filter(x=>S.Pa[x.id]).map(x=>x.name+' '+S.Pa[x.id]);
-  return w.concat(p).join(', ')||'Startbogen';
+  return w.concat(p).join(', ')||LEX.w.bogen;
 }
 function boonText(){
   const out=BOONS.filter(b=>S.boons?.[b.id]).map(b=>
@@ -3813,10 +3848,10 @@ function runReportText(){
     'Boss-Schaden je Waffe: '+weaponDamageText('dmgWBoss'),
     'Waffenverlauf: '+weaponTimelineText(),
     'Evolutionen: '+evos,
-    'Elite-Relikte: '+boonText(),
+    'Elite-Module: '+boonText(),
     'Ausrüstung: '+equippedGearText(),
     'Ausrüstungsfund: '+gearLootText(),
-    'Hold-Vorbereitung: '+(S.preparedRerollsUsed?('+'+S.preparedRerollsUsed+' Rerolls'):'keine')+
+    'Stations-Vorbereitung: '+(S.preparedRerollsUsed?('+'+S.preparedRerollsUsed+' Rerolls'):'keine')+
       ' · Training '+Object.values(S.holdUtility||{}).join('/'),
     LEX.heal+' eingesammelt: '+S.healOrbs,
     'Spitze im SIM-Radius: '+S.peakNearbyEnemies,

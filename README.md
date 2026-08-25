@@ -1,66 +1,52 @@
-# Project Emberhold
+# Orbitblade
 
-> **Arbeitstitel:** Vor Store-Auftritt, Domainkauf oder öffentlichem Marketing
-> wird ein neuer Name gewählt und geprüft. „Emberhold“ ist bereits anderweitig
-> im Spielemarkt belegt.
+> **Technischer Projektname:** Repository, GitHub-Pages-URL, Save-Key und
+> interne IDs heißen vorerst weiter Emberhold. Der sichtbare Name Orbitblade
+> ist laut D-037 eine bewusste Besitzerentscheidung, aber noch nicht marken-
+> oder store-rechtlich freigegeben.
 
-Project Emberhold ist ein reines Solo-PvE-Spiel, das Idle-RPG-Progression mit
-kurzen Bullet-Heaven-Runs verbindet. Die Festung produziert und fertigt
-Ausrüstung, die den Kartenpool im Kampf verändert. Kämpfe erobern wiederum die
-Territorien, welche die Festung versorgen.
+Orbitblade ist ein reines Solo-PvE-Spiel aus kurzen Bullet-Heaven-Sortien und
+einer kleinen lokalen Orbitalstation. Im Run baut der Orbitträger aus Waffen,
+Passivmodulen und Evolutionen einen Build; Bergungswert und Asterit treiben
+zwischen den Läufen Reparaturen, Ausrüstung und Vorbereitung der Station an.
 
 ## Aktueller Stand
 
-Das Projekt befindet sich im Übergang vom **Kampfprototyp zum kleinen
-Hold-Validierungsslice**.
+Der Phase-0-Prototyp enthält drei Sektoren, sechs Waffen mit vollständigen
+Evolutionspfaden, acht Passivmodule, fünf Gegnerfamilien, Eliten,
+**SEKTORBOSS: AEGIS**, Extraktion und Overtime. Die Orbitalstation besitzt
+Asteroidensonde, Materiefabrikator, Fluxlabor, Simulationsdeck,
+Ausrüstungsbucht und Sternenkarte mit lokalem Save v4 und begrenzter
+Offline-Produktion.
 
-Der aktuelle Build enthält einen Helden, ein Territorium, sechs Waffen mit
-vollständigen Evolutionspfaden, acht Passive, fünf Gegnerfamilien, Eliten,
-einen Mittelboss,
-Extraktion und Overtime. Hinzu kommt ein bewusst kleiner Kraterhold mit
-Tiefmine, Emberschmiede, Arkanum, Übungshof, lokaler Speicherung,
-Offline-Produktion, herstellbaren Rerolls und drei Utility-Meisterschaften.
-Aelric nutzt inzwischen einen konsistenten
-4×3-Raster-Atlas mit Idle-, Lauf- und Bogenphasen; Gegner besitzen eigene
-Silhouetten und Blickrichtungen. Die Weltposition bleibt an den Browser-Frame
-gekoppelt, während klar getaktete Einzelposen Doppelbilder vermeiden. Ein
-hellerer, ruhiger Basaltboden und eine dezente Ascheaufhellung trennen dunkle
-Figuren vom Untergrund. Der häufige Schwärmer besitzt als erster Gegnertyp
-einen echten Vier-Phasen-Laufzyklus; weitere Familien folgen erst nach seinem
-Spieltest. Backend, Ton und Monetarisierung bleiben weiterhin außerhalb des
-Scopes.
+D-038 bildet den ersten sichtbaren Orbitblade-Vertikalschnitt: ruhiges
+Sci-Fantasy-HUD, mittelhelles Stationsdeck, dekorative Sternenränder sowie
+code-native Figuren für Orbitträger, Sammlerdrohne, AEGIS und die geworfene
+Orbitklinge. Die Spielmechanik der bisherigen Fernkampfwaffe ist dabei bewusst
+unverändert; eine echte zurückkehrende Klinge ist ein späteres eigenes Gate.
 
-Die Sortietafel bietet inzwischen drei Verträge: den unveränderten
-Wächterring, den schnellen Sturmbruch und die robuste Aschengruft. Auswahl,
-Gegnergewichtung, Risikomodifikator und Erzbonus bleiben über den lokalen
-Spielstand erhalten und werden im Run-HUD sowie Bericht ausgewiesen.
-Elite-Kills öffnen bei 2:00 und 6:00 eine eigene Auswahl aus drei Run-Relikten;
-die zweite Wahl schafft bewusst eine neue Buildentscheidung zwischen Warden
-und Extraktion.
+Die technische Abnahme steht bei **47/47 grünen Checks**. Der nächste
+verbindliche Schritt ist ein vollständiger menschlicher Acht-Minuten-Lauf im
+Trümmerring. Er soll zeigen, ob die nach D-036 gebremste späte Progression,
+Waffenrollen, Übersicht und Lust auf einen zweiten Run tatsächlich besser
+sind. Backend, Ton, Monetarisierung und neue Inhalte bleiben bis dahin
+außerhalb des Scopes.
 
-Jede mindestens drei Minuten gespielte Sortie bringt außerdem ein Teil für die
-Rüstkammer. Ein früher Abbruch behält seine erspielte Basis-Beute, liefert aber
-keinen garantierten Ausrüstungsfund. Sechs feste Teile verteilen sich auf drei
-Slots, Duplikate werden sofort zu Runenstaub und Ränge werden gezielt statt über
-Fusionen erhöht. Die seltene Runenfibel sät mit Runenfunke eine eigene Karte in
-das Angebot des nächsten Runs.
-
-Die einzige Produktfrage der Phase 0 lautet:
+Die Produktfrage der Phase 0 lautet:
 
 > Macht ein Run genug Spaß, dass Testpersonen freiwillig sofort einen zweiten
 > Run starten?
 
 ## Prototyp starten
 
-1. `prototype/web/index.html` im Browser öffnen.
-2. Im Hold die **Tiefmine reparieren** und eine Sortie wählen.
-3. Mit WASD oder Pfeiltasten bewegen.
-4. Den Ember-Stoß mit der Leertaste auslösen.
-5. Karten mit 1, 2 oder 3 wählen.
-6. Mit `Esc`, `P` oder dem Pausenbutton pausieren und fortsetzen.
-
-Der Prototyp ist eigenständig und benötigt für den lokalen Test keine
-Installation und keinen Server.
+- Online: [GitHub Pages](https://driftpine99.github.io/EmberHold/prototype/web/)
+- Lokal: `prototype/web/index.html` im Browser öffnen; Installation und
+  Server sind nicht nötig.
+- In der Orbitalstation den **Trümmerring** wählen und die Sortie starten.
+- Bewegen: WASD/Pfeiltasten; mobil links wischen.
+- Impulsstoß: Leertaste; mobil rechts tippen.
+- Karten: 1, 2, 3 oder antippen.
+- Pause: `Esc`, `P` oder der Button oben rechts.
 
 ## Automatischer Balance-Test
 

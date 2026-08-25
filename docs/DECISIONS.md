@@ -1678,8 +1678,7 @@ Folgen:
 
 ## D-038 – Visueller Orbitblade-Slice vor dem D-036-Feldlauf
 
-**Status:** beschlossen und als EH-2026-08-24-02 für Claude freigegeben
-(24.08.2026).
+**Status:** technisch abgenommen und umgesetzt (25.08.2026).
 
 Der D-036-Feldlauf bleibt fachlich notwendig. Der Besitzer priorisiert jetzt
 jedoch die neue Orbitblade-Identität und möchte Claudes mehrstündige Sitzung
@@ -1699,6 +1698,21 @@ Die Abweichung von der bisherigen Reihenfolge ist messbar abgesichert:
 - neue Präsentation erhält eigene Verhaltenschecks;
 - der vollständige Besitzerlauf folgt nach dem Slice und bleibt Gate vor
   Klingenmechanik, Balance und Content.
+
+Die Codex-Abnahme am 25.08.2026 schließt den Auftrag technisch ab:
+
+- finale Suite 47/47, `git diff --check` sauber;
+- feste Simulation, interne IDs, Save v4 und Hold-Ökonomie unverändert;
+- echter Chrome-Smoke bei 1280×720 und 844×390 einschließlich Station, Run,
+  Pause, Kartenwahl, Ergebnis und Rückkehr;
+- code-native Orbitblade-Figuren haben jetzt Vorrang vor den historischen
+  Fantasy-Atlanten; deren zwei ungenutzte Laufzeitdownloads entfallen;
+- mobile Safe-Area, Toast-Layer und niedrige Dialoghöhen wurden im Review
+  korrigiert; Ausrüstung, Elite-Module und Meisterschaften nutzen ebenfalls
+  die zentrale Sci-Fantasy-Sprache.
+
+Die subjektive Freigabe des Spielgefühls ist damit ausdrücklich noch nicht
+erteilt. Sie bleibt beim vollständigen D-036-Besitzerlauf.
 
 Damit kann die fünfstündige Sitzung breit innerhalb eines zusammenhängenden
 Präsentationsauftrags arbeiten, ohne mehrere untrennbare Gameplaybaustellen zu

@@ -1634,12 +1634,18 @@ try {
   const alleWaffen = engine.WEAPONS.every(w => !!L.w[w.id] && !!L.evo[w.id]);
   const allePassive = engine.PASSIVES.every(p => !!L.p[p.id]);
   const alleSektoren = engine.CONTRACTS.every(c => !!L.sektor[c.id]);
-  const abbildungVollstaendig = alleWaffen && allePassive && alleSektoren;
+  const alleBoni = engine.BOONS.every(b => !!L.boon[b.id]);
+  const alleAusrüstung = engine.GEAR.every(g => !!L.gear[g.id] && !!L.slot[g.slot]);
+  const abbildungVollstaendig = alleWaffen && allePassive && alleSektoren &&
+    alleBoni && alleAusrüstung && !!L.gear[engine.GEAR_CARD.id];
 
   // 2. Die Abbildung wird auch wirklich benutzt.
   const namenGesetzt = engine.WEAPONS.every(w => w.name === L.w[w.id] && w.evo.name === L.evo[w.id]) &&
     engine.PASSIVES.every(p => p.name === L.p[p.id]) &&
-    engine.CONTRACTS.every(c => c.name === L.sektor[c.id]);
+    engine.CONTRACTS.every(c => c.name === L.sektor[c.id]) &&
+    engine.BOONS.every(b => b.name === L.boon[b.id]) &&
+    engine.GEAR.every(g => g.name === L.gear[g.id] && g.slotName === L.slot[g.slot]) &&
+    engine.GEAR_CARD.name === L.gear[engine.GEAR_CARD.id];
   const familienUmbenannt = engine.FAMNAME.length === 5 &&
     engine.FAMNAME.every(n => typeof n === "string" && n.length > 3) &&
     !engine.FAMNAME.includes("Schwärmer") && !engine.FAMNAME.includes("Wahrer");
@@ -1679,13 +1685,17 @@ try {
   // 5. Der Run-Bericht zeigt sichtbare Namen, keine internen IDs.
   engine.begin(480, "ring");
   engine.S.W = { bogen: 3, frost: 1 }; engine.S.Pa = { sehne: 2 }; engine.S.evo = {};
+  engine.S.boons = { fury: 1 }; engine.S.gearEquipped = { weapon: "glutsehne", charm: null, mantle: null };
+  engine.S.gearRanks = { glutsehne: 2 }; engine.S.holdUtility = { path: 1, reach: 0, dash: 0 };
   engine.S.t = 480; engine.S.result = "Extrahiert";
   const bericht = engine.runReportText();
   const berichtZeigtNeueNamen = bericht.includes(L.produkt.toUpperCase()) &&
     bericht.includes(L.w.bogen) && bericht.includes(L.w.frost) &&
-    bericht.includes(L.res.ore) && bericht.includes(L.res.loot) && bericht.includes(L.heal);
+    bericht.includes(L.res.ore) && bericht.includes(L.res.loot) && bericht.includes(L.heal) &&
+    bericht.includes(L.boon.fury) && bericht.includes(L.gear.glutsehne) &&
+    bericht.includes("Stations-Vorbereitung");
   const berichtOhneAlteNamen = ["Langbogen", "Frostnova", "Eisenerz", "Basis-Beute",
-    "Gluttropfen", "EMBERHOLD"].every(alt => !bericht.includes(alt));
+    "Gluttropfen", "Glutkern", "Glutsehne", "Hold-Vorbereitung", "EMBERHOLD"].every(alt => !bericht.includes(alt));
   // Interne IDs duerfen nie im sichtbaren Bericht stehen.
   const berichtOhneIds = !/\b(bogen|splitter|kugel|blitz|klinge|frost|koecher|wetz)\b/.test(bericht);
 
@@ -1693,7 +1703,8 @@ try {
   //    beschrieben werden und erzeugt beim Lesen keine Allokation.
   const eingefroren = Object.isFrozen(L) && Object.isFrozen(L.w) &&
     Object.isFrozen(L.evo) && Object.isFrozen(L.p) && Object.isFrozen(L.sektor) &&
-    Object.isFrozen(L.res) && Object.isFrozen(L.modul);
+    Object.isFrozen(L.res) && Object.isFrozen(L.modul) && Object.isFrozen(L.boon) &&
+    Object.isFrozen(L.gear) && Object.isFrozen(L.slot) && Object.isFrozen(L.mastery);
 
   presentationLayer = abbildungVollstaendig && namenGesetzt && familienUmbenannt &&
     idsUnveraendert && roundtripVerlustfrei && keyUnveraendert &&

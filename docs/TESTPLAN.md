@@ -1,8 +1,8 @@
-# EMBERHOLD — Prototyp Phase 0
+# ORBITBLADE — Prototyp Phase 0
 
-Ein Held (Aelric), ein Territorium, 8-Minuten-Run und ein kleiner funktionaler
-Kraterhold. Kein Backend. Der Kampf bleibt unverändert messbar; zusätzlich wird
-geprüft, ob `Sortie → Produktion → Verbesserung → Sortie` verständlich ist.
+Ein Orbitträger, drei Sektoren, ein 8-Minuten-Run und eine kompakte
+Orbitalstation. Kein Backend. Der Kampf bleibt unverändert messbar;
+zusätzlich wird geprüft, ob `Sortie → Produktion → Verbesserung → Sortie` verständlich ist.
 
 `../prototype/web/index.html` ist eigenständig — Doppelklick genügt, kein
 Server, keine Installation. Läuft auf Desktop und Handy.
@@ -12,27 +12,27 @@ Server, keine Installation. Läuft auf Desktop und Handy.
 | | |
 |---|---|
 | Bewegen | WASD / Pfeiltasten · mobil: links wischen |
-| Ember-Stoß | Leertaste · mobil: rechts tippen |
+| Impulsstoß | Leertaste · mobil: rechts tippen |
 | Karte wählen | Klick oder 1 / 2 / 3 |
 | Neu ziehen | R |
 | Pause | `Esc` oder `P` · Pausenbutton oben rechts |
 | **T** | **Live-Tuning** — Dichte, Schaden, HP, XP-Kurve. Wirkt sofort, auch mitten im Run. |
 | **F3** | Entwickler-Anzeige — FPS, Entities, Pick-Zeiten gegen die Spezifikation |
 
-## Hold-MVP testen
+## Stations-MVP testen
 
-1. Tiefmine kostenlos reparieren.
-2. Nach 15 Sekunden das erste Erz einsammeln oder direkt ein
+1. Asteroidensonde kostenlos reparieren.
+2. Nach 15 Sekunden die erste Einheit Asterit einsammeln oder direkt ein
    3-Minuten-Scharmützel spielen.
-3. Nach der Rückkehr Sortiebeute und Minenlager einsammeln.
-4. Emberschmiede für 10 Erz reparieren; sie verbraucht automatisch 5 Erz je
-   Barren und benötigt dafür 30 Sekunden.
-5. Zwei Barren einsammeln und den Wächterbogen verstärken.
-6. Im nächsten Run muss links `Wächterbogen +10 %` erscheinen.
-7. Arkanum für 15 Erz reparieren, Essenz sammeln und für 2 Essenz einen
-   zusätzlichen Reroll vorbereiten. Der nächste Run startet dann mit 2 statt 1.
-8. Übungshof für 3 Barren reparieren, Trainingsmarken sammeln und einen der
-   drei Utility-Pfade lernen. Die Meisterschaft muss im nächsten Run links
+3. Nach der Rückkehr Sortiebeute und Sondenlager einsammeln.
+4. Materiefabrikator für 10 Asterit reparieren; er verarbeitet automatisch
+   5 Asterit in 30 Sekunden zu 1 Legierungsplatte.
+5. Zwei Legierungsplatten einsammeln und die Orbitklinge verstärken.
+6. Im nächsten Run muss in der Pause `Klingenverstärkung +10 %` erscheinen.
+7. Fluxlabor für 15 Asterit reparieren, Fluxkondensat sammeln und für
+   2 Fluxkondensat einen zusätzlichen Reroll vorbereiten. Der nächste Run startet dann mit 2 statt 1.
+8. Simulationsdeck für 3 Legierungsplatten reparieren, Sim-Daten sammeln und
+   einen der drei Utility-Pfade lernen. Die Meisterschaft muss im nächsten Run in der Pause
    sichtbar sein und den angegebenen Wert verändern.
 9. Seite neu laden: Ressourcen, Gebäude, Vorbereitung und Meisterschaften
    müssen erhalten sein.
@@ -57,36 +57,37 @@ Minuten zu testen. Die langfristigen GDD-Zeiten sind noch nicht aktiv.
 3. Fenster im **Querformat** lassen, möglichst 16:9. Hochformat ist laut D-017
    kein unterstützter Kampfmodus.
 
-### Durchgang A — Hold → Run → Hold
+### Durchgang A — Station → Run → Station
 
-Die neun Schritte aus **Hold-MVP testen** der Reihe nach. Danach zusätzlich:
+Die neun Schritte aus **Stations-MVP testen** der Reihe nach. Danach zusätzlich:
 
-10. Sortietafel: einmal **Sturmbruch** und einmal **Aschengruft** wählen. Beide
-    müssen im HUD und im Run-Bericht namentlich erscheinen, und die Erzbeute
-    muss sichtbar höher ausfallen als beim Wächterring.
-11. Ein Ausrüstungsteil anlegen und ein zweites zerlegen. Der Staub muss steigen,
-    das zerlegte Teil verschwinden, und nichts darf ohne Rückfrage verloren gehen.
-12. **Seite neu laden.** Erz, Barren, Essenz, Marken, Staub, Gebäudestufen,
-    Vorbereitung, Meisterschaften, Ausrüstung und der gewählte Vertrag müssen
+10. Sortietafel: einmal **Ionensturm** und einmal **Nullwrack** wählen. Beide
+    müssen im HUD und im Run-Bericht namentlich erscheinen, und die Asteritbeute
+    muss sichtbar höher ausfallen als beim Trümmerring.
+11. Ein Ausrüstungsteil anlegen und ein zweites zerlegen. Die Modulfragmente
+    müssen steigen, das zerlegte Teil verschwinden, und nichts darf ohne Rückfrage verloren gehen.
+12. **Seite neu laden.** Asterit, Legierungsplatten, Fluxkondensat, Sim-Daten,
+    Modulfragmente, Gebäudestufen, Vorbereitung, Meisterschaften, Ausrüstung
+    und der gewählte Sektor müssen
     vollständig erhalten sein.
 
 ### Durchgang B — Vollständiger 8-Minuten-Run
 
-**Wächterring** wählen — nur dieser Vertrag ist die Balance-Referenz. Dann
+**Trümmerring** wählen — nur dieser Sektor ist die Balance-Referenz. Dann
 durchspielen und unterwegs auf Folgendes achten:
 
 | Zeit | Worauf achten |
 |---|---|
 | 0:00–1:00 | Startet der Run ohne Erklärung verständlich? Erster Kartenzug bei etwa 25–35 s? |
 | 2:00 | Erste Elite: eigene Silhouette, orangefarbener Prioritätsrahmen erkennbar? |
-| 3:00–5:00 | **Schwärmer im Pulk:** wirken sie ruhig und geerdet, oder marschieren sie sichtbar im Gleichschritt? Haftet der Kontaktschatten am Fuß? |
-| 4:10 | Warden-Einstieg: **ist er vollständig sichtbar oder oben/unten angeschnitten?** (offener Vorbehalt aus D-017) |
+| 3:00–5:00 | **Sammlerdrohnen im Pulk:** wirken sie ruhig und geerdet, oder marschieren sie sichtbar im Gleichschritt? Haftet der Kontaktschatten am Fuß? |
+| 4:10 | AEGIS-Einstieg: **ist er vollständig sichtbar oder oben/unten angeschnitten?** (offener Vorbehalt aus D-017) |
 | 6:00–8:00 | **Das eigentliche Lastfenster.** Minimum-FPS im Auge behalten. Hier steht die Dichte bei rund 300 Gegnern, nicht bei den 53 des alten Smoke-Tests. |
 | 8:00 | Extraktion: ist der nächste sinnvolle Schritt eindeutig? |
 
 Danach **„Bericht kopieren"** drücken und den Text unverändert zurückgeben. Er
-enthält bereits Seed, Vertrag, Build, Evolutionen, Elite-Relikte, Ausrüstung,
-Hold-Vorbereitung, beide Telemetriespitzen und den Kampfausschnitt. Seit
+enthält bereits Seed, Sektor, Build, Evolutionen, Elite-Module, Ausrüstung,
+Stations-Vorbereitung, beide Telemetriespitzen und den Kampfausschnitt. Seit
 D-024 zusätzlich drei Zeilen, die den Bericht selbsterklärend machen:
 
 | Zeile | Wozu |
@@ -94,7 +95,7 @@ D-024 zusätzlich drei Zeilen, die den Bericht selbsterklärend machen:
 | `Anzeige: 1280×720 CSS · 1920×1080 px · DPR 1.50` | Die Füllrate hängt an der echten Pixelzahl. Auf einem HiDPI-Gerät rechnet dieselbe Szene mit einem Vielfachen. |
 | `Tuning: unverändert` | Bewegte Live-Regler werden namentlich gemeldet. Ein getunter Lauf ist damit nicht mehr von einem sauberen zu verwechseln. |
 | `FPS 1-%-Low` und `Anteil unter 55 FPS` | Die schlechteste halbe Sekunde allein sagt wenig; ein einzelner Aussetzer setzt sie dauerhaft. Erst diese beiden Zahlen zeigen, ob es ruckelt oder einmal gehakt hat. |
-| `Gluttropfen eingesammelt` | Wie oft du wirklich hingelaufen bist. Null hieße: Der Tropfen ist zu unauffällig oder zu riskant zu holen. |
+| `Nanokapseln eingesammelt` | Wie oft du wirklich hingelaufen bist. Null hieße: Die Kapsel ist zu unauffällig oder zu riskant zu holen. |
 
 **Worauf bei den Zahlen besonders zu achten ist:** `Spitze sichtbar gezeichnet`
 sollte deutlich unter den 294 des letzten Laufs liegen — das ist der Wert, an
@@ -102,10 +103,27 @@ dem laut D-029 die Bildrate hängt. Und `Anteil unter 55 FPS` sollte weit unter
 den 40 % von damals liegen.
 
 
+### Technischer Browser-Smoke nach D-038
+
+Codex hat den aktuellen lokalen Build am 25.08.2026 mit echten Datei-Assets in
+Chrome bei **1280×720** und **844×390** geprüft:
+
+- Orbitalstation, Run, Pause, Kartenwahl, Ergebnis und Rückkehr zur Station
+  funktionieren ohne Seitenfehler;
+- der Kampfausschnitt hat bei 844×390 exakt 75 Pixel dekorative Safe-Area je
+  Seite; die Sternenkacheln ragen nicht mehr in den Kampf;
+- Pause und Kartenwahl bleiben vollständig bedienbar, ohne dass Toasts oder
+  HUD-Texte darüberliegen;
+- Orbitträger und Sammlerdrohne sind die sichtbaren code-nativen Figuren;
+  geladen wird nur noch `enemy-atlas-v1.png` für die übrigen Familien.
+
+Das ist eine technische Layout- und Integrationsprüfung, kein Ersatz für den
+vollständigen Acht-Minuten-Lauf auf dem Gerät des Besitzers.
+
 ### Aktueller Besitzerlauf nach D-036
 
-Bitte genau einen vollständigen **8-Minuten-Wächterring-Lauf** ohne
-Live-Tuning spielen. Hold-Vorbereitung und vorhandene Ausrüstung dürfen wie
+Bitte genau einen vollständigen **Acht-Minuten-Lauf im Trümmerring** ohne
+Live-Tuning spielen. Stations-Vorbereitung und vorhandene Ausrüstung dürfen wie
 üblich verwendet werden. Danach den vollständigen Bericht einschließlich
 `Waffenverlauf` kopieren.
 
@@ -115,7 +133,7 @@ der Korridor, gegen den Codex den Feldlauf bewertet:
 - erster Kartenzug weiterhin ungefähr 30–38 Sekunden;
 - 28–34 Kartenzüge statt 46;
 - typisch ein bis zwei Evolutionen, drei nur bei einem außergewöhnlichen Run;
-- Warden-Phase und Gegnerzahl gefühlt unverändert gegenüber dem guten Lauf;
+- AEGIS-Phase und Gegnerzahl gefühlt unverändert gegenüber dem guten Lauf;
 - in Minute 6–8 wieder echte Gefahr, ohne mehr Gegner einzuführen.
 
 Sechs kurze Fragen zusätzlich zum Bericht:
@@ -126,18 +144,18 @@ Sechs kurze Fragen zusätzlich zum Bericht:
    aber nicht blockiert oder zäh? Wie viele Kartenzüge stehen am Ende?
 3. **Gefahr:** Bist du zwischen Minute 6 und 8 weiterhin praktisch
    unbesiegbar, oder entstehen wieder brenzlige Situationen?
-4. **Waffenrollen:** Ist Pfeilregen weiterhin stark, aber nicht mehr die
-   offensichtliche Pflichtwahl? Lohnt sich die Rundenklinge, falls du sie
-   angeboten bekommst, besonders im Warden-Kampf?
-5. **Warden und Übersicht:** Bleibt der Boss gezielt erreichbar und angemessen?
+4. **Waffenrollen:** Ist Sternenhagel weiterhin stark, aber nicht mehr die
+   offensichtliche Pflichtwahl? Lohnen sich die Sentinel-Drohnen, falls du sie
+   angeboten bekommst, besonders im AEGIS-Kampf?
+5. **AEGIS und Übersicht:** Bleibt der Boss gezielt erreichbar und angemessen?
    Fehlen im Kampf wichtige Informationen oder stehen weiterhin unnötige links?
 6. **Zweiter Run:** Hättest du unmittelbar Lust auf einen weiteren Run? Was
    zieht – oder was macht ihn weiterhin eintönig?
 
-Die seitliche Safe-Area, abgeschnitten wirkende Ränder und die allgemeine
-Optik werden ausdrücklich mitbeobachtet, aber in D-036 noch nicht verändert.
-Sie bilden nach diesem Lauf einen eigenen Designschritt. Keine neue
-Gegneranimation oder Inhaltserweiterung wird gleichzeitig bewertet.
+Die neue Safe-Area, das kompakte HUD, Orbitträger, Sammlerdrohnen und AEGIS
+werden ausdrücklich mitbeobachtet. D-038 hat nur Darstellung und Sprache
+verändert; Spielgefühl, späte Gefahr und Waffenrollen werden weiterhin
+getrennt anhand dieses Laufs bewertet.
 
 ### Historisches D-035-Protokoll (am 24.08.2026 erledigt)
 

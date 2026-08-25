@@ -148,6 +148,17 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
   unverändert
 - Orbitträger, Sammlerdrohne, AEGIS und das Klingenprojektil sind neue
   code-native Canvas-Figuren; die früheren Kreisplatzhalter entfallen
+- **Codex-Nacharbeit zu D-038:** Ausrüstung, Elite-Module und Meisterschaften
+  sind ebenfalls zentral auf Sci-Fantasy-Bezeichnungen umgestellt; interne
+  Save-IDs bleiben unverändert
+- Die code-nativen Figuren haben im echten Browser Vorrang vor den historischen
+  Aelric-/Schwärmer-Atlanten. Beide ungenutzten Laufzeitdownloads entfallen
+  (zusammen rund 2,55 MB), die Dateien bleiben als Projekthistorie erhalten
+- Mobile Safe-Area-Sternenkacheln werden exakt auf ihre 75-Pixel-Ränder
+  geclippt. Toasts liegen nicht mehr über Pause oder Kartenwahl; Dialoge und
+  Karten bleiben bei 844×390 vollständig erreichbar
+- Unabhängige Abschlussprüfung: 47/47 Checks grün, `git diff --check` sauber;
+  echter Chrome-Fluss bei 1280×720 und 844×390 ohne Seitenfehler
 
 - Der Warden bildet eine lesbare Kampfphase: höchstens 90 nachspawnende
   normale Gegner, keine künstliche Entfernung, danach schrittweiser

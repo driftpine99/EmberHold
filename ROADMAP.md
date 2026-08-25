@@ -2,48 +2,40 @@
 
 ## Aktueller Arbeitsfokus
 
-**Orbitblade-Neuausrichtung vom 24.08.2026:** Der Besitzer behält den Namen
-Orbitblade trotz des in D-037 dokumentierten Risikos. EH-2026-08-24-02 ist als
-bis zu fünfstündiger visueller und semantischer Slice freigegeben. Er darf HUD,
-Safe-Area, sichtbare Namen, Orbitalstation Stufe A sowie Orbitträger,
-Sammlerdrohne und AEGIS bearbeiten, muss Simulation, Save und Ökonomie aber
-bitidentisch lassen (D-038).
+**Verbindlicher Stand 25.08.2026:** EH-2026-08-24-02 ist durch Claude umgesetzt
+und durch Codex technisch abgenommen (D-038). Der Prototyp trägt sichtbar die
+Orbitblade-Identität: zentrale Namensabbildung, ruhigeres HUD, Orbitalstation
+Stufe A, dekorative Safe-Area sowie code-native Figuren für Orbitträger,
+Sammlerdrohne, AEGIS und Klingenprojektil.
 
-**Verbindlicher Stand 24.08.2026:** Der vollständige Besitzerlauf nach D-035
-ist gefahren. Warden-Phase und Renderleistung sind bestätigt: Der Boss war
-gezielt erreichbar und angemessen, die reduzierte Gegnerzahl angenehm; 57 FPS
-schlechtester Wert, 60 FPS 1-%-Low und 0 % der Proben unter 55 FPS. Das
-Spielgefühl-Gate bleibt trotzdem negativ: 46 Kartenzüge, Stufe 47 und drei
-Evolutionen machten den Spieler praktisch unbesiegbar; Pfeilregen trug 55 %
-des Gesamtschadens, die Rundenklinge trotz Stufe 4 nur 291 Schaden. Die
-seitliche Safe-Area und unnötige Informationen bleiben ein eigener visueller
-Befund.
+Die unabhängige Abnahme ergab:
 
-EH-2026-08-24-01 ist durch Claude umgesetzt und durch Codex technisch
-abgenommen (D-036):
+1. [x] Claudes vier Gate-Commits und Arbeitsbericht vollständig geprüft.
+2. [x] Simulation, feste Seeds, Save v4, Hold-Ökonomie und interne IDs
+   unverändert; finale Suite **47/47** grün, `git diff --check` sauber.
+3. [x] Echter Chrome-Smoke bei 1280×720 und 844×390. Station, Kampf, Pause,
+   Kartenwahl, Ergebnis und Rückkehr funktionieren ohne Browserfehler.
+4. [x] Codex-Nacharbeit: code-native Figuren vor Alt-Atlanten priorisiert,
+   2,55 MB ungenutzte Fantasy-Downloads entfernt, Safe-Area-Kacheln exakt
+   geclippt, mobile Dialogüberlagerungen beseitigt und verbliebene sichtbare
+   Fantasy-Namen in Ausrüstung, Elite-Modulen und Meisterschaften ersetzt.
 
-1. [x] Frühe XP-Kurve bis einschließlich Stufe 20 unverändert.
-2. [x] Späte XP-Kosten weich erhöht; das alte Stufe-47-Budget erreicht im
-   synthetischen Vertrag jetzt Stufe 33 ohne harten Deckel.
-3. [x] Pfeilregen ausschließlich über seinen EVO-Schadensfaktor um 17,1 %
-   abgeschwächt; normaler Splitterköcher unverändert.
-4. [x] Rundenklinge berücksichtigt wie Projektile den Gegnerkörper. Der
-   reproduzierbare Nahbereichsbenchmark steigt dadurch etwa 2,3-fach, ohne
-   Schadenswert oder Defensive zu erhöhen.
-5. [x] Run-Bericht ergänzt Aufnahmezeit, aktive Zeit, Schaden je aktiver
-   Sekunde und Evolutionszeit je verwendeter Waffe.
-6. [x] Unabhängige Codex-Prüfung: `npm test` 45/45, `git diff --check` sauber.
+Der vollständige Besitzerlauf nach D-036 bleibt das nächste Produktgate.
+D-035 hatte Bossphase und Renderleistung bestätigt, aber 46 Kartenzüge,
+Stufe 47, drei Evolutionen und stark auseinanderlaufende Waffenrollen machten
+den späten Run praktisch ungefährlich. D-036 bremst deshalb die späte
+Progression und korrigiert die Waffenrollen; D-038 verändert diese Mechanik
+nicht.
 
 Nächste verbindliche Reihenfolge:
 
-1. [ ] Claude bearbeitet ausschließlich EH-2026-08-24-02 und übergibt Diff,
-   Paritätsnachweis, Tests und Arbeitsbericht an Codex; kein Push.
-2. [ ] Codex prüft den visuellen Slice unabhängig und pusht nur bei
-   bitidentischer Simulation und grünem Save-/Hold-Vertrag.
-3. [ ] Besitzer spielt danach den vollständigen D-036-Acht-Minuten-Lauf und
-   kopiert Bericht plus visuelles Feedback.
-4. [ ] Erst danach folgen Rückflugmechanik der Orbitklinge, Balance oder neue
-   Inhalte als getrennte Aufträge.
+1. [x] Claude übergibt EH-2026-08-24-02 ohne Push.
+2. [x] Codex prüft, bessert nur Abnahmefehler nach und pusht den grünen Stand.
+3. [ ] Besitzer spielt einen vollständigen Acht-Minuten-Lauf im
+   **Trümmerring** ohne Live-Tuning und kopiert Bericht plus sechs Antworten
+   aus `docs/TESTPLAN.md`.
+4. [ ] Erst danach entscheidet Codex getrennt über Rückflugmechanik der
+   Orbitklinge, weitere Balance oder neue Inhalte.
 
 **Historischer Stand 23.08.2026:** EH-2026-08-23-02 ist durch Claude
 umgesetzt und durch Codex technisch abgenommen. Der Warden hat jetzt ein
