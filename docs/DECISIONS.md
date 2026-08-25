@@ -1818,8 +1818,7 @@ Freigabe.
 
 ## D-041 – AEGIS wird Mittelboss, NEXUS das verpflichtende Run-Finale
 
-**Status:** technisch umgesetzt und durch Codex abgenommen (25.08.2026);
-sichtbare Besitzerabnahme bis NEXUS noch offen.
+**Status:** technisch und durch Besitzer abgenommen (25.08.2026); visuelle Restpunkte werden in D-042 fortgeführt.
 
 Der D-040-Abnahmelauf mit Seed 2395647195 endete bei 8:00 erfolgreich:
 19.176 Kills, Stufe 28, 27 Kartenzüge, zwei Evolutionen, schlechteste FPS 44,
@@ -1912,3 +1911,89 @@ Der sichtbare Browser-Smoke war erneut durch den lokalen Windows-Sandbox-
 Helfer blockiert. Hintergrund, Silhouetten, HUD-Lage, Musterlesbarkeit und
 echte FPS bleiben deshalb bewusst beim Besitzerlauf. Erst danach folgt der
 getrennte Waffenrollenpass.
+
+### Besitzerabnahme vom 25.08.2026
+
+Der vollständige Lauf mit Seed `2026415955` endete nach besiegtem NEXUS bei
+9:35 erfolgreich: 16.846 Kills, Stufe 29, 28 Kartenzüge, drei Evolutionen,
+schlechteste FPS 56, 1-%-Low 58 und keine Probe unter 55 FPS.
+
+Der Besitzer gibt AEGIS mit 50 Begleitern, NEXUS, beide NEXUS-Muster und die
+unterschiedlicheren Gegnerfamilien frei. NEXUS dauerte 1:35, wurde aber als
+fair und unterhaltsam bewertet. Ein einzelner etwas langer Kampf begründet
+noch keine HP-Änderung. Die Lust auf einen weiteren Run ist höher als zuvor.
+
+Nicht freigegeben sind die Kastenstruktur des Hintergrunds, die Position des
+EVO-Hinweises unten mittig und der alte Rammjäger-Look während der
+Rush-Aufladung. Außerdem bleiben Station und Run-Zweck zu abstrakt. Diese
+Punkte sind nicht mehr Teil der NEXUS-Entscheidung, sondern bilden D-042.
+
+## D-042 – Bergungssignal und Stationsring bilden den ersten echten Meta-Loop
+
+**Status:** beschlossen und als EH-2026-08-25-04 zur Umsetzung durch OpenCode freigegeben.
+
+Nach D-041 trägt der Run erstmals drei verständliche Akte und technisch genug
+Reserve. Der nächste Spaßblocker liegt nicht in zusätzlicher Gegnerzahl oder
+weiteren Waffenwerten, sondern in drei zusammenhängenden Wahrnehmungen:
+
+1. Die aktuelle Kulisse sieht trotz korrekter Sci-Fantasy-Farben wie ein
+   gleichförmiges Raster aus Kästen aus.
+2. Die Station zeigt viele Funktionen gleichzeitig, fühlt sich aber weder wie
+   ein Ort noch wie ein Aufbau an.
+3. Asterit, Ausrüstung und Produktionswerte sind vorhanden, trotzdem ist im
+   Run kein bewusst verfolgtes Ergebnis spürbar.
+
+Darum wird vor dem bereits vorgemerkten Waffenrollenpass ein gemeinsamer
+Vertikalschnitt gebaut:
+
+> SIGNAL SICHERN → Stationsdaten bergen → den zentralen Stationskern sichtbar
+> ausbauen → ein Protokoll für die nächste Sortie wählen.
+
+### Visuelle Festlegung
+
+Der Besitzer erlaubt ausdrücklich die aktive lokale Orbitblade-Fassung unter
+`Orbitblade/Saber-Game-Projekt/konzept/` als Referenz. Der Lichthüter und die
+alte Weltraumtiefe sind dort prozeduraler Canvas-Code, keine zu importierenden
+Bitmap-Assets. Übernommen wird nur die eigenständige Formensprache:
+
+- weiß-goldener geschlossener Helm, Cyan-Visier, Goldhalo/Krone,
+  Schulterplatten und geteilter Mantel;
+- Navy-Weltraum, gecachte Sterne/Nebel, große Ringstrukturen und ruhige
+  Parallaxe statt lückenloser quadratischer Bodenpaneele.
+
+Das alte Spielsystem, der Orbitbaum, Save-Key, Werkstattumfang und
+Archivdateien werden nicht importiert. Die Adaption bleibt vorgerendert und
+allokationsfrei in den Hot-Loops. Herkunft und Bearbeitung werden als
+PROTOTYP dokumentiert; eine Store-Rechtefreigabe folgt daraus nicht.
+
+Der Rammjäger behält auch beim Aufladen seine aktuelle Keilsilhouette.
+`Nächste EVO` bleibt genau einmal und wandert innerhalb des Kampfrands unter
+Gesundheit/XP zurück an die linke Seite.
+
+### Stations- und Run-Festlegung
+
+Die Station wird eine visuelle Ringkarte mit sechs bedienbaren Modulen und
+einem zentralen Kern. Immer genau ein Detailpanel ist geöffnet. Die heutigen
+Produktions-, Ausrüstungs-, Trainings-, Sektor- und Startfunktionen bleiben
+vollständig erhalten; sie werden verständlich angeordnet statt ersetzt.
+
+Nur im Acht-Minuten-Run erscheint zwischen 2:30 und 4:00 genau ein kumulativ
+ladbares Sektorziel `SIGNAL SICHERN`. Es erzeugt keine Sonderwelle und nutzt
+keinen Gameplay-RNG. Der Abschluss sichert eine Stationsdatei, ein echter
+NEXUS-Kill eine zweite. Beides gehört zur Basisbergung und bleibt nach einem
+späteren Tod erhalten.
+
+Save v4 wird verlustfrei auf v5 migriert. Der zentrale Kern besitzt drei
+einmalige Stufen zu insgesamt sechs Stationsdaten. Sie schalten drei
+gegenseitig exklusive Vorbereitungsprotokolle frei: eine legale
+Orbitklingen-Karte im ersten Angebot, einen zusätzlichen Stations-Reroll oder
+einen schnelleren Signal-/bevorzugten unbesessenen Ausrüstungsfund. Ohne
+gebautes und gewähltes Protokoll bleibt die Baseline bitidentisch.
+
+### Bewusste Grenzen
+
+Waffen- und Passivwerte, XP, Dichte, AEGIS, NEXUS, Heilung und Magnetradius
+bleiben unangetastet. Die 1:35 des einen NEXUS-Laufs wird nur beobachtet. Der
+Waffenrollenpass folgt nach der technischen und sichtbaren Abnahme von D-042,
+damit Meta-Effekt, neue Kulisse und Waffenbalance nicht gleichzeitig bewertet
+werden müssen.

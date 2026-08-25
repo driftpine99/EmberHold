@@ -1,204 +1,337 @@
 # Aktiver Arbeitsauftrag
-
 ## Steuerung
 
-- **Task-ID:** EH-2026-08-25-03
-- **Thema:** Kampflesbarkeit V3 und verpflichtendes NEXUS-Finale
-- **Status:** **TECHNISCH_ABGENOMMEN_BESITZERTEST_OFFEN**
+- **Task-ID:** EH-2026-08-25-04
+- **Thema:** Lichthüter-Grafik, Bergungssignal und Stationsring V1
+- **Status:** **FREIGEGEBEN_FUER_OPENCODE**
 - **Auftraggeber:** Besitzer
 - **Projektleitung und Abnahme:** Codex
 - **Ausführung:** OpenCode; unabhängige Review und Nacharbeit durch Codex
-- **Priorität:** P0 – sichtbarer Spielspaß und klares Run-Finale
-- **Startstand:** sauberer main nach der Codex-Planungsübergabe; tatsächlichen
-  Ausgangscommit und anfänglichen Git-Status im Arbeitsbericht festhalten
-- **Timebox:** bis zu fünf Stunden produktiv nutzen; Gates in Reihenfolge
-  abschließen und nicht nach einem kosmetischen Teilergebnis stoppen
-- **Abnahme:** 53/53 Checks grün; git diff --check sauber; Botanker 19,78
-  bei unveränderter Toleranz ±3
-- **Offenes Gate:** vollständiger Besitzerlauf bis NEXUS nach
-  docs/TESTPLAN.md; bis dahin kein weiterer Balance- oder Grafikpass
+- **Priorität:** P0 – sichtbare Qualität und ein verständlicher Run→Station-Zweck
+- **Verbindlicher Ausgangscommit:** `d78fdbe5dabd32991b5b5f2ab765cdb290aa9d08`
+- **Zeitregel:** die gesamte verfügbare OpenCode-Arbeitszeit produktiv nutzen,
+  alle Gates in Reihenfolge bearbeiten und nicht nach einem kosmetischen
+  Teilergebnis stoppen. Droht das externe Zeitlimit, den letzten grünen Stand
+  sichern und den Rest ehrlich als teilweise melden.
+
+Bei Widersprüchen mit historischem Kontext in `AGENTS.md`, `CLAUDE.md` oder
+älteren Roadmap-Abschnitten gilt ausschließlich dieser Auftrag.
 
 ## Verbindlicher Besitzerbefund
 
-Der Besitzerlauf mit Seed 2395647195 wurde bei 8:00 extrahiert: 19.176 Kills,
-Stufe 28, 27 Kartenzüge, zwei Evolutionen, schlechteste FPS 44 und 1-%-Low 54.
-Gegnerflut, Animation, AEGIS-Erkennung und Bosskampf sind erheblich besser.
+Der vollständige D-041-Lauf mit Seed `2026415955` wurde am 25.08.2026 bei
+9:35 nach besiegtem NEXUS extrahiert: 16.846 Kills, Stufe 29, 28 Kartenzüge,
+drei Evolutionen, schlechteste FPS 56, 1-%-Low 58 und 0,0 Prozent unter
+55 FPS.
 
-Nicht freigegeben sind: der gegenüber D-038 erheblich schlechtere helle
-Hintergrund, zu ähnliche Gegnerfamilien, der verschwundene Hinweis auf die
-nächste Evolution und weiterhin zu viele Begleiter während AEGIS. Zusätzlich
-entscheidet der Besitzer: Eine Acht-Minuten-Sortie ist erst gemeistert, wenn
-nach der Aufbauphase ein zweiter Boss besiegt wurde.
+Freigegeben sind AEGIS mit Ziel 50, NEXUS als verpflichtendes Finale, beide
+NEXUS-Muster, die unterscheidbareren Gegnerfamilien und die technische
+Performance. Der Besitzer hat danach mehr Lust auf einen weiteren Run.
 
-## Produktentscheidung
+Nicht freigegeben beziehungsweise ausdrücklich gewünscht:
 
-AEGIS bleibt der Mittelboss bei 4:10. Der neue Endboss heißt sichtbar
-**NEXUS** und erscheint bei 8:00. Solange NEXUS lebt, gibt es keine Extraktion.
-Nach seinem Tod erscheint sofort die bestehende Extraktions-/Overtime-
-Entscheidung. Der bisherige 70-Gegner-Schub bei 7:00 entfällt.
+- Der Hintergrund ist weiterhin nur ein Raster aus Kästen und deutlich
+  schwächer als die früheren Orbitblade-Entwürfe.
+- Der Spieler soll die markante weiß-goldene **Lichthüter**-Silhouette der
+  lokalen alten Orbitblade-Fassung übernehmen.
+- Der Rammjäger fällt während seiner Rush-Aufladung auf die alte
+  Gegnerdarstellung zurück.
+- `Nächste EVO` ist hilfreich, stört aber unten mittig und soll kompakt zurück
+  an die linke Seite.
+- Die Station soll wie eine tatsächlich reparierte Raumstation wirken und
+  bedienbares Gameplay statt einer Wand aus Kästen bieten.
+- Im Run fehlt ein bewusst verfolgtes Ergebnis, das nach der Rückkehr sichtbar
+  am Stationsausbau weiterarbeitet.
 
-Bossphasen sind lesbare Arenen, keine normalen Schwarmphasen mit zusätzlichem
-Boss. Überschüssige Gegner ziehen sich kontrolliert und ohne Kills, Erfahrung,
-Bergungswert oder Beute zurück. Waffenwerte bleiben unangetastet.
+NEXUS dauerte in diesem einzelnen Menschenlauf 1:35. Das liegt etwas über dem
+früheren Zielkorridor, wurde aber als „ganz lustig“ und fair bewertet. Dieser
+Auftrag ändert deshalb weder NEXUS-HP noch Bosswerte. Erst ein weiterer
+vergleichbarer Lauf darf daraus eine Balanceentscheidung machen.
+
+## Produktentscheidung: ein zusammenhängender Vertikalschnitt
+
+Der nächste Ausbau verbindet genau eine neue Kette:
+
+> In der Sortie ein Signal sichern → Stationsdaten bergen → den zentralen
+> Stationskern sichtbar aufbauen → ein Protokoll für den nächsten Run wählen.
+
+Das ist ein einzelner vertikaler Produkt-Slice, keine allgemeine
+Content-Erweiterung. Er darf Grafik, Station und Run-Zweck gemeinsam ändern,
+weil diese drei Punkte für den Besitzer denselben Spaßblocker bilden.
+
+## Lokale Orbitblade-Referenz: erlaubt, aber begrenzt
+
+Die lokale Referenz liegt unter
+`Orbitblade/Saber-Game-Projekt/`. Nur die aktive Fassung unter `konzept/` darf
+schreibgeschützt untersucht werden. `archive/`, Trailer, ZIPs, Videos und die
+verschachtelte `.git` bleiben unangetastet.
+
+Vor diesem Referenz-Audit sind die dortige `AGENTS.md` und `CLAUDE.md`
+vollständig zu lesen; ihre Schutzregeln für `archive/` und das aktive
+`konzept/` gelten auch bei rein lesender Arbeit.
+
+Konkret relevant sind in `konzept/game.js`:
+
+- `zeichneLichthueterNeu()` als Formensprache für Helm, Goldhalo,
+  Schulterpanzer, Mantel und cyanfarbenes Visier;
+- `zeichneHintergrund()`, `drawStarLayers()`, `drawNebulae()`,
+  `drawFadedGrid()` und `drawLandmark()` als Referenz für Tiefe, Ringformen,
+  Sterne und ruhige Parallaxe.
+
+Diese Funktionen werden **nicht als alter Spielblock importiert**. Ihre
+Formensprache wird an die bestehende vorgerenderte Emberhold-Runtime adaptiert.
+Kein `Date.now()`, `shadowBlur`, Gradient oder Canvas-Neubau im Figuren- oder
+Schwarm-Hot-Loop. Das Referenzprojekt wird nicht geändert und nicht in den
+Commit aufgenommen. Ursprung und Adaption sind in
+`docs/ASSET_PROVENANCE.md` als PROTOTYP zu dokumentieren; kommerzielle
+Freigabe bleibt offen.
 
 ## Ziel
 
-Der Run besitzt drei erkennbare Akte: Build-Aufbau, AEGIS-Mittelboss und das
-verpflichtende NEXUS-Finale. Gleichzeitig werden Hintergrund,
-Gegnerunterscheidung und Evolutionsanzeige korrigiert.
+Der Kampf sieht sofort stärker nach der beschlossenen kosmischen
+Sci-Fantasy-Richtung aus. Die Station wird zu einer verständlichen visuellen
+Karte mit sechs bedienbaren Modulen. Ein absichtlich verfolgtes Sektorziel
+liefert nach jedem vollständigen Versuch sichtbaren Fortschritt für einen
+dreistufigen Stationskern und spürbare, aber begrenzte Vorbereitungsoptionen.
 
-## Verbindlicher Umsetzungsscope
+## Gate A – visueller Kampfpass mit Lichthüter
 
-### Gate A – bekannten guten Hintergrund wiederherstellen
+1. `buildOrbiterSprites()` behält mindestens sechs Idle-, acht Lauf- und acht
+   Wurfphasen bei ungefähr 12 visuellen Bildern pro Sekunde.
+2. Die Figur übernimmt die eigenständigen Merkmale des alten Lichthüters:
+   geschlossener weiß-goldener Helm, cyanfarbenes Visier, Goldhalo/Krone,
+   breite Schulterplatten und geteilter Mantel. Sie bleibt aufrecht, wird nur
+   horizontal gespiegelt und besitzt einen ruhigen Kontaktschatten.
+3. Lauf, Wurf und Impuls müssen unterschiedliche, flüssig lesbare Posen sein.
+   Keine frei rotierte Figur, kein Wackeln des Ursprungs und kein
+   halbtransparentes Crossfade-Doppelbild.
+4. Der heutige gleichförmige 80er-Kastenboden wird durch eine reichere, ruhige
+   Weltraum-/Orbitalstruktur ersetzt: tiefe Navy-Fläche, wenige gecachte
+   Stern- und Nebelebenen, große gebrochene Ring-/Leitstrukturen und eine
+   zurückhaltende Kampfdeck-Textur. Keine lückenlose Wand quadratischer
+   Paneele, keine schwarze Safe-Area und kein abgeschnittener Arenarand.
+5. Die Kampffläche bleibt mittelhell genug, dass dunkle Gegner und rote/
+   violette Warnungen jederzeit lesbar sind. D-017 bleibt unverändert:
+   Simulation und Seitenverhältnis dürfen sich durch die Kulisse nicht ändern.
+6. Hintergrundebenen werden einmalig vorgerendert, gekachelt oder auf einer
+   wiederverwendeten reduzierten Zwischenleinwand erzeugt. Pro Frame kein neuer
+   Canvas und höchstens die bisherige konstante Zahl teurer Gradienten.
 
-- Commit 9190de9 ist die konkrete Referenz für Bodenfarbe, Panelgröße,
-  Leitungs- und Dekodichte: dunklere blau-graue 80er-Paneele statt der
-  aktuellen hellen 160er-Flächen.
-- D-040 bleibt erhalten: nahtlos bis an alle Ränder, keine abgeschnittene
-  Arena, harte Safe-Area, Randvignette oder dominanten Sternenbalken.
-- Sektortönung bleibt nahtlos. Boden weiterhin vorgerendert/gekachelt; keine
-  zusätzliche Per-Frame-Erzeugung.
+## Gate B – zwei sichtbare Korrekturen
 
-### Gate B – fünf Gegnerfamilien aus der Silhouette unterscheiden
+1. In der Rammjäger-Aufladephase bleibt dieselbe aktuelle keilförmige
+   Rammjäger-Silhouette sichtbar. Der Warnkorridor liegt darunter; die alte
+   Tier-/Fallback-Gegnergrafik darf nicht mehr erscheinen.
+2. Genau ein `Nächste EVO`-Hinweis bleibt erhalten und verwendet weiterhin
+   ausschließlich `leadingEvoPath()`. Er sitzt innerhalb des linken
+   Kampfrands unter Gesundheit/XP, nicht unten mittig. Er darf bei 1280×720
+   und 844×390 weder Spieler noch Karten, Bossleiste, Sektorziel, Waffenleiste,
+   Impuls, Pause oder Dialoge überdecken.
 
-- Gemeinsame D-040-Sprache behalten: dunkler Maschinenkörper, helle Kontur,
-  Leuchtkern und sechs asynchrone Phasen.
-- Sammlerdrohne klein/kompakt; Rammjäger lang und keilförmig;
-  Emitterdrohne breit mit Auslegern; Replikatorsonde als geteilte
-  Zwillingssilhouette; Bollwerkeinheit groß, breit und schwer gepanzert.
-- Außenkontur, Proportion und Größe müssen unterscheiden; Farbe allein reicht
-  nicht. Auch ohne Farbe müssen mindestens vier Familien sofort erkennbar sein.
-- Trefferflächen, Geschwindigkeit, KI, Schaden und Spawnwahrscheinlichkeit
-  bleiben unverändert.
-- Pro Gegner und Frame weiter im Wesentlichen ein drawImage; keine Allokation,
-  Gradienten oder shadowBlur im Schwarm-Hot-Loop.
+## Gate C – Stationsring statt Kartenwand
 
-### Gate C – genau ein kompakter Evolutionshinweis
+Die vorhandenen Funktionen werden nicht gelöscht, sondern neu geordnet:
 
-- leadingEvoPath() bleibt die einzige fachliche Quelle.
-- Oberhalb der unteren Waffenleiste erscheint genau ein schmaler Hinweis
-  „Nächste EVO“ mit Evolutionsname sowie Waffen- und Passivfortschritt.
-- Er zeigt nur den bestehenden Pfad und ändert Kartenmechanik oder
-  EVO_FOCUS_AT nicht. Nach Abschluss wechselt er sofort; ohne Pfad verschwindet
-  er.
-- Bei 1280×720 und 844×390 keine Überlappung mit Waffen, Impuls, Karten,
-  Toast oder Dialog. Linke Textliste bleibt ausgeblendet.
+1. Die Startansicht zeigt eine zusammenhängende, eigenständige Orbitalstation
+   um einen zentralen Kern. Planet, Sterne, Ringsegmente, Stromleitungen und
+   Reparaturzustände bilden eine echte Szene statt des bisherigen Kraters und
+   der gleichzeitig sichtbaren Rechteckkarten.
+2. Sechs klar getrennte, große Hotspots bilden Asteroidensonde,
+   Materiefabrikator, Fluxlabor, Simulationsdeck, Ausrüstungsbucht und
+   Sternenkarte ab. Ein Klick/Tap öffnet genau ein zugehöriges Detailpanel mit
+   den heutigen Aktionen und Werten.
+3. Offline, reparierbar, produzierend und abholbereit müssen bereits auf der
+   Stationskarte an Licht, Schaden, Leitung oder Animation unterscheidbar sein.
+   Der zentrale Kern zeigt seine neue Ausbaustufe ebenso sichtbar.
+4. Alle heutigen Funktionen bleiben erreichbar: Produktion und Einsammeln,
+   Orbitklingen-Verstärkung, Reroll-Vorbereitung, drei Meisterschaften,
+   Ausrüstung anlegen/aufwerten/zerlegen, Sektorwahl, 3-/8-Minuten-Start und
+   letzter Run-Bericht.
+5. Oben stehen weiterhin nur Asterit, Legierungsplatten,
+   Fluxkondensat und die anders gestaltete Sortienstatistik. Stationsdaten
+   erscheinen ausschließlich am zentralen Kern beziehungsweise Ziel.
+6. Standardfokus ist das eine nächste Stationsziel. Tastaturfokus,
+   `aria-label`s und große Touchflächen bleiben erhalten. Bei 1280×720 und
+   844×390 keine abgeschnittenen Module; ein Detailpanel darf intern scrollen,
+   die Karte selbst nicht horizontal.
 
-### Gate D – AEGIS als echte Bossarena
+Die Station darf als code-natives Canvas/SVG/CSS-Motiv umgesetzt werden.
+Neue Bitmap- oder Fremdassets sind nicht erlaubt. Ein neues eigenes SVG ist
+nur zulässig, wenn es kleiner und wartbarer als die Inline-Lösung ist und in
+der Provenienz erfasst wird.
 
-- AEGIS bleibt bei CFG.BOSS_AT = 250 Sekunden mit seinen aktuellen Mustern,
-  Ortung und Grundwerten.
-- Während AEGIS lebt gilt ein Ziel von **50 normalen Gegnern** statt 90.
-- Überschuss zieht sich innerhalb höchstens acht Sekunden sichtbar,
-  deterministisch und allokationsfrei aus dem Simulationsradius zurück.
-- Rückzug erzeugt niemals Kill, XP, Splitter, Nanokapsel, Bergungswert,
-  Ausrüstung oder andere Belohnung. Eliten dürfen nicht als künstliche Beute
-  verschwinden; ihre Behandlung ist zu dokumentieren.
-- Nach AEGIS baut sich die Dichte sanft wieder auf. Der 70er-SURGE bei 7:00
-  wird entfernt.
+## Gate D – ein bewegungsbasiertes Sektorziel
 
-### Gate E – verpflichtender Endboss NEXUS
+Nur in der Acht-Minuten-Sortie erscheint **genau ein** Ziel `SIGNAL SICHERN`:
 
-- Nur die Acht-Minuten-Sortie erhält NEXUS. Drei-Minuten-Scharmützel behalten
-  ihr bisheriges Ende.
-- Ab 7:45 kurze nicht blockierende Warnung und kontrollierte Dichtereduktion;
-  bei 8:00 Spawn innerhalb des sichtbaren Kampfausschnitts.
-- Während NEXUS lebt Ziel von **30 normalen Gegnern**, kein Massen-Spawn.
-- Nach 8:00 zeigt die Uhr verständlich die Finaldauer. Das ist noch keine
-  freiwillige Overtime; deren Schadensmultiplikator bleibt aus.
-- Bei 8:00 keine Extraktionsansicht. Erst der echte NEXUS-Tod öffnet sie.
-  Spielertod im Finale bleibt „Gefallen“; ohne NEXUS-Kill niemals
-  „Extrahiert“ oder gemeistert.
-- NEXUS braucht eine von AEGIS klar verschiedene Silhouette, eigene
-  Animationsphasen und mindestens zwei klar telegraphierte Angriffsmuster.
-  Mindestens eines ist spielerisch neu; keine bloße Umfärbung.
-- Jeder Angriff hat eine sichere Reaktion und mindestens eine Sekunde
-  Vorwarnung; keine unvermeidbaren Vollbildtreffer oder Franchise-Anleihen.
-- Zielkorridor mit repräsentativem Ein- bis Zwei-EVO-Build: ungefähr
-  30–75 Sekunden. Nicht in zwei bis drei Treffern und nicht minutenlang.
-  Deterministischen Benchmark liefern.
-- Bossleiste und Ortung dynamisch BOSS: AEGIS bzw. BOSS: NEXUS.
-- Run-Bericht ergänzt Finalboss-Status, Spawn-, Tötungszeit und Finaldauer.
-- Keine neue Meta-Währung, Stationsstufe oder Gebäudeänderung.
+1. Spawn bei 2:30 an einer deterministischen, gut erreichbaren Position in
+   ungefähr 220–300 Welteinheiten Abstand zum Spieler; Platzierung nutzt einen
+   separaten Hash aus Seed/Position und verbraucht keinen Gameplay-RNG.
+2. Ein Richtungspfeil und ein ruhiger Ring machen das Ziel auffindbar. Innerhalb
+   von ungefähr 110 Welteinheiten lädt es insgesamt acht Sekunden. Verlassen
+   pausiert den Fortschritt, setzt ihn nicht zurück.
+3. Das Zeitfenster endet bei 4:00, damit das Ziel nicht mit AEGIS kollidiert.
+   Es erzeugt keine Sonderwelle, keine neue Gegnerart und blockiert weder
+   AEGIS noch NEXUS, Tod, Pause oder Kartenwahl.
+4. Abschluss sichert **eine Stationsdatei**. Ein echter NEXUS-Kill sichert eine
+   zweite. Beide gehören zur Basisbergung und bleiben deshalb auch bei einem
+   späteren Tod im Finale oder in Overtime erhalten. Abbruch vor dem jeweiligen
+   Erfolg erzeugt nichts.
+5. Gutschrift erfolgt in `depositRunReward()` exakt einmal. Wiederholtes
+   Öffnen, Extraktion/Overtime oder doppelte Endereignisse dürfen nichts
+   duplizieren.
+6. Run-HUD, Ergebnis und kopierbarer Bericht nennen Status, Ladefortschritt
+   und verdiente Stationsdaten verständlich.
+
+## Gate E – zentraler Stationskern und Sortie-Protokolle
+
+Save v4 wird explizit auf **v5** migriert. Alle alten Ressourcen, Gebäude,
+Ausrüstung, Meisterschaften, Rerolls und Sektorwahl bleiben exakt erhalten.
+Neue Felder werden exakt bereinigt: `stationData` als Ganzzahl 0–999,
+`coreStage` als Ganzzahl 0–3 und `sortieProtocol` als `none` oder ein bereits
+freigeschaltetes Protokoll (interne Namen dürfen abweichen, Bedeutung nicht).
+
+Der zentrale Stationskern besitzt drei einmalige Ausbaustufen:
+
+| Stufe | Kosten | Freigeschaltetes Protokoll |
+|---|---|---|
+| 1 | 1 Stationsdatei + 5 Asterit | **Klingenfokus:** Der erste legale Kartenzug enthält eine Orbitklingen-Aufwertung. |
+| 2 | 2 Stationsdaten + 1 Legierungsplatte | **Fluxreserve:** Der Run startet mit genau einem zusätzlichen, nicht verbrauchten Stations-Reroll. |
+| 3 | 3 Stationsdaten + 2 Legierungsplatten | **Bergungsscanner:** SIGNAL SICHERN lädt in fünf statt acht Sekunden; bei Erfolg wird der garantierte Ausrüstungsfund bevorzugt aus noch nicht besessenen Teilen gewählt, solange eines existiert. |
+
+Regeln:
+
+- Jede Stufe verändert den sichtbaren Kern und versorgt weitere Module mit
+  Licht; der Ausbau darf nicht nur eine Zahl in einem Panel sein.
+- Vor einer Sortie ist genau `kein Protokoll` oder eines der bereits
+  freigeschalteten Protokolle aktiv. Die Wahl ist kostenlos, klar erklärt und
+  im Kampf nur kompakt in Pause/Run-Bericht sichtbar.
+- `Klingenfokus` injiziert deterministisch eine **legale** bestehende Karte,
+  ohne zusätzliche RNG-Ziehung, ohne EVO-Voraussetzungen zu umgehen und ohne
+  einen vierten Kartenplatz zu erzeugen. Ist keine Aufwertung legal, bleibt
+  das normale Angebot unverändert.
+- `Fluxreserve` ist getrennt von hergestellten Rerolls. Es erhöht das
+  Startbudget um exakt eins, verbraucht keine Fluxkondensate und stapelt nur
+  mit den bestehenden maximal zwei vorbereiteten Rerolls.
+- `Bergungsscanner` gibt kein doppeltes Item. Er verändert nur die Auswahl des
+  ohnehin garantierten Funds; sind alle Teile besessen, gilt der bisherige
+  Duplikat-/Staubpfad.
+- Ohne gebautes/gewähltes Protokoll bleibt der serialisierte Baseline-Run
+  bitidentisch. Hold-Boni dürfen nicht unbemerkt in die Referenzsuite gelangen.
 
 ## Unverhandelbare Grenzen
 
-- Keine Änderung an Waffen/Passivwerten, Evolutionsvoraussetzungen,
-  Kartenwahrscheinlichkeiten, XP-Kurve, Magnetradius oder Heilung.
-- Sternenhagel, Sonnenbruch, Orbitklinge, Kettenemitter und Sentinel-Drohnen
-  nur messen, nicht balancen.
-- Save v4, Save-Key, Stationskosten und Offline-Produktion unverändert.
-- Keine neue Engine, Bibliothek, Buildkette, Netzabhängigkeit, Fremdassets,
-  lokalen Referenzspiel-Dateien oder erkennbaren Franchise-Designs.
-- D-017 bleibt erhalten; keine Seitenverhältnis-Abhängigkeit.
-- Kein Waffen-, Stations-, Audio- oder Monetarisierungs-Folgeauftrag. Kein Push.
+- Keine Änderung an Waffen-/Passivschaden, XP-Kurve, Evolutionen,
+  Gegnerwerten, Dichtezielen, AEGIS/NEXUS, Heilung oder Magnetradius.
+- Kein neuer Kampfknopf, keine neue Waffe, Gegnerfamilie, Bossphase, Währung
+  außerhalb der projektgebundenen Stationsdaten, kein Audio und keine
+  Monetarisierung.
+- Kein Import des alten Orbitblade-Saves, Spielsystems, Orbitbaums oder
+  Werkstattumfangs. `orbitblade_konzept_save` wird nie gelesen.
+- Keine Netzwerk-, Build-, Bibliotheks- oder Engine-Abhängigkeit.
+- Keine Franchise-Namen oder erkennbaren geschützten Designs.
+- `main` wird nicht gepusht. Keine Änderung an geschützten kanonischen
+  Dokumenten außerhalb der unten erlaubten Dateien.
 
 ## Kosten- und Agentenregel
 
-Claude soll die fünf Stunden produktiv nutzen. Günstige einfachere
-Coding-Subagenten sind für getrennte Aufgaben wie CSS/EVO-Anzeige,
-Sprite-Silhouetten oder Tests erwünscht. Wegen der monolithischen index.html
-nie gleichzeitig dieselben Zeilenbereiche bearbeiten. Claude behält
-Bosszustandsmaschine, Architektur, Integration und Review selbst, prüft jeden
-fremden Diff vollständig und testet nach jeder Integration.
+OpenCode soll günstige/einfache Subagenten sinnvoll einsetzen, mindestens für
+zwei klar begrenzte Aufgaben, sofern seine Umgebung Subagenten anbietet:
+
+1. schreibgeschützter Audit von Lichthüter/Hintergrund im Referenzprojekt;
+2. Testspezifikation oder unabhängige Diff-/Renderkostenprüfung;
+3. optional Station-Layout/CSS als Analyse oder isolierter Entwurf.
+
+Wegen der monolithischen `prototype/web/index.html` dürfen Subagenten diese
+Datei nicht gleichzeitig in überlappenden Bereichen editieren. OpenCode hält
+Save-Migration, Run-Zustand, Integration und Schlussreview selbst, liest jeden
+Subagenten-Diff vollständig und übernimmt keine Aussage ungeprüft. Ist keine
+Subagentenfunktion verfügbar, wird das im Bericht notiert und lokal
+weitergearbeitet.
 
 ## Automatische Abnahme
 
-1. Aktuelle 49 Checks und neun Seeds vorher messen und dokumentieren.
-2. npm test grün; keine Schwelle zum Verdecken eines Fehlers lockern.
-3. Neuer finalBossFlow: 3-Minuten-Ende unverändert; NEXUS bei 8:00; keine
-   Extraktion/Overtime solange er lebt; Bosskill öffnet Extraktion;
-   Spielertod bleibt Niederlage.
-4. bossCombatPocket V2: Ziele 50/30, Rückzug in höchstens acht Sekunden,
-   keine Kunstkills/Belohnungen, Wiederaufbau nach AEGIS, kein 70er-Surge.
-5. Neuer evolutionFocusHud-Check für genau einen aktuellen Pfad.
-6. Präsentationscheck für fünf unterschiedliche Silhouetten/Abmessungen und
-   dynamischen Bossnamen; Farbe allein darf nicht bestehen.
-7. renderCostContract grün; keine gegnerlinear zusätzlichen Zeichenoperationen.
-8. Erwartete Seed-Abweichungen ab geändertem Boss-/Dichtezeitpunkt mit
-   vollständiger Vorher-/Nachher-Tabelle dokumentieren. Frühphase bis 4:10 und
-   nicht betroffene Systeme stabil. Botanker nur nach Messung neu
-   referenzieren, nie durch breitere Toleranz.
-9. Save-, Hold-, Contract-, Report- und Aspect-Checks grün.
-10. git diff --check sauber; keine Browserfehler.
+Vor Beginn Baseline `npm test` und `git status --short --branch` protokollieren.
+Danach mindestens:
 
-## Manuelle Abnahme durch Claude
+1. `npm test` vollständig grün; keine bestehende Schwelle lockern.
+2. Neuer `combatArtV3`-Vertrag: Phasenzahlen 6/8/8 oder höher,
+   Lichthüter-Merkmale, keine alte Rammjäger-Warnfigur, EVO-Hinweis links und
+   keine verbotenen Hot-Loop-Operationen.
+3. Neuer `sectorObjectiveFlow`: nur 8 Minuten, 2:30–4:00, kumulativer
+   Fortschritt, Pause/Resume, Erfolg/Misserfolg, kein RNG-Verbrauch, kein
+   Bossblocker und keine doppelte Gutschrift.
+4. Neuer `stationCoreFlow`: Kosten und drei Stufen, sichtbare Zustände,
+   Protokollsperren/-wahl sowie Wirkung jedes Protokolls.
+5. Save-Migration v4→v5 mit vollständigem Feldvergleich der alten Daten;
+   fehlerhafte neue Felder werden sicher bereinigt.
+6. `baselineIsolated`: ohne aktives Protokoll serialisierte neun Seeds und
+   früher Lauf bis 4:10 bitidentisch zum Ausgangscommit. Der neue rein
+   visuelle Hintergrund verbraucht keinen Gameplay-RNG.
+7. Getrennte Protokollchecks: legale Karteninjektion ohne EVO-Bypass,
+   Rerollbudget exakt +1 und unbesessener Gear-Fund mit vollständigem
+   Duplikat-Fallback.
+8. `renderCostContract` und `aspectIndependent` grün. Keine
+   gegnerlinear zusätzliche Draw-Pässe, keine Canvas-Allokation pro Frame,
+   kein `shadowBlur` im Schwarmpfad.
+9. Stations-DOM/UX-Vertrag: sechs eindeutige Hotspots, zentraler Kern, genau
+   ein offenes Detailpanel, alle bisherigen Aktions-IDs erreichbar.
+10. `git diff --check` sauber; keine Browserfehler.
+
+Wenn durch die absichtlich gewählten Protokolle Seed-Ergebnisse abweichen,
+werden sie separat gemessen. Der Baseline-Anker **19,78 ±3** bleibt unangetastet.
+
+## Manuelle Abnahme durch OpenCode
 
 Wenn ein sichtbarer Browser verfügbar ist:
 
-1. 1280×720 und 844×390 mit Kartenwahl, Pause und EVO-Hinweis prüfen.
-2. Hintergrund gegen 9190de9 und Ausgangsstand vergleichen; Screenshots nennen.
-3. Bei hoher Dichte alle fünf Familien visuell identifizieren.
-4. AEGIS-Rückzug ohne belohntes Verschwinden prüfen.
-5. Vollständigen Run bis NEXUS: Warnung, Spawn, zwei Muster,
-   Extraktionssperre, Tod und anschließende Extraktion.
-6. Schlechteste FPS, 1-%-Low und Anteil unter 55 messen; gegenüber
-   44/54/2,0 % nicht erkennbar schlechter.
+1. Station bei 1280×720 und 844×390: alle sieben Hotspots, Detailpanel,
+   Reparatur-/Produktionszustände, zentrale Kernstufen und Sortiestart.
+2. Kampf bei beiden Größen: Lichthüter Idle/Lauf/Wurf/Impuls,
+   Richtungswechsel, neuer Hintergrund, dunkler Gegnerpulk und Warnfarben.
+3. Rammjäger beim vollständigen Aufladen: kein Wechsel auf das alte Design.
+4. EVO links sowie SIGNAL SICHERN mit Marker, Pause, Karte und AEGIS ohne
+   Überlappung.
+5. Ein beschleunigter kompletter Ablauf: Signal sichern, NEXUS besiegen,
+   Rückkehr, Daten exakt einmal erhalten, Kernstufe bauen, Protokoll wählen,
+   neuen Run starten.
+6. FPS/1-%-Low bei hoher Dichte gegen Besitzerreferenz 56/58/0,0 Prozent
+   dokumentieren. Nicht erkennbar schlechter; das echte Besitzergerät bleibt
+   die finale Freigabe.
 
-Ohne sichtbaren Browser Grenzen ehrlich dokumentieren, keine Freigabe erfinden.
+Ohne sichtbaren Browser die Grenze offen benennen und keine visuelle Abnahme
+behaupten.
 
 ## Erlaubte Dateien
 
-- prototype/web/index.html
-- tools/run-balance-suite.mjs nur für echte neue Verträge/Messungen
-- CHANGELOG.md
-- docs/WORK_REPORT.md
-- docs/ASSET_PROVENANCE.md nur bei unerwartetem neuem Runtime-Asset; vor
-  Import stoppen
+- `prototype/web/index.html`
+- `prototype/web/assets/orbitblade-station-v1.svg` nur falls Gate C die
+  externe eigene SVG-Variante begründet
+- `tools/run-balance-suite.mjs`
+- `CHANGELOG.md`
+- `docs/WORK_REPORT.md`
+- `docs/ASSET_PROVENANCE.md`
 
-Geschützt: ROADMAP.md, README.md, AGENTS.md, CLAUDE.md,
-docs/DECISIONS.md, docs/TESTPLAN.md, docs/CURRENT_TASK.md und Konzeptbilder.
+Geschützt: `ROADMAP.md`, `README.md`, `AGENTS.md`, `CLAUDE.md`,
+`docs/DECISIONS.md`, `docs/TESTPLAN.md`, `docs/CURRENT_TASK.md`,
+`docs/WORKFLOW.md`, Konzeptbilder und der gesamte lokale Referenzordner.
 
 ## Rückgabe
 
-docs/WORK_REPORT.md vollständig nach docs/WORKFLOW.md ersetzen, zusätzlich:
+`docs/WORK_REPORT.md` vollständig nach `docs/WORKFLOW.md` ersetzen und
+zusätzlich liefern:
 
-- Gates mit Diff/Test, Subagenten und eigene Diffprüfung;
-- neun Seeds vorher/nachher;
-- Dichte vor/während/nach AEGIS sowie vor/während NEXUS;
-- Beleg: Rückzug ohne Kills/Belohnung;
-- NEXUS-Benchmark für schwachen und repräsentativen Build;
-- Renderkosten, Browsergrößen/FPS, Risiken und nicht mögliche Prüfungen;
-- lokale Commits, finaler Git-Status und Empfehlung an Codex.
+- Status und Beleg je Gate; eingesetzte Subagenten, deren Auftrag und eigene
+  Diffprüfung;
+- Referenzfunktionen und genaue Art der Adaption, ohne pauschalen Codeimport;
+- Vorher-/Nachher-Bilder oder präzise Browserbeschreibung für beide Größen;
+- Save-v4-Migrationsbeleg und Beispielstand vor/nach Ausbau;
+- Signal-/NEXUS-Datenfluss inklusive Doppelgutschrift-Schutz;
+- Baseline-Seeds sowie getrennte Messung der drei Protokolle;
+- Renderkosten und echte FPS, soweit messbar;
+- alle Testbefehle mit Exitcode, Risiken, Abweichungen und offene manuelle
+  Prüfungen;
+- lokale kleine Commits, finaler Git-Status und Empfehlung an Codex.
 
-Lokale kleine Commits nach grünen Tests erlaubt. Kein Push, kein Folgeauftrag.
+Lokale kleine Commits nach grünen Tests sind erlaubt. Kein Push und kein
+Folgeauftrag.

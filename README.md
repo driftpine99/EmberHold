@@ -19,24 +19,27 @@ Asteroidensonde, Materiefabrikator, Fluxlabor, Simulationsdeck,
 Ausrüstungsbucht und Sternenkarte mit lokalem Save v4 und begrenzter
 Offline-Produktion.
 
-D-041 ist technisch umgesetzt: Der dunklere, feinere Deckboden ist
-wiederhergestellt, fünf Gegnerfamilien besitzen getrennte Silhouetten und
-genau ein kompakter Hinweis „Nächste EVO“ steht über der Waffenleiste.
+D-041 ist technisch und durch den Besitzer abgenommen. AEGIS ist der
+Mittelboss mit Ziel 50; bei 8:00 erscheint NEXUS mit höchstens 30 normalen
+Begleitern. Erst sein Tod schaltet Extraktion beziehungsweise freiwillige
+Overtime frei. Der vollständige Besitzerlauf endete bei 9:35 mit 56 FPS
+Minimum, 58 FPS im 1-%-Low und einer höheren Lust auf einen weiteren Run.
 
-AEGIS ist nun der Mittelboss mit einem Ziel von 50 normalen Begleitern. Der
-alte 70-Gegner-Schub bei 7:00 entfällt. Bei 8:00 erscheint der verpflichtende
-Endboss NEXUS mit höchstens 30 normalen Begleitern; erst sein Tod schaltet
-Extraktion beziehungsweise freiwillige Overtime frei.
+Offen bleiben sichtbare Qualität und Meta-Zweck: Der Kampfgrund wirkt noch wie
+ein Raster aus Kästen, `Nächste EVO` sitzt falsch, der Rammjäger zeigt beim
+Aufladen kurz die alte Figur und die Station fühlt sich trotz ihrer Funktionen
+nicht wie ein verständlicher Aufbau an.
 
-OpenCodes Umsetzung wurde durch Codex unabhängig geprüft. Die Review
-korrigierte einen kaskadierenden Rückzug, Trefferinteraktionen mit
-zurückziehenden Gegnern, die Gesamtdauer über Finale plus Overtime und
-verbleibende NEXUS-Gefahren nach dem Bosskill.
+Deshalb ist D-042 / EH-2026-08-25-04 für OpenCode freigegeben. Der nächste
+Vertikalschnitt adaptiert den code-nativen Lichthüter und die kosmische Tiefe
+der lokalen Orbitblade-Referenz, ordnet die Station als Ringkarte und verbindet
+`SIGNAL SICHERN` über Stationsdaten mit drei sichtbaren Kernstufen und
+wählbaren Sortie-Protokollen. Waffenwerte, XP, Dichte und beide Bosse bleiben
+in diesem Auftrag unverändert.
 
-Die technische Baseline steht bei **53/53 grünen Checks**. Offen ist der
-Besitzerlauf bis NEXUS für Grafik, Lesbarkeit, Bossgefühl und echte FPS.
-Danach folgt der getrennte Waffenrollenpass. Der letzte Run-Bericht bleibt
-lokal kopierbar; Backend, Ton und Monetarisierung bleiben außerhalb des Scopes.
+Die technische Baseline steht vor D-042 bei **53/53 grünen Checks** und einem
+Botanker von 19,78 ±3. Der letzte Run-Bericht bleibt lokal kopierbar; Backend,
+Ton und Monetarisierung bleiben außerhalb des Scopes.
 
 Die Produktfrage der Phase 0 lautet:
 

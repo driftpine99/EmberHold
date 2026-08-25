@@ -40,6 +40,66 @@ Server, keine Installation. Läuft auf Desktop und Handy.
 Die kurzen Timer dienen nur dazu, den vollständigen Loop innerhalb weniger
 Minuten zu testen. Die langfristigen GDD-Zeiten sind noch nicht aktiv.
 
+
+## Besitzerabnahme D-041 – abgeschlossen
+
+Der Besitzerlauf mit Seed `2026415955` wurde am 25.08.2026 ohne Live-Tuning
+bis nach NEXUS gespielt und bei 9:35 extrahiert. Gemessen wurden 16.846 Kills,
+Stufe 29, 28 Kartenzüge, drei Evolutionen, 56 FPS Minimum, 58 FPS im 1-%-Low
+und 0,0 Prozent von 1.124 Proben unter 55 FPS.
+
+Subjektives Ergebnis:
+
+- AEGIS mit 50 Begleitern fühlt sich passend an.
+- NEXUS ist verständlich, fair und unterhaltsam; 1:35 wird als etwas lang
+  beobachtet, aber noch nicht neu balanciert.
+- Die Gegnerfamilien sind unterscheidbarer und die Performance ist freigegeben.
+- Der aktuelle Rammjäger wechselt beim Aufladen sichtbar auf die alte Figur.
+- `Nächste EVO` ist hilfreich, unten mittig aber störend.
+- Hintergrund, Station und sichtbarer Run-Zweck sind nicht freigegeben.
+- Die unmittelbare Lust auf einen weiteren Run ist höher als vor D-041.
+
+Damit ist das NEXUS-Gate positiv abgeschlossen. Die offenen Punkte bilden den
+eigenen D-042-Vertikalschnitt und sind kein Grund, D-041 zurückzurollen.
+
+## Geplante Besitzerabnahme nach D-042
+
+Diesen Test erst nach technischer Codex-Review von EH-2026-08-25-04 fahren.
+Er besteht aus einem vollständigen Ablauf, nicht aus getrennten Screenshots:
+
+1. Vor dem Start die Station öffnen und prüfen, ob sie als zusammenhängender
+   Ring mit sechs Modulen und zentralem Kern lesbar ist. Jedes Modul einmal
+   antippen; immer darf nur ein passendes Detailpanel offen sein.
+2. Bestehende Produktion, Ausrüstung, Meisterschaften, Sektorauswahl,
+   Reroll-Vorbereitung und letzter Run-Bericht müssen noch erreichbar sein.
+3. Trümmerring · 8 Minuten starten. Zwischen 2:30 und 4:00 `SIGNAL SICHERN`
+   aufsuchen, den Ring verlassen und wieder betreten: Fortschritt muss pausieren
+   und danach weiterlaufen, nicht neu beginnen.
+4. AEGIS und NEXUS spielen. Nach NEXUS extrahieren und prüfen, ob genau zwei
+   Stationsdaten gutgeschrieben werden: eine für das Signal, eine für NEXUS.
+5. Zur Station zurückkehren, Kernstufe 1 bauen und `Klingenfokus` wählen. Der
+   Kern muss sich sichtbar verändern; im nächsten Run muss das erste legale
+   Kartenangebot eine Orbitklingen-Aufwertung enthalten.
+6. Seite neu laden. Alte Ressourcen/Gebäude/Ausrüstung sowie neue Daten,
+   Kernstufe und Protokoll müssen vollständig erhalten sein.
+
+Zusätzlich zum kopierbaren Run-Bericht diese Fragen beantworten:
+
+1. Wirkt der neue Hintergrund endlich wie Orbitblade und nicht mehr wie ein
+   Raster aus Kästen? Bleiben Gegner und Warnflächen trotzdem klar?
+2. Ist der Lichthüter beim Stehen, Laufen, Werfen und Richtungswechsel markant
+   und flüssig genug?
+3. Bleibt der Rammjäger während seiner gesamten Aufladung dieselbe Figur?
+4. Sind EVO-Hinweis links und Signal-/Bossanzeige hilfreich, ohne den Kampf zu
+   verdecken?
+5. Versteht man ohne Erklärung, welches Stationsmodul anklickbar ist, was
+   gerade produziert und was als Nächstes gebaut werden kann?
+6. Fühlt sich das gesicherte Signal nach der Rückkehr wie ein sichtbares
+   Ergebnis des Runs an?
+7. Erzeugt die Protokollwahl einen konkreten Grund für den nächsten Run oder
+   wirkt sie nur wie eine weitere kleine Zahl?
+8. Schlechteste FPS, 1-%-Low und Anteil unter 55 FPS im Lastfenster sowie im
+   NEXUS-Finale notieren.
 ## Manueller Gesamttest des Phase-0.5-Slices
 
 > **Diesen Test kann nur der Besitzer fahren.** In der Claude-Code-Umgebung wird
@@ -478,8 +538,9 @@ der sechs Pfade. `eliteChoices` prüft den Weg vom Elite-Kill zur einmaligen
 
 Fünf Checks sichern D-035 zusätzlich:
 
-- `bossCombatPocket` prüft Ziel 90 ohne künstliche Kills oder Beute und den
-  Wiederaufbau nach dem Boss.
+- `bossCombatPocket` begann mit Ziel 90. Seit D-041 prüft V2 die getrennten
+  Ziele 50 für AEGIS und 30 für NEXUS, belohnungsfreien Rückzug und den
+  Wiederaufbau nach AEGIS.
 - `bossLocatorState` prüft vier Pfeilrichtungen, sichtbaren Chevron, Tod und
   den knappen oberen 16:9-Rand.
 - `compactCombatHud` prüft acht Einträge beim Feldbuild und alle
@@ -497,6 +558,16 @@ D-036 ergänzt zwei neue Checks:
   hält das Pfeilregen-/Grundköcher-Verhältnis im festen Fernfeld zwischen 2,0
   und 3,0.
 
+
+D-041 ergänzt beziehungsweise erweitert vier Verträge:
+
+- `finalBossFlow` prüft Warnung, Spawn, Extraktionssperre, Niederlage,
+  Bosskill, Gesamtdauer und anschließende Overtime.
+- `nexusBenchmark` misst schwachen und repräsentativen Build deterministisch.
+- `evolutionFocusHud` prüft genau einen führenden Pfad; seine Lage wird in
+  D-042 bewusst von unten mittig nach links geändert.
+- `foeSilhouettes` prüft fünf verschiedene Profile; Gate B von D-042 ergänzt,
+  dass der Rammjäger in seiner Warnphase nicht auf alte Tiergrafik fällt.
 Seit D-017 führt der Test `resize()` tatsächlich aus und prüft fünf
 Querformate mit demselben Seed:
 
