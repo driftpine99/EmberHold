@@ -207,6 +207,36 @@ Sentinel-Drohnen kamen nicht vor und sind mit diesem Lauf nicht bewertbar.
 Numerische Änderungen sind fachlich freigegeben, werden aber bewusst erst nach
 dem Grafik-/UI-Pass und getrennt nach Boss/Dichte sowie Waffenrollen umgesetzt.
 
+### Besitzerabnahme für EH-2026-08-25-02
+
+Bitte nach dem Pages-Update einen vollständigen **Acht-Minuten-Lauf im
+Trümmerring** spielen. Dieser Lauf entscheidet nur über Grafik, UI und
+Renderleistung; Balancewerte werden dabei noch nicht geändert.
+
+Während des Laufs bitte auf sechs Punkte achten:
+
+1. Läuft das Orbitaldeck ruhig bis an alle Ränder, ohne abgeschnittene Balken
+   oder sichtbare Farbnaht?
+2. Sind Gesundheit, Erfahrung, Uhr, Pause und die Waffenleiste ausreichend,
+   ohne dass dir der dauerhaft ausgeblendete Sektorname fehlt?
+3. Sind die sechs Waffenpiktogramme schnell unterscheidbar und bleiben
+   Stufen-/Abklinganzeige verständlich?
+4. Wirken Orbitträger und Gegner sichtbar flüssiger, aufrecht und asynchron,
+   besonders bei hoher Dichte?
+5. Ist AEGIS als Boss sofort erkennbar und bleiben Marker, sichere Lücke sowie
+   Angriffskorridor lesbar?
+6. Bleiben schlechteste FPS und 1-%-Low ungefähr auf dem bisherigen Niveau
+   von 57 beziehungsweise 60?
+
+Danach bitte den vollständigen Run-Bericht kopieren und kurz beantworten:
+
+- Gefällt dir der Kampf jetzt optisch deutlich besser?
+- Stört oder fehlt noch eine konkrete UI-Information?
+- Wirken die Figuren wirklich flüssiger oder nur anders?
+- Sind einzelne Gegner oder Angriffe weiterhin schlecht lesbar?
+- Ist der Grafikpass gut genug, damit als Nächstes Boss und Gegnerdichte
+  bearbeitet werden dürfen?
+
 ### Historisches D-035-Protokoll (am 24.08.2026 erledigt)
 
 **Stand 23.08.2026, nach D-035.** Bitte den vollständigen

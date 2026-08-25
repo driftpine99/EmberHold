@@ -84,7 +84,11 @@ canvas{display:block;position:absolute;inset:0;width:100%;height:100%}
 .wslot{position:relative;width:46px;height:46px;border-radius:50%;
   background:radial-gradient(circle at 50% 38%,rgba(38,52,80,.94),rgba(16,22,38,.94));
   border:1px solid #35486a;display:flex;align-items:center;justify-content:center}
-.wslot .wglyph{width:20px;height:20px;border-radius:4px}
+.wslot .wglyph{width:24px;height:24px;display:grid;place-items:center;color:var(--wcol,#7fd4e8)}
+.wslot .wglyph svg{width:100%;height:100%;overflow:visible}
+.wslot .wglyph path,.wslot .wglyph line,.wslot .wglyph circle,.wslot .wglyph polyline{
+  fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.wslot .wglyph .fill{fill:currentColor;stroke:none}
 .wslot .wlv{position:absolute;right:-2px;bottom:-2px;min-width:15px;height:15px;
   border-radius:8px;background:#101626;border:1px solid #35486a;color:#e6f2ff;
   font-size:9px;line-height:13px;text-align:center;font-weight:700;
@@ -1023,7 +1027,7 @@ function drawOrbiterPose(g, modus, t){
   g.restore();
 }
 
-/** Vier Idle-, sechs Lauf- und sechs Wurfposen. */
+/** Sechs Idle-, acht Lauf- und acht Wurfposen. */
 function buildOrbiterSprites(){
   const A=ORBITER_ANIM, out=[];
   const mach=(modus,n)=>{
@@ -3034,6 +3038,12 @@ function render(){
   ctx.translate(cxs,cys); ctx.scale(SCALE,SCALE); ctx.translate(-S.x,-S.y);
   drawArenaFloor(dx0,dx1,dy0,dy1);
   ctx.restore();
+  // Die Sektortoennung liegt ueber dem gesamten Deck. Innerhalb des technisch
+  // kleineren Kampfausschnitts entstuende sonst auf breiten Formaten wieder
+  // genau die sichtbare Seitennaht, die D-040 beseitigt.
+  if(S.contract?.tint){
+    ctx.fillStyle=S.contract.tint; ctx.fillRect(0,0,W,H);
+  }
   // Periphere Weltraumbrueche: nur ganz aussen, ruhig und ohne harte Kante.
   drawDeckEdges();
 
@@ -3047,10 +3057,6 @@ function render(){
   const vx0=S.x-VIEW_W/2-60, vx1=S.x+VIEW_W/2+60;
   const vy0=S.y-VIEW_H/2-60, vy1=S.y+VIEW_H/2+60;
 
-  if(S.contract?.tint){
-    ctx.fillStyle=S.contract.tint;
-    ctx.fillRect(vx0,vy0,vx1-vx0,vy1-vy0);
-  }
 
   // --- Lichtkreis: die Farbe kehrt mit deiner Macht zurück ---------------
   const grd = ctx.createRadialGradient(S.x,S.y,0,S.x,S.y,lr);
@@ -3784,6 +3790,15 @@ function pathHTML(p){
     `${p.passive.name} <em>${p.pl}/${EVO_PASSIVE_LV}</em></div>`+
     `<div class="evometer"><span style="width:${pct}%"></span></div></div>`;
 }
+const WEAPON_GLYPHS=Object.freeze({
+  bogen:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19L18 5"/><path d="M11 5h7v7"/><path d="M5 14l5 5"/></svg>',
+  splitter:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19L18 5"/><path d="M4 19L12 4"/><path d="M4 19L20 12"/><circle class="fill" cx="4" cy="19" r="2"/></svg>',
+  kugel:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5"/><circle class="fill" cx="12" cy="12" r="2.3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>',
+  blitz:'<svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="14,2 6,13 11,13 8,22 19,9 13,9 16,2"/></svg>',
+  klinge:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 16a8 8 0 1 0 1-10"/><path d="M4 5l3 .5-1 3"/><path d="M15 7c-1 5-4 8-8 9"/></svg>',
+  frost:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v20M3.3 7l17.4 10M3.3 17L20.7 7"/><path d="M9.5 4.5L12 7l2.5-2.5M9.5 19.5L12 17l2.5 2.5"/></svg>'
+});
+function weaponGlyph(id){ return WEAPON_GLYPHS[id]||WEAPON_GLYPHS.bogen; }
 /** Bis zu sechs aktive Waffen als Symbole unten mittig. Der Aufbau erfolgt nur
  *  bei echter Änderung, damit im laufenden Kampf kein DOM pro Frame entsteht. */
 let weaponBarSig='';
@@ -3794,8 +3809,9 @@ function renderWeaponBar(){
     weaponBarSig=sig;
     bar.innerHTML=aktiv.slice(0,6).map(w=>{
       const evo=!!S.evo[w.id];
+      const col=evo?w.evo.col:w.col;
       return '<div class="wslot'+(evo?' evo':'')+'" title="'+weaponLabel(w.id,evo)+'">'+
-        '<span class="wglyph" style="background:'+(evo?w.evo.col:w.col)+'"></span>'+
+        '<span class="wglyph" style="--wcol:'+col+'">'+weaponGlyph(w.id)+'</span>'+
         '<span class="wcool"></span>'+
         '<span class="wlv">'+(evo?'E':S.W[w.id])+'</span></div>';
     }).join('');

@@ -1847,6 +1847,17 @@ try {
   const waffenleisteVorhanden = html.includes('id="weaponbar"') &&
     html.includes("function renderWeaponBar()") &&
     html.includes("aktiv.slice(0,6)");
+  const weaponBarBlock=html.slice(html.indexOf("function renderWeaponBar()"),
+    html.indexOf("\nlet slotSig"));
+  const evoPos=weaponBarBlock.indexOf("const evo=!!S.evo[w.id]");
+  const colPos=weaponBarBlock.indexOf("const col=evo?w.evo.col:w.col");
+  const glyphPos=weaponBarBlock.indexOf("weaponGlyph(w.id)");
+  const piktogrammVerdrahtet=evoPos>=0&&colPos>evoPos&&glyphPos>colPos;
+  const waffenPiktogramme = piktogrammVerdrahtet &&
+    html.includes("const WEAPON_GLYPHS=Object.freeze") &&
+    html.includes("function weaponGlyph(id)") &&
+    ["bogen","splitter","kugel","blitz","klinge","frost"].every(id=>
+      html.includes(id+":'<svg"));
 
   // 3. Boss-Titel korrekt
   const bossTitelKorrekt = html.includes("BOSS: AEGIS") &&
@@ -1858,9 +1869,11 @@ try {
 
   // 5. Boden vor dem Clipping
   const indexDrawFloor = html.indexOf("drawArenaFloor(dx0,dx1,dy0,dy1)");
+  const indexTint = html.indexOf("if(S.contract?.tint)");
   const indexClipRect = html.indexOf("ctx.rect(CLIP_X,CLIP_Y,CLIP_W,CLIP_H)");
+  const sektortintNahtlos = indexTint > indexDrawFloor && indexTint < indexClipRect;
   const deckVorDemClip = indexDrawFloor >= 0 && indexClipRect >= 0 &&
-    indexDrawFloor < indexClipRect;
+    indexDrawFloor < indexClipRect && sektortintNahtlos;
 
   // 6. Animationsphasen nach D-040
   const orbiterMatch = html.match(/ORBITER_ANIM = Object\.freeze\(\{IDLE:(\d+), WALK:(\d+), THROW:(\d+)/);
@@ -1895,11 +1908,11 @@ try {
   canvasElement.clientWidth = 1000; canvasElement.clientHeight = 700;
   engine.resize();
 
-  combatUiV2 = keineLinkeListe && waffenleisteVorhanden && bossTitelKorrekt &&
+  combatUiV2 = keineLinkeListe && waffenleisteVorhanden && waffenPiktogramme && bossTitelKorrekt &&
     keineSafeAreaBalken && deckVorDemClip && phasenzahlen && deckBisZumRand;
   combatUiV2Diagnostics = {
-    keineLinkeListe, waffenleisteVorhanden, bossTitelKorrekt,
-    keineSafeAreaBalken, deckVorDemClip, phasenzahlen, deckBisZumRand,
+    keineLinkeListe, waffenleisteVorhanden, waffenPiktogramme, bossTitelKorrekt,
+    keineSafeAreaBalken, deckVorDemClip, sektortintNahtlos, phasenzahlen, deckBisZumRand,
     kacheln16zu9: schmal.gezeichnet, kacheln21zu9: breit.gezeichnet,
     safeArea21zu9: breit.safeArea,
     phasen: { idle, walk, throw: throwPhase, foe }

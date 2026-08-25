@@ -2,33 +2,35 @@
 
 ## Aktueller Arbeitsfokus
 
-**Verbindlicher Stand 25.08.2026:** Der D-036-Besitzerlauf ist vollständig
-ausgewertet. Technik und Performance sind gut, das Spielgefühl-Gate ist aber
-negativ: zu viel Flucht, nach AEGIS wieder stark steigender Gegnerdruck, ein
-zu ereignisloser Boss und Sternenhagel als deutliche Pflichtwahl. Der Besitzer
-hat zugleich bestätigt, dass die Orbitblade-Umstellung klar besser aussieht.
+**Verbindlicher Stand 25.08.2026:** EH-2026-08-25-02 ist durch Claude
+umgesetzt und durch Codex technisch abgenommen (D-040). Der Kampf folgt jetzt
+Entwurf 3: durchgehendes mittelhelles Orbitaldeck, keine permanente linke
+Textliste, `BOSS: AEGIS`, Waffenleiste unten und eine gemeinsame
+weißgolden-violett-cyane Figurensprache.
 
-Für den eigenen Spielspaß erhält jetzt der sichtbare Kampf Vorrang. Entwurf 3
-ist als verbindliche Richtung V2 ausgewählt und unter
-`docs/concepts/orbitblade-combat-ui-direction-v2.png` gesichert (D-040). Der
-nächste Auftrag ist ein reiner Grafik-/UI-Pass: durchgehendes Orbitaldeck,
-minimale Rand-UI, klarer AEGIS und flüssiger wirkende einheitliche Figuren.
-Simulation und Balance bleiben dabei bitgenau unverändert.
+Orbitträger, fünf normale Gegnerfamilien, Elite und AEGIS besitzen zusammen 64
+aktive vorgerenderte Phasen statt 28. Codex hat in der Review sechs eigene
+Waffenpiktogramme ergänzt und die Sektortönung über das gesamte Deck gezogen,
+damit an der technischen Clip-Grenze keine neue Seitennaht entsteht. Der
+Sektorname bleibt bewusst nur als Start-Toast sowie in Pause und Run-Bericht.
 
-Der letzte abgeschlossene Run-Bericht wird seit EH-2026-08-25-01 automatisch
-lokal gesichert; die technische Basis bleibt bei **48/48** grünen Checks.
+Die unabhängige Suite steht bei **49/49** grünen Checks. Neun feste Seeds,
+Simulation, Balance, RNG, Save v4 und Ökonomie sind unverändert; der
+Rendervertrag bleibt grün. Claudes Browsermessungen bei 1280×720 und 844×390
+sind plausibel. Codex konnte den sichtbaren Browser-Smoke lokal nicht
+wiederholen, daher bleibt die subjektive Freigabe beim Besitzer.
 
 Nächste verbindliche Reihenfolge:
 
 1. [x] D-036-Besitzerlauf und subjektive Antworten auswerten.
 2. [x] Visuelle Zielrichtung auswählen: taktisches Sci-Fantasy, Entwurf 3.
-3. [ ] EH-2026-08-25-02 als reinen Kampf-Grafik-/UI-Pass umsetzen und durch
-   Codex technisch prüfen.
-4. [ ] Besitzer nimmt Lesbarkeit, Animation und Bildschirmaufteilung in einem
-   kurzen Run subjektiv ab.
+3. [x] EH-2026-08-25-02 umsetzen und technisch durch Codex abnehmen.
+4. [ ] Besitzer spielt einen vollständigen Acht-Minuten-Lauf und bewertet
+   Lesbarkeit, Animation, Piktogramme, AEGIS und Renderleistung.
 5. [ ] Danach Boss-/Dichtepass getrennt umsetzen.
 6. [ ] Danach Waffenrollen einschließlich Sternenhagel und Kettenemitter
    anhand kontrollierter Telemetrie bearbeiten.
+
 **Historischer Stand 23.08.2026:** EH-2026-08-23-02 ist durch Claude
 umgesetzt und durch Codex technisch abgenommen. Der Warden hat jetzt ein
 eigenes Verstärkungsziel von 90 normalen Gegnern, eine dauerhafte Ortung,

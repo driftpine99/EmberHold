@@ -147,13 +147,15 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
   Simulation bleibt bitidentisch
 - Minimale Rand-UI: links kompakt Leben und Erfahrung, mittig ausschließlich
   `BOSS: AEGIS` mit Lebensleiste und zwei visuellen Phasenmarkern, rechts
-  allein die Pause, unten mittig bis zu sechs Waffensymbole mit Stufe und
-  echtem Abklingring. Die permanente linke Textliste ist im Kampf entfallen;
+  allein die Pause, unten mittig bis zu sechs eigene Waffenpiktogramme mit
+  Stufe und Abklingring. Die permanente linke Textliste ist im Kampf entfallen;
   alle Werte bleiben über Pause und Run-Bericht erreichbar
 - Durchgehendes Orbitaldeck: Der Boden wird vor dem Clip über die ganze
   Leinwand gezeichnet. Safe-Area-Balken, Sternenkacheln am Rand und die harte
   Cyan-Trennlinie sind entfallen; große helle Paneele mit wenigen Fugen und
   dezenter Kreisgeometrie ersetzen den Arena-Rahmen
+- Die Sektortönung liegt über dem gesamten Deck und erzeugt deshalb an der
+  technisch weiter bestehenden Clip-Grenze keine neue sichtbare Seitennaht
 - Einheitliche Figurensprache: vorgerenderte Phasen von 28 auf 64 erhöht —
   Orbitträger 22, fünf Gegnerfamilien je sechs, Elite und AEGIS je sechs.
   AEGIS erhält violetten Kern und zwei visuell getrennte Seitenpanzer

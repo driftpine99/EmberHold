@@ -12,7 +12,7 @@
 - **Anfangsstatus:** `## main...origin/main`, Arbeitsbaum sauber, keine fremden
   Änderungen; `npm test` 48/48 grün, Exitcode 0
 - **Endstand:** `npm test` **49/49 grün**, Exitcode 0; `git diff --check` sauber
-- **Lokale Commits:** einer (`46088fc`), **nicht gepusht**
+- **Lokale Commits:** zwei (`46088fc`, `f711ae5`), **nicht gepusht**
 
 ## Ergebnis in einem Satz
 
@@ -224,16 +224,14 @@ damit im Quelltext unverändert prüfbar.
 
 ## Risiken und offene Punkte
 
-1. **Der Sektorname ist im Kampf nicht mehr sichtbar.** D-040 verlangt oben
-   mittig ausschließlich `BOSS: AEGIS`. Der Vertragsname steht weiterhin in
-   Pause und Run-Bericht. Falls der Besitzer ihn im Kampf vermisst, ist das
-   eine Produktentscheidung für Codex.
-2. **Die Waffensymbole tragen nur ein Farbfeld**, kein eigenes Piktogramm.
-   Ausreichend zur Unterscheidung, aber deutlich schlichter als Entwurf 3.
+1. **Sektorname entschieden:** nicht dauerhaft sichtbar. Start-Toast, Pause und
+   Run-Bericht reichen; die Kampfmitte bleibt frei.
+2. **Waffenpiktogramme in der Codex-Review erledigt:** sechs eigene
+   code-native Symbole ersetzen die reinen Farbfelder.
 3. **Die alten PNG-Atlanten liegen weiterhin im Runtime-Ordner** und zeigen
-   Fantasy-Figuren. Der neue Gegnerpfad hat Vorrang, solange `SPR.foe`
-   existiert — beim Orbitträger greift dagegen weiterhin der Atlas, sobald er
-   lädt. Eine Ablösung ist ein eigener Auftrag.
+   Fantasy-Figuren. Code-native Orbitträger-, Gegner- und AEGIS-Sprites haben
+   jedoch Vorrang. Eine spätere Entfernung der ungenutzten Dateien ist ein
+   eigener Aufräumschritt, kein Laufzeitblocker.
 4. **Keine echte FPS-Zahl.** Die Renderzeit sieht sehr gut aus, ersetzt aber
    keine Messung im laufenden Spiel auf Zielhardware.
 5. **Die Balancebefunde aus D-040 bleiben offen** — Gegnerflut, Bossdruck und
@@ -242,16 +240,11 @@ damit im Quelltext unverändert prüfbar.
 ## Abschließender Git-Status
 
 ```text
-## main...origin/main [ahead 1]
- M CHANGELOG.md
- M docs/WORK_REPORT.md
+## main...origin/main [ahead 2]
 ```
 
-`prototype/web/index.html` und `tools/run-balance-suite.mjs` sind in
-`46088fc` committet. `docs/CURRENT_TASK.md` wurde **nicht** angefasst — es
-steht in diesem Auftrag ausdrücklich auf der Schutzliste. Ebenso unverändert:
-`ROADMAP.md`, `docs/DECISIONS.md`, `docs/TESTPLAN.md`,
-`docs/ASSET_PROVENANCE.md` und die Konzeptbilder.
+`46088fc` enthält Laufzeit und Tests; `f711ae5` enthält Changelog und diesen
+Arbeitsbericht. Claude hat geschützte Dateien nicht verändert.
 
 ## Empfehlung an Codex
 
@@ -263,10 +256,33 @@ Browserfehler. Der sichtbare Sprung gegenüber D-038 ist groß: keine
 abgeschnittenen Seiten mehr, keine linke Textwand, ein klar benannter Boss und
 eine einheitliche Figurensprache mit mehr als doppelt so vielen Phasen.
 
-Zwei Punkte gehören dir:
-
-1. Soll der Sektorname im Kampf sichtbar bleiben (Risiko 1)?
-2. Sollen die Waffensymbole eigene Piktogramme bekommen (Risiko 2)?
+Codex entscheidet über die beiden offenen UI-Punkte. Die technische
+Besitzerfreigabe bleibt wegen des fehlenden vollständigen 8-Minuten-Smokes
+offen.
 
 Danach ist der nächste Schritt laut D-040 der Boss- und Dichtepass — und erst
 danach der Waffenrollenpass.
+
+## Codex-Review
+
+Codex hat beide Commits unabhängig geprüft. Der Bericht war nach dem zweiten
+Dokumentationscommit an drei Stellen veraltet: Tatsächlich wurden zwei lokale
+Commits übergeben, der Arbeitsbaum war sauber und der code-native Orbitträger
+hat in der Runtime Vorrang vor dem alten Atlas. Diese Angaben sind oben
+korrigiert.
+
+Produktentscheidungen:
+
+1. Der Sektorname bleibt aus der permanenten Kampf-UI entfernt. Der vorhandene
+   Start-Toast sowie Pause und Run-Bericht reichen aus.
+2. Farbflächen reichen als Waffensymbole nicht. Codex hat sechs eigene
+   code-native SVG-Piktogramme ergänzt.
+
+Zusätzliche Review-Korrektur: Die Sektortönung liegt nun über dem gesamten
+Deck, damit auf breiten Formaten keine neue Farbnaht an der technischen
+Clip-Grenze entsteht. Der Test prüft außerdem die korrekte
+Verdrahtungsreihenfolge der Piktogramme und die Tönung vor dem Clip.
+
+Unabhängige Prüfung: `npm test` 49/49 grün, `git diff --check` sauber.
+Eine eigene sichtbare Browserfreigabe war wegen der lokalen Browserverbindung
+nicht möglich; deshalb bleibt der Besitzerlauf verbindlich.

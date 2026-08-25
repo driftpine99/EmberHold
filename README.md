@@ -19,19 +19,19 @@ Asteroidensonde, Materiefabrikator, Fluxlabor, Simulationsdeck,
 Ausrüstungsbucht und Sternenkarte mit lokalem Save v4 und begrenzter
 Offline-Produktion.
 
-D-038 bildet den ersten sichtbaren Orbitblade-Vertikalschnitt: ruhiges
-Sci-Fantasy-HUD, mittelhelles Stationsdeck, dekorative Sternenränder sowie
-code-native Figuren für Orbitträger, Sammlerdrohne, AEGIS und die geworfene
-Orbitklinge. Die Spielmechanik der bisherigen Fernkampfwaffe ist dabei bewusst
+D-040 setzt die gewählte Kampfrichtung V2 technisch um:
+durchgehendes mittelhelles Orbitaldeck, minimale Rand-UI, sechs eigene
+Waffenpiktogramme sowie code-native Animationen für Orbitträger, alle fünf
+Gegnerfamilien, Elite und AEGIS. Simulation und Spielmechanik bleiben dabei
 unverändert; eine echte zurückkehrende Klinge ist ein späteres eigenes Gate.
 
-Die technische Abnahme steht bei **48/48 grünen Checks**. Der letzte
-abgeschlossene Run-Bericht wird nun getrennt von Save v4 lokal gesichert und
-kann in der Orbitalstation erneut kopiert werden. Der erste D-036-Feldbericht
-liegt vor; vor weiterer Balance fehlen noch die sechs subjektiven Antworten zu
-später Gefahr, Waffenrollen, Übersicht und Lust auf einen zweiten Run.
-Backend, Ton, Monetarisierung und neue Inhalte bleiben bis dahin außerhalb des
-Scopes.
+Die technische Abnahme steht bei **49/49 grünen Checks**. Der letzte
+abgeschlossene Run-Bericht wird getrennt von Save v4 lokal gesichert und kann
+in der Orbitalstation erneut kopiert werden. Der D-036-Feldlauf ist negativ
+ausgewertet: Gegnerflut, Bossdruck und Waffenrollen bleiben offen. Vor diesen
+getrennten Balancepässen nimmt der Besitzer zunächst Grafik, UI und Animation
+im vollständigen Lauf ab. Backend, Ton und Monetarisierung bleiben außerhalb
+des Scopes.
 
 Die Produktfrage der Phase 0 lautet:
 

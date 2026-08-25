@@ -45,20 +45,27 @@ Leitung. Der vollständige Ablauf steht in docs/WORKFLOW.md.
 
 ## Verbindliche aktuelle Grafikrichtung
 
-- Sichtbarer Produktname und Art Direction sind seit D-037/D-038 **Orbitblade**.
-  Repository, Pages-URL, Save-Key und interne IDs bleiben vorerst Emberhold.
-- Flaches 2D-Sci-Fantasy in Navy, Violett, Cyan und Weißgold auf einem
-  mittelhellen Stationsdeck. Seitliche Sternenflächen sind rein dekorativ und
-  müssen exakt auf die Safe-Area geclippt bleiben.
-- Der Orbitträger nutzt die code-native Posefolge `SPR.orbiter`: aufrecht,
-  horizontal gespiegelt, niemals frei rotiert. Der alte Aelric-Atlas ist nur
-  noch historische Projektdatei und wird zur Laufzeit nicht geladen.
-- Sammlerdrohnen nutzen `SPR.drone` mit sechs asynchronen Phasen. AEGIS und
-  das Orbitklingenprojektil sind ebenfalls code-native. Der allgemeine
-  `enemy-atlas-v1.png` bleibt vorläufig für die noch nicht konvertierten
-  Familien aktiv.
-- Gegner bleiben unabhängig von Entfernung vollständige Figuren. Keine
-  Kreisplatzhalter, abstrakten Schattenfiguren oder Randabdunklung einführen.
+- Sichtbarer Produktname und Art Direction sind seit D-037/D-040
+  **Orbitblade**. Repository, Pages-URL, Save-Key und interne IDs bleiben
+  vorerst Emberhold.
+- Verbindliche Referenz ist
+  `docs/concepts/orbitblade-combat-ui-direction-v2.png`: taktisches flaches
+  2D-Sci-Fantasy in Navy, Violett, Cyan und Weißgold.
+- Das mittelhelle Orbitaldeck läuft optisch bis an alle Bildschirmränder.
+  Keine sichtbaren Safe-Area-Balken, harten Trennlinien oder Randabdunklung
+  wieder einführen. Simulationsclip und D-017 bleiben technisch unverändert.
+- Der Orbitträger nutzt `SPR.orbiter` mit 6 Idle-, 8 Bewegungs- und 8
+  Wurfphasen. Er bleibt aufrecht, wird nur horizontal gespiegelt und niemals
+  frei rotiert.
+- Alle fünf normalen Familien nutzen `SPR.foe[f][phase]` mit je sechs
+  asynchronen Phasen. Elite und AEGIS nutzen `SPR.eliteA` beziehungsweise
+  `SPR.aegisA` mit je sechs Phasen. Alte PNG-Atlanten sind keine aktive
+  visuelle Referenz.
+- Gegner bleiben vollständige Figuren mit klaren Leuchtkernen. Keine
+  Kreisplatzhalter, abstrakten Schattenfiguren oder synchronen Pulkphasen.
+- Dauerhafte Kampf-UI: Gesundheit/Erfahrung links oben, Uhr und Pause am Rand,
+  `BOSS: AEGIS` bei lebendem Boss sowie höchstens sechs eigene
+  Waffenpiktogramme unten. Sektorname nur als Start-Toast, in Pause und Bericht.
 - Weltbewegung läuft am Browser-Frame; Posen wechseln ungefähr mit 10–12 FPS
   ohne Crossfade. Keine Gradienten, `shadowBlur` oder Objektallokationen pro
   Einheit und Frame.
@@ -71,25 +78,21 @@ Leitung. Der vollständige Ablauf steht in docs/WORKFLOW.md.
 Dieser Abschnitt ist kein Arbeitsauftrag. Priorität und Scope stehen nur in
 `docs/CURRENT_TASK.md`.
 
-**Stand 25.08.2026, nach D-038.** Der Besitzerlauf nach D-035 bestätigte
-Bossphase und Leistung, aber nicht das Spielgefühl: 46 Kartenzüge, Stufe 47,
-drei Evolutionen und stark auseinanderlaufende Waffenrollen machten den
-späten Run praktisch ungefährlich. D-036 bremst deshalb nur die späte
-Progression, schwächt Sternenhagel gezielt ab, verbessert die
-Sentinel-Drohnen-Hitgeometrie und erweitert die Waffentelemetrie.
+**Stand 25.08.2026, nach D-040.** Der vollständige D-036-Besitzerlauf ist
+negativ ausgewertet: Die Progressionsbremse wirkt und die Performance ist gut,
+aber Gegnerflut, Fluchtgefühl, ereignisarmer AEGIS-Kampf und die Dominanz von
+Sternenhagel verhindern weiterhin die Spielgefühl-Freigabe. D-039 sichert den
+letzten Abschlussbericht lokal.
 
-D-038 ist technisch abgenommen: sichtbare Sprache, HUD, Orbitalstation,
-Safe-Area sowie Orbitträger, Sammlerdrohne, AEGIS und Klingenprojektil bilden
-den ersten Orbitblade-Slice. Die Simulation, Save v4, interne IDs und
-Hold-Ökonomie blieben unverändert.
+D-040 priorisiert auf Besitzerwunsch zunächst den sichtbaren Kampf. Der
+Grafik-/UI-Pass ist technisch abgenommen: 64 aktive vorgerenderte Phasen,
+durchgehendes Deck, minimale UI, eigene Waffenpiktogramme und 49/49 Checks bei
+bitidentischer Neun-Seed-Simulation.
 
-Der D-036-Besitzerbericht mit Seed 1818720884 liegt vor: Stufe 25,
-24 Kartenzüge, zwei Evolutionen und stabile 60 FPS im 1-%-Low. Quantitativ ist
-die Schneeballkurve beseitigt; Sternenhagel bleibt auffällig dominant. Die
-sechs subjektiven Antworten und damit die Spielgefühl-Freigabe fehlen noch.
-D-039 sichert künftige Abschlussberichte getrennt von Save v4 lokal. Der
-nächste verbindliche Schritt sind die sechs Antworten aus
-`docs/TESTPLAN.md`, nicht ein neuer Balance- oder Contentauftrag.
+Der nächste verbindliche Schritt ist genau ein vollständiger Besitzerlauf zur
+Abnahme von Grafik, Animation, AEGIS-Lesbarkeit und Renderleistung. Bis dahin
+keinen weiteren Balancepass stapeln. Danach folgt zuerst Boss/Dichte und erst
+danach der getrennte Waffenrollenpass.
 
 ### Drei Dinge, die eine neue Sitzung wissen muss
 
@@ -98,11 +101,10 @@ nächste verbindliche Schritt sind die sechs Antworten aus
 „zurück auf 21 repariert“, macht den Vertrag kaputt. Der Besitzerlauf nach
 D-036 soll 28–34 Kartenzüge erreichen.
 
-**2. Vor dem Feldlauf keine weitere Balance oder neuen Content stapeln.**
-Der Lauf muss zuerst zeigen, ob späte Gefahr, Waffenrollen, Übersicht und Lust
-auf einen zweiten Run wirklich besser sind. Rückflugmechanik der Orbitklinge,
-weitere Gegneranimationen und Stationsausbau bleiben bis dahin getrennte
-Folgeaufträge.
+**2. Vor der Besitzerabnahme keine weitere Balance stapeln.**
+Der Lauf prüft zuerst Grafik, Animation, AEGIS-Lesbarkeit und echte
+Renderleistung. Danach folgt Boss/Dichte und erst anschließend der
+Waffenrollenpass; Rückflugmechanik und neuer Content bleiben getrennte Gates.
 
 **3. Sichtbare Namen sind eine Präsentationsschicht.** `LEX` darf Bezeichnungen
 ändern; IDs wie `bogen`, `glutsehne`, `ring` und der Save-Key

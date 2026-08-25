@@ -4,7 +4,7 @@
 
 - **Task-ID:** EH-2026-08-25-02
 - **Thema:** Kampf-Grafik und UI nach Entwurf 3
-- **Status:** **FREIGEGEBEN_FUER_CLAUDE**
+- **Status:** **TECHNISCH_ABGENOMMEN_DURCH_CODEX** (25.08.2026)
 - **Auftraggeber:** Besitzer
 - **Projektleitung und Abnahme:** Codex
 - **Ausführung:** Claude Code
@@ -191,3 +191,20 @@ Alle anderen Dateien sind geschützt. Insbesondere nicht ändern:
 - abschließendem Git-Status und Empfehlung an Codex.
 
 Lokale kleine Commits sind nach grünen Tests erlaubt. Kein Push.
+
+## Codex-Abnahme
+
+**Technisch abgenommen am 25.08.2026.** Claude hat den Auftrag in zwei lokalen
+Commits umgesetzt. Codex hat beide Diffs unabhängig geprüft, die UI-Fragen
+entschieden und als kleine Review-Nacharbeit sechs eigene Waffenpiktogramme
+sowie eine nahtlose Sektortönung über dem gesamten Deck ergänzt.
+
+- `npm test`: 49/49 Checks grün;
+- `git diff --check`: sauber;
+- neun feste Seeds und alle Balancekennzahlen unverändert;
+- Rendervertrag weiter bei zwei Gradienten, keinem `shadowBlur` und keinem
+  neuen Canvas pro Frame im gemessenen Pfad;
+- Sektorname nur als Start-Toast sowie in Pause und Run-Bericht, nicht dauerhaft;
+- subjektive Sicht- und Performancefreigabe bleibt beim Besitzerlauf.
+
+Bis zu diesem Besitzerlauf wird kein Boss-/Dichte- oder Waffenpass gestapelt.

@@ -1756,8 +1756,8 @@ führen zur Reihenfolge aus D-040.
 
 ## D-040 – Taktisches Sci-Fantasy ist die verbindliche Kampfrichtung V2
 
-**Status:** auf ausdrücklichen Besitzerwunsch beschlossen (25.08.2026);
-Runtime-Umsetzung und subjektive Abnahme stehen aus.
+**Status:** technisch umgesetzt und durch Codex abgenommen (25.08.2026);
+subjektive Besitzerabnahme steht aus.
 
 Der D-036-Besitzerlauf ist spielbar und technisch performant, trägt aber noch
 keinen freiwilligen zweiten Run. Der Besitzer beschreibt weiterhin eine zu
@@ -1796,3 +1796,22 @@ interne IDs bleiben im visuellen Auftrag unverändert. Danach folgen getrennt:
 
 Das Bild bleibt laut AP-004 eine interne Designreferenz. Neue Runtime-Assets
 brauchen eigene Provenienz und vor kommerzieller Nutzung einen Rechtepass.
+
+### Technische Umsetzung
+
+EH-2026-08-25-02 ist am 25.08.2026 technisch abgenommen. Das Deck läuft
+außerhalb des weiterhin festen Simulationsclips bis an alle Ränder; auch die
+Sektortönung wird vor dem Clip über das ganze Deck gelegt. Die linke Textliste
+ist ausgeblendet, aktive Waffen stehen mit sechs eigenen Piktogrammen, Stufe
+und Abklingring unten mittig. Der Sektorname erscheint bewusst nur kurz beim
+Start und bleibt zusätzlich in Pause und Run-Bericht.
+
+Orbitträger, fünf normale Maschinenfamilien, Elite und AEGIS verwenden
+code-native vorgerenderte Phasen. Der aktive Umfang steigt von 28 auf 64
+Phasen. Der Gegnerpfad bleibt ein `drawImage` je Figur; die Testsuite steht
+bei 49/49 und die serialisierte Neun-Seed-Referenz ist bitidentisch.
+
+Codex konnte den sichtbaren Browser-Smoke wegen der lokalen Browserverbindung
+nicht wiederholen. Claudes Messung bei 1280×720 und 844×390 ist technisch
+plausibel, ersetzt aber weder den Besitzerlauf noch dessen subjektive
+Freigabe.
