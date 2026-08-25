@@ -29,6 +29,16 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
   - Suite auf 58 Checks: combatArtV3, sectorObjectiveFlow, stationCoreFlow,
     stationDomContract sowie baselineIsolated — 18 bitidente Fingerprints
     gegen den Ausgangscommit belegen die Isolation von Protokoll und Kulisse
+  - Codex-Review: Klingenfokus bleibt bei Rerolls bis zur ersten tatsächlichen
+    Kartenwahl aktiv; der Regressionstest sichert diesen Randfall
+  - Die Station zeigt Sternenkarte und Start nur noch im zugehörigen Hotspot;
+    ein zweiter Tap lässt das einzige Detailpanel offen, die doppelte
+    permanente Kartenwand ist entfernt
+  - Stationsdaten bleiben eine getrennte todsichere Basisbergung und verändern
+    den bisherigen Bergungswert beziehungsweise die Asteritkurve nicht
+  - Unabhängige Abschlussprüfung: 58/58 Checks grün, `git diff --check`
+    sauber; sichtbare Desktop-/Handy-Abnahme wegen Browser-Sandboxfehler offen
+
 
 - EH-2026-08-25-03 / D-041 — Kampflesbarkeit V3 und verpflichtendes
   NEXUS-Finale:

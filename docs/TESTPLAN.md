@@ -62,14 +62,19 @@ Subjektives Ergebnis:
 Damit ist das NEXUS-Gate positiv abgeschlossen. Die offenen Punkte bilden den
 eigenen D-042-Vertikalschnitt und sind kein Grund, D-041 zurückzurollen.
 
-## Geplante Besitzerabnahme nach D-042
+## Besitzerabnahme D-042 – technisch freigegeben, sichtbar offen
 
-Diesen Test erst nach technischer Codex-Review von EH-2026-08-25-04 fahren.
-Er besteht aus einem vollständigen Ablauf, nicht aus getrennten Screenshots:
+Die technische Codex-Review von EH-2026-08-25-04 ist abgeschlossen:
+`npm test` steht bei 58/58, 18 Baseline-Fingerprints sind bitidentisch,
+Klingenfokus überlebt Rerolls und der Stations-DOM-Vertrag verhindert die
+doppelte Kartenwand. Die sichtbare Browserabnahme konnte wegen des
+Windows-Sandboxfehlers nicht automatisiert werden. Dieser Besitzerlauf ist
+deshalb jetzt der nächste verbindliche Schritt:
 
 1. Vor dem Start die Station öffnen und prüfen, ob sie als zusammenhängender
    Ring mit sechs Modulen und zentralem Kern lesbar ist. Jedes Modul einmal
-   antippen; immer darf nur ein passendes Detailpanel offen sein.
+   antippen; immer muss genau ein passendes Detailpanel offen bleiben, auch
+   nach einem zweiten Tap auf dasselbe Modul.
 2. Bestehende Produktion, Ausrüstung, Meisterschaften, Sektorauswahl,
    Reroll-Vorbereitung und letzter Run-Bericht müssen noch erreichbar sein.
 3. Trümmerring · 8 Minuten starten. Zwischen 2:30 und 4:00 `SIGNAL SICHERN`
@@ -78,8 +83,10 @@ Er besteht aus einem vollständigen Ablauf, nicht aus getrennten Screenshots:
 4. AEGIS und NEXUS spielen. Nach NEXUS extrahieren und prüfen, ob genau zwei
    Stationsdaten gutgeschrieben werden: eine für das Signal, eine für NEXUS.
 5. Zur Station zurückkehren, Kernstufe 1 bauen und `Klingenfokus` wählen. Der
-   Kern muss sich sichtbar verändern; im nächsten Run muss das erste legale
-   Kartenangebot eine Orbitklingen-Aufwertung enthalten.
+   Kern muss sich sichtbar verändern. Im nächsten Run beim ersten Kartenzug
+   einmal neu ziehen: Sowohl vor als auch nach dem Reroll muss eine legale
+   Orbitklingen-Aufwertung enthalten sein; nach der tatsächlichen Kartenwahl
+   darf die Garantie nicht erneut greifen.
 6. Seite neu laden. Alte Ressourcen/Gebäude/Ausrüstung sowie neue Daten,
    Kernstufe und Protokoll müssen vollständig erhalten sein.
 
@@ -100,6 +107,7 @@ Zusätzlich zum kopierbaren Run-Bericht diese Fragen beantworten:
    wirkt sie nur wie eine weitere kleine Zahl?
 8. Schlechteste FPS, 1-%-Low und Anteil unter 55 FPS im Lastfenster sowie im
    NEXUS-Finale notieren.
+
 ## Manueller Gesamttest des Phase-0.5-Slices
 
 > **Diesen Test kann nur der Besitzer fahren.** In der Claude-Code-Umgebung wird

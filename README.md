@@ -16,30 +16,27 @@ Der Phase-0-Prototyp enthält drei Sektoren, sechs Waffen mit vollständigen
 Evolutionspfaden, acht Passivmodule, fünf Gegnerfamilien, Eliten,
 **SEKTORBOSS: AEGIS**, Extraktion und Overtime. Die Orbitalstation besitzt
 Asteroidensonde, Materiefabrikator, Fluxlabor, Simulationsdeck,
-Ausrüstungsbucht und Sternenkarte mit lokalem Save v4 und begrenzter
+Ausrüstungsbucht und Sternenkarte mit lokalem Save v5 und begrenzter
 Offline-Produktion.
 
-D-041 ist technisch und durch den Besitzer abgenommen. AEGIS ist der
-Mittelboss mit Ziel 50; bei 8:00 erscheint NEXUS mit höchstens 30 normalen
-Begleitern. Erst sein Tod schaltet Extraktion beziehungsweise freiwillige
-Overtime frei. Der vollständige Besitzerlauf endete bei 9:35 mit 56 FPS
-Minimum, 58 FPS im 1-%-Low und einer höheren Lust auf einen weiteren Run.
+D-042 ist durch OpenCode umgesetzt und durch Codex technisch abgenommen. Der
+Kampf nutzt jetzt die weiß-goldene Lichthüter-Silhouette vor einer ruhigeren
+kosmischen Kulisse; Rammjäger und EVO-Hinweis sind korrigiert. Die Station ist
+eine Ringkarte mit sechs Hotspots und einem sichtbaren Kern statt einer
+permanenten Kartenwand.
 
-Offen bleiben sichtbare Qualität und Meta-Zweck: Der Kampfgrund wirkt noch wie
-ein Raster aus Kästen, `Nächste EVO` sitzt falsch, der Rammjäger zeigt beim
-Aufladen kurz die alte Figur und die Station fühlt sich trotz ihrer Funktionen
-nicht wie ein verständlicher Aufbau an.
+Im Acht-Minuten-Run verbindet `SIGNAL SICHERN` den Kampf mit dem Stationsausbau:
+Signal und echter NEXUS-Kill liefern je eine todsichere Stationsdatei. Save v5
+speichert Stationsdaten, drei Kernstufen und ein wählbares Sortie-Protokoll.
+Klingenfokus bleibt auch nach einem Reroll für den ersten tatsächlichen
+Kartenzug aktiv; Fluxreserve und Bergungsscanner verändern nur ihren
+ausgewiesenen Run-Aspekt.
 
-Deshalb ist D-042 / EH-2026-08-25-04 für OpenCode freigegeben. Der nächste
-Vertikalschnitt adaptiert den code-nativen Lichthüter und die kosmische Tiefe
-der lokalen Orbitblade-Referenz, ordnet die Station als Ringkarte und verbindet
-`SIGNAL SICHERN` über Stationsdaten mit drei sichtbaren Kernstufen und
-wählbaren Sortie-Protokollen. Waffenwerte, XP, Dichte und beide Bosse bleiben
-in diesem Auftrag unverändert.
-
-Die technische Baseline steht vor D-042 bei **53/53 grünen Checks** und einem
-Botanker von 19,78 ±3. Der letzte Run-Bericht bleibt lokal kopierbar; Backend,
-Ton und Monetarisierung bleiben außerhalb des Scopes.
+Die unabhängige Suite steht bei **58/58 grünen Checks**, der Botanker bleibt
+19,78 ±3 und die Baseline ist über 18 Fingerprints bitidentisch. Die sichtbare
+Besitzerabnahme auf Desktop und Handy steht noch aus. Der letzte Run-Bericht
+bleibt lokal kopierbar; Backend, Ton und Monetarisierung bleiben außerhalb des
+Scopes.
 
 Die Produktfrage der Phase 0 lautet:
 

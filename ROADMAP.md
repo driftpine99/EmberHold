@@ -2,44 +2,38 @@
 
 ## Aktueller Arbeitsfokus
 
-**Verbindlicher Stand 25.08.2026:** D-041 ist technisch und durch den Besitzer
-abgenommen. Der vollständige NEXUS-Lauf mit Seed `2026415955` endete bei 9:35
-mit 28 Kartenzügen, drei Evolutionen, 56 FPS Minimum, 58 FPS im 1-%-Low und
-keiner Probe unter 55 FPS. AEGIS mit Ziel 50, NEXUS, seine beiden Muster und
-die getrennten Gegnerfamilien funktionieren; die Lust auf einen weiteren Run
-ist höher als zuvor.
+**Verbindlicher Stand 25.08.2026:** D-042 /
+EH-2026-08-25-04 ist durch OpenCode umgesetzt und durch Codex technisch
+abgenommen. Die Suite steht bei **58/58 grünen Checks**, der Botanker bleibt
+19,78 ±3 und 18 Baseline-Fingerprints sind bitidentisch zum Ausgangscommit.
 
-Der nächste Produktblocker ist jetzt klar: Der Kampfgrund wirkt weiterhin wie
-ein Raster aus Kästen, der EVO-Hinweis sitzt falsch, der Rammjäger zeigt beim
-Aufladen kurz die alte Figur, die Station ist eine Kartenwand und im Run fehlt
-ein bewusst verfolgtes Ergebnis für den Stationsausbau.
+Umgesetzt sind die fünf zusammenhängenden Gates:
 
-Darum ist **EH-2026-08-25-04 / D-042** als großer, aber zusammenhängender
-Vertikalschnitt für OpenCode freigegeben:
+1. weiß-goldener Lichthüter und ruhigere kosmische Orbitblade-Kulisse;
+2. korrigierte Rammjäger-Aufladung und `Nächste EVO` links;
+3. Stationsring mit sechs Hotspots, zentralem Kern und genau einem
+   Detailpanel statt zusätzlicher permanenter Kartenwand;
+4. `SIGNAL SICHERN` zwischen 2:30 und 4:00 sowie je eine todsichere
+   Stationsdatei für Signal und echten NEXUS-Kill;
+5. verlustfreie Save-v5-Migration, drei Kernstufen und drei wählbare
+   Sortie-Protokolle.
 
-1. Lichthüter-Formensprache und kosmische Tiefe aus der aktiven lokalen
-   Orbitblade-Referenz an den vorgerenderten Runtime-Pfad adaptieren.
-2. Rammjäger-Aufladung korrigieren und `Nächste EVO` zurück an die linke Seite
-   setzen.
-3. Die Station als visuelle Ringkarte mit sechs Modulen und zentralem Kern
-   ordnen, während alle bisherigen Funktionen erhalten bleiben.
-4. Im Acht-Minuten-Run genau ein Ziel `SIGNAL SICHERN` zwischen 2:30 und 4:00
-   einführen; Erfolg und NEXUS-Kill liefern zusammen höchstens zwei
-   Stationsdaten.
-5. Save v4 verlustfrei auf v5 migrieren und drei sichtbare Kernstufen mit
-   wählbaren Sortie-Protokollen bauen.
+Die unabhängige Review hat drei Abweichungen korrigiert: Klingenfokus bleibt
+bei Rerolls bis zur tatsächlichen ersten Kartenwahl aktiv, ein erneut
+angetippter Hotspot lässt sein einziges Detailpanel offen, und Stationsdaten
+verändern nicht zusätzlich die bestehende Bergungswert-/Asteritkurve.
 
-Waffenwerte, XP, Dichte, AEGIS und NEXUS bleiben dabei unverändert. Die 1:35
-des einen NEXUS-Kampfs ist vorgemerkt, aber noch keine belastbare
-Balancegrundlage. Der Waffenrollenpass wartet bis nach D-042, damit nicht
-gleichzeitig Meta-Loop, Grafik und Kampfbalance bewertet werden.
+Waffenwerte, XP, Dichte, AEGIS und NEXUS blieben unangetastet. Offen ist nur
+die sichtbare Besitzerabnahme auf Desktop und Handy; die Browsersteuerung der
+Codex-Umgebung war wegen eines Windows-Sandboxfehlers nicht verfügbar. Der
+Waffenrollenpass wartet weiterhin auf diesen Feldlauf.
 
 Nächste verbindliche Reihenfolge:
 
 1. [x] D-041-Besitzerlauf bis NEXUS auswerten.
 2. [x] D-042 entscheiden und EH-2026-08-25-04 freigeben.
-3. [ ] OpenCode setzt die fünf Gates vollständig um, testet und berichtet ohne Push.
-4. [ ] Codex prüft Diff, Save-Migration, Baseline, Protokolle und Renderkosten unabhängig.
+3. [x] OpenCode hat die fünf Gates vollständig umgesetzt, getestet und berichtet.
+4. [x] Codex hat Diff, Migration, Baseline, Protokolle und Renderkosten unabhängig geprüft und nachgehärtet.
 5. [ ] Besitzer prüft einen vollständigen Signal→NEXUS→Stationskern-Ablauf auf Desktop/Handy.
 6. [ ] Erst danach den getrennten Waffenrollenpass planen.
 

@@ -1930,7 +1930,8 @@ Punkte sind nicht mehr Teil der NEXUS-Entscheidung, sondern bilden D-042.
 
 ## D-042 – Bergungssignal und Stationsring bilden den ersten echten Meta-Loop
 
-**Status:** beschlossen und als EH-2026-08-25-04 zur Umsetzung durch OpenCode freigegeben.
+**Status:** umgesetzt und durch Codex technisch abgenommen; sichtbare
+Besitzerabnahme auf Desktop und Handy offen.
 
 Nach D-041 trägt der Run erstmals drei verständliche Akte und technisch genug
 Reserve. Der nächste Spaßblocker liegt nicht in zusätzlicher Gegnerzahl oder
@@ -1986,9 +1987,28 @@ späteren Tod erhalten.
 Save v4 wird verlustfrei auf v5 migriert. Der zentrale Kern besitzt drei
 einmalige Stufen zu insgesamt sechs Stationsdaten. Sie schalten drei
 gegenseitig exklusive Vorbereitungsprotokolle frei: eine legale
-Orbitklingen-Karte im ersten Angebot, einen zusätzlichen Stations-Reroll oder
+Orbitklingen-Karte im ersten tatsächlichen Kartenzug, einen zusätzlichen Stations-Reroll oder
 einen schnelleren Signal-/bevorzugten unbesessenen Ausrüstungsfund. Ohne
 gebautes und gewähltes Protokoll bleibt die Baseline bitidentisch.
+
+### Technische Abnahme
+
+OpenCode hat alle fünf Gates umgesetzt; Codex hat Runtime, Save-Migration,
+Protokolle, Rendervertrag und die 18 Baseline-Fingerprints unabhängig geprüft.
+`npm test` steht bei 58/58 grünen Checks, der Botanker bleibt 19,78 ±3.
+
+Die Review hat drei Vertragsabweichungen vor der Freigabe korrigiert:
+
+- Klingenfokus bleibt bei Rerolls aktiv, bis im ersten Kartenzug tatsächlich
+  eine Karte gewählt wurde.
+- Ein erneut angetippter Hotspot lässt sein einziges Detailpanel offen; die
+  doppelte permanente Sternenkarten-/Startwand wurde entfernt.
+- Stationsdaten sind eine getrennte todsichere Basisbergung. Sie verändern
+  den bestehenden Bergungswert und damit die Asteritkurve nicht zusätzlich.
+
+Die sichtbare Browserabnahme war in der Codex-Umgebung wegen eines
+Windows-Sandboxfehlers nicht möglich und bleibt deshalb ausdrücklich offen.
+
 
 ### Bewusste Grenzen
 

@@ -8,7 +8,7 @@
 
 - **Task-ID:** EH-2026-08-25-04 — Lichthüter-Grafik, Bergungssignal und
   Stationsring V1 (D-042)
-- **Status:** FERTIG, bereit für Codex-Review
+- **Status:** TECHNISCH ABGENOMMEN; sichtbare Besitzerabnahme offen
 - **Verbindlicher Ausgangscommit laut Auftrag:** `d78fdbe`
 - **Tatsächlicher Startcommit:** `0a97b59` (= `d78fdbe` plus rein
   dokumentarischer Commit „docs: D-042 Stations-Vertikalschnitt planen“);
@@ -37,9 +37,9 @@ Fingerprints), bei **58/58** grünen Checks.
 |---|---|---|---|
 | A – Lichthüter + Hintergrund | erfüllt | `drawOrbiterPose` adaptiert die Referenzgrammatik (`zeichneLichthueterNeu`, Zeilen 1442–1482): Helm-Hexagon mit Goldraute, cyan-V-Visier, Halo r≈11.8 mit vier Ticks, Schulterplatten bis ±15, Fünfeckspanzer, geteilter Mantel; Pulse eingefroren, kein Date.now. Hintergrund: Navy-Basiskachel 512 px mit weichen Schattierungen, Nebelschleiern, Feinfugen, Leitungen, Mikrosternen; Parallax-Sternebene (Faktor 0.12); Landmark-Zellen à 2000 WE mit Ring/Galaxie/Asteroiden; seltener Ringplanet; `drawDeckEdges` als No-op erhalten | Neuer Vertrag `combatArtV3` (Phasen 6/8/8 @ 12 FPS, Merkmale, Hot-Loop ohne Zeit/Zufall); `renderCostContract`: 281 sichtbar, 324 drawImage erster Frame, 2 Gradienten/Frame (nur die zwei Lichtkreise), 0 shadowBlur, 0 Canvas/Frame |
 | B – zwei Korrekturen | erfüllt | Rammjäger-Ladephase nutzt dieselbe `SPR.foe[1]`-Silhouette (Bedingung `SPR.foe&&E.kind[i]===0`); Tier-/Fallback nur noch ohne Atlas. `#evohint` links (`left:14px;top:64px`, kein translateX) | `combatArtV3.rammjaegerNeu/evoLinks`; `evolutionFocusHud` auf Links-Lage umgestellt und grün; `singlePassRendering` unverändert grün (Fallback-Pfad erhalten) |
-| C – Stationsring | erfüllt | `.holdscene`: Sterne, Planet, zwei gebrochene Ringsegmente, Leitungen; zentraler Kern-Knopf mit Orb, drei Stufenlichtern, Ausbau-Aktion; sechs Hotspots mit Zustandslampen (offline/produziert/bereit). Genau ein Detailpanel via `data-panel` (Toggle schließt). Alle bisherigen IDs/Aktionen erhalten; Sektorwahl + Protokoll + Sortiestart zusätzlich im Kartenpanel (`btnStart2/btnStart32`) | Neuer Vertrag `stationDomContract` (eindeutige IDs, Panel-Mapping, Aktionen, Toggle-Verhalten, Lampen, Kernstufe); `holdFlow/holdExpansion/equipmentFlow/presentationLayer` weiter grün |
-| D – Sektorziel | erfüllt | Nur 8 Minuten: Spawn t=150 an Hash-Position 220–300 WE (eigener visualHash aus Seed+Konstanten — null Gameplay-RNG), Fenster bis 240 (< AEGIS), kumulativ 8 s in r=110 (Scanner 5 s), Verlassen pausiert ohne Reset. Erfolg = Stationsdatei 1, echter NEXUS-Kill = Datei 2; beide in `baseReward` (+60 je Datei) und exakt einmal in `depositRunReward()` hinter dem bestehenden `rewardGranted`-Guard | Neuer Vertrag `sectorObjectiveFlow`: 17 Teilprüfungen inkl. Determinismus zweier Läufe, Kumulativ/Pause, Terminalität von „verpasst“, Doppelgutschrift-Schutz, Tod-im-Finale-Pfad |
-| E – Kern & Protokolle | erfüllt | Save v4→v5 verlustfrei; stationData 0–999, coreStage 0–3, sortieProtocol-Whitelist mit Klemmung/Bereinigung. Kernkosten [1♦+5 Erz / 2♦+1 Platte / 3♦+2 Platten], sequenziell. Klingenfokus injiziert im ERSTEN Angebot deterministisch eine legale Orbitklingen-Karte (kein Extra-RNG, kein 4. Platz, kein EVO-Bypass; bogen 0 oder 5 → unverändert), Fluxreserve = exakt +1 Start-Reroll (mit 2 vorbereiteten stapelbar → max 4), Scanner = 5 s Laden + Fund bevorzugt unbesessene Teile, sonst Duplikat-/Staubpfad. Ohne Wahl: Baseline bitidentisch | Neue Verträge `stationCoreFlow` (Sanitizing, Kosten, Sperren, drei Wirkungen inkl. Grenzfälle) und `baselineIsolated` (18/18 Fingerprints bitidentisch zu `d78fdbe`) |
+| C – Stationsring | erfüllt | `.holdscene`: Sterne, Planet, zwei gebrochene Ringsegmente, Leitungen; zentraler Kern-Knopf mit Orb, drei Stufenlichtern, Ausbau-Aktion; sechs Hotspots mit Zustandslampen (offline/produziert/bereit). Genau ein Detailpanel via `data-panel`; ein zweiter Tap lässt es offen. Alle bisherigen IDs/Aktionen liegen in ihren Hotspots; die doppelte permanente Sternenkarten-/Startwand ist entfernt | Neuer Vertrag `stationDomContract` (eindeutige IDs, Panel-Mapping, Aktionen, genau ein offenes Panel, keine Doppelwand, Lampen, Kernstufe); `holdFlow/holdExpansion/equipmentFlow/presentationLayer` weiter grün |
+| D – Sektorziel | erfüllt | Nur 8 Minuten: Spawn t=150 an Hash-Position 220–300 WE (eigener visualHash aus Seed+Konstanten — null Gameplay-RNG), Fenster bis 240 (< AEGIS), kumulativ 8 s in r=110 (Scanner 5 s), Verlassen pausiert ohne Reset. Erfolg = Stationsdatei 1, echter NEXUS-Kill = Datei 2; beide getrennt vom unveränderten Bergungswert und exakt einmal in `depositRunReward()` hinter dem bestehenden `rewardGranted`-Guard | Neuer Vertrag `sectorObjectiveFlow`: 17 Teilprüfungen inkl. Determinismus zweier Läufe, Kumulativ/Pause, Terminalität von „verpasst“, Doppelgutschrift-Schutz, Tod-im-Finale-Pfad |
+| E – Kern & Protokolle | erfüllt | Save v4→v5 verlustfrei; stationData 0–999, coreStage 0–3, sortieProtocol-Whitelist mit Klemmung/Bereinigung. Kernkosten [1♦+5 Erz / 2♦+1 Platte / 3♦+2 Platten], sequenziell. Klingenfokus injiziert bis zur ersten tatsächlichen Kartenwahl deterministisch eine legale Orbitklingen-Karte und überlebt Rerolls (kein Extra-RNG, kein 4. Platz, kein EVO-Bypass; bogen 0 oder 5 → unverändert), Fluxreserve = exakt +1 Start-Reroll (mit 2 vorbereiteten stapelbar → max 4), Scanner = 5 s Laden + Fund bevorzugt unbesessene Teile, sonst Duplikat-/Staubpfad. Ohne Wahl: Baseline bitidentisch | Neue Verträge `stationCoreFlow` (Sanitizing, Kosten, Sperren, drei Wirkungen inkl. Grenzfälle) und `baselineIsolated` (18/18 Fingerprints bitidentisch zu `d78fdbe`) |
 
 ## Subagenten (drei eingesetzt; jeder Befund von mir geprüft)
 
@@ -59,7 +59,7 @@ Fingerprints), bei **58/58** grünen Checks.
    Signal-Doppelzählung, Protokoll-Grenzen, DOM-Doppel-IDs, Canvas-Kosten.
    Übernommene Fixes: Meta-Voll-Restore in `stationCoreFlow`,
    Shim-`classList.remove(...)`+`className`, CSS-Typo `data-panel="arcanum"`,
-   Button-Namen für `btnStart2/32`, `#signalhud`-Abstand. Der BLOCKER-Fund
+   zwischenzeitliche Button-Namen und `#signalhud`-Abstand. Der BLOCKER-Fund
    (HEAD rot wegen fehlender Exports) betraf den Zwischenstand und ist durch
    Commit `0c289b8` behoben. Akzeptierte OK-Hinweise: Reroll bezieht sich auf
    das erste ANGEBOT (Design gemäß Auftragstext), setLineDash-Mikroallokation
@@ -92,9 +92,9 @@ Sanitizing: `stationData:"12.7"`→12, `coreStage:9`→3, gesperrtes Protokoll�
 
 Spawn (updateEvents, Seed-Hash) → Ladefortschritt ausschließlich in step() bei
 phase 'run' im Radius → securedData++ genau beim Erreichen von signalBedarf()
-bzw. im NEXUS-Tod-Ast von killEnemy() → baseReward identisch in showExtract
-und endRun-Fallback (+60 je Datei) → depositRunReward() bucht
-META.stationData += securedData genau einmal hinter rewardGranted. Suite:
+bzw. im NEXUS-Tod-Ast von killEnemy() → der normale baseReward bleibt
+unverändert → depositRunReward() bucht META.stationData += securedData genau
+einmal hinter rewardGranted. Suite:
 Doppelaufruf unverändert, Tod nach NEXUS-Kill behält beide Dateien, Abbruch
 vor Erfolg sichert nichts.
 
@@ -106,8 +106,9 @@ vor Erfolg sichert nichts.
   Beweis damit: Signal-Hash, Kulisse und Stationsfelder verbrauchen keinen
   Gameplay-RNG und ändern die Simulation nicht.
 - Protokolle getrennt gemessen (stationCoreFlow): Injektion legal
-  (bogen lv1 an Platz 1, ≤3 Karten), zweites Angebot unauffällig; bogen 5 +
-  Sehne 3 → unverändertes EVO-Angebot; Fluxreserve rerolls 1→2, mit zwei
+  (bogen lv1 an Platz 1, ≤3 Karten), Reroll bewahrt den Fokus und erst die
+  Auswahl verbraucht ihn; bogen 5 + Sehne 3 → unverändertes EVO-Angebot;
+  Fluxreserve rerolls 1→2, mit zwei
   vorbereiteten → 4; Scanner lädt nach exakt ~5 s (gemessen 5,02 s Rest im
   Kumulativtest), Fund bevorzugt neu („Deflektormantel“ im Probe-Lauf),
   Vollbesitz → duplicate:true.
@@ -139,9 +140,8 @@ Besitzerlauf.
 
 ## Risiken, Abweichungen, offene Punkte
 
-1. **Klingenfokus = erstes Angebot:** Wer den ersten Zug sofort rerollt,
-   verliert die Garantie (Auftragstext „erster legaler Kartenzug“; bewusst so
-   implementiert und im Code kommentiert).
+1. **Klingenfokus-Randfall behoben:** Rerolls bewahren die Garantie bis zur
+   ersten tatsächlichen Kartenwahl; `stationCoreFlow` sichert dieses Verhalten.
 2. **Signal-Randszenarien:** Solange Bewegung ungebunden ist, ist jede
    Hash-Position erreichbar; kämen später Arena-Grenzen hinzu, müsste der
    Spawn-Hash das berücksichtigen (Hinweis aus dem Diff-Review).
@@ -182,9 +182,44 @@ Lokale Commits: a261165 → a2b37f7 → 0c289b8 → docs(d042). Nicht gepusht.
 **Abnehmen** mit drei Hinweisen:
 1. Sichtbare Abnahme (Posen, Hintergrund, Station bei beiden Größen,
    Signal-Marker, FPS gegen 56/58/0,0 %) bleibt dem Besitzerlauf vorbehalten.
-2. „Erster Kartenzug“ ist als erstes ANGEBOT umgesetzt (Reroll verbraucht die
-   Garantie); falls das anders gemeint war, ist es ein Einzeiler.
+2. Der ursprünglich gemeldete Reroll-Randfall ist durch Codex behoben und
+   automatisiert abgesichert.
 3. baselineIsolated friert die d78fdbe-Simulationsfingerprints ein — künftige
    Balanceaufträge müssen diesen Vertrag bewusst neu referenzieren, nicht
    lockern.
 
+## Codex-Abnahme (maßgeblich, 25.08.2026)
+
+**Status:** technisch abgenommen; sichtbare Besitzerabnahme offen.
+
+Codex hat die vier OpenCode-Commits unabhängig gegen
+`docs/CURRENT_TASK.md` geprüft und drei Abweichungen vor der Freigabe
+korrigiert:
+
+1. Klingenfokus wurde vom ersten erzeugten Angebot an den ersten tatsächlich
+   abgeschlossenen Kartenzug gebunden. Ein oder mehrere Rerolls behalten die
+   legale Orbitklingen-Karte; erst eine Kartenwahl verbraucht die Garantie.
+2. Ein zweiter Tap auf denselben Stations-Hotspot schließt das einzige
+   Detailpanel nicht mehr. Die zusätzlich unter dem Stationsring stehen
+   gebliebene permanente Sternenkarten-/Startwand wurde entfernt; Sektorwahl,
+   Protokoll, 3-/8-Minuten-Start und letzter Bericht liegen vollständig im
+   Sternenkarten-Hotspot.
+3. Der unbeauftragte Bonus von 60 Bergungswert je Stationsdatei wurde entfernt.
+   Stationsdaten bleiben eine getrennte, todsichere Basisbergung und werden
+   weiterhin exakt einmal in `depositRunReward()` gutgeschrieben, ohne die
+   bestehende Bergungswert-/Asteritkurve zu verändern.
+
+Die Regressionen sichern jetzt zusätzlich
+`rerollBewahrtFokus`, `bleibtOffen` und
+`keineDoppelteKartenwand`. Abschließende unabhängige Prüfung:
+
+- `npm test`: **58/58 grün**, Exitcode 0
+- Botanker: **19,78 ±3**
+- Baseline-Isolation: **18/18 bitidentisch**
+- `git diff --check`: sauber
+
+Die sichtbare Browserprüfung war nicht möglich, weil die Browsersteuerung in
+der Codex-Umgebung am Windows-Sandboxfehler abbrach. Deshalb werden Avatar,
+Hintergrund, Stationslayout, Signalmarker und echte FPS nicht behauptet,
+sondern im nächsten Besitzerlauf nach `docs/TESTPLAN.md` geprüft. Die
+vorstehende OpenCode-Empfehlung zum Reroll ist durch diese Abnahme überholt.

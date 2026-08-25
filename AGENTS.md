@@ -41,24 +41,27 @@ und Testplan und entscheidet über den Push.
 
 ## Verbindliche aktuelle Grafikrichtung
 
-- Sichtbarer Produktname und Art Direction sind seit D-037/D-041
+- Sichtbarer Produktname und Art Direction sind seit D-037/D-042
   **Orbitblade**. Repository, Pages-URL, Save-Key und interne IDs bleiben
   vorerst Emberhold.
 - Referenz bleibt docs/concepts/orbitblade-combat-ui-direction-v2.png:
   taktisches flaches 2D-Sci-Fantasy in Navy, Violett, Cyan und Weißgold.
-- Der feinere, dunklere Deckboden aus Commit 9190de9 ist die D-041-Referenz,
-  läuft aber mit der nahtlosen D-040-Technik bis an alle Bildschirmränder.
-  Keine Safe-Area-Balken, harten Trennlinien oder Randabdunklung.
-- Der Orbitträger nutzt SPR.orbiter mit 6 Idle-, 8 Bewegungs- und 8
-  Wurfphasen; aufrecht, nur horizontal gespiegelt, nie frei rotiert.
+- D-042 ersetzt die D-041-Kastenfläche durch eine vorgerenderte kosmische
+  Kulisse mit Navy-Grund, Nebel, Parallax-Sternen und großen Ringstrukturen.
+  Keine permanente Kachelwand, Safe-Area-Balken, harten Trennlinien oder
+  Randabdunklung wieder einführen.
+- Der Orbitträger nutzt SPR.orbiter als weiß-goldenen Lichthüter mit 6 Idle-,
+  8 Bewegungs- und 8 Wurfphasen; aufrecht, nur horizontal gespiegelt, nie frei
+  rotiert.
 - Alle fünf Familien behalten sechs asynchrone Phasen, müssen sich nach D-041
   aber klar durch Außenkontur, Proportion und Größe unterscheiden. Farbe allein
   reicht nicht. Elite, AEGIS und der neue NEXUS bleiben sofort eigenständig.
 - Gegner bleiben vollständige Figuren mit klaren Leuchtkernen. Keine
   Kreisplatzhalter, Schattenfiguren oder synchronen Pulkphasen.
 - Kampf-UI: Gesundheit/Erfahrung, Uhr, Pause, dynamische Bossleiste, höchstens
-  sechs Waffenpiktogramme und genau ein kompakter Hinweis „Nächste EVO“.
-  Sektorname nur als Start-Toast, in Pause und Bericht.
+  sechs Waffenpiktogramme und genau ein kompakter Hinweis „Nächste EVO“ links.
+  Das zeitlich begrenzte Signal darf darunter kompakt erscheinen. Sektorname
+  nur als Start-Toast, in Pause und Bericht.
 - Weltbewegung läuft am Browser-Frame; Posen wechseln ungefähr mit 10–12 FPS
   ohne Crossfade. Keine Gradienten, `shadowBlur` oder Objektallokationen pro
   Einheit und Frame.
@@ -71,16 +74,16 @@ und Testplan und entscheidet über den Push.
 Dieser Abschnitt ist kein Arbeitsauftrag. Priorität und Scope stehen nur in
 `docs/CURRENT_TASK.md`.
 
-**Stand 25.08.2026, nach technischer D-041-Abnahme.** OpenCode hat
-EH-2026-08-25-03 umgesetzt; Codex hat den Diff unabhängig geprüft und
-Rückzug, Trefferinteraktionen, Gesamtdauer sowie Restgefahren nach NEXUS
-korrigiert. AEGIS hat Ziel 50, NEXUS Ziel 30 und sperrt bis zu seinem Tod die
-Extraktion. Waffenwerte blieben unverändert.
+**Stand 25.08.2026, nach technischer D-042-Abnahme.** OpenCode hat
+EH-2026-08-25-04 umgesetzt; Codex hat Diff, Save v5, Signal, Protokolle,
+Renderkosten und Baseline unabhängig geprüft und drei Vertragsabweichungen
+korrigiert. Die Suite steht bei 58/58 Checks, der Botanker bei 19,78 ±3 und
+18 Baseline-Fingerprints sind bitidentisch.
 
-Offen ist der Besitzerlauf bis NEXUS für Hintergrund, Familienlesbarkeit,
-EVO-Hinweis, Bossgefühl und echte FPS. Erst danach folgt der separate
-Waffenrollenpass. Technische Baseline: 53/53 Checks; letzter Feldlauf
-19.176 Kills, 27 Kartenzüge, zwei Evolutionen, FPS 44/54.
+Offen ist ausschließlich der Besitzerlauf für Lichthüter, kosmische Kulisse,
+Stationsring, Signal→NEXUS→Kern-Ablauf und echte FPS auf Desktop/Handy. Bis
+zu diesem Lauf keine weitere Balance oder Darstellung stapeln; danach folgt
+der getrennte Waffenrollenpass.
 
 ### Drei Dinge, die eine neue Sitzung wissen muss
 
@@ -89,15 +92,16 @@ Waffenrollenpass. Technische Baseline: 53/53 Checks; letzter Feldlauf
 „zurück auf 21 repariert“, macht den Vertrag kaputt. Der Besitzerlauf nach
 D-036 soll 28–34 Kartenzüge erreichen.
 
-**2. D-041 wartet auf die sichtbare Besitzerabnahme.** Keine weitere Balance
-oder Darstellung stapeln. Erst der Besitzerlauf bis NEXUS trennt Finale und
-Waffenwirkung sauber; danach folgt der Waffenpass. Station, Audio und
-Monetarisierung bleiben eigene Gates.
+**2. D-042 wartet auf die sichtbare Besitzerabnahme.** Keine weitere Balance
+oder Darstellung stapeln. Der nächste Lauf prüft Signal, NEXUS, Stationskern,
+Lichthüter, Hintergrund und echte FPS als einen zusammenhängenden Ablauf.
+Erst danach folgt der Waffenpass; Audio und Monetarisierung bleiben eigene Gates.
 
 **3. Sichtbare Namen sind eine Präsentationsschicht.** `LEX` darf Bezeichnungen
 ändern; IDs wie `bogen`, `glutsehne`, `ring` und der Save-Key
-`emberhold:hold:v1` bleiben für Spielstände und Tests erhalten. Alte Begriffe
-in Migrationen sind deshalb kein sichtbarer Rückfall.
+`emberhold:hold:v1` bleiben für Spielstände und Tests erhalten. Save v5
+ergänzt `stationData`, `coreStage` und `sortieProtocol` additiv; alte
+Begriffe in Migrationen sind deshalb kein sichtbarer Rückfall.
 
 ### Was weiterhin unverhandelbar ist
 

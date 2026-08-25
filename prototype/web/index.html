@@ -387,12 +387,7 @@ button.b.danger{background:#c9402e;color:#fff}
 .lockedslots{display:grid;grid-template-columns:1fr 1fr;gap:7px}
 .lockedslot{display:grid;place-items:center;background:rgba(13,13,19,.82);border:1px dashed #30303b;
   border-radius:9px;color:#5d5a53;font-size:10px;text-align:center;padding:9px}
-.holdsortie{order:4;margin-top:14px}.holdsortie .btnrow{margin-top:0}
 .holdnote{color:#5f5b53;font-size:10px;margin-top:7px}
-.contractboard{width:min(920px,100%);margin:0 auto 12px;text-align:left}
-.contractboard>div:first-child{display:flex;justify-content:space-between;align-items:baseline;
-  gap:10px;margin-bottom:7px}.contractboard h2{font-size:13px;color:#d8d3c9}
-.contractboard>div:first-child span{font-size:9px;color:#6f6a61;letter-spacing:.12em;text-transform:uppercase}
 .contractgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .contractcard{pointer-events:auto;border:1px solid #31313d;background:rgba(18,18,26,.94);
   color:#a8a396;border-radius:10px;padding:10px 11px;text-align:left;cursor:pointer;font:inherit;
@@ -739,28 +734,17 @@ button.b.danger{background:#c9402e;color:#fff}
       <section class="dpanel" id="panel-map" data-panel="map">
         <section class="armorybox mapbox">
           <div class="masteryhead"><b>Sternenkarte</b><span>Sektor, Protokoll und Start</span></div>
-          <div class="contractgrid inlinegrid" id="contractgrid2"></div>
+          <div class="contractgrid inlinegrid" id="contractgrid"></div>
           <div class="protocolrow">
             <b>Sortie-Protokoll</b>
             <div class="protocolchips" id="protocolchips"></div>
             <p class="panelnote" id="protocolnote">Kein Protokoll gewählt: Die Sortie läuft unverändert.</p>
           </div>
-          <div class="btnrow"><button class="b" id="btnStart2">Sortie · 8 Min</button><button class="b ghost" id="btnStart32">Aufklärung · 3 Min</button></div>
+          <div class="btnrow"><button class="b" id="btnStart">Sortie · 8 Min</button><button class="b ghost" id="btnStart3">Aufklärung · 3 Min</button></div>
+          <button class="copyline lastreport" id="btnCopyLast" hidden aria-hidden="true">Letzten Run-Bericht kopieren</button>
+          <p class="holdnote">Lokaler Prototyp · Offline-Produktion bis maximal 24 Stunden · Ton und weitere Sektoren folgen später</p>
         </section>
       </section>
-    </div>
-    <div class="holdsortie">
-      <div class="contractboard">
-        <div><h2>Sternenkarte &amp; Start</h2><span>Sektor, Protokoll und Sortiestart</span></div>
-        <div class="protocolrow">
-          <b>Protokoll:</b> <span id="protocolshort">kein Protokoll</span>
-          <button class="smallaction" id="btnOpenMap">Wählen …</button>
-        </div>
-        <div class="contractgrid" id="contractgrid"></div>
-        <div class="btnrow"><button class="b" id="btnStart">Sortie · 8 Min</button><button class="b ghost" id="btnStart3">Aufklärung · 3 Min</button></div>
-        <button class="copyline lastreport" id="btnCopyLast" hidden aria-hidden="true">Letzten Run-Bericht kopieren</button>
-        <p class="holdnote">Lokaler Prototyp · Offline-Produktion bis maximal 24 Stunden · Ton und weitere Sektoren folgen später</p>
-      </div>
     </div>
   </div>
 
@@ -2272,13 +2256,12 @@ const NEXUS_HP_MULT=660;
 // (eigener Hash aus Seed und Konstanten -- verbraucht KEINEN Gameplay-RNG),
 // Ladefenster bis 4:00 (vor AEGIS), kumulativ 8 s im Radius (Scanner: 5 s).
 // Erfolg sichert eine Stationsdatei, ein echter NEXUS-Kill die zweite; beide
-// gehoeren zur Basisbergung und werden exakt einmal in depositRunReward()
-// gutgeschrieben.
+// sind todsichere Basisbergung und werden exakt einmal in depositRunReward()
+// als Stationsdaten gutgeschrieben, ohne die bestehende Asteritkurve zu aendern.
 const SIGNAL = Object.freeze({
   SPAWN_AT:150, END_AT:240, RADIUS:110,
   CHARGE_S:8, CHARGE_S_SCANNER:5,
   DIST_MIN:220, DIST_MAX:300,
-  FILE_LOOT:60,
 });
 function signalBedarf(){ return (S&&S.protocol==='bergungsscanner')
   ? SIGNAL.CHARGE_S_SCANNER : SIGNAL.CHARGE_S; }
@@ -3034,11 +3017,10 @@ function buildOffer(){
   const pool = [];
   const nW = Object.keys(S.W).length, nP = Object.keys(S.Pa).length;
   // D-042 / Gate E: Klingenfokus gilt fuer den ERSTEN Kartenzug der Sortie.
-  // Der Flag wird beim ersten Angebot gesetzt -- auch wenn dort keine legale
-  // Orbitklingen-Aufwertung existiert; dann bleibt dieses und jedes weitere
-  // Angebot unveraendert (keine Nachruestung, kein Bypass).
+  // Ein Reroll ist noch kein abgeschlossener Kartenzug; die Garantie bleibt
+  // deshalb bis zur tatsaechlichen Auswahl aktiv. Ist keine legale
+  // Orbitklingen-Aufwertung vorhanden, bleibt jedes Angebot unveraendert.
   const kfErsterZug = S.protocol==='klingenfokus' && !S.kfUsed;
-  S.kfUsed = true;
   // Evolution hat Vorrang und wird garantiert angeboten
   for (const w of WEAPONS){
     if (!w.evo) continue;
@@ -3187,6 +3169,9 @@ function applyBoon(boon){
 }
 function applyOffer(o){
   if (!o) return;
+  // Der erste normale Kartenzug ist erst mit der Auswahl verbraucht. Elite-
+  // Module sind ein eigener Belohnungstyp und beruehren Klingenfokus nicht.
+  if(o.type!=='boon' && S.protocol==='klingenfokus') S.kfUsed=true;
   if(o.type==='gearcard'){
     S.gearCardTaken=true; S.gearCardActive=true;
     if(!HEADLESS) toast(o.card.name+' entfacht');
@@ -4443,21 +4428,21 @@ function renderContracts(){
     `<em>${c.tag}</em><span>${c.desc}</span><small>Erz ×${c.reward.toFixed(2)}</small></button>`
   ).join('');
   el('contractgrid').innerHTML=karte;
-  const g2=el('contractgrid2'); if(g2) g2.innerHTML=karte;
   document.querySelectorAll('[data-contract]').forEach(btn=>{
     btn.onclick=()=>selectContract(btn.dataset.contract);
   });
   el('btnStart').textContent=selected.name+' · 8 Min';
   el('btnStart3').textContent=selected.name+' · 3 Min';
-  el('btnStart2').textContent=selected.name+' · 8 Min';
-  el('btnStart32').textContent=selected.name+' · 3 Min';
 }
 // ===========================================================================
 //  D-042 / Gate C: Stationsring — Hotspots, genau ein Detailpanel, Kern
 // ===========================================================================
 let openPanelId=null;
 function openPanel(modul){
-  openPanelId=(openPanelId===modul)?null:modul;
+  // Die Stationskarte haelt immer genau ein Detail offen, sobald ein Hotspot
+  // gewaehlt wurde. Ein zweiter Tap auf denselben Hotspot darf die einzige
+  // erreichbare Aktionsflaeche nicht wieder verstecken.
+  openPanelId=modul;
   const start=el('start');
   if(openPanelId) start.setAttribute('data-panel',openPanelId);
   else start.removeAttribute('data-panel');
@@ -4555,8 +4540,6 @@ function renderStationMap(){
       (b.dataset.proto==='none'?'kein Protokoll':STATION.PROTOCOLS.find(p=>p.id===b.dataset.proto).name)); };
   });
   el('protocolnote').textContent=beschreibung[aktiv]||beschreibung.none;
-  const pname=aktiv==='none'?'kein Protokoll':STATION.PROTOCOLS.find(p=>p.id===aktiv).name;
-  el('protocolshort').textContent=pname;
 }
 function renderHold(message){
   if(message){ holdNotice=message; holdNoticeUntil=Date.now()+3200; }
@@ -5068,9 +5051,9 @@ function togglePause(){
   }
 }
 function showExtract(){
-  // D-042 / Gate D: gesicherte Stationsdateien zaehlen zur Basisbergung.
-  S.baseReward = Math.round(S.kills*1.0 + S.gemsTaken*0.6) +
-    S.securedData*SIGNAL.FILE_LOOT;
+  // Stationsdaten sind eine getrennte, todsichere Basisbergung. Der bestehende
+  // Bergungswert und damit die Asteritkurve bleiben unveraendert.
+  S.baseReward = Math.round(S.kills*1.0 + S.gemsTaken*0.6);
   el('extractkick').textContent=fmtTime(S.runLen)+' · Extraktionsfenster offen';
   el('exstats').innerHTML =
     statTile(S.kills.toLocaleString('de-DE'),'Kills') +
@@ -5089,10 +5072,10 @@ function endRun(survived){
   if (S.phase==='over') return;
   S.phase='over';
   const otMul = S.otActive ? Math.pow(CFG.OT_REWARD, S.ot/60) : 1;
-  // D-042 / Gate D: dieselbe Formel wie showExtract -- die gesicherten
-  // Stationsdateien bleiben auch beim Tod im Finale oder in Overtime erhalten.
+  // Dieselbe unveraenderte Bergungsformel wie showExtract. Stationsdaten
+  // bleiben separat auch beim Tod im Finale oder in Overtime erhalten.
   const base = S.baseReward ||
-    Math.round(S.kills*1.0 + S.gemsTaken*0.6) + S.securedData*SIGNAL.FILE_LOOT;
+    Math.round(S.kills*1.0 + S.gemsTaken*0.6);
   const bonus = survived ? Math.round(base*(otMul-1)) : 0;
   S.baseReward = base;
   S.reward = base + bonus;
@@ -5319,7 +5302,7 @@ function showStartMenu(){
   holdOpen=true;
   const gained=S.holdOre?('Bergung eingelagert: +'+S.holdOre+' '+LEX.res.ore+'.'):'';
   advanceHold(Date.now()); saveHold(); renderHold(gained);
-  setSheet('start',true,'btnStart');
+  setSheet('start',true,'hsMap');
 }
 
 // --------------------------------------------------------------- Pacing-Bericht
@@ -5558,10 +5541,7 @@ el('btnMasteryDash').onclick = ()=>trainMastery('dash');
 for(const id of ['hsCore','hsMine','hsForge','hsArcanum','hsYard','hsArmory','hsMap']){
   el(id).onclick=()=>openPanel(el(id).dataset.modul);
 }
-el('btnOpenMap').onclick=()=>openPanel('map');
 el('btnCoreUpgrade').onclick=upgradeCore;
-el('btnStart2').onclick  = ()=>begin(480);
-el('btnStart32').onclick = ()=>begin(RUN_MIN_S);
 
 
 // ===========================================================================

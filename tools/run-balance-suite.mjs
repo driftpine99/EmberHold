@@ -2391,7 +2391,7 @@ try {
   const zweiteDatei = engine.S.securedData === 2;
   engine.showExtract();
   const basisFormel = Math.abs(engine.S.baseReward -
-    Math.round(engine.S.kills*1.0 + engine.S.gemsTaken*0.6) - 2*60) < 1e-6;
+    Math.round(engine.S.kills*1.0 + engine.S.gemsTaken*0.6)) < 1e-6;
   engine.depositRunReward();
   const gutschriftEinmal = engine.H.stationData === 2;
   engine.depositRunReward();
@@ -2499,6 +2499,9 @@ try {
   const angebot1 = engine.buildOffer();
   const injektionLegal = !!angebot1[0] && angebot1[0].type === "w" &&
     angebot1[0].w.id === "bogen" && angebot1[0].lv === 1 && angebot1.length <= 3;
+  const rerollErste = engine.buildOffer()[0];
+  const rerollBewahrtFokus = rerollErste.type === "w" && rerollErste.w.id === "bogen";
+  engine.applyOffer(rerollErste);
   const zweitesErste = engine.buildOffer()[0];
   const nurErsterZug = !(zweitesErste.type === "w" && zweitesErste.w.id === "bogen");
   engine.newRun(480, 20260827, "ring", { protocol: "klingenfokus" });
@@ -2538,12 +2541,12 @@ try {
 
   stationCoreFlow = sanitiert && gesperrtBereinigt && kauf1 && kauf2 && kauf3 &&
     kostenStimmen && alleFreigeschaltet && sperreLaufend && wahlNone &&
-    unbekanntAbgelehnt && injektionLegal && nurErsterZug && keinEvoBypass &&
+    unbekanntAbgelehnt && injektionLegal && rerollBewahrtFokus && nurErsterZug && keinEvoBypass &&
     fluxreservePlusEins && stapelGesamt && scannerLaedtFuenf &&
     bevorzugtUnbesessen && vollbesitzDuplikatPfad;
   stationCoreDiagnostics = { sanitiert, gesperrtBereinigt, kostenStimmen,
     alleFreigeschaltet, sperreLaufend, wahlNone, unbekanntAbgelehnt,
-    injektionLegal, nurErsterZug, keinEvoBypass, fluxreservePlusEins,
+    injektionLegal, rerollBewahrtFokus, nurErsterZug, keinEvoBypass, fluxreservePlusEins,
     stapelGesamt, scannerLaedtFuenf, bevorzugtUnbesessen, vollbesitzDuplikatPfad,
     fund: fundNeu ? fundNeu.name : null };
   const snap = JSON.parse(metaSnapshot);
@@ -2568,6 +2571,9 @@ try {
     "btnPrepareReroll","btnMasteryPath","btnMasteryReach","btnMasteryDash",
     "btnStart","btnStart3","btnCopyLast","btnCoreUpgrade","contractgrid"]
     .every(id => html.includes('id="'+id+'"'));
+  const keineDoppelteKartenwand = !html.includes('id="contractgrid2"') &&
+    !html.includes('id="btnStart2"') && !html.includes('id="btnStart32"') &&
+    !html.includes('class="holdsortie"');
   engine.showStartMenu();
   const startEl = globalThis.document.getElementById("start");
   const panelAttr = () => startEl.getAttribute("data-panel") ?? null;
@@ -2577,7 +2583,7 @@ try {
   engine.openPanel("yard");
   const wechselt = panelAttr() === "yard";
   engine.openPanel("yard");
-  const toggleZu = panelAttr() === null;
+  const bleibtOffen = panelAttr() === "yard";
   const lampenKlassen = hotspots.every(id => {
     const n = globalThis.document.getElementById(id);
     return /st-(off|run|ready)/.test(n.className || "");
@@ -2585,11 +2591,11 @@ try {
   const kernStufen = /class="core st-\d"/.test(html);
   const protokollZeile = html.includes('id="protocolchips"') &&
     html.includes('id="protocolnote"');
-  stationDomContract = sechsHotspots && panelVorhanden && aktionen &&
-    zuBegin && offenMine && wechselt && toggleZu && lampenKlassen &&
+  stationDomContract = sechsHotspots && panelVorhanden && aktionen && keineDoppelteKartenwand &&
+    zuBegin && offenMine && wechselt && bleibtOffen && lampenKlassen &&
     kernStufen && protokollZeile;
-  stationDomDiagnostics = { sechsHotspots, panelVorhanden, aktionen,
-    zuBegin, offenMine, wechselt, toggleZu, lampenKlassen, kernStufen,
+  stationDomDiagnostics = { sechsHotspots, panelVorhanden, aktionen, keineDoppelteKartenwand,
+    zuBegin, offenMine, wechselt, bleibtOffen, lampenKlassen, kernStufen,
     protokollZeile };
 } catch (error) {
   stationDomError = error instanceof Error ? error.message : String(error);

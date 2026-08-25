@@ -3,7 +3,7 @@
 
 - **Task-ID:** EH-2026-08-25-04
 - **Thema:** Lichthüter-Grafik, Bergungssignal und Stationsring V1
-- **Status:** **FREIGEGEBEN_FUER_OPENCODE**
+- **Status:** **TECHNISCH_ABGENOMMEN_WARTET_BESITZERTEST**
 - **Auftraggeber:** Besitzer
 - **Projektleitung und Abnahme:** Codex
 - **Ausführung:** OpenCode; unabhängige Review und Nacharbeit durch Codex
@@ -13,6 +13,11 @@
   alle Gates in Reihenfolge bearbeiten und nicht nach einem kosmetischen
   Teilergebnis stoppen. Droht das externe Zeitlimit, den letzten grünen Stand
   sichern und den Rest ehrlich als teilweise melden.
+
+**Codex-Abnahme 25.08.2026:** 58/58 Checks grün, 18 Baseline-Fingerprints
+bitidentisch, `git diff --check` sauber. Die Review-Nacharbeit steht in
+`docs/WORK_REPORT.md`. Kein Agent darf ohne neuen freigegebenen Auftrag
+weitere Balance-, Grafik- oder Stationsänderungen stapeln.
 
 Bei Widersprüchen mit historischem Kontext in `AGENTS.md`, `CLAUDE.md` oder
 älteren Roadmap-Abschnitten gilt ausschließlich dieser Auftrag.
