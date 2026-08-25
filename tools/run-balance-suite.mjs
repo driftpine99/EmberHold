@@ -2159,16 +2159,20 @@ try {
   const nameEl = globalThis.document.getElementById("ehname");
   const progEl = globalThis.document.getElementById("ehprog");
 
-  // 1) Statisch: genau ein Element, Quelle fuehrender Pfad, Lage ueber der
-  //    Waffenleiste, unterhalb der Karten-/Dialogebene.
+  // 1) Statisch: genau ein Element, Quelle fuehrender Pfad, Lage LINKS im
+  //    Kampfrand unter Gesundheit/Erfahrung (D-042 Gate B), unterhalb der
+  //    Karten-/Dialogebene.
   const genauEinElement = (html.match(/id="evohint"/g) || []).length === 1 &&
     html.includes("function updateEvoHint()") &&
     html.includes("const lead=leadingEvoPath();");
-  const bottomBar = parseInt((html.match(/#weaponbar\{[^}]*bottom:(\d+)px/) || [])[1], 10);
-  const bottomHint = parseInt((html.match(/#evohint\{[^}]*bottom:(\d+)px/) || [])[1], 10);
+  const leftHint = parseInt((html.match(/#evohint\{[^}]*left:(\d+)px/) || [])[1], 10);
+  const topHint = parseInt((html.match(/#evohint\{[^}]*top:(\d+)px/) || [])[1], 10);
+  const evohintRegel = html.match(/#evohint\{[^}]*\}/) ? html.match(/#evohint\{[^}]*\}/)[0] : "";
   const zHint = parseInt((html.match(/#evohint\{[^}]*z-index:(\d+)/) || [])[1], 10);
   const zCards = parseInt((html.match(/#cards\{[^}]*z-index:(\d+)/) || [])[1], 10);
-  const lageKorrekt = bottomHint > bottomBar && zHint < zCards;
+  const lageKorrekt = leftHint <= 40 && topHint >= 40 &&
+    !evohintRegel.includes("translateX(-50%)") && !evohintRegel.includes("bottom:") &&
+    zHint < zCards;
 
   // 2) Verhalten: genau der fuehrende Pfad wird angezeigt, nicht der andere.
   engine.begin(480, "ring");
@@ -2198,7 +2202,7 @@ try {
   evolutionFocusHud = genauEinElement && lageKorrekt && anNachLead &&
     nameIstFuehrender && fortschrittDrin && wechseltSofort && verstecktOhnePfad;
   evoFocusDiagnostics = { genauEinElement, lageKorrekt,
-    bottomBar, bottomHint, zHint, zCards,
+    leftHint, topHint, zHint, zCards,
     fuehrend: leadA.w.id, name: nameEl.textContent,
     anNachLead, nameIstFuehrender, fortschrittDrin, wechseltSofort, verstecktOhnePfad };
 } catch (error) {

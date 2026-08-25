@@ -98,12 +98,11 @@ canvas{display:block;position:absolute;inset:0;width:100%;height:100%}
   font-variant-numeric:tabular-nums}
 .wslot.evo{border-color:#f0c45a;box-shadow:0 0 10px rgba(240,196,90,.28)}
 .wslot.evo .wlv{border-color:#f0c45a;color:#f0c45a}
-/* D-041 / Gate C: genau ein kompakter Hinweis „Nächste EVO“, oberhalb der
-   unteren Waffenleiste. Er schwebt mit klarer Luecke ueber den Symbolen,
-   bleibt zentriert schmal und wird zusammen mit der Leiste eingeblendet.
-   Karten und Dialoge liegen auf einem hoeheren z-index und verdecken ihn. */
-#evohint{position:absolute;left:50%;bottom:72px;transform:translateX(-50%);
-  display:flex;align-items:center;gap:8px;padding:4px 12px;border-radius:9px;
+/* D-042 / Gate B: genau ein kompakter Hinweis „Nächste EVO“, jetzt links
+   innerhalb des Kampfrands unter Gesundheit/Erfahrung. Er ist einspaltig,
+   stört nicht mehr unten mittig und bleibt unterhalb der Dialogebene. */
+#evohint{position:absolute;left:14px;top:64px;
+  display:flex;flex-direction:column;gap:2px;padding:5px 10px;border-radius:9px;
   background:rgba(13,18,30,.78);border:1px solid #2c3c58;
   font-size:10px;letter-spacing:.06em;color:#8fa0bd;white-space:nowrap;
   opacity:0;transition:opacity .18s ease;pointer-events:none;z-index:5}
@@ -873,7 +872,8 @@ function famSprite(fam, color, size, glow){
 const ENEMY_NORMAL_TIER=2, ENEMY_TELEGRAPH_TIER=3;
 const SPR = { enemy:[], elite:null, boss:null, gem:null, gemBig:null,
               arrow:[], orbBlade:[], orb:null, blade:null, frost:null, eproj:null,
-              floorTile:null, emberVent:null, wardPillar:null, starField:null,
+              floorTile:null, emberVent:null, wardPillar:null,
+              starTile:null, landmarks:null, planet:null,
               orbiter:null, drone:null, aegis:null, foe:null, eliteA:null, aegisA:null,
               nexusA:null };
 const ART = { hero:[], enemy:[], swarmer:[], elite:null, boss:null,
@@ -894,43 +894,139 @@ function visualHash(x,y,salt){
 
 /** Basalt, Glutofen und Pfeiler werden einmal gebaut und danach nur kopiert. */
 function buildArenaSprites(){
-  // D-041 / Gate A: Der Deckboden kehrt zur dunkleren, feineren Fassung aus
-  // Commit 9190de9 zurueck — blaugruefliche 80er-Paneele mit mehr ruhiger
-  // technischer Struktur. Die nahtlose D-040-Technik (Boden ueber die ganze
-  // Leinwand, Sektortoennung vor dem Clipping, keine Randbalken) bleibt
-  // unveraendert; hier steht nur die Kachel selbst.
-  const T=320, tile=mkCanvas(T), g=tile.getContext('2d');
-  g.fillStyle='#39435c'; g.fillRect(0,0,T,T);
-  const bw=80, bh=80;
-  for(let row=0;row<T/bh;row++){
-    for(let col=0;col<T/bw;col++){
-      const x=col*bw, y=row*bh, h=visualHash(col,row,11);
-      const shade=62+((h*14)|0);
-      g.fillStyle='rgb('+shade+','+(shade+9)+','+(shade+26)+')';
-      g.fillRect(x+2,y+2,bw-4,bh-4);
-      // Fugenlicht: schmale Cyan-Kante oben und links, dunkle Kante unten.
-      g.strokeStyle='rgba(127,212,232,'+(0.10+h*0.08).toFixed(3)+')';
-      g.lineWidth=1; g.beginPath();
-      g.moveTo(x+2,y+bh-3); g.lineTo(x+2,y+2); g.lineTo(x+bw-3,y+2); g.stroke();
-      g.strokeStyle='rgba(18,23,38,.45)'; g.beginPath();
-      g.moveTo(x+bw-2.5,y+2); g.lineTo(x+bw-2.5,y+bh-2.5); g.lineTo(x+2,y+bh-2.5); g.stroke();
-      // Kleine Wartungsmarkierung, fest pro Panel.
-      if(h>0.78){
-        g.fillStyle='rgba(240,196,90,.16)';
-        g.fillRect(x+bw*0.62,y+bh*0.20,bw*0.20,3);
-      }
-    }
+  // D-042 / Gate A: Der gleichfoermige 80er-Kastenboden weicht einer ruhigen
+  // Orbitalszene. Formensprache adaptiert aus der lokalen Referenz
+  // (drawStarLayers/drawNebulae/drawFadedGrid/drawLandmark): tiefe Navy-
+  // Flaeche mit weichen Nebelschleiern, wenigen Sternen, haarfeinen Fugen,
+  // grossen gebrochenen Ring- und Leitstrukturen -- alles EINMAL vorgerendert,
+  // pro Frame nur drawImage. Keine lückenlose Kistenwand, kein Randbalken,
+  // und die Flaeche bleibt mittelhell genug fuer dunkle Silhouetten.
+  const T=512, tile=mkCanvas(T), g=tile.getContext('2d');
+  g.fillStyle='#2c3653'; g.fillRect(0,0,T,T);
+  // Unregelmaessige, GROSSE Schattierungsflaechen statt gleichmaessiger Paneele.
+  for(let i=0;i<7;i++){
+    const hx=visualHash(i,1,31), hy=visualHash(i,2,32);
+    const w=T*(0.30+hx*0.45), h=T*(0.26+hy*0.42);
+    g.fillStyle=hx>0.5?'rgba(36,48,73,.55)':'rgba(51,64,95,.50)';
+    g.beginPath();
+    g.ellipse(hx*T,hy*T,w*0.5,h*0.5,(hx-0.5)*1.2,0,6.2832);
+    g.fill();
   }
-  // Feste Leitungsbahnen — einmal gebaut, nie pro Frame gerechnet.
-  for(let i=0;i<22;i++){
-    const x=visualHash(i,3,21)*T, y=visualHash(i,9,22)*T;
-    const len=20+visualHash(i,5,23)*40, a=(visualHash(i,7,24)*4|0)*1.5708;
-    g.strokeStyle=i%6===0?'rgba(185,143,224,.20)':'rgba(20,26,42,.34)';
-    g.lineWidth=i%6===0?1.4:1;
+  // Nebelschleier: drei weiche Farbfelder (einmalig gebacken).
+  const nebel=[[64,58,132,.11],[40,90,170,.08],[96,28,120,.06]];
+  for(let i=0;i<nebel.length;i++){
+    const cx=visualHash(i,3,33)*T, cy=visualHash(i,4,34)*T, R=T*(0.30+i*0.10);
+    const ng=g.createRadialGradient(cx,cy,R*0.1,cx,cy,R);
+    const n=nebel[i];
+    ng.addColorStop(0,'rgba('+n[0]+','+n[1]+','+n[2]+','+n[3]+')');
+    ng.addColorStop(1,'rgba('+n[0]+','+n[1]+','+n[2]+',0)');
+    g.fillStyle=ng; g.beginPath(); g.arc(cx,cy,R,0,6.2832); g.fill();
+  }
+  // Haarfeine Deckfugen: angedeutete Struktur ohne Kastenwand-Wirkung.
+  g.strokeStyle='rgba(127,212,232,.05)'; g.lineWidth=1;
+  for(let q=0;q<T;q+=128){
+    g.beginPath(); g.moveTo(q,0); g.lineTo(q,T); g.stroke();
+    g.beginPath(); g.moveTo(0,q); g.lineTo(T,q); g.stroke();
+  }
+  // Ein paar feste Leitungsbahnen mit Knotenpunkten.
+  for(let i=0;i<9;i++){
+    const x=visualHash(i,5,35)*T, y=visualHash(i,6,36)*T;
+    const len=60+visualHash(i,7,37)*130, a=(visualHash(i,8,38)*4|0)*1.5708;
+    g.strokeStyle=i%5===0?'rgba(185,143,224,.16)':'rgba(20,26,42,.22)';
+    g.lineWidth=i%5===0?1.4:1;
     g.beginPath(); g.moveTo(x,y);
     g.lineTo(x+Math.cos(a)*len,y+Math.sin(a)*len); g.stroke();
+    if(i%3===0){
+      g.fillStyle='rgba(127,212,232,.20)';
+      g.fillRect(x-2,y-2,4,4);
+    }
+  }
+  // Sparsame Mikrosterne direkt in der Basis (die groessere Sternebene
+  // liegt darueber mit leichter Parallaxe).
+  for(let i=0;i<26;i++){
+    const sx=visualHash(i,9,39)*T, sy=visualHash(i,10,40)*T;
+    const br=visualHash(i,11,41);
+    g.fillStyle='rgba(214,228,255,'+(0.16+br*0.30).toFixed(2)+')';
+    g.beginPath(); g.arc(sx,sy,br>0.8?1.1:0.7,0,6.2832); g.fill();
   }
   SPR.floorTile=tile;
+
+  // Eigene Sternebene fuer leichte Parallaxe (0.12): etwas groessere Sterne,
+  // deterministisch verteilt, nahtlos kachelbar.
+  const ST=256, skyT=mkCanvas(ST), sg2=skyT.getContext('2d');
+  for(let i=0;i<44;i++){
+    const sx=visualHash(i,12,42)*ST, sy=visualHash(i,13,43)*ST;
+    const b=visualHash(i,14,44), r=b>0.92?1.6:(b>0.66?1.1:0.75);
+    sg2.fillStyle=b>0.92?'rgba(240,243,255,.80)'
+              :(b>0.66?'rgba(184,220,255,.52)':'rgba(150,170,210,.30)');
+    sg2.beginPath(); sg2.arc(sx,sy,r,0,6.2832); sg2.fill();
+  }
+  SPR.starTile=skyT;
+
+  // Drei Landmark-Varianten fuer die grosse Weltraumstruktur (2000er-Zellen),
+  // je einmal gebacken: gebrochener Doppelring, Spiralgalaxie, Asteroiden.
+  const baueLandmark=(art)=>{
+    const L=680, cv=mkCanvas(L), lg=cv.getContext('2d'), c=L/2;
+    lg.lineCap='round';
+    if(art===0){                       // gebrochene Ring-/Leitstruktur
+      lg.strokeStyle='rgba(110,160,220,.17)'; lg.lineWidth=2.4;
+      lg.beginPath(); lg.ellipse(c,c,250,150,-0.5,0.35,2.4); lg.stroke();
+      lg.strokeStyle='rgba(110,200,255,.12)'; lg.lineWidth=1.6;
+      lg.beginPath(); lg.ellipse(c,c,190,105,0.4,3.6,5.9); lg.stroke();
+      lg.strokeStyle='rgba(217,180,90,.15)'; lg.lineWidth=2.0;
+      lg.beginPath(); lg.ellipse(c,c,305,205,-0.2,4.4,5.6); lg.stroke();
+      // Radiale Streben wie im Referenz-Raster.
+      lg.strokeStyle='rgba(96,166,236,.13)'; lg.lineWidth=1.4;
+      for(let k=0;k<3;k++){
+        const a=k*2.094+0.5;
+        lg.beginPath();
+        lg.moveTo(c+Math.cos(a)*120,c+Math.sin(a)*72);
+        lg.lineTo(c+Math.cos(a)*280,c+Math.sin(a)*168);
+        lg.stroke();
+      }
+    } else if(art===1){                // Spiralgalaxie
+      lg.strokeStyle='rgba(150,170,230,.15)'; lg.lineWidth=1.5;
+      for(const dreh of [0,3.1416]){
+        lg.beginPath();
+        for(let f2=0;f2<=1;f2+=0.025){
+          const a=dreh+f2*5.0, rr=14+f2*215;
+          const px=c+Math.cos(a)*rr, py=c+Math.sin(a)*rr*0.62;
+          f2?lg.lineTo(px,py):lg.moveTo(px,py);
+        }
+        lg.stroke();
+      }
+      lg.fillStyle='rgba(220,230,255,.20)';
+      lg.beginPath(); lg.arc(c,c,26,0,6.2832); lg.fill();
+    } else {                           // lockerer Asteroidenverband
+      lg.fillStyle='rgba(90,104,136,.30)';
+      lg.strokeStyle='rgba(150,170,210,.18)'; lg.lineWidth=1.4;
+      for(let k=0;k<5;k++){
+        const a=k*1.257+0.4, rr=90+k*46;
+        const px=c+Math.cos(a)*rr*1.25, py=c+Math.sin(a)*rr;
+        const R=13+k*4.5;
+        lg.beginPath();
+        lg.moveTo(px+R,py);
+        lg.quadraticCurveTo(px+R*0.4,py-R*0.9,px-R*0.8,py-R*0.3);
+        lg.quadraticCurveTo(px-R*1.05,py+R*0.35,px-R*0.2,py+R*0.85);
+        lg.quadraticCurveTo(px+R*0.5,py+R*1.0,px+R,py);
+        lg.fill(); lg.stroke();
+      }
+    }
+    return cv;
+  };
+  SPR.landmarks=[baueLandmark(0),baueLandmark(1),baueLandmark(2)];
+
+  // Seltener Ringplanet als tiefer Hintergrund-Anker.
+  const PL=460, pl=mkCanvas(PL), pg2=pl.getContext('2d'), pcc=PL/2;
+  const pgrad=pg2.createRadialGradient(pcc-40,pcc-46,18,pcc,pcc,150);
+  pgrad.addColorStop(0,'#4a6a9a'); pgrad.addColorStop(0.55,'#2c4266');
+  pgrad.addColorStop(1,'#16223c');
+  pg2.fillStyle=pgrad; pg2.beginPath(); pg2.arc(pcc,pcc,148,0,6.2832); pg2.fill();
+  pg2.strokeStyle='rgba(217,180,90,.30)'; pg2.lineWidth=7;
+  pg2.beginPath(); pg2.ellipse(pcc,pcc,236,74,-0.30,0.15,3.05); pg2.stroke();
+  pg2.strokeStyle='rgba(127,212,232,.22)'; pg2.lineWidth=3;
+  pg2.beginPath(); pg2.ellipse(pcc,pcc,252,84,-0.30,3.3,6.1); pg2.stroke();
+  SPR.planet=pl;
 
   const V=82, vent=mkCanvas(V), vg=vent.getContext('2d'), vc=V/2;
   vg.translate(vc,vc);
@@ -958,25 +1054,6 @@ function buildArenaSprites(){
   pg.strokeStyle='#7fd4e8'; pg.lineWidth=2; pg.strokeRect(-13,-13,26,26);
   pg.fillStyle='#b8f0ff'; pg.fillRect(-4,-4,8,8);
   SPR.wardPillar=pillar;
-
-  // Sternenfeld fuer die seitliche Weltfortsetzung. Einmal gebaut, danach nur
-  // gekachelt. Bewusst ruhig: kleine Sterne, ein schwacher Violettschleier,
-  // keine Bewegung, damit die Flaeche nicht vom Kampf ablenkt.
-  const SF=256, sky=mkCanvas(SF), sg=sky.getContext('2d');
-  sg.fillStyle='#141a2a'; sg.fillRect(0,0,SF,SF);
-  const neb=sg.createRadialGradient(SF*0.62,SF*0.34,4,SF*0.62,SF*0.34,SF*0.72);
-  neb.addColorStop(0,'rgba(120,80,180,.16)');
-  neb.addColorStop(.55,'rgba(70,60,140,.07)');
-  neb.addColorStop(1,'rgba(20,26,42,0)');
-  sg.fillStyle=neb; sg.fillRect(0,0,SF,SF);
-  for(let i=0;i<90;i++){
-    const x=visualHash(i,1,61)*SF, y=visualHash(i,2,62)*SF;
-    const b=visualHash(i,3,63), r=b>0.94?1.6:(b>0.72?1.1:0.7);
-    sg.fillStyle=b>0.94?'rgba(240,243,255,.85)'
-              :(b>0.72?'rgba(184,240,255,.55)':'rgba(150,170,210,.34)');
-    sg.beginPath(); sg.arc(x,y,r,0,6.2832); sg.fill();
-  }
-  SPR.starField=sky;
 }
 
 
@@ -990,83 +1067,136 @@ function buildArenaSprites(){
 const ORBITER_ANIM = Object.freeze({IDLE:6, WALK:8, THROW:8, FPS:12});
 const DRONE_ANIM   = Object.freeze({FRAMES:6, FPS:11});
 
-/** Eine aufrechte Figur: Kopf, Rumpf, zwei Arme, zwei Beine. Sie wird nie
- *  frei rotiert -- die Blickrichtung entsteht allein durch horizontales
- *  Spiegeln beim Zeichnen. */
+/** D-042 / Gate A: Der Orbitträger trägt jetzt die Lichthüter-Formensprache
+ *  aus der lokalen Referenz (zeichneLichthueterNeu, dort Zeilen 1442–1482):
+ *  geschlossener weiß-goldener Helm mit Goldraute, cyane V-Visier,
+ *  Goldhalo mit vier diagonalen Ticks, breite Schulterplatten, spitzer
+ *  Fünfeckspanzer und geteilter transluzenter Mantel. Die Puls-Werte der
+ *  Referenz sind bewusst EINGEFROREN (Halo-Alpha .82, kein Date.now) --
+ *  hier entsteht keine Zeitquelle und keine Allokation.
+ *  t laeuft von 0 bis 1 innerhalb der jeweiligen Phase. */
 function drawOrbiterPose(g, modus, t){
-  // t laeuft von 0 bis 1 innerhalb der jeweiligen Phase.
   const schwung = Math.sin(t*6.2832);
-  const gold='#f0c45a', weiss='#fff3d0', schatten='#b8935a', visier='#7fd4e8';
-  let beinA=0, beinB=0, armA=0, armB=0, neigung=0, huefte=0;
+  const weiss='#eef3f8', hell='#f6f8fb', grau='#c7d2df', gold='#d9b45a',
+        halo='rgba(229,185,91,.78)', visier='#7fd4e8',
+        mantel='rgba(92,190,255,.24)';
+  // Posen: nur Beinschritt, Mantelschwung, Arme und eine kleine Neigung.
+  // Der Ursprung bleibt stabil -- kein Wackeln, keine Rotation.
+  let schritt=0, mantelSway=0, beugung=0;
+  let armA=0, armB=0, neigung=0;
   if(modus==='walk'){
-    beinA= schwung*5.0; beinB=-schwung*5.0;
-    armA =-schwung*3.4; armB = schwung*3.4;
-    huefte= Math.abs(schwung)*0.9; neigung=0.05;
+    schritt = schwung*3.2;
+    mantelSway = schwung*2.6;
+    armA = -schwung*2.6; armB = schwung*2.6;
+    neigung = 0.04;
   } else if(modus==='throw'){
-    // Ausholen, Wurf, Nachschwung -- der Wurfarm fuehrt die Bewegung.
-    const w = t<0.45 ? -t/0.45 : (t-0.45)/0.55;
-    armA = w*9.5; armB = -w*2.2; neigung = w*0.09;
-    beinA = 1.6; beinB = -1.6;
+    const w = t<0.42 ? -t/0.42 : (t-0.42)/0.58;
+    armA = w*8.6; armB = -w*1.8;
+    neigung = w*0.085;
+    mantelSway = -w*3.2;
+    beugung = Math.abs(w)*1.1;
   } else {
-    const atem = Math.sin(t*6.2832)*0.7;
-    armA = atem*0.8; armB = -atem*0.8; huefte = atem*0.35;
+    const atem = Math.sin(t*6.2832);
+    armA = atem*0.7; armB = -atem*0.7;
+    mantelSway = atem*0.9;
   }
 
   g.save();
-  g.translate(0, huefte);
   g.rotate(neigung*0.12);
-  // Cyaner Energiekern hinter der Figur -- die Signatur des Orbittraegers.
-  g.fillStyle='rgba(127,212,232,.22)';
-  g.beginPath(); g.ellipse(0,-2,9.5,12,0,0,6.2832); g.fill();
+  g.translate(0, beugung);
 
-  // Beine
-  g.strokeStyle=schatten; g.lineWidth=4.6; g.lineCap='round';
-  g.beginPath(); g.moveTo(-2.2, 6); g.lineTo(-3.4+beinA, 15.5); g.stroke();
-  g.beginPath(); g.moveTo( 2.2, 6); g.lineTo( 3.4+beinB, 15.5); g.stroke();
-
-  // Rumpf: schmale Taille, breite Schultern
-  g.fillStyle=weiss;
+  // Geteilter Mantel: zwei Fluegel, die seitlich auffaechern (hinter allem).
+  for(const s of [-1,1]){
+    g.fillStyle=mantel;
+    g.beginPath();
+    g.moveTo(s*7,-5);
+    g.quadraticCurveTo(s*(16+mantelSway*0.25), 6, s*(13+mantelSway), 18);
+    g.lineTo(s*(4+mantelSway*0.35), 11);
+    g.lineTo(s*3,-3);
+    g.closePath(); g.fill();
+  }
+  // Beine: kurze abgerundete Segmente mit Gegenschwingung.
+  g.fillStyle=grau;
+  const beinW=5.4, beinH=10, rBein=2.4;
   g.beginPath();
-  g.moveTo(-5.4,-6); g.lineTo(5.4,-6); g.lineTo(3.4,7); g.lineTo(-3.4,7);
+  g.roundRect ? g.roundRect(-7+schritt*0.55,7,beinW,beinH,rBein)
+              : g.rect(-7+schritt*0.55,7,beinW,beinH);
+  g.roundRect ? g.roundRect(1.5-schritt*0.55,7,beinW,beinH,rBein)
+              : g.rect(1.5-schritt*0.55,7,beinW,beinH);
+  g.fill();
+
+  // Goldhalo hinter Rumpf und Kopf: Vollkreis plus vier diagonale Ticks.
+  g.strokeStyle=halo; g.lineWidth=1.8;
+  g.beginPath(); g.arc(0,-14,11.8,0,6.2832); g.stroke();
+  for(let k2=0;k2<4;k2++){
+    const a=0.7854+k2*1.5708;
+    g.beginPath();
+    g.moveTo(Math.cos(a)*10, -14+Math.sin(a)*10);
+    g.lineTo(Math.cos(a)*14, -14+Math.sin(a)*14);
+    g.stroke();
+  }
+
+  // Rumpf: spitz zulaufender Fuenfeckpanzer mit heller Flaeche.
+  g.fillStyle=weiss; g.strokeStyle=gold; g.lineWidth=1.15; g.lineJoin='round';
+  g.beginPath();
+  g.moveTo(-9,-8); g.lineTo(-11,1); g.lineTo(0,11); g.lineTo(11,1); g.lineTo(9,-8);
+  g.closePath(); g.fill(); g.stroke();
+  g.fillStyle=grau;
+  g.beginPath();
+  g.moveTo(-7,-6); g.lineTo(0,6); g.lineTo(7,-6); g.lineTo(0,-1);
   g.closePath(); g.fill();
+
+  // Glutkern: kleiner cyanner Leuchtpunkt der Brust.
+  g.fillStyle=visier;
+  g.beginPath(); g.arc(0,-1.5,2.5,0,6.2832); g.fill();
+
+  // Breite Schulterplatten: breiteste Silhouettenstelle bei x = +/-15.
+  for(const s of [-1,1]){
+    g.fillStyle=hell; g.strokeStyle=gold; g.lineWidth=1.15;
+    g.beginPath();
+    g.moveTo(s*7,-7); g.lineTo(s*15,-5); g.lineTo(s*12,1); g.lineTo(s*7,-1);
+    g.closePath(); g.fill(); g.stroke();
+    // Kurze Panzerfaust als Arm-Andeutung (Lesbarkeit bei Lauf/Wurf).
+    g.strokeStyle=grau; g.lineWidth=3.2; g.lineCap='round';
+    g.beginPath();
+    g.moveTo(s*11,0);
+    g.lineTo(s*(13+armA*s*0.35), 6+(s===1?armB:armA)*0.42);
+    g.stroke();
+  }
+
+  // Geschlossener Helm: Sechseck-Silhouette mit Goldkante.
+  g.fillStyle=weiss; g.strokeStyle=gold; g.lineWidth=1.15;
+  g.beginPath();
+  g.moveTo(0,-24); g.lineTo(7,-19); g.lineTo(6,-11); g.lineTo(0,-7);
+  g.lineTo(-6,-11); g.lineTo(-7,-19);
+  g.closePath(); g.fill(); g.stroke();
+
+  // Goldraute als Helmspitze: hoechster Punkt der Figur.
   g.fillStyle=gold;
   g.beginPath();
-  g.moveTo(-6.6,-7.2); g.lineTo(6.6,-7.2); g.lineTo(5.0,-2.4); g.lineTo(-5.0,-2.4);
+  g.moveTo(0,-26); g.lineTo(2,-21); g.lineTo(0,-18); g.lineTo(-2,-21);
   g.closePath(); g.fill();
 
-  // Arme
-  g.strokeStyle=weiss; g.lineWidth=3.6;
-  g.beginPath(); g.moveTo(-5.6,-5); g.lineTo(-8.2+armA*0.6, 3.2+armA*0.5); g.stroke();
-  g.beginPath(); g.moveTo( 5.6,-5); g.lineTo( 8.2+armB*0.6, 3.2+armB*0.5); g.stroke();
-
-  // Kopf mit Cyan-Visier
-  g.fillStyle=weiss;
-  g.beginPath(); g.arc(0,-11.6,4.5,0,6.2832); g.fill();
-  g.fillStyle=gold;
-  g.beginPath(); g.arc(0,-13.0,4.5,3.34,6.08); g.fill();
+  // Cyane V-Visier-Bahn.
   g.fillStyle=visier;
-  g.fillRect(-2.6,-12.2,5.2,1.9);
-  // Schulterfinnen: die weissgoldene Silhouette bleibt auch klein lesbar.
-  g.fillStyle=gold;
-  g.beginPath(); g.moveTo(-6.6,-7.2); g.lineTo(-10.4,-10.6); g.lineTo(-6.0,-4.2);
+  g.beginPath();
+  g.moveTo(-4.8,-17); g.lineTo(0,-14.5); g.lineTo(4.8,-17);
+  g.lineTo(4.2,-14.5); g.lineTo(0,-12.6); g.lineTo(-4.2,-14.5);
   g.closePath(); g.fill();
-  g.beginPath(); g.moveTo(6.6,-7.2); g.lineTo(10.4,-10.6); g.lineTo(6.0,-4.2);
-  g.closePath(); g.fill();
-  g.fillStyle=visier;
-  g.beginPath(); g.arc(0,-1.5,1.9,0,6.2832); g.fill();
   g.restore();
 }
 
-/** Sechs Idle-, acht Lauf- und acht Wurfposen. */
+/** Sechs Idle-, acht Lauf- und acht Wurfposen. Das Sprite ist 52 px gross,
+ *  damit Mantelfluegel und Goldraute ohne Anschnitt Platz haben. */
 function buildOrbiterSprites(){
   const A=ORBITER_ANIM, out=[];
   const mach=(modus,n)=>{
     for(let k=0;k<n;k++){
-      const S2=48, cv=mkCanvas(S2), g=cv.getContext('2d');
-      g.translate(S2/2,S2/2+3);
+      const S2=52, cv=mkCanvas(S2), g=cv.getContext('2d');
+      g.translate(S2/2,S2/2+4);
       // Kontaktschatten gehoert ins Sprite, damit er nicht pro Frame kostet.
       g.fillStyle='rgba(10,14,26,.42)';
-      g.beginPath(); g.ellipse(0,17,9,3.2,0,0,6.2832); g.fill();
+      g.beginPath(); g.ellipse(0,19,9.5,3.2,0,0,6.2832); g.fill();
       drawOrbiterPose(g, modus, k/n);
       out.push(cv);
     }
@@ -3135,30 +3265,53 @@ function drawWardenSeal(cx,cy,rot){
  *  keine Trennlinie, kein Vollbild-Glow. Laeuft in Bildschirmkoordinaten und
  *  erzeugt pro Frame nichts Neues. */
 const DECK_EDGE = 26;
+/** D-042: Die frueheren Randbalken mit Sternenkacheln sind entfallen -- die
+ *  kosmische Szene laeuft jetzt ueber die ganze Leinwand. Die Funktion bleibt
+ *  als Vertragserwartung (combatUiV2) erhalten und ist bewusst ein No-op. */
 function drawDeckEdges(){
-  const sky=SPR.starField;
-  if(sky){
-    // Nur die aeussersten Streifen bekommen einen Hauch Tiefe.
-    ctx.save();
-    ctx.globalAlpha=.16;
-    ctx.beginPath();
-    ctx.rect(0,0,DECK_EDGE,H); ctx.rect(W-DECK_EDGE,0,DECK_EDGE,H);
-    ctx.rect(0,0,W,DECK_EDGE); ctx.rect(0,H-DECK_EDGE,W,DECK_EDGE);
-    ctx.clip();
-    const ST=sky.width;
-    for(let y=0;y<H;y+=ST) for(let x=0;x<W;x+=ST) ctx.drawImage(sky,x,y);
-    ctx.restore();
-  }
-  // Bewusst KEINE Randabdunklung: D-014 verbietet sie, und Entwurf 3 zeigt ein
-  // Deck, das ohne Rahmen bis an den Bildrand laeuft. Die Sterne oben liegen
-  // nur in den aeussersten Streifen und bleiben dezent.
 }
 function drawArenaFloor(vx0,vx1,vy0,vy1){
   const tile=SPR.floorTile, T=tile.width;
-  ctx.globalAlpha=.98;
+  ctx.globalAlpha=.985;
   for(let y=Math.floor(vy0/T)*T;y<vy1;y+=T)
     for(let x=Math.floor(vx0/T)*T;x<vx1;x+=T) ctx.drawImage(tile,x,y);
   ctx.globalAlpha=1;
+
+  // Sternebene mit leichter Parallaxe: der Versatz haengt nur an der
+  // Kamera, nicht an der Zeit -- deterministisch und ohne Allokation.
+  const st=SPR.starTile, ST=st.width;
+  if(st){
+    const ox=S.x*0.12, oy=S.y*0.12;
+    const px0=vx0*0.88-ox, py0=vy0*0.88-oy;
+    ctx.globalAlpha=.9;
+    for(let y=Math.floor((vy0-oy)/ST)*ST+oy;y<vy1;y+=ST)
+      for(let x=Math.floor((vx0-ox)/ST)*ST+ox;x<vx1;x+=ST) ctx.drawImage(st,x,y);
+    ctx.globalAlpha=1;
+  }
+
+  // Grosse Weltraumstrukturen in festen 2000er-Weltzellen. Der Hash nutzt
+  // nur die Zellindizes (wie drawLandmark in der Referenz) -- nichts
+  // springt, nichts verbraucht den Spiel-RNG.
+  const LZ=2000;
+  const gx0=Math.floor((vx0-LZ)/LZ), gx1=Math.floor((vx1+LZ)/LZ);
+  const gy0=Math.floor((vy0-LZ)/LZ), gy1=Math.floor((vy1+LZ)/LZ);
+  for(let gy=gy0;gy<=gy1;gy++){
+    for(let gx=gx0;gx<=gx1;gx++){
+      const h=visualHash(gx,gy,77);
+      let spr=null, skale=1, alpha=1;
+      if(h>0.90){ spr=SPR.planet; skale=1.15; alpha=.95; }
+      else if(h>0.55){ spr=SPR.landmarks[((h*97)|0)%3]; skale=0.85+h*0.5; alpha=.8; }
+      else continue;
+      const ax=gx*LZ+visualHash(gx,gy,78)*LZ;
+      const ay=gy*LZ+visualHash(gx,gy,79)*LZ;
+      if(ax+spr.width*skale/2<vx0||ax-spr.width*skale/2>vx1||
+         ay+spr.height*skale/2<vy0||ay-spr.height*skale/2>vy1) continue;
+      ctx.globalAlpha=alpha;
+      const w2=spr.width*skale/2;
+      ctx.drawImage(spr,ax-w2,ay-w2,spr.width*skale,spr.height*skale);
+      ctx.globalAlpha=1;
+    }
+  }
 
   const sx=Math.floor((vx0-ARENA_RADIUS)/ARENA_STEP)*ARENA_STEP;
   const sy=Math.floor((vy0-ARENA_RADIUS)/ARENA_STEP)*ARENA_STEP;
@@ -3536,10 +3689,13 @@ function render(){
       if(f===0&&!SPR.foe&&!SPR.drone&&ART.swarmerReady){
         const frame=((S.visualT*SWARMER_ANIM.FPS+i*.73)|0)%SWARMER_ANIM.FRAMES;
         spr=ART.swarmer[frame][dir];
-      } else if(SPR.foe&&tier===ENEMY_NORMAL_TIER){
+      } else if(SPR.foe&&E.kind[i]===0){
         // Alle fuenf Familien, code-native: sechs Phasen, ueber den Index
         // versetzt, damit ein Pulk nicht im Gleichschritt atmet. Genau ein
         // drawImage je Gegner, nichts wird pro Gegner erzeugt (D-040).
+        // D-042 / Gate B: auch die Rammjaeger-Aufladphase bleibt in derselben
+        // aktuellen Silhouette -- der Warnkorridor liegt darunter; die alte
+        // Tier-/Fallback-Darstellung erscheint nur noch ohne Sprite-Atlas.
         spr=SPR.foe[f][((S.visualT*FOE_ANIM.FPS+i*.61)|0)%FOE_ANIM.FRAMES];
       } else {
         spr=artSet?artSet[dir]:SPR.enemy[f][tier];
