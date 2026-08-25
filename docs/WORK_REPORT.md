@@ -1,4 +1,4 @@
-# Claude-Arbeitsbericht
+# OpenCode-Arbeitsbericht
 
 > Diese Datei wird von Claude für jeden Auftrag vollständig ersetzt. Der
 > aktuelle Auftrag steht in `docs/CURRENT_TASK.md`; ältere Berichte bleiben in
@@ -8,7 +8,7 @@
 
 - **Task-ID:** EH-2026-08-25-03 — Kampflesbarkeit V3 und verpflichtendes
   NEXUS-Finale (D-041)
-- **Status:** FERTIG, bereit für Codex-Review
+- **Status:** FERTIG; anschließend durch Codex technisch abgenommen
 - **Ausgangscommit:** `dffc2e5bf7662fd89ffecf79e11e844bac4697ab`
   („docs: NEXUS-Finale und Grafiknacharbeit planen“)
 - **Anfangsstatus:** `## main...origin/main`, Arbeitsbaum sauber, keine fremden
@@ -16,7 +16,7 @@
 - **Endstand:** `npm test` **53/53 grün**, Exitcode 0; `git diff --check`
   sauber (Exitcode 0)
 - **Lokale Commits:** zwei — `ebb88c7` (feat(d041): Spielcode + Suite),
-  `docs(d041)` (Bericht + Changelog, direkt danach). **Nicht gepusht.**
+  `7172c89` (Bericht + Changelog, direkt danach). **Nicht gepusht.**
 
 ## Ergebnis in einem Satz
 
@@ -52,26 +52,26 @@ Telemetrie- und UX-Checks laufen unverändert grün.
 
 ## Botanker: Vorher-/Nachher-Messung (Anker neu referenziert)
 
-Der entfernte 7:00-Schub nahm dem Bot späte Erfahrung weg; der Botanker ist
-deshalb nach Messung von 21,7 auf **17,56** neu referenziert (Toleranz
-unverändert ±3, Verfahren wie D-035). Beide Messreihen: Original `dffc2e5`
-gegen Endstand, identische Bot-Strategie, neun feste Seeds.
+Nach der Codex-Korrektur des Rückzugs wurde der Botanker exakt erneut
+gemessen: von 21,7 auf **19,78**, Toleranz unverändert ±3. Beide Messreihen
+vergleichen Original `dffc2e5` mit dem final geprüften Stand bei identischer
+Bot-Strategie und neun festen Seeds.
 
 | Seed | Züge vorher | Züge nachher | Kills vorher | Kills nachher | EVO vorher→nachher | Stufe vorher→nachher |
 |---|---:|---:|---:|---:|---|---|
-| 1701 | 14 | 11 | 3018 | 2746 | 1→0 | 15→12 |
-| 1709 | 25 | 24 | 7368 | 8070 | 2→3 | 26→25 |
-| 1721 | 17 | 15 | 5991 | 4221 | 1→1 | 18→16 |
-| 1733 | 9 | 9 | 2218 | 1637 | 0→0 | 10→10 |
-| 1741 | 27 | 17 | 12169 | 5088 | 3→1 | 28→18 |
-| 1753 | 26 | 25 | 10579 | 10754 | 3→3 | 27→26 |
-| 1777 | 18 | 21 | 4798 | 6638 | 1→1 | 19→22 |
-| 1789 | 22 | 22 | 6451 | 6781 | 2→2 | 23→23 |
-| 2474367456 | 13 | 14 | 3526 | 4355 | 0→1 | 14→15 |
-| **Mittel** | **19,00** | **17,56** | — | — | **7/9 → 6/9 Läufe** | — |
+| 1701 | 14 | 12 | 3018 | 3189 | 1→0 | 15→13 |
+| 1709 | 25 | 26 | 7368 | 8839 | 2→2 | 26→27 |
+| 1721 | 17 | 15 | 5991 | 4438 | 1→1 | 18→16 |
+| 1733 | 9 | 10 | 2218 | 2024 | 0→0 | 10→11 |
+| 1741 | 27 | 26 | 12169 | 10462 | 3→2 | 28→27 |
+| 1753 | 26 | 28 | 10579 | 13110 | 3→3 | 27→29 |
+| 1777 | 18 | 26 | 4798 | 10133 | 1→2 | 19→27 |
+| 1789 | 22 | 21 | 6451 | 6834 | 2→2 | 23→22 |
+| 2474367456 | 13 | 14 | 3526 | 4515 | 0→1 | 14→15 |
+| **Mittel** | **19,00** | **19,78** | — | — | **7/9 → 7/9 Läufe** | — |
 
 Erster Kartenzug 31,6 s (unverändert im Korridor), Sensitivitätsverhältnis und
-Dichteüberschuss weiter grün. `evolutionReachable` (≥2/9) bleibt mit 6/9
+Dichteüberschuss weiter grün. `evolutionReachable` (≥2/9) bleibt mit 7/9
 erfüllt; keine Schwelle wurde gelockert.
 
 ## Dichte vor/während/nach den Bossphasen
@@ -103,8 +103,8 @@ Spieler unsterblich:
 
 | Build | Ergebnis |
 |---|---|
-| Repräsentativ (Photonenschneise-EVO + Sternenhagel 4 + Plasmakern 2) | **47,3 s** besiegt — Korridor 30–75 s ✓ |
-| Wiederholung desselben Laufs | 47,3 s — bitidentisch ✓ |
+| Repräsentativ (Photonenschneise-EVO + Sternenhagel 4 + Plasmakern 2) | **44,9 s** besiegt — Korridor 30–75 s ✓ |
+| Wiederholung desselben Laufs | 44,9 s — bitidentisch ✓ |
 | Schwach (Orbitklinge 2, sonst nichts) | nach 300 s **nicht besiegt** ✓ |
 
 Kalibrierung ausschließlich über den neuen Boss-Multiplikator
@@ -156,8 +156,8 @@ Sache des Besitzerlaufs durch Codex/Besitzer.
 1. **Botanker-Neureferenz:** fachlich begründet und vollständig tabelliert;
    wer den alten Wert 21,7 wiederherstellt, macht die Suite bewusst rot.
 2. **Wegfall Bergungsflut:** Der Run endet jetzt im Finale statt in einer
-   Beuteflut; das späte Gefüge (XP-Rhythmus, Evolutionen je Lauf 6/9 statt
-   7/9) hat sich messbar, aber im Korridor verschoben. Der folgende
+   Beuteflut; das späte Gefüge hat sich je Seed verschoben, während weiterhin
+   7/9 Botläufe mindestens eine Evolution erreichen. Der folgende
    Waffenrollenpass sollte die Telemetrie am neuen Finale neu messen.
 3. **NEXUS-Zähigkeit ist bewusst hoch (×660).** Der Korridor wird mit einem
    Photonenschneise-lastigen Referenzbuild erreicht; Builds ohne Fernschaden
@@ -189,7 +189,7 @@ AGENTS, CLAUDE, WORKFLOW, Konzeptbilder) wurden nicht verändert.
 ```
 
 Arbeitsbaum sauber; lokale Commits `ebb88c7` (Implementierung + Suite) und
-`f569037` (dieser Bericht + Changelog). **Nicht gepusht** — der Push liegt
+`7172c89` (dieser Bericht + Changelog). **Nicht gepusht** — der Push liegt
 bei Codex.
 
 ## Empfehlung an Codex
@@ -198,5 +198,31 @@ bei Codex.
 1. Sichtbare Abnahme im Browser (Boden, Silhouetten, EVO-Hinweis-Lage,
    NEXUS-Muster, FPS-Fenster 6:00–8:00+) kann hier nicht erfolgen und gehört
    in den Besitzerlauf.
-2. Der neue Botanker 17,56 ist Messwert, kein Designziel; bitte beim Push
+2. Der neue Botanker 19,78 ist Messwert, kein Designziel; bitte beim Push
    zusammen mit dem Vorher-/Nachher-Tabelle in TESTPLAN/DECISIONS konservieren.
+
+## Codex-Review und technische Abnahme
+
+**Status:** technisch abgenommen; Besitzerlauf offen.
+
+Codex hat OpenCodes Diff und Tests unabhängig geprüft. Dabei wurden vier
+Randfälle korrigiert:
+
+- Der Rückzug markiert exakt den Überschuss im Simulationsradius statt in
+  Folgeticks auch die verbleibende Arenabelegung.
+- Rückzügler verbrauchen keine Projektile und beeinflussen keine Ketten-,
+  Klingen-, Frost-, Sog- oder Flächeneffekte.
+- Gesamtdauer und Run-Bericht behalten die Finaldauer beim Overtime-Start.
+- NEXUS-Zielzonen und feindliche Projektile werden beim Bosskill entfernt.
+
+Die Regressionen prüfen Kaskadenrückzug, Projektilverbrauch, aktive
+Bossgefahren, Gesamtdauer und Overtime-Erhalt verhaltensbasiert.
+
+Abschlussbelege:
+
+- npm test: 53/53 Checks grün, Exitcode 0.
+- git diff --check: sauber.
+- Browser-Smoke: wegen Windows-Sandbox-Verbindungsfehler nicht möglich.
+
+Ergebnis: technisch freigegeben. Der Besitzerlauf nach docs/TESTPLAN.md bleibt
+das Gate vor dem getrennten Waffenrollenpass; bis dahin nichts weiter stapeln.

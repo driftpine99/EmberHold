@@ -268,6 +268,26 @@ Familienlesbarkeit und Evolutionshinweis gemeinsam mit dem Boss-/Dichtepass.
 
 ### Besitzerabnahme für EH-2026-08-25-03
 
+**Technischer Stand nach Codex-Review:** OpenCodes Umsetzung ist abgenommen.
+Codex hat Rückzug, Trefferinteraktionen, Gesamtdauer und Bossgefahren
+nachgehärtet, ohne Waffenwerte oder Toleranzen zu verändern.
+
+Automatisierte Belege:
+
+- 53/53 Checks grün; Save-, Hold-, Sektor-, Report-, Seitenverhältnis- und
+  Renderkostenverträge bleiben grün.
+- Bossarenen halten 50/30 aktive Normale; exakt nur der Überschuss zieht sich
+  ohne Kill, XP oder Beute zurück und blockiert keine Spielerprojektile.
+- NEXUS sperrt Extraktion, Tod bleibt Niederlage, der echte Bosskill entfernt
+  Restgefahren und öffnet erst dann Extraktion/Overtime.
+- Finale und freiwillige Overtime bleiben in der Gesamtdauer erhalten.
+- Repräsentativer Build: 44,9 Sekunden; schwacher Build: nach 300 Sekunden
+  nicht besiegt.
+- Neun-Seed-Botanker: 19,78 Kartenzüge, Toleranz unverändert ±3.
+
+Ein echter Browser-Smoke war wegen der lokalen Windows-Browserverbindung nicht
+möglich. Die folgenden sichtbaren Punkte sind deshalb keine Formalität.
+
 Nach Codex-Review und Pages-Update bitte einen vollständigen
 Acht-Minuten-Trümmerring-Lauf **bis zum Tod von NEXUS** spielen. Bei 8:00 darf
 noch keine Extraktion erscheinen.
@@ -288,7 +308,9 @@ Während des Laufs prüfen:
 6. Erscheint NEXUS erst bei 8:00, sperrt die Extraktion und besitzt zwei
    verständlich vermeidbare Muster?
 7. Öffnet der echte NEXUS-Tod unmittelbar Extraktion/Overtime?
-8. Bleiben schlechteste FPS und 1-%-Low mindestens ungefähr im Bereich des
+8. Zeigt der Run-Bericht eine Zeit über 8:00 sowie plausible Spawn-,
+   Tötungs- und Finaldauer?
+9. Bleiben schlechteste FPS und 1-%-Low mindestens ungefähr im Bereich des
    letzten Feldlaufs 44/54?
 
 Danach den vollständigen Run-Bericht kopieren und kurz beantworten:
@@ -421,24 +443,24 @@ tatsächlich prüft — und das ist beim Kartenzug ein **Regressionsanker auf de
 Bot**, kein Designziel. Der Bot bildet die menschliche Kurve nicht ab (D-026).
 `CFG.PICK_TARGETS` enthält weiter den historischen Wert 21. Seit D-036 ist der
 aktuelle Menschenkorridor für diesen Feldtest **28–34 Kartenzüge**; der
-Bot-Regressionsanker bleibt davon getrennt bei 21,7 ± 3.
+Bot-Regressionsanker bleibt davon getrennt bei 19,78 ± 3.
 
 | Größe | Ist | Vertrag (Bot) | Designziel (Mensch) |
 |---|---:|---:|---:|
 | Erster Kartenzug, Mittelwert | 31,6 s | 25–45 s | 35 s |
-| Kartenzüge in 8 Min, Mittelwert | 19,00 | 21,7 ± 3 | **28–34 im Menschenlauf** |
-| Rhythmus pro Minute | 1,44 · 1,67 · 1,78 · 2,00 · 1,44 · 2,00 · 3,00 · 5,67 | — | Feldlauf entscheidet |
-| Kartenzüge bei −10 % XP-Kosten | 25,00 | — | — |
-| Kartenzüge bei +10 % XP-Kosten | 20,56 | — | — |
-| Verhältnis der beiden Varianten | 1,216 | ≤ 1,75 | — |
+| Kartenzüge in 8 Min, Mittelwert | 19,78 | 19,78 ± 3 | **28–34 im Menschenlauf** |
+| Rhythmus pro Minute | 1,44 · 1,67 · 1,78 · 2,00 · 1,33 · 1,78 · 4,89 · 4,89 | — | Feldlauf entscheidet |
+| Kartenzüge bei −10 % XP-Kosten | 23,78 | — | — |
+| Kartenzüge bei +10 % XP-Kosten | 17,67 | — | — |
+| Verhältnis der beiden Varianten | 1,346 | ≤ 1,75 | — |
 | Runs mit Evolution | 7 / 9 | mindestens 2 / 9 (Bodenschwelle) | 1–2 typisch |
 | Evolutionen je Run, Mittelwert | 1,44 | — | 1–2 typisch, 3 außergewöhnlich |
-| Spitze im Feld, Maximum | 312 | ≤ 331 (Zieldichte +10 %) | — |
+| Spitze im Feld, Maximum | 302 | ≤ 331 (Zieldichte +10 %) | — |
 | Elite-Reliktwahlen | 2 in 9 / 9 Runs | exakt 2 pro vollständigem Run | — |
 | Erz aus absichtlich untätigem Lauf | 1 Erz, schlechteste Rate 1,58/Min | ≤ 1,75 Erz je Minute | — |
 
 Alle Ist-Werte dieser Tabelle stammen aus der grünen `npm test`-Ausgabe mit
-45/45 Checks bei der Codex-Abnahme vom 24.08.2026.
+53/53 Checks bei der Codex-Abnahme von D-041 am 25.08.2026.
 
 Ein Wiederholungslauf mit demselben Seed muss bitgenau dasselbe Ergebnis
 liefern. Der Test endet mit Fehlercode, sobald ein Korridor oder diese

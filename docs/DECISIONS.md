@@ -1818,8 +1818,8 @@ Freigabe.
 
 ## D-041 – AEGIS wird Mittelboss, NEXUS das verpflichtende Run-Finale
 
-**Status:** auf Grundlage des Besitzerlaufs beschlossen und als
-EH-2026-08-25-03 für Claude freigegeben (25.08.2026).
+**Status:** technisch umgesetzt und durch Codex abgenommen (25.08.2026);
+sichtbare Besitzerabnahme bis NEXUS noch offen.
 
 Der D-040-Abnahmelauf mit Seed 2395647195 endete bei 8:00 erfolgreich:
 19.176 Kills, Stufe 28, 27 Kartenzüge, zwei Evolutionen, schlechteste FPS 44,
@@ -1880,3 +1880,35 @@ zurück.
 Waffenwerte, XP-Kurve, Kartenlogik, Save v4, Station und Ökonomie bleiben in
 diesem Auftrag unverändert. Nach dem Besitzerlauf des neuen Finales folgt der
 bereits beschlossene getrennte Waffenrollenpass.
+
+### Technische Umsetzung und Codex-Abnahme
+
+EH-2026-08-25-03 stellt den feineren D-038-Deckboden mit der nahtlosen
+D-040-Randtechnik wieder her. Fünf feste Gegnerprofile unterscheiden
+Außenkontur, Proportion und Größe; der Schwarm bleibt bei einem drawImage je
+Figur. Genau ein Hinweis „Nächste EVO“ verwendet weiterhin
+leadingEvoPath() als einzige fachliche Quelle. AEGIS hat Ziel 50, NEXUS Ziel
+30; der alte 7:00-Schub ist entfernt.
+
+Die unabhängige Codex-Review korrigierte vier Randfälle:
+
+- Nur der echte Überschuss im Simulationsradius beginnt den Rückzug; die
+  verbleibenden 50 beziehungsweise 30 Gegner werden nicht im Folgetick
+  ebenfalls markiert.
+- Rückzügler verbrauchen keine Projektile, verstärken keine Flächenwirkung und
+  werden von Ketten-, Klingen-, Frost- und Sogeffekten nicht beeinflusst.
+- Gesamtdauer und Run-Bericht behalten die verpflichtende Finaldauer auch
+  nach dem Start freiwilliger Overtime.
+- Beim NEXUS-Tod werden laufende Zielzonen und feindliche Projektile entfernt,
+  damit sie nach der Extraktionsentscheidung nicht wieder anlaufen.
+
+Die finale Suite besteht mit **53/53 Checks**; git diff --check ist sauber.
+Der exakt neu gemessene Neun-Seed-Botanker ist **19,78** Kartenzüge bei
+unveränderter Toleranz ±3. Der repräsentative NEXUS-Build benötigt
+deterministisch 44,9 Sekunden und bleibt im Zielkorridor 30–75 Sekunden; der
+schwache Build besiegt ihn auch nach 300 Sekunden nicht.
+
+Der sichtbare Browser-Smoke war erneut durch den lokalen Windows-Sandbox-
+Helfer blockiert. Hintergrund, Silhouetten, HUD-Lage, Musterlesbarkeit und
+echte FPS bleiben deshalb bewusst beim Besitzerlauf. Erst danach folgt der
+getrennte Waffenrollenpass.

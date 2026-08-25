@@ -19,23 +19,24 @@ Asteroidensonde, Materiefabrikator, Fluxlabor, Simulationsdeck,
 Ausrüstungsbucht und Sternenkarte mit lokalem Save v4 und begrenzter
 Offline-Produktion.
 
-D-040 hat den Sci-Fantasy-Stil, flüssigere code-native Animationen und eine
-reduzierte Rand-UI eingeführt. Der Besitzerlauf bestätigt Bewegung,
-AEGIS-Erkennung und eine erheblich angenehmere Gegnerflut. Der aufgehellte
-grobe Deckboden, zu ähnliche Gegnerfamilien und der fehlende kompakte
-Evolutionshinweis werden jedoch in D-041 nachgebessert.
+D-041 ist technisch umgesetzt: Der dunklere, feinere Deckboden ist
+wiederhergestellt, fünf Gegnerfamilien besitzen getrennte Silhouetten und
+genau ein kompakter Hinweis „Nächste EVO“ steht über der Waffenleiste.
 
-Der nächste freigegebene Auftrag EH-2026-08-25-03 macht AEGIS zum klaren
-Mittelboss und ergänzt nach der achtminütigen Aufbauphase den verpflichtenden
-Endboss NEXUS. Extraktion ist erst nach seinem Tod möglich. Der alte
-70-Gegner-Schub bei 7:00 entfällt; Bossarenen reduzieren die normalen
-Begleiter kontrolliert. Waffenwerte bleiben bis zum anschließenden getrennten
-Waffenrollenpass unverändert.
+AEGIS ist nun der Mittelboss mit einem Ziel von 50 normalen Begleitern. Der
+alte 70-Gegner-Schub bei 7:00 entfällt. Bei 8:00 erscheint der verpflichtende
+Endboss NEXUS mit höchstens 30 normalen Begleitern; erst sein Tod schaltet
+Extraktion beziehungsweise freiwillige Overtime frei.
 
-Die technische Baseline steht bei **49/49 grünen Checks**. Der letzte
-abgeschlossene Run-Bericht wird getrennt von Save v4 lokal gesichert und kann
-in der Orbitalstation erneut kopiert werden. Backend, Ton und Monetarisierung
-bleiben außerhalb des Scopes.
+OpenCodes Umsetzung wurde durch Codex unabhängig geprüft. Die Review
+korrigierte einen kaskadierenden Rückzug, Trefferinteraktionen mit
+zurückziehenden Gegnern, die Gesamtdauer über Finale plus Overtime und
+verbleibende NEXUS-Gefahren nach dem Bosskill.
+
+Die technische Baseline steht bei **53/53 grünen Checks**. Offen ist der
+Besitzerlauf bis NEXUS für Grafik, Lesbarkeit, Bossgefühl und echte FPS.
+Danach folgt der getrennte Waffenrollenpass. Der letzte Run-Bericht bleibt
+lokal kopierbar; Backend, Ton und Monetarisierung bleiben außerhalb des Scopes.
 
 Die Produktfrage der Phase 0 lautet:
 

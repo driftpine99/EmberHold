@@ -2,35 +2,31 @@
 
 ## Aktueller Arbeitsfokus
 
-**Verbindlicher Stand 25.08.2026:** Der Besitzerlauf für D-040 ist ausgewertet
-(D-041). Stil, Bewegung, AEGIS-Erkennung und die reduzierte Gegnerflut sind
-grundsätzlich besser. Nicht freigegeben sind der erheblich schlechtere helle
-Deckboden, zu ähnliche Gegnerfamilien, der fehlende Evolutionshinweis und die
-weiterhin hohe Begleitdichte während AEGIS.
+**Verbindlicher Stand 25.08.2026:** EH-2026-08-25-03 / D-041 ist durch
+OpenCode umgesetzt und durch Codex technisch abgenommen. Offen ist nur der
+Besitzerlauf bis NEXUS für sichtbare Qualität, Bossgefühl und echte FPS.
 
-Der nächste freigegebene Auftrag ist **EH-2026-08-25-03**. Er verbindet den
-notwendigen sichtbaren Reparaturpass mit dem bereits geplanten Boss-/
-Dichtepass: dunklerer D-038-Deckboden bei erhaltener nahtloser Randabdeckung,
-fünf klar getrennte Silhouetten, genau ein kompakter Hinweis „Nächste EVO“
-und AEGIS mit nur 50 normalen Begleitern.
+Umgesetzt sind der dunklere D-038-Deckboden bei nahtloser D-040-Randabdeckung,
+fünf getrennte Silhouetten und genau ein kompakter Hinweis „Nächste EVO“.
 
-Die Sortie erhält außerdem ein echtes Finale. Der alte 70-Gegner-Schub bei
-7:00 entfällt. Ab 7:45 bereitet sich die Arena vor; bei 8:00 erscheint
-**NEXUS** mit höchstens 30 normalen Begleitern. Erst sein Tod schaltet
-Extraktion beziehungsweise freiwillige Overtime frei. Waffenwerte bleiben in
-diesem Auftrag unverändert.
+AEGIS hat ein Ziel von 50 normalen Begleitern; der alte 70-Gegner-Schub ist
+entfallen. Ab 7:45 bereitet sich die Arena vor, bei 8:00 erscheint **NEXUS**
+mit Ziel 30. Erst sein Tod schaltet Extraktion oder freiwillige Overtime frei.
+Waffenwerte blieben unverändert.
 
-Aktuelle technische Baseline: **49/49** Checks, sauberer main bei c5f11a3.
+Aktuelle technische Baseline: **53/53** Checks. Der korrigierte
+Neun-Seed-Botanker liegt bei 19,78 Kartenzügen, Toleranz unverändert ±3.
 Der letzte Feldlauf erreichte 19.176 Kills, Stufe 28, 27 Kartenzüge, zwei
-Evolutionen sowie 44 FPS Minimum und 54 FPS im 1-%-Low.
+Evolutionen sowie 44 FPS Minimum und 54 FPS im 1-%-Low; diese Werte bleiben
+die Vergleichsbasis für den Besitzerlauf.
 
 Nächste verbindliche Reihenfolge:
 
 1. [x] D-040-Besitzerlauf und subjektive Antworten auswerten.
 2. [x] D-041 und EH-2026-08-25-03 technisch planen und freigeben.
-3. [ ] Claude setzt Hintergrundkorrektur, Familienlesbarkeit,
+3. [x] OpenCode setzt Hintergrundkorrektur, Familienlesbarkeit,
    Evolutionshinweis, AEGIS-Arena und NEXUS-Finale um.
-4. [ ] Codex prüft Code, Balancevertrag, Bosszustände und Performance.
+4. [x] Codex prüft Code, Balancevertrag, Bosszustände und Performance.
 5. [ ] Besitzer spielt den vollständigen Run bis NEXUS und nimmt das Finale ab.
 6. [ ] Danach Waffenrollen anhand kontrollierter Telemetrie bearbeiten.
 

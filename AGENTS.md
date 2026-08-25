@@ -71,28 +71,28 @@ und Testplan und entscheidet über den Push.
 Dieser Abschnitt ist kein Arbeitsauftrag. Priorität und Scope stehen nur in
 `docs/CURRENT_TASK.md`.
 
-**Stand 25.08.2026, nach D-041.** Der D-040-Besitzerlauf hat Stil,
-Animation, AEGIS-Lesbarkeit und die erheblich angenehmere Gegnerflut bestätigt.
-Nicht freigegeben sind der helle grobe Hintergrund, zu ähnliche Gegner und der
-fehlende Evolutionshinweis. AEGIS besitzt außerdem noch zu viele Begleiter.
+**Stand 25.08.2026, nach technischer D-041-Abnahme.** OpenCode hat
+EH-2026-08-25-03 umgesetzt; Codex hat den Diff unabhängig geprüft und
+Rückzug, Trefferinteraktionen, Gesamtdauer sowie Restgefahren nach NEXUS
+korrigiert. AEGIS hat Ziel 50, NEXUS Ziel 30 und sperrt bis zu seinem Tod die
+Extraktion. Waffenwerte blieben unverändert.
 
-EH-2026-08-25-03 ist freigegeben: sichtbare Korrekturen, AEGIS mit Ziel 50
-und ein verpflichtender Endboss NEXUS nach der achtminütigen Aufbauphase mit
-Ziel 30. Erst NEXUS' Tod schaltet Extraktion/Overtime frei. Waffenwerte bleiben
-bis zum folgenden separaten Waffenrollenpass unverändert. Baseline: 49/49
-Checks; Feldlauf 19.176 Kills, 27 Kartenzüge, zwei Evolutionen, FPS 44/54.
+Offen ist der Besitzerlauf bis NEXUS für Hintergrund, Familienlesbarkeit,
+EVO-Hinweis, Bossgefühl und echte FPS. Erst danach folgt der separate
+Waffenrollenpass. Technische Baseline: 53/53 Checks; letzter Feldlauf
+19.176 Kills, 27 Kartenzüge, zwei Evolutionen, FPS 44/54.
 
 ### Drei Dinge, die eine neue Sitzung wissen muss
 
 **1. Der Botwert ist nur ein Regressionsanker.** `totalPicks` prüft gegen
-`BOT_PICK_REF = 21.7`, nicht gegen das menschliche Designziel. Wer den Anker
+`BOT_PICK_REF = 19.78`, nicht gegen das menschliche Designziel. Wer den Anker
 „zurück auf 21 repariert“, macht den Vertrag kaputt. Der Besitzerlauf nach
 D-036 soll 28–34 Kartenzüge erreichen.
 
-**2. EH-2026-08-25-03 verändert nur Boss/Dichte und Darstellung.**
-Waffenrollen trotz auffälliger Telemetrie nicht gleichzeitig anfassen. Erst
-der Besitzerlauf bis NEXUS trennt Finale und Waffenwirkung sauber; danach
-folgt der Waffenpass. Station, Audio und Monetarisierung bleiben eigene Gates.
+**2. D-041 wartet auf die sichtbare Besitzerabnahme.** Keine weitere Balance
+oder Darstellung stapeln. Erst der Besitzerlauf bis NEXUS trennt Finale und
+Waffenwirkung sauber; danach folgt der Waffenpass. Station, Audio und
+Monetarisierung bleiben eigene Gates.
 
 **3. Sichtbare Namen sind eine Präsentationsschicht.** `LEX` darf Bezeichnungen
 ändern; IDs wie `bogen`, `glutsehne`, `ring` und der Save-Key

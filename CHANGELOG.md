@@ -25,14 +25,19 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
     telegraphierte Muster (Zielbomben neu, rotierende Ringsalven), dynamische
     Bossleiste `BOSS: AEGIS`/`BOSS: NEXUS`, FINALE-Uhr ohne Overtime-Multiplikator,
     Run-Bericht mit Spawn-, Tötungszeit und Finaldauer. Benchmark: Build mit
-    ein bis zwei Evolutionen besiegt ihn in 47,3 s (Korridor 30–75 s),
+    ein bis zwei Evolutionen besiegt ihn in 44,9 s (Korridor 30–75 s),
     schwacher Build scheitert; deterministisch über festen Seed
 - Neue Verträge in der Suite: `finalBossFlow`, erweiterter `bossCombatPocket`
   (Ziele 50/30 plus belohnungsfreier Rückzug), `nexusBenchmark`,
   `evolutionFocusHud` und Silhouetten-Presentationscheck; zusammen 53/53 Checks
-- Botanker nach Messung neu referenziert: 21,7 auf 17,56 (Toleranz unverändert
-  ±3), weil der entfernte 7:00-Schub dem Bot späte Erfahrung nahm. Vorher-
-  und Nachher-Tabelle je Seed im Arbeitsbericht
+- Botanker nach finaler Review-Messung neu referenziert: 21,7 auf 19,78;
+  Toleranz unverändert ±3. Die neun Einzelwerte stehen in der Testausgabe
+- Codex-Review härtet D-041: exakt nur der Arena-Überschuss zieht sich zurück;
+  Rückzügler verbrauchen keine Projektile und beeinflussen keine Waffen- oder
+  Flächeneffekte; Finale plus Overtime bleiben in der Gesamtdauer erhalten;
+  beim NEXUS-Tod werden laufende Zielzonen und feindliche Projektile entfernt
+- Die erweiterten Regressionen prüfen Kaskadenrückzug, Projektilverbrauch,
+  Boss-Restgefahren und Gesamtdauer weiterhin innerhalb der 53/53 Checks
 
 
 - Entwurf 3 ist als interne Kampf- und UI-Zielrichtung V2 dokumentiert:

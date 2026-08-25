@@ -646,7 +646,7 @@ try {
     // waehrend eines lebenden Wardens nur normale Gegner zaehlen -- beide
     // Quellen bleiben aber Simulationstelemetrie, nie Renderwerte.
     html.includes("Math.ceil((want-have)*0.16)") &&
-    html.includes("const have = bossAlive ? nearbyAdds : nearby;") &&
+    html.includes("const have = bossAlive ? nearbyActiveAdds : nearby;") &&
     !/const (want|have)[^\n]*visible/i.test(html) &&
     !html.includes("S.onScreen") &&
     !html.includes("S.peakEnemies");
@@ -1165,7 +1165,12 @@ try {
   const xpVor = engine.S.xpTotal;
   const bossC = engine.spawnEnemy(240, 4, 2, 400, 0);
   engine.S.bossIndex = bossC; engine.S.bossId = "aegis";
-  laufen(60);                                                  // 1 Sekunde
+  laufen(2);
+  const rueckzugFrueh = engine.enemyCounts();
+  const erwarteterUeberschuss = vorArena.normal - ZIEL_AEGIS;
+  const rueckzugNurUeberschuss = rueckzugFrueh.retreating === erwarteterUeberschuss &&
+    rueckzugFrueh.normal - rueckzugFrueh.retreating === ZIEL_AEGIS;
+  laufen(58);                                                  // zusammen 1 Sekunde
   const rueckzugSichtbar = engine.enemyCounts().retreating > 0;
   const budgetTicks = Math.ceil((RETREAT_S + 1.5) / TICK);
   laufen(budgetTicks - 60);
@@ -1180,6 +1185,23 @@ try {
   const keineBeute = cGems.splitter === gemsVor.splitter &&
     cGems.tropfen === gemsVor.tropfen && cXp === xpVor;
   const elitenBleiben = nachRueckzug.elite === vorArena.elite && vorArena.elite === 5;
+
+  // C2) Ein Projektil darf an einem Rueckzuegler weder verbraucht werden noch
+  // Schaden buchen. 51 Normale erzeugen exakt einen Rueckzugsslot.
+  engine.begin(480); engine.S.x = 0; engine.S.y = 0; engine.S.t = 240; stillLegen();
+  const retreatTarget = engine.spawnEnemy(240, 0, 0, 200, 0);
+  for(let k=0;k<50;k++){
+    const a=k/50*Math.PI*2;
+    engine.spawnEnemy(240, k%5, 0, Math.cos(a)*400, Math.sin(a)*400);
+  }
+  const retreatBoss = engine.spawnEnemy(240, 4, 2, -300, 0);
+  engine.S.bossIndex=retreatBoss; engine.S.bossId="aegis";
+  laufen(1);
+  const retreatHp=engine.enemyHp(retreatTarget);
+  engine.shoot(200,0,0,0,0,10,1,0,5,engine.W_IDX.bogen);
+  engine.updateProjectiles(0.01);
+  const rueckzugVerbrauchtKeinProjektil = engine.enemyCounts().retreating === 1 &&
+    engine.counts().p === 1 && engine.enemyHp(retreatTarget) === retreatHp;
 
   // D) Mit lebendem NEXUS gilt das engere Finale-Ziel von 30.
   engine.begin(480); engine.S.x = 0; engine.S.y = 0; engine.S.t = 300; stillLegen();
@@ -1209,13 +1231,16 @@ try {
   const baustWiederAuf = danach > waehrend;
 
   bossCombatPocket = aegisGedeckelt && nexusGedeckelt && bossZaehltNichtMit &&
-    normalHoeherOhneBoss && rueckzugSichtbar && rueckzugAbgeschlossen &&
-    keineKunstKills && keineBeute && elitenBleiben && bossWeg && baustWiederAuf;
+    normalHoeherOhneBoss && rueckzugSichtbar && rueckzugNurUeberschuss &&
+    rueckzugAbgeschlossen && rueckzugVerbrauchtKeinProjektil && keineKunstKills &&
+    keineBeute && elitenBleiben && bossWeg && baustWiederAuf;
   bossPocketDiagnostics = { zielAegis: ZIEL_AEGIS, zielNexus: ZIEL_NEXUS,
     zielOhneBoss,
     ohneBossNormal: ohneBoss.normal, mitAegisNormal: mitAegis.normal,
     mitNexusNormal: mitNexus.normal,
     vorArenaNormal: vorArena.normal, rueckzugSichtbar,
+    retreatingFrueh: rueckzugFrueh.retreating, erwarteterUeberschuss,
+    rueckzugNurUeberschuss, rueckzugVerbrauchtKeinProjektil,
     nachRueckzugNormal: nachRueckzug.normal, retreatingNach: nachRueckzug.retreating,
     rueckzugBudgetSekunden: RETREAT_S,
     killsVor, killsNach: cKills,
@@ -1271,7 +1296,8 @@ try {
     engine.S.phase === "run" && engine.S.pendingExtract === false;
   const nexusIdx = engine.S.bossIndex;
   const nexusHp = engine.enemyMax(nexusIdx);
-  laufen(5);
+  laufen(1.2); // beide NEXUS-Muster haben jetzt eine aktive Vorwarnung/Salve
+  const finaleGefahrVorKill = engine.hazards() + engine.enemyProjectileCount() > 0;
   const sperreHaelt = engine.S.phase === "run" && engine.S.nexusState === 1;
   const keineOvertimeImFinale = engine.S.otActive === false && engine.S.ot === 0;
   const spawnZeit = engine.S.nexusSpawnT;
@@ -1288,8 +1314,17 @@ try {
     engine.S.nexusSpawnT >= 0 && engine.S.nexusKillT >= 0;
   const killZeit = engine.S.nexusKillT;
   const finalDauerPositiv = killZeit > spawnZeit;
-  const berichtZeigtFinale = engine.runReportText().includes("NEXUS besiegt") &&
-    engine.runReportText().includes("Finaldauer");
+  const gefahrenNachKill = engine.hazards() + engine.enemyProjectileCount();
+  const gesamtzeitMitFinale = Math.abs(engine.runSeconds() - engine.S.t) < TICK &&
+    engine.runSeconds() > engine.S.runLen;
+  const berichtNachFinale = engine.runReportText();
+  const berichtZeigtFinale = berichtNachFinale.includes("NEXUS besiegt") &&
+    berichtNachFinale.includes("Finaldauer");
+  const berichtZeigtGesamtdauer = /Zeit: 8:0[1-9]/.test(berichtNachFinale);
+  engine.startOvertime();
+  laufen(2);
+  const overtimeBewahrtFinale = Math.abs(engine.runSeconds() - engine.S.t) < TICK &&
+    engine.runSeconds() > engine.S.runLen + engine.S.ot + 1;
   engine.endRun(true);
   const ergebnisExtrahiert = engine.S.result === "Extrahiert";
 
@@ -1310,13 +1345,16 @@ try {
 
   finalBossFlow = kurzKeinNexusVorEnde && kurzEndeExtraktion && warnNochNicht &&
     warnErteilt && spawnBeiAcht && sperreHaelt && keineOvertimeImFinale &&
-    titelNexus && uhrFinal && extraktionNachKill && finalDauerPositiv &&
-    berichtZeigtFinale && ergebnisExtrahiert && finaleLebt && todImFinale &&
-    nexusHp >= 9000;
+    titelNexus && uhrFinal && finaleGefahrVorKill && extraktionNachKill &&
+    finalDauerPositiv && gefahrenNachKill === 0 && gesamtzeitMitFinale &&
+    berichtZeigtFinale && berichtZeigtGesamtdauer && overtimeBewahrtFinale &&
+    ergebnisExtrahiert && finaleLebt && todImFinale && nexusHp >= 9000;
   finalBossDiagnostics = { kurzKeinNexusVorEnde, kurzEndeExtraktion, warnNochNicht,
     warnErteilt, spawnBeiAcht, sperreHaelt, keineOvertimeImFinale,
-    titelNexus, uhrFinal, nexusHp, extraktionNachKill, finalDauerPositiv,
-    berichtZeigtFinale, ergebnisExtrahiert, finaleLebt, todImFinale,
+    titelNexus, uhrFinal, nexusHp, finaleGefahrVorKill, extraktionNachKill,
+    finalDauerPositiv, gefahrenNachKill, gesamtzeitMitFinale,
+    berichtZeigtFinale, berichtZeigtGesamtdauer, overtimeBewahrtFinale,
+    ergebnisExtrahiert, finaleLebt, todImFinale,
     spawnT: spawnZeit, killT: killZeit };
 } catch (error) {
   finalBossError = error instanceof Error ? error.message : String(error);
@@ -2234,6 +2272,8 @@ const output = {
     stationaryDeath: stationaryRun.died,
     feedbackSeed: feedbackRun ? { kills: feedbackRun.kills, picks: feedbackRun.total,
       simSpitze: feedbackRun.peak, simRadius: feedbackRun.nearby, evo: feedbackRun.evo } : null,
+    seedRuns: report.runs.baseline.map(r=>({seed:r.seed,picks:r.total,kills:r.kills,
+      level:r.level,evolutionen:r.evo.length})),
     eliteChoiceDiagnostics,
     viewports: viewportRows },
 };

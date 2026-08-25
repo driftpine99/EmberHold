@@ -4,15 +4,19 @@
 
 - **Task-ID:** EH-2026-08-25-03
 - **Thema:** Kampflesbarkeit V3 und verpflichtendes NEXUS-Finale
-- **Status:** **FREIGEGEBEN_FUER_CLAUDE**
+- **Status:** **TECHNISCH_ABGENOMMEN_BESITZERTEST_OFFEN**
 - **Auftraggeber:** Besitzer
 - **Projektleitung und Abnahme:** Codex
-- **Ausführung:** Claude Code
+- **Ausführung:** OpenCode; unabhängige Review und Nacharbeit durch Codex
 - **Priorität:** P0 – sichtbarer Spielspaß und klares Run-Finale
 - **Startstand:** sauberer main nach der Codex-Planungsübergabe; tatsächlichen
   Ausgangscommit und anfänglichen Git-Status im Arbeitsbericht festhalten
 - **Timebox:** bis zu fünf Stunden produktiv nutzen; Gates in Reihenfolge
   abschließen und nicht nach einem kosmetischen Teilergebnis stoppen
+- **Abnahme:** 53/53 Checks grün; git diff --check sauber; Botanker 19,78
+  bei unveränderter Toleranz ±3
+- **Offenes Gate:** vollständiger Besitzerlauf bis NEXUS nach
+  docs/TESTPLAN.md; bis dahin kein weiterer Balance- oder Grafikpass
 
 ## Verbindlicher Besitzerbefund
 
