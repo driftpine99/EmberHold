@@ -54,6 +54,7 @@ function makeElement(id = "") {
     },
     setAttribute: (name, value) => attributes.set(name, String(value)),
     getAttribute: (name) => attributes.get(name),
+    removeAttribute: (name) => { attributes.delete(name); },
     addEventListener: noop,
     appendChild: (child) => { node.firstElementChild ||= child; },
     getContext: () => context,
@@ -376,8 +377,12 @@ try {
     bowUpgrade: 1, selectedContract: "hollow", lastAt: 1000,
   }));
   engine.loadHold(1000);
-  const migrated = engine.H.version === 4 && engine.H.essence === 0 &&
+  // D-042: Die Migrationskette laeuft jetzt bis Save v5 durch; die neuen
+  // Felder starten bereinigt bei 0/0/'none'.
+  const migrated = engine.H.version === 5 && engine.H.essence === 0 &&
     engine.H.marks === 0 && engine.H.preparedRerolls === 0 &&
+    engine.H.stationData === 0 && engine.H.coreStage === 0 &&
+    engine.H.sortieProtocol === "none" &&
     engine.H.masteries.path === 0 && engine.H.selectedContract === "hollow";
 
   engine.H.arcanumLevel = 1; engine.H.arcanumStored = 0;
@@ -428,7 +433,10 @@ try {
     masteries: { path: 0, reach: 0, dash: 0 }, selectedContract: "ring", lastAt: 1000,
   }));
   engine.loadHold(1000);
-  const migrated = engine.H.version === 4 && engine.H.dust === 0 &&
+  // D-042: v3→v5-Kette, neue Felder sauber initialisiert.
+  const migrated = engine.H.version === 5 && engine.H.dust === 0 &&
+    engine.H.stationData === 0 && engine.H.coreStage === 0 &&
+    engine.H.sortieProtocol === "none" &&
     Object.keys(engine.H.gearOwned).length === 0 && engine.H.gearEquipped.charm === null;
 
   const first = engine.grantGear("runenfibel");
@@ -1942,9 +1950,9 @@ try {
     engine.CONTRACTS.map(c => c.id).join(",") === "ring,breach,hollow" &&
     engine.WEAPONS.every(w => !!engine.W_IDX[w.id] || w.id === "bogen");
 
-  // 4. Der Save-Key bleibt emberhold:hold:v1 und ein v4-Stand ueberlebt
-  //    Speichern und Neuladen verlustfrei. Kein Quelltextvergleich, sondern
-  //    ein echter Rundlauf durch localStorage.
+  // 4. Der Save-Key bleibt emberhold:hold:v1 und ein v4-Stand wird nach
+  //    D-042 auf v5 migriert und ueberlebt Speichern/Neuladen verlustfrei --
+  //    inklusive der drei neuen Felder. Echter Rundlauf durch localStorage.
   localStorage.setItem("emberhold:hold:v1", JSON.stringify({
     version: 4, ore: 33, bars: 7, essence: 2, marks: 1, dust: 14, runs: 9,
     mineLevel: 1, forgeLevel: 1, bowUpgrade: 1, arcanumLevel: 1, yardLevel: 1,
@@ -1959,9 +1967,12 @@ try {
   engine.loadHold(1000);
   // Bewusst NICHT gegen den Rohwert 33 pruefen: Der Materiefabrikator
   // verbraucht beim Laden planmaessig 5 Asterit fuer die naechste Charge.
-  // Entscheidend ist, dass der Rundlauf nichts verliert oder veraendert.
+  // Entscheidend ist, dass der Rundlauf nichts verliert oder veraendert --
+  // jetzt inklusive stationData/coreStage/sortieProtocol (D-042).
   const roundtripVerlustfrei = JSON.stringify(engine.H) === geladen &&
-    engine.H.version === 4 && engine.H.dust === 14 &&
+    engine.H.version === 5 && engine.H.dust === 14 &&
+    engine.H.stationData === 0 && engine.H.coreStage === 0 &&
+    engine.H.sortieProtocol === "none" &&
     engine.H.selectedContract === "hollow" && engine.H.gearOwned.glutsehne === 2 &&
     engine.H.masteries.reach === 2 && engine.H.bowUpgrade === 1 &&
     engine.H.preparedRerolls === 1 && engine.H.runs === 9;

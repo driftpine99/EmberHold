@@ -112,6 +112,13 @@ canvas{display:block;position:absolute;inset:0;width:100%;height:100%}
 #evohint .ehprog{font-variant-numeric:tabular-nums;color:#a8b6cf}
 #evohint.ready{border-color:#e07a3f;box-shadow:0 0 12px rgba(224,122,63,.20)}
 #evohint.ready .ehname{color:#ffb870}
+/* D-042 / Gate D: kompakter Signal-Status unter dem EVO-Hinweis. */
+#signalhud{position:absolute;left:14px;top:124px;padding:4px 10px;border-radius:8px;
+  background:rgba(13,18,30,.78);border:1px solid #2c4a58;
+  font-size:10px;letter-spacing:.06em;color:#8fd8e8;white-space:nowrap;
+  opacity:0;transition:opacity .18s ease;pointer-events:none;z-index:5;
+  font-variant-numeric:tabular-nums}
+#signalhud.on{opacity:1}
 /* Der Ring zeigt den echten Abklingfortschritt. --cd laeuft von 0 bis 1 und
    wird nur bei sichtbarer Aenderung gesetzt, nicht in jedem Frame. */
 .wcool{position:absolute;inset:-3px;border-radius:50%;
@@ -207,10 +214,14 @@ button.b.danger{background:#c9402e;color:#fff}
 .help kbd{background:#1d1d29;border:1px solid #2e2e3c;border-radius:5px;padding:2px 8px;
   font:inherit;font-size:11.5px;color:#e8e4dc;flex-shrink:0;min-width:74px;text-align:center}
 
-/* ---------- Kraterhold ---------- */
+/* ---------- D-042 / Gate C: Stationsring statt Kartenwand ----------
+   Die Startansicht ist eine zusammenhaengende Szene: Planet, Sterne,
+   gebrochene Ringsegmente, Leitungen, sechs Hotspots und der zentrale Kern.
+   Alle Zustaende sind code-nativ (CSS-Formen), keine neuen Assets. */
 #start.holdsheet{justify-content:flex-start;background:
-  radial-gradient(circle at 50% 39%,rgba(100,35,20,.28),transparent 24%),
-  linear-gradient(rgba(8,8,12,.91),rgba(8,8,12,.97));padding:18px 20px 28px}
+  radial-gradient(circle at 78% -6%,rgba(70,58,140,.20),transparent 34%),
+  radial-gradient(circle at 12% 108%,rgba(40,90,170,.14),transparent 30%),
+  linear-gradient(rgba(7,9,16,.94),rgba(8,10,18,.97));padding:18px 20px 28px}
 .holdhead{order:0;width:min(1100px,100%);display:flex;align-items:flex-end;justify-content:space-between;
   gap:16px;text-align:left}.holdhead .kick{margin:0}.holdhead h1{font-size:clamp(25px,5vw,42px)}
 .holdresources{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
@@ -218,27 +229,116 @@ button.b.danger{background:#c9402e;color:#fff}
   padding:6px 11px;min-width:92px}.holdres b{display:block;color:#e8e4dc;font-size:17px;
   font-variant-numeric:tabular-nums}.holdres span{display:block;color:#777164;font-size:9px;
   letter-spacing:.12em;text-transform:uppercase}
-.holdstage{order:2;position:relative;width:min(820px,100%);margin:12px auto 0;padding-top:185px}
-.crater{position:absolute;left:50%;top:0;width:420px;height:210px;transform:translateX(-50%);
-  border-radius:50%;background:radial-gradient(ellipse,#221710 0 8%,#352119 9% 12%,#17171e 13% 27%,
-  #343039 28% 30%,#12131a 31% 46%,#292a32 47% 50%,#0b0c11 51% 68%,#24252d 69% 72%,transparent 73%);
-  box-shadow:0 22px 46px rgba(0,0,0,.7),inset 0 0 35px rgba(0,0,0,.85)}
-.embercore{position:absolute;left:50%;top:64px;transform:translateX(-50%);width:54px;height:82px;
-  display:grid;place-items:center;filter:drop-shadow(0 0 17px rgba(224,86,42,.72))}
-.embercore:before{content:"";width:28px;height:64px;background:linear-gradient(#ffd18a,#e05a2e 48%,#711f19);
-  clip-path:polygon(50% 0,82% 35%,68% 100%,32% 100%,18% 35%);animation:corepulse 2.4s ease-in-out infinite}
-.embercore:after{content:"";position:absolute;bottom:-5px;width:62px;height:18px;border:6px solid #373740;
-  border-radius:50%;box-shadow:0 0 14px rgba(224,90,45,.42)}
-@keyframes corepulse{50%{filter:brightness(1.3);transform:scale(.95,1.05)}}
-@media (prefers-reduced-motion:reduce){.embercore:before{animation:none}}
-.holdstatus{position:absolute;top:146px;left:50%;transform:translateX(-50%);font-size:11px;
-  color:#a88672;width:min(620px,92vw);text-align:center}
+
+.holdscene{order:1;position:relative;width:min(880px,100%);height:308px;margin:12px auto 0;
+  border-radius:16px;overflow:hidden;background:
+  radial-gradient(ellipse at 50% 62%,rgba(52,66,102,.55),rgba(13,17,28,.92) 72%);
+  border:1px solid #232c44}
+.holdstatus{order:2;width:min(680px,92vw);margin:10px auto 0;font-size:11px;
+  color:#a88672;text-align:center}
+.holdgoal{order:3;width:min(680px,92vw);margin:6px auto 12px;padding:11px 14px 12px;text-align:left;
+  background:rgba(24,20,26,.94);border:1px solid #3a2b2c;border-left:3px solid #e07a3f;
+  border-radius:10px}
+.scene-stars{position:absolute;inset:0;background-image:
+  radial-gradient(1.2px 1.2px at 12% 22%,rgba(220,232,255,.85),transparent 60%),
+  radial-gradient(1px 1px at 31% 68%,rgba(190,214,255,.6),transparent 60%),
+  radial-gradient(1.4px 1.4px at 47% 14%,rgba(255,243,208,.75),transparent 60%),
+  radial-gradient(1px 1px at 63% 41%,rgba(214,228,255,.55),transparent 60%),
+  radial-gradient(1.3px 1.3px at 76% 76%,rgba(184,240,255,.65),transparent 60%),
+  radial-gradient(1px 1px at 89% 27%,rgba(220,232,255,.5),transparent 60%),
+  radial-gradient(1.1px 1.1px at 22% 86%,rgba(200,222,255,.45),transparent 60%),
+  radial-gradient(1px 1px at 55% 90%,rgba(220,232,255,.4),transparent 60%)}
+.scene-planet{position:absolute;left:-96px;bottom:-150px;width:280px;height:280px;border-radius:50%;
+  background:radial-gradient(circle at 36% 32%,#4a6a9a,#2c4266 52%,#141f38 88%);
+  box-shadow:inset -18px -22px 48px rgba(0,0,0,.55),0 0 42px rgba(40,70,120,.35)}
+.scene-ring{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);border-radius:50%;
+  border:2px solid transparent}
+.scene-ring.ring-a{width:330px;height:330px;
+  border-top-color:rgba(127,212,232,.30);border-right-color:rgba(127,212,232,.12);
+  transform:translate(-50%,-50%) rotate(24deg)}
+.scene-ring.ring-b{width:452px;height:452px;
+  border-bottom-color:rgba(217,180,90,.22);border-left-color:rgba(185,143,224,.14);
+  transform:translate(-50%,-50%) rotate(-38deg)}
+.scene-conduit{position:absolute;top:56%;height:2px;width:31%;
+  background:linear-gradient(90deg,transparent,rgba(127,212,232,.34))}
+.conduit-l{left:0}.conduit-r{right:0;transform:scaleX(-1)}
+
+/* Zentraler Kern mit drei sichtbaren Ausbaustufen */
+.core{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);
+  display:grid;justify-items:center;gap:3px;padding:11px 15px 9px;border-radius:14px;
+  background:radial-gradient(circle at 50% 38%,rgba(38,52,80,.95),rgba(14,20,34,.95));
+  border:1px solid #35486a;color:#d8e4f5;font:inherit;cursor:pointer;pointer-events:auto}
+.core:hover{border-color:#7fd4e8}
+.core-orb{position:relative;width:44px;height:44px;border-radius:50%;
+  background:radial-gradient(circle at 42% 36%,#b8f0ff,#2c4266 68%);
+  box-shadow:0 0 22px rgba(127,212,232,.35);display:grid;place-items:center}
+.core-orb i{width:14px;height:14px;border-radius:50%;background:#e9fbff;
+  box-shadow:0 0 14px rgba(184,240,255,.9)}
+@keyframes kernpuls{50%{filter:brightness(1.25)}}
+.core-orb{animation:kernpuls 3.2s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.core-orb{animation:none}}
+.core-lights{display:flex;gap:5px;margin-top:2px}
+.core-lights i{width:9px;height:9px;border-radius:50%;background:#20293c;border:1px solid #35486a}
+.core.st-1 .core-lights i:nth-child(1),
+.core.st-2 .core-lights i:nth-child(-n+2),
+.core.st-3 .core-lights i{background:#ffd98a;border-color:#d9b45a;
+  box-shadow:0 0 8px rgba(240,196,90,.55)}
+.core b{font-size:11px;letter-spacing:.06em}
+.core em{font-style:normal;font-size:9px;color:#8fd8e8;font-variant-numeric:tabular-nums}
+
+/* Sechs Hotspots auf dem Ring; Lampen zeigen den Reparaturzustand */
+.hotspot{position:absolute;display:grid;justify-items:center;gap:2px;min-width:96px;min-height:62px;
+  padding:8px 10px;border-radius:12px;background:rgba(15,21,36,.88);
+  border:1px solid #2c3c58;color:#cfe0f5;font:inherit;cursor:pointer;pointer-events:auto}
+.hotspot:hover{border-color:#7fd4e8}
+.hotspot b{font-size:11.5px;letter-spacing:.04em}
+.hotspot em{font-style:normal;font-size:9px;color:#8fa0bd;font-variant-numeric:tabular-nums;
+  white-space:nowrap}
+.hotspot .lamp{width:10px;height:10px;border-radius:50%;background:#3a2030;border:1px solid #57303c}
+.hotspot.st-off .lamp{background:#7a3040;box-shadow:0 0 8px rgba(180,60,80,.45)}
+.hotspot.st-run .lamp{background:#d98a3c;box-shadow:0 0 9px rgba(224,138,60,.6);
+  animation:lampulse 1.6s ease-in-out infinite}
+.hotspot.st-ready .lamp{background:#7fe8ff;box-shadow:0 0 12px rgba(127,232,255,.8)}
+@keyframes lampulse{50%{opacity:.55}}
+@media (prefers-reduced-motion:reduce){.hotspot.st-run .lamp{animation:none}}
+.hs-mine{left:9%;top:8%}
+.hs-forge{right:9%;top:8%}
+.hs-arcanum{left:3%;top:52%}
+.hs-yard{right:3%;top:52%}
+.hs-armory{left:22%;bottom:5%}
+.hs-map{right:22%;bottom:5%}
+
+/* Genau ein Detailpanel gleichzeitig offen; Panel darf intern scrollen */
+.detailpanels{order:3;width:min(880px,100%);margin:10px auto 0}
+.dpanel{display:none;max-height:318px;overflow-y:auto;text-align:left;
+  background:rgba(13,16,27,.94);border:1px solid #26304a;border-radius:12px;padding:12px 14px}
+#start[data-panel="core"]   .dpanel[data-panel="core"],
+#start[data-panel="mine"]   .dpanel[data-panel="mine"],
+#start[data-panel="forge"]  .dpanel[data-panel="forge"],
+#start[data-panel="arcanum"].dpanel[data-panel="arcanum"],
+#start[data-panel="arcanum"] .dpanel[data-panel="arcanum"],
+#start[data-panel="yard"]   .dpanel[data-panel="yard"],
+#start[data-panel="armory"] .dpanel[data-panel="armory"],
+#start[data-panel="map"]    .dpanel[data-panel="map"]{display:block}
+.panelnote{font-size:11px;color:#8fa0bd;margin:6px 0 8px;line-height:1.45}
+.hotspot.active{border-color:#7fd4e8;box-shadow:0 0 14px rgba(127,212,232,.25)}
+.protocolrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0}
+.protocolrow>b{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#8fa0bd}
+.protocolchips{display:flex;gap:6px;flex-wrap:wrap}
+.pchip{border:1px solid #2c3c58;background:rgba(15,21,36,.9);color:#a8b6cf;border-radius:999px;
+  padding:5px 11px;font:inherit;font-size:10.5px;cursor:pointer;pointer-events:auto}
+.pchip.selected{border-color:#ffd98a;color:#ffd98a;box-shadow:0 0 10px rgba(240,196,90,.22)}
+.pchip.locked{opacity:.38;cursor:default}
+.inlinegrid{grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-bottom:6px}
+.holdstatus{width:min(680px,92vw);margin:10px auto 0;font-size:11px;
+  color:#a88672;text-align:center}
 /* Ein einziges hervorgehobenes Ziel. Der Hold zeigt sechs Ressourcen, vier
    Gebaeude, Vertraege, Ausruestung und Meisterschaften gleichzeitig; es fehlt
    kein Inhalt, es fehlt eine Rangfolge (D-033). */
-.holdgoal{width:min(620px,92vw);margin:0 auto 14px;padding:11px 14px 12px;text-align:left;
-  background:rgba(24,20,26,.94);border:1px solid #3a2b2c;border-left:3px solid #e07a3f;
-  border-radius:10px}
+/* Ein einziges hervorgehobenes Ziel. Der Hold zeigt sechs Ressourcen, vier
+   Gebaeude, Vertraege, Ausruestung und Meisterschaften gleichzeitig; es fehlt
+   kein Inhalt, es fehlt eine Rangfolge (D-033). Container-Satz liegt oben bei
+   der Stationszene (D-042); hier folgen nur die Inhaltstile. */
 .holdgoal .goalhead{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
 .holdgoal .goalhead>span{font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:#8b8577}
 .holdgoal .goalhead>b{font-size:14px;color:#e8e4dc;font-weight:650}
@@ -288,7 +388,7 @@ button.b.danger{background:#c9402e;color:#fff}
 .lockedslots{display:grid;grid-template-columns:1fr 1fr;gap:7px}
 .lockedslot{display:grid;place-items:center;background:rgba(13,13,19,.82);border:1px dashed #30303b;
   border-radius:9px;color:#5d5a53;font-size:10px;text-align:center;padding:9px}
-.holdsortie{order:1;margin-top:14px}.holdsortie .btnrow{margin-top:0}
+.holdsortie{order:4;margin-top:14px}.holdsortie .btnrow{margin-top:0}
 .holdnote{color:#5f5b53;font-size:10px;margin-top:7px}
 .contractboard{width:min(920px,100%);margin:0 auto 12px;text-align:left}
 .contractboard>div:first-child{display:flex;justify-content:space-between;align-items:baseline;
@@ -319,9 +419,15 @@ button.b.danger{background:#c9402e;color:#fff}
 @media (max-width:620px){
   #start.holdsheet{padding:14px 12px 24px}.holdhead{align-items:flex-start;flex-direction:column}
   .holdresources{justify-content:flex-start}.holdres{min-width:82px;padding:5px 9px}
-  .holdstage{padding-top:160px}.crater{width:330px;height:165px}.embercore{top:43px}
-  .holdstatus{top:126px}.holdgrid,.holdlower{grid-template-columns:1fr}.holdbuilding{padding:11px 12px}
-  .holdupgrade{align-items:flex-start}.masterygrid,.geargrid{grid-template-columns:1fr}.holdsortie button.b{padding:11px 18px}
+  .holdscene{height:236px}
+  .hs-mine{left:4%;top:6%}.hs-forge{right:4%;top:6%}
+  .hs-arcanum{left:2%;top:50%}.hs-yard{right:2%;top:50%}
+  .hs-armory{left:16%;bottom:4%}.hs-map{right:16%;bottom:4%}
+  .hotspot{min-width:84px;min-height:54px;padding:6px 8px}
+  .scene-ring.ring-a{width:250px;height:250px}
+  .scene-ring.ring-b{width:330px;height:330px}
+  .holdlower{grid-template-columns:1fr}.holdbuilding{padding:11px 12px}
+  .holdupgrade{align-items:flex-start}.masterygrid,.geargrid{grid-template-columns:1fr}
   .contractgrid{grid-template-columns:1fr}.contractcard{padding:9px 10px}
 }
 
@@ -451,7 +557,11 @@ button.b.danger{background:#c9402e;color:#fff}
 
 /* Dialoge in typischer Handy-Landschaft: Kopf und Aktionen bleiben erreichbar,
    lange Inhalte scrollen ab oben statt durch vertikale Zentrierung abzuschneiden. */
+.stationkick{display:none}
 @media (max-height:480px){
+  .holdscene{height:200px}
+  .hotspot{min-width:80px;min-height:50px}
+  .dpanel{max-height:190px}
   #cards{justify-content:flex-start;padding:8px 20px;gap:6px;overflow-y:auto}
   #cardhead h2{font-size:10px}
   #cardhead p{font-size:21px;margin-top:1px}
@@ -493,6 +603,9 @@ button.b.danger{background:#c9402e;color:#fff}
   <!-- D-041 / Gate C: der einzige Evolutionshinweis im Kampfbild -->
   <div id="evohint" aria-hidden="true"><span class="ehlabel">Nächste EVO</span><b id="ehname" class="ehname"></b><span id="ehprog" class="ehprog"></span></div>
 
+  <!-- D-042 / Gate D: Status des Sektorziels -->
+  <div id="signalhud" aria-hidden="true"></div>
+
   <div id="slots"></div>
   <div id="clock">0:00</div>
   <button id="pausebtn" class="panel" title="Pause (Esc oder P)" aria-label="Spiel pausieren">Ⅱ</button>
@@ -528,64 +641,127 @@ button.b.danger{background:#c9402e;color:#fff}
         <div class="holdstat"><b id="holdruns">0</b><span>Sortien geflogen</span></div>
       </div>
     </div>
-    <div class="holdstage">
-      <div class="crater" aria-hidden="true"></div><div class="embercore" aria-hidden="true"></div>
-      <p class="stationkick" aria-hidden="true">Innerer Ring · sechs Module</p>
-      <div class="holdstatus" id="holdstatus">Die Station wartet auf Reparaturen.</div>
-      <div class="holdgoal" id="holdgoal"></div>
-      <div class="holdgrid">
+    <div class="holdscene" id="holdscene" aria-label="Orbitalstation · sechs Module um den zentralen Kern">
+      <div class="scene-stars" aria-hidden="true"></div>
+      <div class="scene-planet" aria-hidden="true"></div>
+      <div class="scene-ring ring-a" aria-hidden="true"></div>
+      <div class="scene-ring ring-b" aria-hidden="true"></div>
+      <div class="scene-conduit conduit-l" aria-hidden="true"></div>
+      <div class="scene-conduit conduit-r" aria-hidden="true"></div>
+
+      <!-- Zentraler Stationskern: Stufen, Stationsdaten und Ausbau -->
+      <button class="core st-0" id="hsCore" data-modul="core" aria-label="Zentraler Kern: Stationdaten und Ausbau öffnen">
+        <span class="core-orb" aria-hidden="true"><i></i></span>
+        <span class="core-lights" aria-hidden="true"><i></i><i></i><i></i></span>
+        <b id="corelabel">Kern · Stufe 0</b>
+        <em id="coredata">0 Stationsdaten</em>
+      </button>
+
+      <!-- Sechs Hotspots; Lampen zeigen Offline/Produziert/Bereit -->
+      <button class="hotspot hs-mine" id="hsMine" data-modul="mine" aria-label="Asteroidensonde öffnen">
+        <i class="lamp" aria-hidden="true"></i><b>Sonde</b><em id="hsmineinfo">Offline</em></button>
+      <button class="hotspot hs-forge" id="hsForge" data-modul="forge" aria-label="Materiefabrikator öffnen">
+        <i class="lamp" aria-hidden="true"></i><b>Fabrikator</b><em id="hsforgeinfo">Offline</em></button>
+      <button class="hotspot hs-arcanum" id="hsArcanum" data-modul="arcanum" aria-label="Fluxlabor öffnen">
+        <i class="lamp" aria-hidden="true"></i><b>Fluxlabor</b><em id="hsarcanuminfo">Offline</em></button>
+      <button class="hotspot hs-yard" id="hsYard" data-modul="yard" aria-label="Simulationsdeck öffnen">
+        <i class="lamp" aria-hidden="true"></i><b>Simulation</b><em id="hsyardinfo">Offline</em></button>
+      <button class="hotspot hs-armory" id="hsArmory" data-modul="armory" aria-label="Ausrüstungsbucht öffnen">
+        <i class="lamp" aria-hidden="true"></i><b>Ausrüstung</b><em id="hsarmoryinfo">Rüstkammer</em></button>
+      <button class="hotspot hs-map" id="hsMap" data-modul="map" aria-label="Sternenkarte und Sortiestart öffnen">
+        <i class="lamp" aria-hidden="true"></i><b>Sternenkarte</b><em id="hsmapinfo">Sortie</em></button>
+    </div>
+
+    <div class="holdstatus" id="holdstatus">Die Station wartet auf Reparaturen.</div>
+    <div class="holdgoal" id="holdgoal"></div>
+
+    <!-- Genau ein Detailpanel ist gleichzeitig offen (data-panel am Sheet) -->
+    <div class="detailpanels">
+      <section class="dpanel" id="panel-core" data-panel="core">
+        <div class="masteryhead"><b>Zentraler Kern</b><span>Ausbau · drei einmalige Stufen</span>
+          <em class="modulres"><b id="coredata2">0</b> Stationsdaten</em></div>
+        <p class="panelnote">Stationsdaten entstehen in Sortien: Das Sektorziel
+        „SIGNAL SICHERN“ sichert eine Datei, ein echter NEXUS-Kill eine zweite.
+        Jede Kernstufe versorgt weitere Module mit Licht.</p>
+        <div class="holdlower">
+          <section class="holdupgrade" id="coreupgrade"><div><b id="coreupname">Kern Stufe 1</b><p id="coreupdesc">1 Stationsdatei + 5 Asterit · schaltet Klingenfokus frei</p></div><button class="smallaction" id="btnCoreUpgrade">Ausbauen</button></section>
+          <section class="holdupgrade" id="bowupgrade"><div><b>Orbitklinge verstärken</b><p>2 Legierungsplatten · dauerhaft +10 % Schaden in Sortien</p></div><button class="smallaction" id="btnBowUpgrade">Verstärken</button></section>
+          <section class="holdupgrade" id="rerollprep"><div><b>Flux neu ausrichten</b><p>2 Fluxkondensat · +1 Reroll im nächsten Run · maximal 2</p></div><button class="smallaction" id="btnPrepareReroll">Vorbereiten</button></section>
+        </div>
+      </section>
+      <section class="dpanel" id="panel-mine" data-panel="mine">
         <section class="holdbuilding" id="minecard">
           <div class="buildingtop"><b>Asteroidensonde</b><span id="minelevel">Offline</span></div>
           <p>Fördert 1 Asterit alle 15 Sekunden. Lagerkapazität: 20.</p>
           <div class="prodbar"><i id="minebar"></i></div>
           <div class="buildingfoot"><span class="buildingstate" id="minestate">Noch nicht repariert</span><button class="smallaction" id="btnMine">Kostenlos reparieren</button></div>
         </section>
+      </section>
+      <section class="dpanel" id="panel-forge" data-panel="forge">
         <section class="holdbuilding" id="forgecard">
           <div class="buildingtop"><b>Materiefabrikator</b><span id="forgelevel">Offline</span></div>
           <p>Verarbeitet automatisch 5 Asterit in 30 Sekunden zu 1 Legierungsplatte.</p>
           <div class="prodbar"><i id="forgebar"></i></div>
           <div class="buildingfoot"><span class="buildingstate" id="forgestate">Benötigt 10 Asterit</span><button class="smallaction" id="btnForge">Reparieren · 10</button></div>
         </section>
+      </section>
+      <section class="dpanel" id="panel-arcanum" data-panel="arcanum">
         <section class="holdbuilding" id="arcanumcard">
           <div class="buildingtop"><b>Fluxlabor</b><span id="arcanumlevel">Offline</span></div>
           <p>Verdichtet alle 45 Sekunden 1 Fluxkondensat. Lagerkapazität: 6.</p>
           <div class="prodbar"><i id="arcanumbar"></i></div>
           <div class="buildingfoot"><span class="buildingstate" id="arcanumstate">Benötigt 15 Asterit</span><button class="smallaction" id="btnArcanum">Reparieren · 15</button></div>
         </section>
+      </section>
+      <section class="dpanel" id="panel-yard" data-panel="yard">
         <section class="holdbuilding" id="yardcard">
           <div class="buildingtop"><b>Simulationsdeck</b><span id="yardlevel">Offline</span></div>
           <p>Erzeugt alle 60 Sekunden 1 Sim-Datensatz. Lagerkapazität: 4.</p>
           <div class="prodbar"><i id="yardbar"></i></div>
           <div class="buildingfoot"><span class="buildingstate" id="yardstate">Benötigt 3 Legierungsplatten</span><button class="smallaction" id="btnYard">Reparieren · 3</button></div>
         </section>
-      </div>
-      <div class="holdlower">
-        <section class="holdupgrade" id="bowupgrade"><div><b>Orbitklinge verstärken</b><p>2 Legierungsplatten · dauerhaft +10 % Schaden in Sortien</p></div><button class="smallaction" id="btnBowUpgrade">Verstärken</button></section>
-        <section class="holdupgrade" id="rerollprep"><div><b>Flux neu ausrichten</b><p>2 Fluxkondensat · +1 Reroll im nächsten Run · maximal 2</p></div><button class="smallaction" id="btnPrepareReroll">Vorbereiten</button></section>
-      </div>
-      <section class="masterybox" id="masterybox">
-        <div class="masteryhead"><b>Simulationsdeck</b><span>Utility · maximal Stufe 2</span>
-          <em class="modulres"><b id="holdmarks">0</b> Sim-Daten</em></div>
-        <div class="masterygrid">
-          <div class="masterytile"><div><b>Vektornavigation <em id="masterypath">0/2</em></b><span>+5 % Lauftempo je Stufe</span></div><button class="smallaction" id="btnMasteryPath">Lernen</button></div>
-          <div class="masterytile"><div><b>Traktorkontrolle <em id="masteryreach">0/2</em></b><span>+10 % Aufsammelradius je Stufe</span></div><button class="smallaction" id="btnMasteryReach">Lernen</button></div>
-          <div class="masterytile"><div><b>Impulsdrill <em id="masterydash">0/2</em></b><span>−8 % Stoß-Abklingzeit je Stufe</span></div><button class="smallaction" id="btnMasteryDash">Lernen</button></div>
-        </div>
+        <section class="masterybox" id="masterybox">
+          <div class="masteryhead"><b>Meisterschaften</b><span>Utility · maximal Stufe 2</span>
+            <em class="modulres"><b id="holdmarks">0</b> Sim-Daten</em></div>
+          <div class="masterygrid">
+            <div class="masterytile"><div><b>Vektornavigation <em id="masterypath">0/2</em></b><span>+5 % Lauftempo je Stufe</span></div><button class="smallaction" id="btnMasteryPath">Lernen</button></div>
+            <div class="masterytile"><div><b>Traktorkontrolle <em id="masteryreach">0/2</em></b><span>+10 % Aufsammelradius je Stufe</span></div><button class="smallaction" id="btnMasteryReach">Lernen</button></div>
+            <div class="masterytile"><div><b>Impulsdrill <em id="masterydash">0/2</em></b><span>−8 % Stoß-Abklingzeit je Stufe</span></div><button class="smallaction" id="btnMasteryDash">Lernen</button></div>
+          </div>
+        </section>
       </section>
-      <section class="armorybox">
-        <div class="masteryhead"><b>Ausrüstungsbucht</b><span>3 Slots · Duplikate werden Modulfragmente</span>
-          <em class="modulres"><b id="holddust">0</b> Modulfragmente</em></div>
-        <div class="geargrid" id="geargrid"></div>
+      <section class="dpanel" id="panel-armory" data-panel="armory">
+        <section class="armorybox">
+          <div class="masteryhead"><b>Ausrüstungsbucht</b><span>3 Slots · Duplikate werden Modulfragmente</span>
+            <em class="modulres"><b id="holddust">0</b> Modulfragmente</em></div>
+          <div class="geargrid" id="geargrid"></div>
+        </section>
+      </section>
+      <section class="dpanel" id="panel-map" data-panel="map">
+        <section class="armorybox mapbox">
+          <div class="masteryhead"><b>Sternenkarte</b><span>Sektor, Protokoll und Start</span></div>
+          <div class="contractgrid inlinegrid" id="contractgrid2"></div>
+          <div class="protocolrow">
+            <b>Sortie-Protokoll</b>
+            <div class="protocolchips" id="protocolchips"></div>
+            <p class="panelnote" id="protocolnote">Kein Protokoll gewählt: Die Sortie läuft unverändert.</p>
+          </div>
+          <div class="btnrow"><button class="b" id="btnStart2">Sortie · 8 Min</button><button class="b ghost" id="btnStart32">Aufklärung · 3 Min</button></div>
+        </section>
       </section>
     </div>
     <div class="holdsortie">
       <div class="contractboard">
-        <div><h2>Sternenkarte</h2><span>Wähle Sektor und Risiko</span></div>
+        <div><h2>Sternenkarte &amp; Start</h2><span>Sektor, Protokoll und Sortiestart</span></div>
+        <div class="protocolrow">
+          <b>Protokoll:</b> <span id="protocolshort">kein Protokoll</span>
+          <button class="smallaction" id="btnOpenMap">Wählen …</button>
+        </div>
         <div class="contractgrid" id="contractgrid"></div>
+        <div class="btnrow"><button class="b" id="btnStart">Sortie · 8 Min</button><button class="b ghost" id="btnStart3">Aufklärung · 3 Min</button></div>
+        <button class="copyline lastreport" id="btnCopyLast" hidden aria-hidden="true">Letzten Run-Bericht kopieren</button>
+        <p class="holdnote">Lokaler Prototyp · Offline-Produktion bis maximal 24 Stunden · Ton und weitere Sektoren folgen später</p>
       </div>
-      <div class="btnrow"><button class="b" id="btnStart">Sortie · 8 Min</button><button class="b ghost" id="btnStart3">Aufklärung · 3 Min</button></div>
-      <button class="copyline lastreport" id="btnCopyLast" hidden aria-hidden="true">Letzten Run-Bericht kopieren</button>
-      <p class="holdnote">Lokaler Prototyp · Offline-Produktion bis maximal 24 Stunden · Ton und weitere Sektoren folgen später</p>
     </div>
   </div>
 
@@ -1947,10 +2123,14 @@ function leadingEvoPath(){
 // ===========================================================================
 let S = null;
 let HEADLESS = false;
-function newRun(runLen, seed, contractId){
+function newRun(runLen, seed, contractId, opts){
   const runSeed = seedRandom(seed);
   const contract=contractById(contractId||(HEADLESS?'ring':META?.selectedContract));
   const gear=HEADLESS?equippedGearBonuses(null):equippedGearBonuses(META);
+  // D-042 / Gate E: das Sortie-Protokoll ist eine bewusste Wahl vor der
+  // Sortie. Ohne Wahl -- und in der gesamten Headless-Baseline -- bleibt es
+  // 'none' und damit ohne jede Wirkung auf den serialisierten Lauf.
+  const protocol=(opts&&opts.protocol)||(HEADLESS?'none':(META?.sortieProtocol||'none'));
   S = {
     t:0, running:false, phase:'run',        // run | pause | cards | extract | over
     runLen: runLen,
@@ -1983,8 +2163,13 @@ function newRun(runLen, seed, contractId){
     // aus der Differenz und kostet zur Laufzeit nichts.
     wFirst:new Float64Array(WEAPONS.length).fill(-1),
     evoAt:new Float64Array(WEAPONS.length).fill(-1),
-    rerolls:1,
+    // Fluxreserve: genau ein zusaetzlicher, nicht verbrauchter Stations-Reroll
+    // zum Startbudget -- getrennt von den vorbereiteten Rerolls der Station.
+    rerolls:protocol==='fluxreserve'?2:1,
     pickTimes:[],                           // für den Pacing-Bericht
+    // D-042 / Gate D+E: Sektorziel und Protokoll-Schnappschuss.
+    protocol:protocol,
+    signal:null, securedData:0, kfUsed:false,
     // D-041 / Gate E: Finale-Zustand. nexusState: 0 wartet, 1 lebt, 2 besiegt.
     bossId:null, nexusState:0, nexusWarned:false,
     nexusSpawnT:-1, nexusKillT:-1, pendingExtract:false,
@@ -2083,6 +2268,21 @@ const NEXUS_AT=480;
 // Evolutionen damit den geforderten Korridor von 30–75 Sekunden, waehrend
 // ein schwacher Build am Finale scheitert. Kalibriert am 25.08.2026.
 const NEXUS_HP_MULT=660;
+// D-042 / Gate D: das bewegungsbasierte Sektorziel der Acht-Minuten-Sortie.
+// Genau ein Ziel „SIGNAL SICHERN“: Spawn bei 2:30 an hash-streuer Position
+// (eigener Hash aus Seed und Konstanten -- verbraucht KEINEN Gameplay-RNG),
+// Ladefenster bis 4:00 (vor AEGIS), kumulativ 8 s im Radius (Scanner: 5 s).
+// Erfolg sichert eine Stationsdatei, ein echter NEXUS-Kill die zweite; beide
+// gehoeren zur Basisbergung und werden exakt einmal in depositRunReward()
+// gutgeschrieben.
+const SIGNAL = Object.freeze({
+  SPAWN_AT:150, END_AT:240, RADIUS:110,
+  CHARGE_S:8, CHARGE_S_SCANNER:5,
+  DIST_MIN:220, DIST_MAX:300,
+  FILE_LOOT:60,
+});
+function signalBedarf(){ return (S&&S.protocol==='bergungsscanner')
+  ? SIGNAL.CHARGE_S_SCANNER : SIGNAL.CHARGE_S; }
 // Rueckzugsbudget in Sekunden. Ein Gegner schafft aus dem Zaehlkreis
 // (Radius SIM_DIAG*1.15 = 702) bis zum Recyclingrand (SIM_DIAG*1.20 = 842)
 // im schlechtesten Fall rund 1545 Welteinheiten; bei 230 u/s sind das
@@ -2431,6 +2631,9 @@ function killEnemy(i){
       // D-041 / Gate E: erst der echte Tod von NEXUS meistert den Run und
       // oeffnet unmittelbar die bestehende Extraktions-/Overtime-Entscheidung.
       S.nexusState=2; S.nexusKillT=S.t; S.pendingExtract=true;
+      // D-042 / Gate D: der echte Bosskill sichert zusaetzlich eine zweite
+      // Stationsdatei -- zur Basisbergung gehoerig, also todsicher gebucht.
+      S.securedData++;
       // Bossangriffe duerfen nach der Overtime-Wahl nicht aus dem
       // angehaltenen Extraktionsbild wieder anlaufen.
       for(const k in HZ) HZ[k].length=0;
@@ -2831,6 +3034,12 @@ let pendingPicks = 0, currentOffer = [], cardMode='level';
 function buildOffer(){
   const pool = [];
   const nW = Object.keys(S.W).length, nP = Object.keys(S.Pa).length;
+  // D-042 / Gate E: Klingenfokus gilt fuer den ERSTEN Kartenzug der Sortie.
+  // Der Flag wird beim ersten Angebot gesetzt -- auch wenn dort keine legale
+  // Orbitklingen-Aufwertung existiert; dann bleibt dieses und jedes weitere
+  // Angebot unveraendert (keine Nachruestung, kein Bypass).
+  const kfErsterZug = S.protocol==='klingenfokus' && !S.kfUsed;
+  S.kfUsed = true;
   // Evolution hat Vorrang und wird garantiert angeboten
   for (const w of WEAPONS){
     if (!w.evo) continue;
@@ -2877,6 +3086,16 @@ function buildOffer(){
         if(replace>=0) out[replace]=focus;
       }
     }
+  }
+  // D-042 / Gate E: Klingenfokus-Injektion. Sie ersetzt deterministisch den
+  // ERSTEN Angebotsplatz durch eine legale Orbitklingen-Aufwertung -- ohne
+  // zusaetzliche RNG-Ziehung, ohne vierten Platz, ohne Umgehung von
+  // Evolutionsvoraussetzungen (bogen muss >0 und <5 sein). Ein bereits
+  // eingesäte Gearcard wird nicht verdraengt; ist nichts legal, bleibt das
+  // normale Angebot exakt unverändert.
+  if (kfErsterZug && out.length && !out.some(o=>o.type==='gearcard')){
+    const bogen=WEAPONS.find(w=>w.id==='bogen'), lv=S.W.bogen||0;
+    if (lv>0 && lv<MAXLV) out[0]={type:'w', w:bogen, lv, weight:1};
   }
   return injectGearCard(out);
 }
@@ -3061,6 +3280,19 @@ function updateEvents(){
       // versucht -- die Extraktion bleibt solange zu Recht gesperrt.
     }
   }
+  // D-042 / Gate D: das Sektorziel. Spawn an hash-streuer Position (kein
+  // Gameplay-RNG), Fenster endet vor AEGIS; Verpassen ist terminal.
+  if (S.runLen>=CFG.RUN_LEN){
+    if (!S.signal && S.t>=SIGNAL.SPAWN_AT && S.t<SIGNAL.END_AT){
+      const h1=visualHash(S.seed|0,17,910), h2=visualHash(S.seed|0,23,911);
+      const a=h1*6.2832,
+            d=SIGNAL.DIST_MIN+(SIGNAL.DIST_MAX-SIGNAL.DIST_MIN)*h2;
+      S.signal={x:S.x+Math.cos(a)*d, y:S.y+Math.sin(a)*d,
+                geladen:0, status:'offen'};
+    }
+    if (S.signal && S.signal.status==='offen' && S.t>=SIGNAL.END_AT)
+      S.signal.status='verpasst';
+  }
 }
 
 // ===========================================================================
@@ -3177,6 +3409,22 @@ function step(dt){
   updateGems(dt);
   updateEvents();
   updateHazards(dt);
+
+  // D-042 / Gate D: kumulativer Ladefortschritt. Nur im aktiven Fenster und
+  // im Radius; Verlassen pausiert den Fortschritt, setzt ihn nicht zurück.
+  // Pause und Kartenwahl frieren ohnehin ein -- step() läuft dann nicht.
+  const sig=S.signal;
+  if (sig && sig.status==='offen'){
+    const ddx=S.x-sig.x, ddy=S.y-sig.y;
+    if (ddx*ddx+ddy*ddy <= SIGNAL.RADIUS*SIGNAL.RADIUS){
+      sig.geladen=Math.min(signalBedarf(), sig.geladen+dt);
+      if (sig.geladen>=signalBedarf()){
+        sig.status='gesichert'; S.securedData++;
+        fx(sig.x,sig.y,90,0.6,'#7fd4e8',1);
+        toast('SIGNAL gesichert · Stationsdatei '+S.securedData);
+      }
+    }
+  }
 
   for (let i=FX.t.length-1;i>=0;i--){
     FX.t[i]+=dt;
@@ -3442,6 +3690,51 @@ function drawBossTelegraphs(vx0,vx1,vy0,vy1){
   }
 }
 
+/** D-042 / Gate D: Zielmarker des Signals. Ruhiger Ring, Ladefortschritt als
+ *  Bogen und ein cyaner Randpfeil, solange das Ziel außerhalb des Fensters
+ *  liegt. Reine Anzeige -- keine KI, keine Trefferflaeche, kein RNG. */
+function drawSignalTarget(vx0,vx1,vy0,vy1){
+  const sig=S.signal; if(!sig) return;
+  const pulse=.5+.5*Math.sin(S.visualT*4);
+  ctx.save(); ctx.translate(sig.x,sig.y);
+  const bedarf=signalBedarf(), p=Math.min(1,sig.geladen/bedarf);
+  if(sig.status==='offen'){
+    ctx.strokeStyle='rgba(127,212,232,'+(0.30+pulse*0.22).toFixed(3)+')';
+    ctx.lineWidth=2/SCALE;
+    ctx.beginPath(); ctx.arc(0,0,SIGNAL.RADIUS,0,6.2832); ctx.stroke();
+    ctx.strokeStyle='rgba(184,240,255,.55)'; ctx.lineWidth=1.4/SCALE;
+    ctx.setLineDash([6,7]);
+    ctx.beginPath(); ctx.arc(0,0,16,0,6.2832); ctx.stroke();
+    ctx.setLineDash([]);
+    if(p>0.003){
+      ctx.strokeStyle='#7fe8ff'; ctx.lineWidth=4.5/SCALE; ctx.lineCap='round';
+      ctx.beginPath(); ctx.arc(0,0,SIGNAL.RADIUS-9,-1.5708,-1.5708+p*6.2832); ctx.stroke();
+    }
+  } else {
+    ctx.strokeStyle=sig.status==='gesichert'
+      ? 'rgba(127,232,176,.5)' : 'rgba(150,160,190,.35)';
+    ctx.lineWidth=2/SCALE;
+    ctx.beginPath(); ctx.arc(0,0,26,0,6.2832); ctx.stroke();
+  }
+  ctx.restore();
+  // Randpfeil, solange das Ziel nicht im Kampfausschnitt liegt.
+  const dx=sig.x-S.x, dy=sig.y-S.y;
+  const hw=VIEW_W/2-34, hh=VIEW_H/2-34;
+  if(sig.status==='offen'&&(Math.abs(dx)>hw||Math.abs(dy)>hh)){
+    const sx=Math.abs(dx)>1e-6?hw/Math.abs(dx):Infinity;
+    const sy=Math.abs(dy)>1e-6?hh/Math.abs(dy):Infinity;
+    const s=Math.min(sx,sy);
+    ctx.save();
+    ctx.translate(S.x+dx*s,S.y+dy*s); ctx.rotate(Math.atan2(dy,dx));
+    ctx.globalAlpha=.75+pulse*.25;
+    ctx.fillStyle='#7fd4e8'; ctx.strokeStyle='#e9fbff'; ctx.lineWidth=2;
+    ctx.beginPath();
+    ctx.moveTo(20,0); ctx.lineTo(-10,-13); ctx.lineTo(-3,0); ctx.lineTo(-10,13);
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.restore(); ctx.globalAlpha=1;
+  }
+}
+
 /**
  * Familien-Signale werden unter den Figuren gezeichnet. Sie erklären Verhalten:
  * Rot = eine festgelegte Laufbahn, Violett = ein festgelegter Schuss,
@@ -3639,6 +3932,8 @@ function render(){
 
   // Boss-Vorschauen liegen unter Figuren und Projektilen, aber ueber dem Boden.
   drawBossTelegraphs(vx0,vx1,vy0,vy1);
+  // D-042 / Gate D: Sektorziel-Marker (Ring + Ladefortschritt + Randpfeil).
+  drawSignalTarget(vx0,vx1,vy0,vy1);
 
   // --- Brennender Boden ---------------------------------------------------
   for (let i=0;i<GROUND.x.length;i++){
@@ -3851,12 +4146,16 @@ const HOLD_CFG=Object.freeze({
   YARD_COST:3, YARD_SEC:60, YARD_CAP:4, MASTERY_MAX:2,
 });
 function freshHold(now){
-  return {version:4,ore:0,bars:0,essence:0,marks:0,dust:0,runs:0,mineLevel:0,mineStored:0,
+  // D-042 / Gate E: Save v5. Neu sind stationData (0–999), coreStage (0–3)
+  // und sortieProtocol ('none' oder ein freigeschaltetes Protokoll).
+  return {version:5,ore:0,bars:0,essence:0,marks:0,dust:0,runs:0,mineLevel:0,mineStored:0,
     forgeLevel:0,forgeStored:0,forgeWorking:false,forgeProgress:0,
     arcanumLevel:0,arcanumStored:0,yardLevel:0,yardStored:0,
     preparedRerolls:0,masteries:{path:0,reach:0,dash:0},
     gearOwned:{},gearEquipped:{weapon:null,charm:null,mantle:null},
-    bowUpgrade:0,selectedContract:'ring',lastAt:Number.isFinite(now)?now:Date.now()};
+    bowUpgrade:0,selectedContract:'ring',
+    stationData:0,coreStage:0,sortieProtocol:'none',
+    lastAt:Number.isFinite(now)?now:Date.now()};
 }
 function cleanHold(raw,now){
   const h=freshHold(now), src=raw&&typeof raw==='object'?raw:{};
@@ -3889,6 +4188,15 @@ function cleanHold(raw,now){
   }
   h.bowUpgrade=num('bowUpgrade',0,1)|0;
   h.selectedContract=contractById(src.selectedContract).id;
+  // D-042 / Gate E: v4→v5-Migration. Alte Felder bleiben exakt erhalten;
+  // die drei neuen Felder werden streng bereinigt (Ganzzahlen bzw. Whitelist).
+  h.stationData=Math.min(999,Math.max(0,Math.floor(
+    Number.isFinite(+src.stationData)?+src.stationData:0)));
+  h.coreStage=Math.min(3,Math.max(0,Math.floor(
+    Number.isFinite(+src.coreStage)?+src.coreStage:0)))|0;
+  const proto=src.sortieProtocol;
+  h.sortieProtocol=STATION.PROTOCOLS.some(p=>p.id===proto&&p.stufe<=h.coreStage)
+    ? proto : 'none';
   h.lastAt=Number.isFinite(+src.lastAt)?+src.lastAt:h.lastAt;
   if(!h.forgeLevel||h.forgeStored>=HOLD_CFG.FORGE_CAP){ h.forgeWorking=false; h.forgeProgress=0; }
   return h;
@@ -4026,12 +4334,19 @@ function rewardOre(reward, seconds){
 /** Finale und freiwillige Overtime zaehlen zur tatsaechlich gespielten Dauer. */
 function runSeconds(){ return S ? S.t : 0; }
 function gearUpgradeCost(item,rank){ return rank*(item.rarity==='Selten'?12:6); }
-function grantGear(forcedId){
+function grantGear(forcedId, bevorzugeNeu){
   let item=GEAR_BY_ID[forcedId];
   if(!item){
     if(!S) return null;
     const mixed=(Math.imul((S.seed>>>0)^Math.imul(META.runs+1,0x9e3779b1),0x85ebca6b)>>>0);
-    item=GEAR[mixed%GEAR.length];
+    // D-042 / Gate E, Bergungsscanner: der garantierte Fund bevorzugt Teile,
+    // die noch NICHT besessen sind -- deterministisch ueber denselben Hash.
+    // Sind alle Teile besessen, greift der bisherige Duplikat-/Staub-Pfad.
+    if(bevorzugeNeu){
+      const neu=GEAR.filter(g=>!META.gearOwned[g.id]);
+      if(neu.length){ item=neu[mixed%neu.length]; }
+    }
+    if(!item) item=GEAR[mixed%GEAR.length];
   }
   const rank=META.gearOwned[item.id]||0;
   if(rank){
@@ -4054,10 +4369,15 @@ function depositRunReward(){
   const baseOre=rewardOre(S.reward,dauer), mul=S.contract?.reward||1;
   const ore=Math.max(baseOre,Math.round(baseOre*mul));
   META.ore+=ore; META.runs++; S.holdOre=ore; S.holdOreBase=baseOre; S.rewardGranted=true;
+  // D-042 / Gate D: gesicherte Stationsdateien gehoeren zur Basisbergung und
+  // werden hier GENAU EINMAL gutgeschrieben -- der Guard darueber (S.rewardGranted)
+  // verhindert jede Duplizierung durch wiederholtes Oeffnen oder doppelte
+  // Endereignisse. Sie bleiben auch bei Tod im Finale oder in Overtime erhalten.
+  META.stationData=Math.min(999,(META.stationData||0)+S.securedData);
   // Der garantierte Ausruestungsfund haengt an derselben Grenze. Er ist die
   // staerkste Belohnung je Sortie und war damit der eigentliche Grund, einen
   // Run absichtlich wegzuwerfen: Ein Abbruch bringt Erz, aber kein Teil.
-  S.lootGear=dauer>=RUN_MIN_S?grantGear():null;
+  S.lootGear=dauer>=RUN_MIN_S?grantGear(null,S.protocol==='bergungsscanner'):null;
   saveHold(); return ore;
 }
 /** Genau ein naechstes Ziel, mit Fortschritt und Begruendung. Der Besitzer
@@ -4118,16 +4438,124 @@ function renderContracts(){
   const selected=contractById(META.selectedContract);
   if(contractSig===selected.id) return;
   contractSig=selected.id;
-  el('contractgrid').innerHTML=CONTRACTS.map(c=>
+  const karte=CONTRACTS.map(c=>
     `<button class="contractcard${c.id===selected.id?' selected':''}" data-contract="${c.id}" `+
     `style="--c:${c.col}" aria-pressed="${c.id===selected.id}"><b>${c.name}</b>`+
     `<em>${c.tag}</em><span>${c.desc}</span><small>Erz ×${c.reward.toFixed(2)}</small></button>`
   ).join('');
+  el('contractgrid').innerHTML=karte;
+  const g2=el('contractgrid2'); if(g2) g2.innerHTML=karte;
   document.querySelectorAll('[data-contract]').forEach(btn=>{
     btn.onclick=()=>selectContract(btn.dataset.contract);
   });
   el('btnStart').textContent=selected.name+' · 8 Min';
   el('btnStart3').textContent=selected.name+' · 3 Min';
+}
+// ===========================================================================
+//  D-042 / Gate C: Stationsring — Hotspots, genau ein Detailpanel, Kern
+// ===========================================================================
+let openPanelId=null;
+function openPanel(modul){
+  openPanelId=(openPanelId===modul)?null:modul;
+  const start=el('start');
+  if(openPanelId) start.setAttribute('data-panel',openPanelId);
+  else start.removeAttribute('data-panel');
+  for(const b of document.querySelectorAll('.hotspot,.core'))
+    b.classList.toggle('active',b.dataset.modul===openPanelId);
+}
+/** Protokoll-Verwaltung (Gate E): Namen, Sperren und Wahl. */
+const STATION = Object.freeze({
+  PROTOCOLS:Object.freeze([
+    Object.freeze({id:'klingenfokus',name:'Klingenfokus',stufe:1}),
+    Object.freeze({id:'fluxreserve',name:'Fluxreserve',stufe:2}),
+    Object.freeze({id:'bergungsscanner',name:'Bergungsscanner',stufe:3}),
+  ]),
+  CORE_COSTS:Object.freeze([
+    Object.freeze({daten:1,ore:5,desc:'1 Stationsdatei + 5 Asterit · schaltet Klingenfokus frei'}),
+    Object.freeze({daten:2,bars:1,desc:'2 Stationsdaten + 1 Legierungsplatte · schaltet Fluxreserve frei'}),
+    Object.freeze({daten:3,bars:2,desc:'3 Stationsdaten + 2 Legierungsplatten · schaltet Bergungsscanner frei'}),
+  ]),
+});
+function protocolAktiv(){ return META && META.sortieProtocol!=='none' ? META.sortieProtocol : 'none'; }
+function setProtocol(id){
+  if(S&&S.running) return false;
+  if(id!=='none'&&!STATION.PROTOCOLS.some(p=>p.id===id&&p.stufe<=META.coreStage)) return false;
+  META.sortieProtocol=id; saveHold();
+  if(typeof renderHold==='function') renderHold();
+  return true;
+}
+function upgradeCore(){
+  const st=META.coreStage;
+  if(st>=3) return false;
+  const kosten=STATION.CORE_COSTS[st];
+  if(META.stationData<kosten.daten||
+     (kosten.ore&&META.ore<kosten.ore)||(kosten.bars&&META.bars<kosten.bars)) return false;
+  META.stationData-=kosten.daten;
+  if(kosten.ore) META.ore-=kosten.ore;
+  if(kosten.bars) META.bars-=kosten.bars;
+  META.coreStage=st+1; saveHold(); renderHold('Der zentrale Kern erreicht Stufe '+(st+1)+'.');
+  return true;
+}
+/** Sync der Szene: Lampen je Zustand, Kernstufen, Protokollchips. */
+function renderStationMap(){
+  const zustand=(on,ready)=>!on?'st-off':(ready?'st-ready':'st-run');
+  const hs=(id,infoId,on,ready,text)=>{
+    const n=el(id); n.classList.remove('st-off','st-run','st-ready');
+    n.classList.add(zustand(on,ready));
+    if(text) el(infoId).textContent=text;
+  };
+  const mineN=Math.floor(META.mineStored), forgeN=META.forgeStored,
+        arcN=Math.floor(META.arcanumStored), yardN=Math.floor(META.yardStored);
+  hs('hsMine','hsmineinfo',META.mineLevel>0,mineN>0,META.mineLevel>0?(mineN?'bereit · '+mineN:'produziert'):'offline');
+  hs('hsForge','hsforgeinfo',META.forgeLevel>0,forgeN>0,META.forgeLevel>0?(forgeN?'bereit · '+forgeN:(META.forgeWorking?'fabriziert':'wartet')):'offline');
+  hs('hsArcanum','hsarcanuminfo',META.arcanumLevel>0,arcN>0,META.arcanumLevel>0?(arcN?'bereit · '+arcN:'verdichtet'):'offline');
+  hs('hsYard','hsyardinfo',META.yardLevel>0,yardN>0,META.yardLevel>0?(yardN?'bereit · '+yardN:'rechnet'):'offline');
+  hs('hsArmory','hsarmoryinfo',true,Object.keys(META.gearOwned||{}).length>0,'Rüstkammer');
+  hs('hsMap','hsmapinfo',true,true,CONTRACT_BY_ID[META.selectedContract]?.name||'Sortie');
+
+  const core=el('hsCore');
+  core.classList.remove('st-0','st-1','st-2','st-3');
+  core.classList.add('st-'+META.coreStage);
+  el('corelabel').textContent='Kern · Stufe '+META.coreStage;
+  const daten=META.stationData.toLocaleString('de-DE');
+  el('coredata').textContent=daten+' Stationsdaten';
+  el('coredata2').textContent=META.stationData;
+  const st=META.coreStage, upBtn=el('btnCoreUpgrade');
+  if(st>=3){
+    el('coreupname').textContent='Kern vollständig ausgebaut';
+    el('coreupdesc').textContent='Alle drei Stufen leuchten; Protokolle sind freigeschaltet.';
+    upBtn.textContent='Ausbau komplett'; upBtn.disabled=true;
+  } else {
+    const k=STATION.CORE_COSTS[st];
+    el('coreupname').textContent='Kern Stufe '+(st+1);
+    el('coreupdesc').textContent=k.desc;
+    upBtn.textContent='Ausbauen';
+    upBtn.disabled=META.stationData<k.daten||(k.ore&&META.ore<k.ore)||(k.bars&&META.bars<k.bars);
+  }
+  el('coreupgrade').classList.toggle('done',st>=3);
+
+  // Protokollwahl: kein / freigeschaltete; Wirkung kurz erklärt.
+  const aktiv=protocolAktiv();
+  const beschreibung={
+    none:'Kein Protokoll gewählt: Die Sortie läuft unverändert.',
+    klingenfokus:'Klingenfokus: Der erste legale Kartenzug enthält eine Orbitklingen-Aufwertung.',
+    fluxreserve:'Fluxreserve: Der Run startet mit einem zusätzlichen Stations-Reroll.',
+    bergungsscanner:'Bergungsscanner: SIGNAL SICHERN lädt in 5 statt 8 s; der garantierte Fund bevorzugt neue Teile.',
+  };
+  const chips=el('protocolchips');
+  chips.innerHTML='<button class="pchip'+(aktiv==='none'?' selected':'')+'" data-proto="none">kein Protokoll</button>'+
+    STATION.PROTOCOLS.map(p=>{
+      const frei=p.stufe<=META.coreStage;
+      return '<button class="pchip'+(frei?'':' locked')+(aktiv===p.id?' selected':'')+'" '+
+        'data-proto="'+p.id+'"'+(frei?'':' disabled')+'>'+p.name+'</button>';
+    }).join('');
+  document.querySelectorAll('[data-proto]').forEach(b=>{
+    b.onclick=()=>{ if(setProtocol(b.dataset.proto)) renderHold('Protokoll gewählt: '+
+      (b.dataset.proto==='none'?'kein Protokoll':STATION.PROTOCOLS.find(p=>p.id===b.dataset.proto).name)); };
+  });
+  el('protocolnote').textContent=beschreibung[aktiv]||beschreibung.none;
+  const pname=aktiv==='none'?'kein Protokoll':STATION.PROTOCOLS.find(p=>p.id===aktiv).name;
+  el('protocolshort').textContent=pname;
 }
 function renderHold(message){
   if(message){ holdNotice=message; holdNoticeUntil=Date.now()+3200; }
@@ -4207,6 +4635,7 @@ function renderHold(message){
     btn.disabled=!yardOn||lv>=HOLD_CFG.MASTERY_MAX||META.marks<cost;
   }
   el('masterybox').classList.toggle('locked',!yardOn);
+  renderStationMap();
   renderGear();
 }
 let gearSig='';
@@ -4497,6 +4926,13 @@ function updateEvoHint(){
   }
   hint.classList.add('on'); hint.setAttribute('aria-hidden','false');
 }
+/** D-042 / Gate D: Status des Sektorziels fuer HUD, Bericht und Tests. */
+function signalStatus(){
+  if(!S||!S.signal) return {status:S&&S.runLen<CFG.RUN_LEN?'keiner':'wartet',
+    geladen:0,bedarf:signalBedarf(),dateien:S?S.securedData:0};
+  return {status:S.signal.status, geladen:Math.min(S.signal.geladen,signalBedarf()),
+    bedarf:signalBedarf(), dateien:S.securedData};
+}
 function updateHUD(){
   if (!S) return;
   const c=el('clock');
@@ -4512,6 +4948,16 @@ function updateHUD(){
   el('lvl').innerHTML='Stufe <b>'+S.level+'</b>';
   renderWeaponBar();
   updateEvoHint();
+  // D-042 / Gate D: Signal-Status nur bei sichtbarer Aenderung schreiben.
+  const sh=el('signalhud'), sig=signalStatus();
+  let sigTxt='';
+  if(S.runLen>=CFG.RUN_LEN && sig.status!=='wartet'){
+    if(sig.status==='offen') sigTxt='SIGNAL SICHERN · '+Math.round(sig.geladen/sig.bedarf*100)+' %';
+    else if(sig.status==='gesichert') sigTxt='SIGNAL gesichert · '+sig.dateien+' Datei'+(sig.dateien===1?'':'en');
+    else sigTxt='SIGNAL verpasst';
+  }
+  if(sh._t!==sigTxt){ sh._t=sigTxt; sh.textContent=sigTxt; }
+  sh.classList.toggle('on',!!sigTxt);
   el('xpbar').style.width=Math.min(S.xp/S.need*100,100)+'%';
   el('hpbar').style.width=Math.max(S.hp/S.maxhp*100,0)+'%';
   const bi=S.bossIndex, bossAlive=bossIsAlive();
@@ -4621,7 +5067,9 @@ function togglePause(){
   }
 }
 function showExtract(){
-  S.baseReward = Math.round(S.kills*1.0 + S.gemsTaken*0.6);
+  // D-042 / Gate D: gesicherte Stationsdateien zaehlen zur Basisbergung.
+  S.baseReward = Math.round(S.kills*1.0 + S.gemsTaken*0.6) +
+    S.securedData*SIGNAL.FILE_LOOT;
   el('extractkick').textContent=fmtTime(S.runLen)+' · Extraktionsfenster offen';
   el('exstats').innerHTML =
     statTile(S.kills.toLocaleString('de-DE'),'Kills') +
@@ -4640,7 +5088,10 @@ function endRun(survived){
   if (S.phase==='over') return;
   S.phase='over';
   const otMul = S.otActive ? Math.pow(CFG.OT_REWARD, S.ot/60) : 1;
-  const base = S.baseReward || Math.round(S.kills*1.0 + S.gemsTaken*0.6);
+  // D-042 / Gate D: dieselbe Formel wie showExtract -- die gesicherten
+  // Stationsdateien bleiben auch beim Tod im Finale oder in Overtime erhalten.
+  const base = S.baseReward ||
+    Math.round(S.kills*1.0 + S.gemsTaken*0.6) + S.securedData*SIGNAL.FILE_LOOT;
   const bonus = survived ? Math.round(base*(otMul-1)) : 0;
   S.baseReward = base;
   S.reward = base + bonus;
@@ -4672,9 +5123,10 @@ function endRun(survived){
   el('ovstats').innerHTML =
     statTile(S.kills.toLocaleString('de-DE'),'Kills') +
     statTile(S.level,'Stufe') +
-    statTile(fmtTime(S.t),'Zeit') +
+    statTile(fmtTime(S.otActive?S.runLen+S.ot:S.t),'Zeit') +
     statTile(S.pickTimes.length,'Kartenzüge') +
     statTile(S.eliteChoices,'Elite-Module') +
+    statTile(S.securedData,'Stationsdateien') +
     statTile(gearLootText(),'Ausrüstungsfund') +
     statTile(S.reward.toLocaleString('de-DE'),'Beute gesamt') +
     statTile('+'+S.holdOre,LEX.res.ore+' · '+S.contract.name);
@@ -4794,6 +5246,12 @@ function runReportText(){
     LEX.res.loot+': '+S.baseReward,
     'Overtime-Bonus: '+bonus,
     'Finalboss: '+finalbossText(),
+    // D-042 / Gate D: Sektorziel und Stationsdaten verständlich im Bericht.
+    (()=>{const sg=signalStatus();
+      if(sg.status==='wartet'||sg.status==='keiner') return 'Signal: keines in kurzer Sortie';
+      const pct=Math.round(Math.min(1,sg.geladen/sg.bedarf)*100);
+      const zustand=sg.status==='gesichert'?'gesichert':(sg.status==='verpasst'?'verpasst':'offen · '+pct+' %');
+      return 'Signal: '+zustand+' · Stationsdateien: '+sg.dateien;})(),
     'Sektor: '+S.contract.name+' · '+LEX.res.ore+' ×'+S.contract.reward.toFixed(2),
     LEX.res.ore+' für '+LEX.hold+': '+(S.holdOre||0),
     'Build: '+buildText(),
@@ -4850,6 +5308,10 @@ async function copyLastRunReport(){
   copyFeedback(btn,copied,'Letzten Run-Bericht kopieren');
 }
 function showStartMenu(){
+  openPanelId=null;
+  const st=el('start'); if(st) st.removeAttribute('data-panel');
+  for(const b of document.querySelectorAll('.hotspot,.core'))
+    b.classList.remove('active');
   if(!S) return;
   S.running=false; setSheet('over',false); setSheet('extract',false); setSheet('pause',false);
   hideBossAlert(); if(coachStep) hideCoach(false);
@@ -5091,6 +5553,14 @@ el('btnPrepareReroll').onclick = prepareReroll;
 el('btnMasteryPath').onclick = ()=>trainMastery('path');
 el('btnMasteryReach').onclick = ()=>trainMastery('reach');
 el('btnMasteryDash').onclick = ()=>trainMastery('dash');
+// D-042 / Gate C+E: Stationsring, Detailpanels und Kernausbau.
+for(const id of ['hsCore','hsMine','hsForge','hsArcanum','hsYard','hsArmory','hsMap']){
+  el(id).onclick=()=>openPanel(el(id).dataset.modul);
+}
+el('btnOpenMap').onclick=()=>openPanel('map');
+el('btnCoreUpgrade').onclick=upgradeCore;
+el('btnStart2').onclick  = ()=>begin(480);
+el('btnStart32').onclick = ()=>begin(RUN_MIN_S);
 
 
 // ===========================================================================
@@ -5360,6 +5830,8 @@ window.__EH = { get S(){return S;}, get H(){return META;}, CFG, HOLD_CFG, CONTRA
                 weaponDamageText, weaponTimelineText, xpNeed, hurt, W_IDX, GROUND,
                 LEX, FAMNAME, weaponLabel,
                 FOE_PROFILE, SPR, finalbossText, updateEvoHint, updateHUD,
+                STATION, signalStatus, signalBedarf, setProtocol, upgradeCore,
+                protocolAktiv, openPanel, renderStationMap,
                 BOSS: {BOSS_ADD_TARGET, NEXUS_ADD_TARGET, FINAL_WARN_AT, NEXUS_AT,
                        ENEMY_RETREAT_S, EVO_FOCUS_AT, MAXLV, EVO_PASSIVE_LV,
                        BOSS_MARK_PAD, BOSS_CHEV_HALF},
