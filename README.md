@@ -25,12 +25,13 @@ code-native Figuren für Orbitträger, Sammlerdrohne, AEGIS und die geworfene
 Orbitklinge. Die Spielmechanik der bisherigen Fernkampfwaffe ist dabei bewusst
 unverändert; eine echte zurückkehrende Klinge ist ein späteres eigenes Gate.
 
-Die technische Abnahme steht bei **47/47 grünen Checks**. Der nächste
-verbindliche Schritt ist ein vollständiger menschlicher Acht-Minuten-Lauf im
-Trümmerring. Er soll zeigen, ob die nach D-036 gebremste späte Progression,
-Waffenrollen, Übersicht und Lust auf einen zweiten Run tatsächlich besser
-sind. Backend, Ton, Monetarisierung und neue Inhalte bleiben bis dahin
-außerhalb des Scopes.
+Die technische Abnahme steht bei **48/48 grünen Checks**. Der letzte
+abgeschlossene Run-Bericht wird nun getrennt von Save v4 lokal gesichert und
+kann in der Orbitalstation erneut kopiert werden. Der erste D-036-Feldbericht
+liegt vor; vor weiterer Balance fehlen noch die sechs subjektiven Antworten zu
+später Gefahr, Waffenrollen, Übersicht und Lust auf einen zweiten Run.
+Backend, Ton, Monetarisierung und neue Inhalte bleiben bis dahin außerhalb des
+Scopes.
 
 Die Produktfrage der Phase 0 lautet:
 

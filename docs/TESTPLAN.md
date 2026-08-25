@@ -157,6 +157,41 @@ werden ausdrücklich mitbeobachtet. D-038 hat nur Darstellung und Sprache
 verändert; Spielgefühl, späte Gefahr und Waffenrollen werden weiterhin
 getrennt anhand dieses Laufs bewertet.
 
+#### Quantitativer Eingang vom 25.08.2026
+
+Der vollständige Bericht mit Seed `1818720884` ist sauber: Trümmerring,
+acht Minuten, Extraktion und unverändertes Tuning. Die sechs subjektiven
+Antworten stehen noch aus; dieser Eintrag ist deshalb ausdrücklich keine
+Spielgefühl-Freigabe.
+
+| Kennzahl | Feldziel | Ist | Einordnung |
+|---|---:|---:|---|
+| Erster Kartenzug | 30–38 s | 27,8 s | etwas früher, noch im breiten 25–35-s-Startfenster |
+| Kartenzüge | 28–34 | 24 | unter Ziel; Schneeballkurve klar beseitigt |
+| Stufe | kein harter Korridor | 25 | deutlich unter dem alten Stufe-47-Lauf |
+| Evolutionen | 1–2 typisch | 2 | Ziel erreicht |
+| Sichtbar gezeichnet | deutlich unter 294 | 165 | Renderreserve bestätigt |
+| FPS Minimum / 1-%-Low | mindestens stabil | 57 / 60 | bestanden, 0,0 % unter 55 FPS |
+
+| Waffe | Anteil gesamt | Schaden/s aktiv | Boss-Anteil |
+|---|---:|---:|---:|
+| Photonenschneise EVO | 25 % | 304/s | 49 % |
+| Sternenhagel EVO | **54 %** | **738/s** | 36 % |
+| Plasmakern 1 | 9 % | 121/s | 15 % |
+| Kettenemitter 5 | 11 % | 162/s | 1 % |
+
+Die Progressionsbremse wirkt stärker als im Feldziel. Der Vergleich ist aber
+nicht vollständig kontrolliert: Dieser Lauf hatte Traktorsensor R1 und
+Training 0/0/0; der vorige Stufe-47-Lauf hatte Traktorsensor R2 und Training
+2/2/2. Der kleinere Aufsammelradius kann Erfahrung liegen lassen. Deshalb
+wird aus einem einzelnen Seed noch keine XP-Korrektur abgeleitet.
+
+Sternenhagel bleibt trotz D-036 auffällig: gleicher Gesamtanteil wie zuvor und
+mehr als das Doppelte der aktiven Rate von Photonenschneise. Umgekehrt wirkt
+Kettenemitter trotz Stufe 5, 6:43 aktiver Zeit und nur 1 % Boss-Anteil schwach.
+Sentinel-Drohnen kamen nicht vor und sind mit diesem Lauf nicht bewertbar.
+Numerische Änderungen bleiben bis zu den sechs subjektiven Antworten gesperrt.
+
 ### Historisches D-035-Protokoll (am 24.08.2026 erledigt)
 
 **Stand 23.08.2026, nach D-035.** Bitte den vollständigen
@@ -208,7 +243,7 @@ Waffen jetzt erst einmal; Codex entscheidet danach anhand der Daten.
 
 ### Bisherige Feldläufe
 
-| Datum | Modus | Sauber? | Sichtbar | Erster Zug | Züge | Erz | FPS schlecht. | 1-%-Low | unter 55 |
+| Datum | Modus | Sauber? | Sichtbar | Erster Zug | Züge | Asterit | FPS schlecht. | 1-%-Low | unter 55 |
 |---|---|---|---:|---:|---:|---:|---:|---:|---:|
 | 22.08.2026 | 8 Min | **nein**, Regler bewegt | 339 | 26,9 s | 50 | 17 | 21 | – | – |
 | 22.08.2026 | 3 Min | ja | 60 | 34,9 s | 6 | 10 | 57 | – | – |
@@ -216,6 +251,7 @@ Waffen jetzt erst einmal; Codex entscheidet danach anhand der Daten.
 | 22.08.2026 | 8 Min | ja | 294 | 33,9 s | 28 | 14 | 34 | **38** | **40,0 %** |
 | 23.08.2026 | 8 Min | **ja, gefallen 7:06** | 202 | 31,8 s | 15 | 9 | 35 | **58** | **0,7 %** |
 | 24.08.2026 | 8 Min | **ja, extrahiert** | 158 | 33,8 s | 46 | 19 | 57 | **60** | **0,0 %** |
+| 25.08.2026 | 8 Min | **ja, extrahiert** | 165 | 27,8 s | 24 | 15 | 57 | **60** | **0,0 %** |
 
 Der sechste Lauf schließt das D-035-Technikgate: Die Warden-Phase war
 angemessen und mit weniger Gegnern angenehmer; 57 FPS Minimum, 60 FPS 1-%-Low

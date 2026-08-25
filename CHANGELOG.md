@@ -11,6 +11,11 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 - Kanonische Dateien für aktiven Auftrag und standardisierten Arbeitsbericht
 ### Added
 
+- Der letzte abgeschlossene Run-Bericht wird unter einem eigenen lokalen
+  Schlüssel automatisch gesichert und kann in der Orbitalstation erneut
+  kopiert werden. Der neue Verhaltenscheck `lastRunReportFlow` prüft
+  Abschlussframe, neuen Laufzustand, Reload, ungültige Daten und Sichtbarkeit;
+  die Suite steht bei 48/48
 - Zwei neue Verhaltenschecks: `presentationLayer` prüft die Vollständigkeit der
   Namensabbildung gegen die Laufzeitarrays, unveränderte interne IDs, den
   Save-Key, einen verlustfreien v4-Rundlauf und einen Run-Bericht ohne interne

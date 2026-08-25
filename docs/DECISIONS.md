@@ -1717,3 +1717,38 @@ erteilt. Sie bleibt beim vollständigen D-036-Besitzerlauf.
 Damit kann die fünfstündige Sitzung breit innerhalb eines zusammenhängenden
 Präsentationsauftrags arbeiten, ohne mehrere untrennbare Gameplaybaustellen zu
 stapeln.
+
+## D-039 – Der letzte Run-Bericht ist ein eigenes lokales Artefakt
+
+**Status:** beschlossen und automatisiert technisch abgenommen (25.08.2026).
+Der sichtbare Pages-Check der neuen Stationsaktion bleibt beim Besitzer.
+
+Ein Run-Bericht lebte bisher nur im aktuellen Laufzustand `S`. Wer an der
+Ergebnisansicht vorbeiging und einen neuen Run startete, verlor die gesamte
+Feldtest-Telemetrie. Der Hold-Save ist dafür der falsche Ort: Seine Version 4
+beschreibt die Stationsökonomie und soll durch ein Diagnoseartefakt weder
+migriert noch vergrößert werden.
+
+Deshalb speichert der Prototyp genau den letzten abgeschlossenen, bereits
+formatierten Bericht unter `emberhold:run-report:v1`. Der Eintrag enthält nur
+Version, Zeitstempel und Text, ist auf 24.000 Zeichen begrenzt und wird bei
+falscher Version, falschem Kopf oder ungültigem Inhalt verworfen. Gesperrter
+Browser-Speicher darf den Run nicht blockieren.
+
+Die Speicherung erfolgt sofort nach dem finalen Ergebnis und wird nach
+Abschluss des aktuellen JavaScript-Frames einmal aktualisiert. Damit stimmt
+der lokale Text auch im bekannten Todesframe-Randfall mit dem später
+kopierbaren Bericht überein, ohne Simulation, Auszahlung oder Save v4 zu
+verändern. In der Orbitalstation erscheint nur bei gültigem Eintrag
+„Letzten Run-Bericht kopieren“; Ergebnis- und Stationsaktion teilen denselben
+Clipboard-Fallback.
+
+`lastRunReportFlow` prüft automatisches Speichern, Abschlussframe,
+Überschreiben von `S`, simulierten Reload, ungültige Daten und
+Buttonsichtbarkeit. Die vollständige Suite besteht mit **48/48 Checks**,
+`git diff --check` ist sauber. Der Browsercontroller war in dieser Sitzung
+durch den Windows-Sandbox-Helfer blockiert; deshalb bleibt nur der sichtbare
+Pages-Check der kleinen Stationsaktion offen.
+
+Der D-036-Lauf mit Seed 1818720884 ist quantitativ dokumentiert. Er gibt noch
+keine Balance frei, weil die sechs subjektiven Antworten fehlen.

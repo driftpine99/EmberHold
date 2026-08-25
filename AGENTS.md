@@ -77,9 +77,15 @@ Sentinel-Drohnen-Hitgeometrie und erweitert die Waffentelemetrie.
 D-038 ist technisch abgenommen: sichtbare Sprache, HUD, Orbitalstation,
 Safe-Area sowie Orbitträger, Sammlerdrohne, AEGIS und Klingenprojektil bilden
 den ersten Orbitblade-Slice. Die Simulation, Save v4, interne IDs und
-Hold-Ökonomie blieben unverändert. Der nächste verbindliche Schritt ist ein
-vollständiger menschlicher Acht-Minuten-Lauf nach dem aktuellen Protokoll in
-`docs/TESTPLAN.md`.
+Hold-Ökonomie blieben unverändert.
+
+Der D-036-Besitzerbericht mit Seed 1818720884 liegt vor: Stufe 25,
+24 Kartenzüge, zwei Evolutionen und stabile 60 FPS im 1-%-Low. Quantitativ ist
+die Schneeballkurve beseitigt; Sternenhagel bleibt auffällig dominant. Die
+sechs subjektiven Antworten und damit die Spielgefühl-Freigabe fehlen noch.
+D-039 sichert künftige Abschlussberichte getrennt von Save v4 lokal. Der
+nächste verbindliche Schritt sind die sechs Antworten aus
+`docs/TESTPLAN.md`, nicht ein neuer Balance- oder Contentauftrag.
 
 ### Drei Dinge, die eine neue Sitzung wissen muss
 

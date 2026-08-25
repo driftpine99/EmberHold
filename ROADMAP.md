@@ -20,22 +20,29 @@ Die unabhängige Abnahme ergab:
    geclippt, mobile Dialogüberlagerungen beseitigt und verbliebene sichtbare
    Fantasy-Namen in Ausrüstung, Elite-Modulen und Meisterschaften ersetzt.
 
-Der vollständige Besitzerlauf nach D-036 bleibt das nächste Produktgate.
-D-035 hatte Bossphase und Renderleistung bestätigt, aber 46 Kartenzüge,
-Stufe 47, drei Evolutionen und stark auseinanderlaufende Waffenrollen machten
-den späten Run praktisch ungefährlich. D-036 bremst deshalb die späte
-Progression und korrigiert die Waffenrollen; D-038 verändert diese Mechanik
-nicht.
+Der vollständige D-036-Besitzerbericht liegt jetzt vor: Seed 1818720884,
+Extraktion bei 8:00, Stufe 25, 24 Kartenzüge, zwei Evolutionen, 57 FPS Minimum
+und 60 FPS im 1-%-Low. Die Schneeballkurve ist beseitigt und die Renderreserve
+bestätigt. 24 Kartenzüge liegen unter dem Feldziel; Sternenhagel bleibt mit
+54 % und 738 Schaden/s dominant, während Kettenemitter Stufe 5 nur 162/s und
+1 % Boss-Anteil erreicht. Wegen abweichender Aufsammelboni und fehlender
+subjektiver Antworten folgt daraus noch keine Balanceänderung.
+
+EH-2026-08-25-01 sichert deshalb zunächst nur die Feldtest-Telemetrie (D-039):
+Der letzte abgeschlossene Bericht wird getrennt von Save v4 lokal gespeichert
+und kann in der Orbitalstation erneut kopiert werden. Die Testsuite steht mit
+dem neuen Rundlaufcheck bei **48/48**.
 
 Nächste verbindliche Reihenfolge:
 
 1. [x] Claude übergibt EH-2026-08-24-02 ohne Push.
 2. [x] Codex prüft, bessert nur Abnahmefehler nach und pusht den grünen Stand.
-3. [ ] Besitzer spielt einen vollständigen Acht-Minuten-Lauf im
-   **Trümmerring** ohne Live-Tuning und kopiert Bericht plus sechs Antworten
-   aus `docs/TESTPLAN.md`.
-4. [ ] Erst danach entscheidet Codex getrennt über Rückflugmechanik der
-   Orbitklinge, weitere Balance oder neue Inhalte.
+3. [x] Besitzer spielt einen sauberen Acht-Minuten-Lauf im **Trümmerring** und
+   kopiert den vollständigen Bericht.
+4. [ ] Besitzer beantwortet die sechs kurzen Spielgefühl-Fragen aus
+   `docs/TESTPLAN.md`.
+5. [ ] Codex entscheidet danach getrennt über Waffenbalance,
+   Rückflugmechanik der Orbitklinge oder neue Inhalte.
 
 **Historischer Stand 23.08.2026:** EH-2026-08-23-02 ist durch Claude
 umgesetzt und durch Codex technisch abgenommen. Der Warden hat jetzt ein

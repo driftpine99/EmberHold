@@ -749,6 +749,67 @@ try {
   fpsError = error instanceof Error ? error.message : String(error);
 }
 
+// --- EH-2026-08-25-01: letzter Run-Bericht bleibt lokal erhalten -----------
+let lastRunReportFlow = false;
+let lastRunReportError = "";
+let lastRunReportDiagnostics = null;
+try {
+  const key = "emberhold:run-report:v1";
+  const btn = elements.get("btnCopyLast");
+  localStorage.removeItem(key);
+  const leer = engine.loadLastRunReport();
+  const anfangLeer = leer === null && btn.hidden === true &&
+    btn.getAttribute("aria-hidden") === "true";
+
+  engine.begin(180);
+  engine.S.t = 180;
+  engine.S.kills = 321;
+  engine.S.level = 7;
+  engine.S.pickTimes = [30, 70, 120];
+  engine.S.worstFps = 58;
+  engine.S.fpsLog = [58, 60, 60];
+  elements.get("btnLeave")?.onclick?.();
+  // Der echte Todespfad kann im selben Step noch eine Kennzahl verändern.
+  // Die Mikrotask muss den gespeicherten Text danach auf den Kopierstand heben.
+  engine.S.kills++;
+  await Promise.resolve();
+
+  const raw = JSON.parse(localStorage.getItem(key) || "null");
+  const abschlussframeAktualisiert = raw?.report === engine.runReportText();
+  const automatischGespeichert = engine.S.phase === "over" &&
+    raw?.version === 1 && Number.isFinite(raw.savedAt) &&
+    raw.report === engine.runReportText();
+  const stationZeigtAktion = btn.hidden === false &&
+    btn.getAttribute("aria-hidden") === "false" &&
+    typeof btn.onclick === "function";
+
+  const gemerkterText = raw.report;
+  engine.begin(180);
+  engine.S.kills = 999;
+  const aktuellerRunAnders = engine.runReportText() !== gemerkterText;
+  const nachNeuaufbau = engine.loadLastRunReport();
+  const ueberlebtNeuenRun = nachNeuaufbau?.report === gemerkterText;
+
+  localStorage.setItem(key, JSON.stringify({version:1,savedAt:1,report:"kein Bericht"}));
+  const ungueltig = engine.loadLastRunReport();
+  const ungueltigVerworfen = ungueltig === null &&
+    localStorage.getItem(key) === null && btn.hidden === true;
+
+  localStorage.setItem(key, JSON.stringify(raw));
+  const wiederGeladen = engine.loadLastRunReport();
+  const reloadRundlauf = wiederGeladen?.report === gemerkterText && btn.hidden === false;
+
+  lastRunReportFlow = anfangLeer && automatischGespeichert && abschlussframeAktualisiert &&
+    stationZeigtAktion && aktuellerRunAnders && ueberlebtNeuenRun &&
+    ungueltigVerworfen && reloadRundlauf;
+  lastRunReportDiagnostics = { anfangLeer, automatischGespeichert,
+    abschlussframeAktualisiert, stationZeigtAktion,
+    aktuellerRunAnders, ueberlebtNeuenRun, ungueltigVerworfen, reloadRundlauf,
+    zeichen: gemerkterText.length };
+} catch (error) {
+  lastRunReportError = error instanceof Error ? error.message : String(error);
+}
+
 // --- D-032: Gluttropfen -----------------------------------------------------
 // Geprueft wird das Verhalten, nicht der Quelltext: heilt statt XP zu geben,
 // hat einen kleineren Sog als ein Splitter und kommt nicht von selbst, und die
@@ -1774,8 +1835,8 @@ try {
 }
 
 const output = {
-  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && slotLayout && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && contractFlow && holdExpansion && equipmentFlow && evolutionCatalog && eliteChoices && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling && fpsMetrics && reportHardened && healOrbFlow && holdGoalLadder && oreCurve && earlyLossGuard && bossCombatPocket && bossLocatorState && compactCombatHud && evolutionCompletion && weaponDamageReport && lateProgression && weaponRoles && presentationLayer && renderCostContract,
-  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, slotLayout, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, contractFlow, holdExpansion, equipmentFlow, evolutionCatalog, eliteChoices, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling, fpsMetrics, reportHardened, healOrbFlow, holdGoalLadder, oreCurve, earlyLossGuard, bossCombatPocket, bossLocatorState, compactCombatHud, evolutionCompletion, weaponDamageReport, lateProgression, weaponRoles, presentationLayer, renderCostContract },
+  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && slotLayout && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && contractFlow && holdExpansion && equipmentFlow && evolutionCatalog && eliteChoices && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling && fpsMetrics && reportHardened && lastRunReportFlow && healOrbFlow && holdGoalLadder && oreCurve && earlyLossGuard && bossCombatPocket && bossLocatorState && compactCombatHud && evolutionCompletion && weaponDamageReport && lateProgression && weaponRoles && presentationLayer && renderCostContract,
+  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, slotLayout, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, contractFlow, holdExpansion, equipmentFlow, evolutionCatalog, eliteChoices, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling, fpsMetrics, reportHardened, lastRunReportFlow, healOrbFlow, holdGoalLadder, oreCurve, earlyLossGuard, bossCombatPocket, bossLocatorState, compactCombatHud, evolutionCompletion, weaponDamageReport, lateProgression, weaponRoles, presentationLayer, renderCostContract },
   targets: report.targets,
   ueberschuss: report.ueberschuss,
   seeds: report.seeds,
@@ -1790,6 +1851,7 @@ if (aspectError) output.aspectError = aspectError;
 if (telemetryError) output.telemetryError = telemetryError;
 if (visibleError) output.visibleError = visibleError;
 if (fpsError) output.fpsError = fpsError;
+if (lastRunReportError) output.lastRunReportError = lastRunReportError;
 if (healOrbError) output.healOrbError = healOrbError;
 if (holdGoalError) output.holdGoalError = holdGoalError;
 if (oreCurveError) output.oreCurveError = oreCurveError;
@@ -1804,6 +1866,7 @@ if (weaponRolesError) output.weaponRolesError = weaponRolesError;
 if (presentationError) output.presentationError = presentationError;
 if (renderCostError) output.renderCostError = renderCostError;
 if (renderCostDiagnostics) output.summary.renderCost = renderCostDiagnostics;
+if (lastRunReportDiagnostics) output.summary.lastRunReport = lastRunReportDiagnostics;
 if (presentationDiagnostics) output.summary.presentation = presentationDiagnostics;
 if (weaponRolesDiagnostics) output.summary.weaponRoles = weaponRolesDiagnostics;
 if (lateProgressionDiagnostics) output.summary.lateProgression = lateProgressionDiagnostics;

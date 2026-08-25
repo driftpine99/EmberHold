@@ -362,6 +362,7 @@ button.b.danger{background:#c9402e;color:#fff}
 .copyline{margin-top:13px;background:none;border:0;color:#8b8577;font:inherit;
   font-size:12px;text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:7px 10px}
 .copyline:hover{color:#e07a3f}
+.lastreport:not([hidden]){display:block;margin:6px auto 0}
 
 @media (max-width:560px){
   #devbtn,#tunebtn{display:none}
@@ -520,6 +521,7 @@ button.b.danger{background:#c9402e;color:#fff}
         <div class="contractgrid" id="contractgrid"></div>
       </div>
       <div class="btnrow"><button class="b" id="btnStart">Sortie · 8 Min</button><button class="b ghost" id="btnStart3">Aufklärung · 3 Min</button></div>
+      <button class="copyline lastreport" id="btnCopyLast" hidden aria-hidden="true">Letzten Run-Bericht kopieren</button>
       <p class="holdnote">Lokaler Prototyp · Offline-Produktion bis maximal 24 Stunden · Ton und weitere Sektoren folgen später</p>
     </div>
   </div>
@@ -3038,6 +3040,8 @@ const el = id=>document.getElementById(id);
 //  HOLD-MVP — lokaler, deterministischer Produktionszustand
 // ===========================================================================
 const HOLD_KEY='emberhold:hold:v1';
+const RUN_REPORT_KEY='emberhold:run-report:v1';
+const RUN_REPORT_VERSION=1, RUN_REPORT_MAX=24000;
 const HOLD_CFG=Object.freeze({
   OFFLINE_CAP:86400, MINE_SEC:15, MINE_CAP:20,
   FORGE_COST:10, FORGE_INPUT:5, FORGE_SEC:30, FORGE_CAP:4,
@@ -3087,6 +3091,57 @@ function cleanHold(raw,now){
   h.lastAt=Number.isFinite(+src.lastAt)?+src.lastAt:h.lastAt;
   if(!h.forgeLevel||h.forgeStored>=HOLD_CFG.FORGE_CAP){ h.forgeWorking=false; h.forgeProgress=0; }
   return h;
+}
+let LAST_RUN_REPORT=null;
+function cleanLastRunReport(raw){
+  if(!raw||typeof raw!=='object'||raw.version!==RUN_REPORT_VERSION) return null;
+  const report=typeof raw.report==='string'?raw.report.trim():'';
+  if(!report||report.length>RUN_REPORT_MAX||
+     !report.startsWith(LEX.produkt.toUpperCase()+' RUN-BERICHT\n')) return null;
+  const savedAt=Number.isFinite(+raw.savedAt)?+raw.savedAt:0;
+  return {version:RUN_REPORT_VERSION,savedAt,report};
+}
+function renderLastRunReportAction(){
+  const btn=el('btnCopyLast');
+  if(!btn) return;
+  const available=!!LAST_RUN_REPORT;
+  btn.hidden=!available;
+  btn.setAttribute('aria-hidden',available?'false':'true');
+}
+function loadLastRunReport(){
+  let raw=null, hadValue=false;
+  try {
+    const text=localStorage.getItem(RUN_REPORT_KEY);
+    hadValue=!!text; raw=JSON.parse(text||'null');
+  } catch(_){ hadValue=true; }
+  LAST_RUN_REPORT=cleanLastRunReport(raw);
+  if(hadValue&&!LAST_RUN_REPORT){
+    try { localStorage.removeItem(RUN_REPORT_KEY); } catch(_){}
+  }
+  renderLastRunReportAction();
+  return LAST_RUN_REPORT;
+}
+function saveLastRunReport(report,now){
+  const saved=cleanLastRunReport({version:RUN_REPORT_VERSION,
+    savedAt:Number.isFinite(now)?now:Date.now(),report});
+  if(!saved) return false;
+  try { localStorage.setItem(RUN_REPORT_KEY,JSON.stringify(saved)); }
+  catch(_){ return false; }
+  LAST_RUN_REPORT=saved;
+  renderLastRunReportAction();
+  return true;
+}
+function saveFinishedRunReport(){
+  const finished=S;
+  const persist=()=>{
+    if(S!==finished||finished.phase!=='over') return;
+    try { saveLastRunReport(runReportText(),Date.now()); } catch(_){}
+  };
+  // Sofort sichern; nach Abschluss des aktuellen Frames einmal aktualisieren.
+  // So bleibt auch der bekannte Todesframe-Randfall mit dem später kopierbaren
+  // Bericht identisch, ohne den Kampfablauf oder Save v4 anzufassen.
+  persist();
+  if(typeof queueMicrotask==='function') queueMicrotask(persist);
 }
 let META=freshHold(Date.now()), holdOpen=true, holdUiT=0, holdSaveT=0, holdNotice='', holdNoticeUntil=0;
 function saveHold(){
@@ -3275,6 +3330,7 @@ function renderContracts(){
 }
 function renderHold(message){
   if(message){ holdNotice=message; holdNoticeUntil=Date.now()+3200; }
+  renderLastRunReportAction();
   el('holdore').textContent=Math.floor(META.ore).toLocaleString('de-DE');
   el('holdbars').textContent=Math.floor(META.bars).toLocaleString('de-DE');
   el('holdessence').textContent=Math.floor(META.essence).toLocaleString('de-DE');
@@ -3711,6 +3767,9 @@ function endRun(survived){
   if (HEADLESS) return;
   depositRunReward();
   S.running=false;
+  // Der fertig formatierte Bericht lebt sonst nur in S und wird beim nächsten
+  // begin() überschrieben. Ein separater lokaler Schlüssel hält Save v4 sauber.
+  saveFinishedRunReport();
   setSheet('extract',false);
   const cards=el('cards'); cards.classList.remove('on'); cards.setAttribute('aria-hidden','true');
   hideBossAlert();
@@ -3864,11 +3923,12 @@ function runReportText(){
     'Anteil unter '+FPS_TARGET+' FPS: '+(st?(st.anteilUnterZiel*100).toFixed(1)+' % von '+st.proben+' Proben':'–'),
   ].join('\n');
 }
-async function copyRunReport(){
-  const text=runReportText(), btn=el('btnCopy');
+async function writeClipboardText(text){
   let copied=false;
   try {
-    if(navigator.clipboard&&navigator.clipboard.writeText){ await navigator.clipboard.writeText(text); copied=true; }
+    if(typeof navigator!=='undefined'&&navigator.clipboard&&navigator.clipboard.writeText){
+      await navigator.clipboard.writeText(text); copied=true;
+    }
   } catch(_){}
   if(!copied){
     const ta=document.createElement('textarea');
@@ -3878,9 +3938,22 @@ async function copyRunReport(){
     try { copied=!!document.execCommand&&document.execCommand('copy'); } catch(_){}
     ta.remove();
   }
+  return copied;
+}
+function copyFeedback(btn,copied,resetText){
+  if(!btn) return;
   btn.textContent=copied?'Bericht kopiert':'Kopieren nicht möglich';
   if(copied) toast('Run-Bericht kopiert');
-  setTimeout(()=>{ btn.textContent='Run-Bericht kopieren'; },1800);
+  setTimeout(()=>{ btn.textContent=resetText; },1800);
+}
+async function copyRunReport(){
+  const btn=el('btnCopy'), copied=await writeClipboardText(runReportText());
+  copyFeedback(btn,copied,'Run-Bericht kopieren');
+}
+async function copyLastRunReport(){
+  if(!LAST_RUN_REPORT){ renderLastRunReportAction(); return; }
+  const btn=el('btnCopyLast'), copied=await writeClipboardText(LAST_RUN_REPORT.report);
+  copyFeedback(btn,copied,'Letzten Run-Bericht kopieren');
 }
 function showStartMenu(){
   if(!S) return;
@@ -4113,6 +4186,7 @@ el('btnResume').onclick  = togglePause;
 el('btnAgain').onclick   = ()=>begin(S&&S.runLen?S.runLen:480,S?.contractId);
 el('btnMenu').onclick    = showStartMenu;
 el('btnCopy').onclick    = copyRunReport;
+el('btnCopyLast').onclick = copyLastRunReport;
 el('reroll').onclick     = doReroll;
 el('btnMine').onclick    = mineAction;
 el('btnForge').onclick   = forgeAction;
@@ -4167,6 +4241,7 @@ buildSprites();
 loadRasterArt();
 resize();
 loadHold(Date.now());
+loadLastRunReport();
 newRun(480);            // damit der Hintergrund schon lebt
 S.running=false;
 renderHold(); holdOpen=true;
@@ -4373,6 +4448,8 @@ window.__EH = { get S(){return S;}, get H(){return META;}, CFG, HOLD_CFG, CONTRA
                 stats:stat, dashCooldown,
                 enemyHp:(i)=>E.hp[i], enemyMax:(i)=>E.max[i],
                 advanceHold, saveHold, loadHold, depositRunReward, selectContract,
+                saveLastRunReport, loadLastRunReport,
+                get lastRunReport(){return LAST_RUN_REPORT;},
                 holdGoal, goalHTML, rewardOre, runSeconds,
                 ORE: {RUN_MIN_S, ORE_RATE_REF},
                 arcanumAction, yardAction, prepareReroll, trainMastery,
