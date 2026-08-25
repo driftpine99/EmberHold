@@ -17,24 +17,32 @@ canvas{display:block;position:absolute;inset:0;width:100%;height:100%}
 .panel{pointer-events:auto}
 
 /* ---------- HUD ---------- */
-#hud{position:absolute;top:0;left:0;right:0;padding:10px 14px}
-#topbar{padding-right:146px}   /* Platz fuer Pause, T und FPS */
-#topbar{display:flex;align-items:center;gap:12px}
-#clock{font-variant-numeric:tabular-nums;font-size:22px;font-weight:600;letter-spacing:.02em}
-#clock.ot{color:#e05038}
-#lvl{font-size:12px;color:#8b8577;letter-spacing:.1em;text-transform:uppercase}
-#lvl b{color:#e07a3f;font-size:15px}
-#contracthud{font-size:10px;color:#b9a18a;border-left:1px solid #34333a;padding-left:12px;
-  letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
-#kills{margin-left:auto;font-size:12px;color:#8b8577;font-variant-numeric:tabular-nums;
-  white-space:nowrap}
-#xpwrap{height:4px;background:#1e1e28;border-radius:2px;margin-top:8px;overflow:hidden;
-  margin-right:146px}
-#xpbar{height:100%;width:0;background:linear-gradient(90deg,#6bb8d4,#8fd4e8);
+#hud{position:absolute;top:0;left:0;right:0;padding:10px 14px;
+  --hudw:min(26vw,300px)}
+/* Oben links trägt nur noch Zustand: Stufe, Erfahrung, Leben. */
+#topbar{display:flex;align-items:center;gap:12px;max-width:var(--hudw)}
+/* Uhr ist der eine kompakte Kontextindikator oben rechts. */
+/* Rechts stehen Pause (10), FPS (54) und Tuning (98). Die Uhr als einziger
+   Kontextindikator setzt sich links daneben. */
+#clock{position:absolute;right:140px;top:16px;font-variant-numeric:tabular-nums;
+  font-size:15px;font-weight:600;letter-spacing:.02em;color:#cfe0f5}
+#clock.ot{color:#ffa04a}
+#lvl{font-size:12px;color:#8fa0bd;letter-spacing:.1em;text-transform:uppercase}
+#lvl b{color:#f0c45a;font-size:15px}
+/* Oben mittig: der aktuelle Sektor — und sobald AEGIS lebt, tritt die
+   Bossleiste an seine Stelle. Nie beides gleichzeitig. */
+#sectorhud{position:absolute;left:50%;top:14px;transform:translateX(-50%);
+  font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#7fd4e8;
+  white-space:nowrap;transition:opacity .18s ease}
+#sectorhud.hidden{opacity:0}
+
+#xpwrap{height:4px;background:#1c2233;border-radius:2px;margin-top:8px;overflow:hidden;
+  max-width:var(--hudw)}
+#xpbar{height:100%;width:0;background:linear-gradient(90deg,#6bd4e8,#b8f0ff);
   transition:width .08s linear}
-#hpwrap{height:6px;background:#1e1e28;border-radius:3px;margin-top:5px;overflow:hidden;
-  max-width:230px}
-#hpbar{height:100%;width:100%;background:linear-gradient(90deg,#c9402e,#e07a3f);
+#hpwrap{height:6px;background:#1c2233;border-radius:3px;margin-top:5px;overflow:hidden;
+  max-width:var(--hudw)}
+#hpbar{height:100%;width:100%;background:linear-gradient(90deg,#ff5a8a,#f0c45a);
   transition:width .12s ease}
 
 /* Waffenleiste */
@@ -325,17 +333,17 @@ button.b.danger{background:#c9402e;color:#fff}
 #bossalert.on{opacity:1;transform:translate(-50%,0)}
 #bossalert b{display:block;color:#ff765e;font-size:17px;letter-spacing:.18em}
 #bossalert span{display:block;color:#b9a29c;font-size:12px;margin-top:2px}
-#bossbar{position:absolute;left:50%;top:63px;transform:translate(-50%,-8px);
-  width:min(360px,calc(100% - 170px));padding:7px 11px 9px;border:1px solid rgba(217,55,39,.34);
-  border-radius:8px;background:linear-gradient(180deg,rgba(24,11,14,.88),rgba(13,13,19,.78));
+#bossbar{position:absolute;left:50%;top:30px;transform:translate(-50%,-8px);max-width:min(42vw,360px);
+  width:min(360px,calc(100% - 170px));padding:7px 11px 9px;border:1px solid rgba(255,90,138,.34);
+  border-radius:8px;background:linear-gradient(180deg,rgba(26,14,30,.88),rgba(16,20,34,.80));
   box-shadow:0 5px 25px rgba(0,0,0,.26);opacity:0;transition:opacity .2s ease,transform .2s ease;
   pointer-events:none;z-index:9}
 #bossbar.on{opacity:1;transform:translate(-50%,0)}
 #bossbarhead{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
-#bossbarhead span{font-size:8px;letter-spacing:.2em;color:#ff765e;text-transform:uppercase}
+#bossbarhead span{font-size:8px;letter-spacing:.2em;color:#ff5a8a;text-transform:uppercase}
 #bossbarhead b{font-size:11px;color:#e8e4dc;letter-spacing:.04em;font-weight:650}
 #bosshp{height:3px;margin-top:5px;background:#29202a;border-radius:2px;overflow:hidden}
-#bossfill{display:block;height:100%;width:100%;background:linear-gradient(90deg,#9c2f29,#ef684b);
+#bossfill{display:block;height:100%;width:100%;background:linear-gradient(90deg,#8a2b52,#ff5a8a);
   box-shadow:0 0 8px rgba(238,79,56,.45);transition:width .1s linear}
 
 .copyline{margin-top:13px;background:none;border:0;color:#8b8577;font:inherit;
@@ -344,7 +352,7 @@ button.b.danger{background:#c9402e;color:#fff}
 
 @media (max-width:560px){
   #devbtn,#tunebtn{display:none}
-  #topbar{padding-right:54px}#xpwrap{margin-right:54px}
+  #clock{right:56px}
   #coach{left:14px;right:100px;width:auto;transform:translateY(18px)}
   #coach.on{transform:translateY(0)}
   .help{gap:6px}.help div{font-size:12.5px}
@@ -377,16 +385,14 @@ button.b.danger{background:#c9402e;color:#fff}
 
   <div id="hud">
     <div id="topbar">
-      <div id="clock">0:00</div>
       <div id="lvl">Stufe <b>1</b></div>
-      <div id="contracthud">Trümmerring</div>
-      <div id="kills">0 Kills</div>
     </div>
     <div id="xpwrap"><div id="xpbar"></div></div>
     <div id="hpwrap"><div id="hpbar"></div></div>
   </div>
 
   <div id="slots"></div>
+  <div id="clock">0:00</div>
   <button id="pausebtn" class="panel" title="Pause (Esc oder P)" aria-label="Spiel pausieren">Ⅱ</button>
   <button id="devbtn" class="panel" title="Entwickleranzeige (F3)" aria-label="Entwickleranzeige">FPS</button>
   <button id="tunebtn" class="panel" title="Live-Tuning (T)" aria-label="Live-Tuning">T</button>
@@ -399,6 +405,7 @@ button.b.danger{background:#c9402e;color:#fff}
     <span id="coachstep">1 / 3</span><div id="coachcopy"><b id="coachtitle">Bewegen</b><span id="coachtext"></span></div>
   </div>
   <div id="bossalert" role="alert" aria-live="assertive" aria-hidden="true"><b id="bossalerttitle"></b><span id="bossalerttext"></span></div>
+  <div id="sectorhud" aria-hidden="false">Trümmerring</div>
   <div id="bossbar" aria-hidden="true"><div id="bossbarhead"><span>SEKTORBOSS</span><b>AEGIS</b></div><div id="bosshp"><span id="bossfill"></span></div></div>
   <div id="toast" role="status" aria-live="polite"></div>
 
@@ -657,16 +664,20 @@ function tuningDeviations(){
 const FPS_TARGET = 55;
 
 // --------------------------------------------------------------------- Farben
+// Sci-Fantasy-Palette (D-038): Navy und Violett als Grund, Cyan fuer
+// Orbittechnik, Weissgold fuer den Orbittraeger, Orange nur als gezielter
+// Akzent. Der Kampfboden ist bewusst mittelhell, damit dunkle Silhouetten
+// nicht auf Schwarz verschwinden.
 const COL = {
-  bg:'#1b1e25', grid:'#2b2e36',
-  // Ruhige Flaeche neben dem Kampfausschnitt auf Formaten breiter als 16:9.
-  safe:'#15171c',
-  player:'#ffc48a', playerCore:'#e07a3f',
-  gem:'#6bb8d4', gemBig:'#a8e0f0',
-  heal:'#f2a65a',                         // Gluttropfen: warm, klar vom Splitter getrennt
+  bg:'#242b3c', grid:'#333d54',
+  // Dekorative Weltfortsetzung neben dem Kampfausschnitt, kein leerer Balken.
+  safe:'#141a2a',
+  player:'#fff3d0', playerCore:'#f0c45a',
+  gem:'#6bd4e8', gemBig:'#b8f0ff',
+  heal:'#7fe8b0',                         // Nanokapseln: klar vom Splitter getrennt
   // Gegnerfamilien: eine Akzentfarbe kodiert die Familie
-  fam:['#6b7b8c','#c9402e','#9b7fb8','#7d9463','#d4a94a'],
-  elite:'#ff8a4a', boss:'#e05038',
+  fam:['#8fa8c8','#ff7a3f','#b98fe0','#7fd4a8','#e8c46a'],
+  elite:'#ffa04a', boss:'#ff5a8a',
 };
 // ===========================================================================
 //  PRÄSENTATIONSSCHICHT (D-038)
@@ -743,7 +754,7 @@ function famSprite(fam, color, size, glow){
 const ENEMY_NORMAL_TIER=2, ENEMY_TELEGRAPH_TIER=3;
 const SPR = { enemy:[], elite:null, boss:null, gem:null, gemBig:null,
               arrow:[], orb:null, blade:null, frost:null, eproj:null,
-              floorTile:null, emberVent:null, wardPillar:null };
+              floorTile:null, emberVent:null, wardPillar:null, starField:null };
 const ART = { hero:[], enemy:[], swarmer:[], elite:null, boss:null,
               heroReady:false, enemyReady:false, swarmerReady:false };
 const HERO_ANIM = Object.freeze({
@@ -762,58 +773,87 @@ function visualHash(x,y,salt){
 
 /** Basalt, Glutofen und Pfeiler werden einmal gebaut und danach nur kopiert. */
 function buildArenaSprites(){
+  // Stationsdeck statt Basalt: mittelhelle blaugraue Panelplatten mit
+  // Cyan-Fugen. Bewusst heller als der alte Boden, damit dunkle Gegner und
+  // helle Projektile gleichzeitig lesbar bleiben.
   const T=320, tile=mkCanvas(T), g=tile.getContext('2d');
-  g.fillStyle='#252830'; g.fillRect(0,0,T,T);
-  const bw=64, bh=40;
+  g.fillStyle='#39435c'; g.fillRect(0,0,T,T);
+  const bw=80, bh=80;
   for(let row=0;row<T/bh;row++){
-    const off=(row&1)*-bw/2;
-    for(let col=-1;col<=T/bw;col++){
-      const x=off+col*bw, y=row*bh, h=visualHash(col,row,11);
-      const shade=37+((h*8)|0);
-      g.fillStyle='rgb('+shade+','+(shade+2)+','+(shade+7)+')';
-      g.fillRect(x+1,y+1,bw-2,bh-2);
-      g.strokeStyle='rgba(93,96,106,'+(0.16+h*0.10).toFixed(3)+')';
-      g.lineWidth=1; g.strokeRect(x+1.5,y+1.5,bw-3,bh-3);
+    for(let col=0;col<T/bw;col++){
+      const x=col*bw, y=row*bh, h=visualHash(col,row,11);
+      const shade=62+((h*14)|0);
+      g.fillStyle='rgb('+shade+','+(shade+9)+','+(shade+26)+')';
+      g.fillRect(x+2,y+2,bw-4,bh-4);
+      // Fugenlicht: schmale Cyan-Kante oben und links, dunkle Kante unten.
+      g.strokeStyle='rgba(127,212,232,'+(0.10+h*0.08).toFixed(3)+')';
+      g.lineWidth=1; g.beginPath();
+      g.moveTo(x+2,y+bh-3); g.lineTo(x+2,y+2); g.lineTo(x+bw-3,y+2); g.stroke();
+      g.strokeStyle='rgba(18,23,38,.45)'; g.beginPath();
+      g.moveTo(x+bw-2.5,y+2); g.lineTo(x+bw-2.5,y+bh-2.5); g.lineTo(x+2,y+bh-2.5); g.stroke();
+      // Kleine Wartungsmarkierung, fest pro Panel.
+      if(h>0.78){
+        g.fillStyle='rgba(240,196,90,.16)';
+        g.fillRect(x+bw*0.62,y+bh*0.20,bw*0.20,3);
+      }
     }
   }
-  // wenige feste Bruchlinien und Glutadern — nicht pro Frame neu berechnen
-  for(let i=0;i<26;i++){
+  // Wenige feste Leitungsbahnen — einmal gebaut, nie pro Frame gerechnet.
+  for(let i=0;i<22;i++){
     const x=visualHash(i,3,21)*T, y=visualHash(i,9,22)*T;
-    const len=16+visualHash(i,5,23)*34, a=visualHash(i,7,24)*6.2832;
-    g.strokeStyle=i%7===0?'rgba(191,68,34,.18)':'rgba(12,14,18,.42)';
-    g.lineWidth=i%7===0?1.2:1;
+    const len=20+visualHash(i,5,23)*40, a=(visualHash(i,7,24)*4|0)*1.5708;
+    g.strokeStyle=i%6===0?'rgba(185,143,224,.20)':'rgba(20,26,42,.34)';
+    g.lineWidth=i%6===0?1.4:1;
     g.beginPath(); g.moveTo(x,y);
-    g.lineTo(x+Math.cos(a)*len*.5,y+Math.sin(a)*len*.5);
-    g.lineTo(x+Math.cos(a+.42)*len,y+Math.sin(a+.42)*len); g.stroke();
+    g.lineTo(x+Math.cos(a)*len,y+Math.sin(a)*len); g.stroke();
   }
   SPR.floorTile=tile;
 
   const V=82, vent=mkCanvas(V), vg=vent.getContext('2d'), vc=V/2;
   vg.translate(vc,vc);
-  vg.fillStyle='rgba(3,4,7,.72)'; vg.beginPath(); vg.arc(0,0,35,0,6.2832); vg.fill();
-  vg.strokeStyle='#343741'; vg.lineWidth=8; vg.beginPath(); vg.arc(0,0,28,0,6.2832); vg.stroke();
-  vg.strokeStyle='#11131a'; vg.lineWidth=3; vg.beginPath(); vg.arc(0,0,19,0,6.2832); vg.stroke();
+  vg.fillStyle='rgba(14,20,36,.70)'; vg.beginPath(); vg.arc(0,0,35,0,6.2832); vg.fill();
+  vg.strokeStyle='#4a5878'; vg.lineWidth=8; vg.beginPath(); vg.arc(0,0,28,0,6.2832); vg.stroke();
+  vg.strokeStyle='#1a2238'; vg.lineWidth=3; vg.beginPath(); vg.arc(0,0,19,0,6.2832); vg.stroke();
   const flame=vg.createRadialGradient(0,0,1,0,0,18);
-  flame.addColorStop(0,'rgba(255,220,132,.98)');
-  flame.addColorStop(.24,'rgba(244,119,51,.92)');
-  flame.addColorStop(.62,'rgba(179,47,25,.46)');
-  flame.addColorStop(1,'rgba(100,25,17,0)');
+  flame.addColorStop(0,'rgba(230,252,255,.98)');
+  flame.addColorStop(.24,'rgba(127,212,232,.92)');
+  flame.addColorStop(.62,'rgba(90,140,220,.44)');
+  flame.addColorStop(1,'rgba(40,60,130,0)');
   vg.fillStyle=flame; vg.beginPath(); vg.arc(0,0,19,0,6.2832); vg.fill();
   for(let k=0;k<8;k++){
-    const a=k*0.7854; vg.strokeStyle='#53545c'; vg.lineWidth=3;
+    const a=k*0.7854; vg.strokeStyle='#68789c'; vg.lineWidth=3;
     vg.beginPath(); vg.moveTo(Math.cos(a)*24,Math.sin(a)*24); vg.lineTo(Math.cos(a)*34,Math.sin(a)*34); vg.stroke();
   }
   SPR.emberVent=vent;
 
   const P=94, pillar=mkCanvas(P), pg=pillar.getContext('2d'), pc=P/2;
   pg.translate(pc,pc); pg.rotate(.7854);
-  pg.fillStyle='rgba(3,4,7,.74)'; pg.fillRect(-34,-34,68,68);
-  pg.fillStyle='#242731'; pg.fillRect(-28,-28,56,56);
-  pg.strokeStyle='#4a4c55'; pg.lineWidth=3; pg.strokeRect(-28,-28,56,56);
-  pg.fillStyle='#14161d'; pg.fillRect(-17,-17,34,34);
-  pg.strokeStyle='#8f3927'; pg.lineWidth=2; pg.strokeRect(-13,-13,26,26);
-  pg.fillStyle='#e06c35'; pg.fillRect(-4,-4,8,8);
+  pg.fillStyle='rgba(12,17,32,.72)'; pg.fillRect(-34,-34,68,68);
+  pg.fillStyle='#2e3850'; pg.fillRect(-28,-28,56,56);
+  pg.strokeStyle='#68789c'; pg.lineWidth=3; pg.strokeRect(-28,-28,56,56);
+  pg.fillStyle='#1a2238'; pg.fillRect(-17,-17,34,34);
+  pg.strokeStyle='#7fd4e8'; pg.lineWidth=2; pg.strokeRect(-13,-13,26,26);
+  pg.fillStyle='#b8f0ff'; pg.fillRect(-4,-4,8,8);
   SPR.wardPillar=pillar;
+
+  // Sternenfeld fuer die seitliche Weltfortsetzung. Einmal gebaut, danach nur
+  // gekachelt. Bewusst ruhig: kleine Sterne, ein schwacher Violettschleier,
+  // keine Bewegung, damit die Flaeche nicht vom Kampf ablenkt.
+  const SF=256, sky=mkCanvas(SF), sg=sky.getContext('2d');
+  sg.fillStyle='#141a2a'; sg.fillRect(0,0,SF,SF);
+  const neb=sg.createRadialGradient(SF*0.62,SF*0.34,4,SF*0.62,SF*0.34,SF*0.72);
+  neb.addColorStop(0,'rgba(120,80,180,.16)');
+  neb.addColorStop(.55,'rgba(70,60,140,.07)');
+  neb.addColorStop(1,'rgba(20,26,42,0)');
+  sg.fillStyle=neb; sg.fillRect(0,0,SF,SF);
+  for(let i=0;i<90;i++){
+    const x=visualHash(i,1,61)*SF, y=visualHash(i,2,62)*SF;
+    const b=visualHash(i,3,63), r=b>0.94?1.6:(b>0.72?1.1:0.7);
+    sg.fillStyle=b>0.94?'rgba(240,243,255,.85)'
+              :(b>0.72?'rgba(184,240,255,.55)':'rgba(150,170,210,.34)');
+    sg.beginPath(); sg.arc(x,y,r,0,6.2832); sg.fill();
+  }
+  SPR.starField=sky;
 }
 
 function buildSprites(){
@@ -2680,10 +2720,22 @@ function render(){
   // Bewusst flach und ohne Verlauf: das ist keine Randvignette (D-014),
   // sondern eine sichtbare Rahmung des Kampfausschnitts.
   if (CLIP_X > 0.5){
+    // Kein leerer Balken mehr: Ein einmal vorgerendertes Sternenfeld wird hier
+    // gekachelt. Das ist reine Dekoration -- keine Entities, keine Simulation,
+    // keine Allokation pro Frame.
     ctx.fillStyle = COL.safe;
     ctx.fillRect(0,0,CLIP_X,H);
     ctx.fillRect(CLIP_X+CLIP_W,0,W-CLIP_X-CLIP_W,H);
-    ctx.fillStyle = 'rgba(224,122,63,0.10)';
+    const sky=SPR.starField;
+    if(sky){
+      const ST=sky.width;
+      for(let y=0;y<H;y+=ST){
+        for(let x=0;x<CLIP_X;x+=ST) ctx.drawImage(sky,x,y);
+        for(let x=CLIP_X+CLIP_W;x<W;x+=ST) ctx.drawImage(sky,x,y);
+      }
+    }
+    // Ruhige Rahmenkante in Cyan statt hartem Schnitt.
+    ctx.fillStyle = 'rgba(127,212,232,0.16)';
     ctx.fillRect(CLIP_X-1,0,1,H);
     ctx.fillRect(CLIP_X+CLIP_W,0,1,H);
   }
@@ -3272,11 +3324,15 @@ function updateHUD(){
   if (S.otActive){ c.textContent='+'+fmtTime(S.ot); c.classList.add('ot'); }
   else { c.textContent=fmtTime(Math.min(S.t,S.runLen)); c.classList.remove('ot'); }
   el('lvl').innerHTML='Stufe <b>'+S.level+'</b>';
-  el('kills').textContent=S.kills.toLocaleString('de-DE')+' Kills';
-  el('contracthud').textContent=S.contract?.name||'Wächterring';
   el('xpbar').style.width=Math.min(S.xp/S.need*100,100)+'%';
   el('hpbar').style.width=Math.max(S.hp/S.maxhp*100,0)+'%';
   const bi=S.bossIndex, bossAlive=bossIsAlive();
+  // Oben mittig steht entweder der Sektor oder die Bossleiste, nie beides.
+  const sec=el('sectorhud');
+  const secName=S.contract?.name||LEX.sektor.ring;
+  if(sec.textContent!==secName) sec.textContent=secName;
+  sec.classList.toggle('hidden',bossAlive);
+  sec.setAttribute('aria-hidden',bossAlive?'true':'false');
   const bb=el('bossbar'); bb.classList.toggle('on',bossAlive);
   bb.setAttribute('aria-hidden',bossAlive?'false':'true');
   if(bossAlive) el('bossfill').style.width=Math.max(0,E.hp[bi]/E.max[bi]*100)+'%';
@@ -3364,7 +3420,7 @@ function togglePause(){
   if(!S||!S.running) return;
   if(S.phase==='run'){
     S.phase='pause'; acc=0;
-    el('pausekick').textContent=fmtTime(S.t)+' · Run pausiert';
+    el('pausekick').textContent=fmtTime(S.t)+' · '+(S.contract?.name||LEX.sektor.ring);
     el('pausestats').innerHTML=
       statTile(S.kills.toLocaleString('de-DE'),'Kills')+
       statTile(S.level,'Stufe')+
