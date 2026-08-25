@@ -2,48 +2,33 @@
 
 ## Aktueller Arbeitsfokus
 
-**Verbindlicher Stand 25.08.2026:** EH-2026-08-24-02 ist durch Claude umgesetzt
-und durch Codex technisch abgenommen (D-038). Der Prototyp trägt sichtbar die
-Orbitblade-Identität: zentrale Namensabbildung, ruhigeres HUD, Orbitalstation
-Stufe A, dekorative Safe-Area sowie code-native Figuren für Orbitträger,
-Sammlerdrohne, AEGIS und Klingenprojektil.
+**Verbindlicher Stand 25.08.2026:** Der D-036-Besitzerlauf ist vollständig
+ausgewertet. Technik und Performance sind gut, das Spielgefühl-Gate ist aber
+negativ: zu viel Flucht, nach AEGIS wieder stark steigender Gegnerdruck, ein
+zu ereignisloser Boss und Sternenhagel als deutliche Pflichtwahl. Der Besitzer
+hat zugleich bestätigt, dass die Orbitblade-Umstellung klar besser aussieht.
 
-Die unabhängige Abnahme ergab:
+Für den eigenen Spielspaß erhält jetzt der sichtbare Kampf Vorrang. Entwurf 3
+ist als verbindliche Richtung V2 ausgewählt und unter
+`docs/concepts/orbitblade-combat-ui-direction-v2.png` gesichert (D-040). Der
+nächste Auftrag ist ein reiner Grafik-/UI-Pass: durchgehendes Orbitaldeck,
+minimale Rand-UI, klarer AEGIS und flüssiger wirkende einheitliche Figuren.
+Simulation und Balance bleiben dabei bitgenau unverändert.
 
-1. [x] Claudes vier Gate-Commits und Arbeitsbericht vollständig geprüft.
-2. [x] Simulation, feste Seeds, Save v4, Hold-Ökonomie und interne IDs
-   unverändert; finale Suite **47/47** grün, `git diff --check` sauber.
-3. [x] Echter Chrome-Smoke bei 1280×720 und 844×390. Station, Kampf, Pause,
-   Kartenwahl, Ergebnis und Rückkehr funktionieren ohne Browserfehler.
-4. [x] Codex-Nacharbeit: code-native Figuren vor Alt-Atlanten priorisiert,
-   2,55 MB ungenutzte Fantasy-Downloads entfernt, Safe-Area-Kacheln exakt
-   geclippt, mobile Dialogüberlagerungen beseitigt und verbliebene sichtbare
-   Fantasy-Namen in Ausrüstung, Elite-Modulen und Meisterschaften ersetzt.
-
-Der vollständige D-036-Besitzerbericht liegt jetzt vor: Seed 1818720884,
-Extraktion bei 8:00, Stufe 25, 24 Kartenzüge, zwei Evolutionen, 57 FPS Minimum
-und 60 FPS im 1-%-Low. Die Schneeballkurve ist beseitigt und die Renderreserve
-bestätigt. 24 Kartenzüge liegen unter dem Feldziel; Sternenhagel bleibt mit
-54 % und 738 Schaden/s dominant, während Kettenemitter Stufe 5 nur 162/s und
-1 % Boss-Anteil erreicht. Wegen abweichender Aufsammelboni und fehlender
-subjektiver Antworten folgt daraus noch keine Balanceänderung.
-
-EH-2026-08-25-01 sichert deshalb zunächst nur die Feldtest-Telemetrie (D-039):
-Der letzte abgeschlossene Bericht wird getrennt von Save v4 lokal gespeichert
-und kann in der Orbitalstation erneut kopiert werden. Die Testsuite steht mit
-dem neuen Rundlaufcheck bei **48/48**.
+Der letzte abgeschlossene Run-Bericht wird seit EH-2026-08-25-01 automatisch
+lokal gesichert; die technische Basis bleibt bei **48/48** grünen Checks.
 
 Nächste verbindliche Reihenfolge:
 
-1. [x] Claude übergibt EH-2026-08-24-02 ohne Push.
-2. [x] Codex prüft, bessert nur Abnahmefehler nach und pusht den grünen Stand.
-3. [x] Besitzer spielt einen sauberen Acht-Minuten-Lauf im **Trümmerring** und
-   kopiert den vollständigen Bericht.
-4. [ ] Besitzer beantwortet die sechs kurzen Spielgefühl-Fragen aus
-   `docs/TESTPLAN.md`.
-5. [ ] Codex entscheidet danach getrennt über Waffenbalance,
-   Rückflugmechanik der Orbitklinge oder neue Inhalte.
-
+1. [x] D-036-Besitzerlauf und subjektive Antworten auswerten.
+2. [x] Visuelle Zielrichtung auswählen: taktisches Sci-Fantasy, Entwurf 3.
+3. [ ] EH-2026-08-25-02 als reinen Kampf-Grafik-/UI-Pass umsetzen und durch
+   Codex technisch prüfen.
+4. [ ] Besitzer nimmt Lesbarkeit, Animation und Bildschirmaufteilung in einem
+   kurzen Run subjektiv ab.
+5. [ ] Danach Boss-/Dichtepass getrennt umsetzen.
+6. [ ] Danach Waffenrollen einschließlich Sternenhagel und Kettenemitter
+   anhand kontrollierter Telemetrie bearbeiten.
 **Historischer Stand 23.08.2026:** EH-2026-08-23-02 ist durch Claude
 umgesetzt und durch Codex technisch abgenommen. Der Warden hat jetzt ein
 eigenes Verstärkungsziel von 90 normalen Gegnern, eine dauerhafte Ortung,

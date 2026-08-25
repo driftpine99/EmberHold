@@ -120,12 +120,10 @@ Chrome bei **1280×720** und **844×390** geprüft:
 Das ist eine technische Layout- und Integrationsprüfung, kein Ersatz für den
 vollständigen Acht-Minuten-Lauf auf dem Gerät des Besitzers.
 
-### Aktueller Besitzerlauf nach D-036
+### Besitzerlauf nach D-036 – ausgewertet
 
-Bitte genau einen vollständigen **Acht-Minuten-Lauf im Trümmerring** ohne
-Live-Tuning spielen. Stations-Vorbereitung und vorhandene Ausrüstung dürfen wie
-üblich verwendet werden. Danach den vollständigen Bericht einschließlich
-`Waffenverlauf` kopieren.
+Der vollständige **Acht-Minuten-Lauf im Trümmerring** ohne Live-Tuning wurde am
+25.08.2026 gespielt und einschließlich `Waffenverlauf` ausgewertet.
 
 Zielwerte sind keine Erfolgsgarantie für einen einzelnen Zufallsseed, sondern
 der Korridor, gegen den Codex den Feldlauf bewertet:
@@ -152,17 +150,33 @@ Sechs kurze Fragen zusätzlich zum Bericht:
 6. **Zweiter Run:** Hättest du unmittelbar Lust auf einen weiteren Run? Was
    zieht – oder was macht ihn weiterhin eintönig?
 
-Die neue Safe-Area, das kompakte HUD, Orbitträger, Sammlerdrohnen und AEGIS
-werden ausdrücklich mitbeobachtet. D-038 hat nur Darstellung und Sprache
-verändert; Spielgefühl, späte Gefahr und Waffenrollen werden weiterhin
-getrennt anhand dieses Laufs bewertet.
+#### Subjektive Auswertung vom 25.08.2026
+
+- Die ersten Minuten sind grundsätzlich spielbar, fühlen sich wegen der
+  Gegnerflut aber weiterhin überwiegend wie Weglaufen an.
+- Die Progression wird später spürbar langsamer; ein harter Stillstand wurde
+  nicht berichtet.
+- Direkt nach AEGIS nimmt der Gegnerdruck deutlich zu.
+- Sternenhagel beziehungsweise der Mehrfachschuss ist ein befriedigender
+  Game-Changer, den übrigen Angriffen aber deutlich überlegen.
+- AEGIS war als Boss semantisch nicht eindeutig und der Kampf trotz Marker
+  unübersichtlich sowie ereignisarm. Gewünscht ist ein mächtigerer Boss bei
+  weniger normalen Gegnern während seiner Phase.
+- Die unmittelbare Lust auf einen weiteren Run ist nur mäßig.
+- Die Orbitblade-Welt gefällt besser als die frühere Gestaltung; Grafik und UI
+  bleiben trotzdem der dringendste Spaßblocker. Der Besitzer hat deshalb
+  Entwurf 3 aus D-040 als nächste visuelle Zielrichtung gewählt.
+
+Damit ist das D-036-Spielgefühl-Gate **negativ abgeschlossen**. D-040 erlaubt
+zuerst einen rein visuellen Pass. Boss/Dichte und Waffenrollen bleiben danach
+zwei getrennte Balanceaufträge.
 
 #### Quantitativer Eingang vom 25.08.2026
 
 Der vollständige Bericht mit Seed `1818720884` ist sauber: Trümmerring,
-acht Minuten, Extraktion und unverändertes Tuning. Die sechs subjektiven
-Antworten stehen noch aus; dieser Eintrag ist deshalb ausdrücklich keine
-Spielgefühl-Freigabe.
+acht Minuten, Extraktion und unverändertes Tuning. Zusammen mit den
+subjektiven Antworten ist er keine Spielgefühl-Freigabe, sondern die Grundlage
+für die neue Reihenfolge aus D-040.
 
 | Kennzahl | Feldziel | Ist | Einordnung |
 |---|---:|---:|---|
@@ -190,7 +204,8 @@ Sternenhagel bleibt trotz D-036 auffällig: gleicher Gesamtanteil wie zuvor und
 mehr als das Doppelte der aktiven Rate von Photonenschneise. Umgekehrt wirkt
 Kettenemitter trotz Stufe 5, 6:43 aktiver Zeit und nur 1 % Boss-Anteil schwach.
 Sentinel-Drohnen kamen nicht vor und sind mit diesem Lauf nicht bewertbar.
-Numerische Änderungen bleiben bis zu den sechs subjektiven Antworten gesperrt.
+Numerische Änderungen sind fachlich freigegeben, werden aber bewusst erst nach
+dem Grafik-/UI-Pass und getrennt nach Boss/Dichte sowie Waffenrollen umgesetzt.
 
 ### Historisches D-035-Protokoll (am 24.08.2026 erledigt)
 

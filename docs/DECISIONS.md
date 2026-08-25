@@ -1750,5 +1750,49 @@ Buttonsichtbarkeit. Die vollständige Suite besteht mit **48/48 Checks**,
 durch den Windows-Sandbox-Helfer blockiert; deshalb bleibt nur der sichtbare
 Pages-Check der kleinen Stationsaktion offen.
 
-Der D-036-Lauf mit Seed 1818720884 ist quantitativ dokumentiert. Er gibt noch
-keine Balance frei, weil die sechs subjektiven Antworten fehlen.
+Zum Zeitpunkt von D-039 war der D-036-Lauf nur quantitativ dokumentiert; die
+subjektiven Antworten standen noch aus. Sie sind inzwischen ausgewertet und
+führen zur Reihenfolge aus D-040.
+
+## D-040 – Taktisches Sci-Fantasy ist die verbindliche Kampfrichtung V2
+
+**Status:** auf ausdrücklichen Besitzerwunsch beschlossen (25.08.2026);
+Runtime-Umsetzung und subjektive Abnahme stehen aus.
+
+Der D-036-Besitzerlauf ist spielbar und technisch performant, trägt aber noch
+keinen freiwilligen zweiten Run. Der Besitzer beschreibt weiterhin eine zu
+große Gegnerflut und überwiegend Flucht statt kontrolliertem Kampf. Nach AEGIS
+steigt der Druck spürbar, der Boss selbst wirkt langweilig und ist trotz
+Ortung semantisch nicht klar genug. Sternenhagel ist ein befriedigender
+Game-Changer, zugleich aber den übrigen Angriffen deutlich überlegen.
+
+Trotz dieser Balancebefunde wird zuerst genau ein **reiner Kampf-Grafik- und
+UI-Pass** umgesetzt. Der Besitzer priorisiert den sichtbaren Qualitätssprung
+für den eigenen Spielspaß und hat von drei Entwürfen ausdrücklich Entwurf 3
+gewählt: `docs/concepts/orbitblade-combat-ui-direction-v2.png`.
+
+Für die Runtime verbindlich sind:
+
+- ein durchgehendes ruhiges Orbitaldeck ohne harte Sternenbalken oder sichtbar
+  abgeschnittene Kampfränder;
+- minimale Rand-UI: Gesundheit/Erfahrung oben links, eindeutiges
+  `BOSS: AEGIS` oben mittig, Pause oben rechts, Waffen kompakt unten;
+- keine permanente linke Textliste; Detailwerte bleiben in Pause und Bericht;
+- ein weiß-goldener Orbitträger, cyanfarbene Waffenenergie, dunkle Gegner mit
+  klaren Leuchtkernen und ein großer violetter AEGIS;
+- mittel detaillierte, vorgerenderte 2D-Figuren mit genügend Phasen für
+  flüssig wirkende Bewegung, ohne per-Gegner-Allokationen im Renderpfad;
+- geometrische, ruhige Bosswarnflächen und ein eindeutiger Zielmarker.
+
+Das Konzeptbild ist keine pixelgenaue Vorlage. Insbesondere sind seine acht
+Gegner, Bossphasen, verwundbaren Seitenmodule und Kreuzattacke **keine bereits
+freigegebenen Mechaniken**. Simulation, Spawnziele, Schaden, RNG, Save v4 und
+interne IDs bleiben im visuellen Auftrag unverändert. Danach folgen getrennt:
+
+1. Boss-/Dichtepass mit weniger Verstärkung während AEGIS und kontrolliertem
+   Wiederaufbau nach dem Boss;
+2. Waffenrollenpass, der Alternativen stärkt, ohne Sternenhagels befriedigendes
+   Kerngefühl einfach wegzunerfen.
+
+Das Bild bleibt laut AP-004 eine interne Designreferenz. Neue Runtime-Assets
+brauchen eigene Provenienz und vor kommerzieller Nutzung einen Rechtepass.

@@ -5,6 +5,10 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 ## Unreleased
 
 
+- Entwurf 3 ist als interne Kampf- und UI-Zielrichtung V2 dokumentiert:
+  durchgehendes Orbitaldeck, minimale Rand-UI, klarer AEGIS und
+  animationsfreundliche 2D-Sci-Fantasy-Figuren. Das Konzeptbild ist kein
+  Runtime-Asset; Simulation und Balance sind unverändert
 - Verbindlicher Codex–Claude-Workflow mit klarer Rollenverteilung:
   Codex priorisiert, prüft und pusht; Claude implementiert nur den freigegebenen
   Einzelauftrag

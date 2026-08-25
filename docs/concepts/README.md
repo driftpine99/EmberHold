@@ -3,7 +3,48 @@
 Diese Bilder sind interne Designreferenzen. Sie sind keine fertigen
 Produktionsassets und werden vom Spielcode nicht geladen.
 
-Generiert wurden beide Entwürfe mit dem eingebauten ImageGen-Werkzeug. Die
+## Verbindliche Kampf- und UI-Richtung v2
+
+Datei: `orbitblade-combat-ui-direction-v2.png`
+
+Der Besitzer hat am 25.08.2026 den dritten von drei neuen Entwürfen als
+Zielrichtung ausgewählt. Verbindlich sind nicht die exakten Bilddetails,
+sondern die folgenden Gestaltungsregeln:
+
+- ein ruhiges, mittelhelles Orbitaldeck ohne sichtbar abgeschnittene
+  Dekorationsränder;
+- eine sehr kleine Rand-UI mit Gesundheit und Erfahrung oben links,
+  `BOSS: AEGIS` oben mittig, Pause oben rechts und kompakten Waffensymbolen
+  unten;
+- klare weiß-goldene Spieler-, violette Boss- und cyanfarbene
+  Angriffs-Silhouetten;
+- eine große, sofort lesbare AEGIS-Figur mit geometrischen Warnflächen und
+  freiem Kampfraum;
+- gemalte 2D-Sci-Fantasy-Figuren mittlerer Detailstufe, die mit kleinen
+  Animationsatlanten umsetzbar bleiben.
+
+Die geringe Gegnerzahl im Konzeptbild ist **keine** Balancevorgabe für den
+ersten Grafikpass. Gegnerdichte, Bossverstärkung und Waffenwerte werden in
+einem späteren, getrennt messbaren Auftrag verändert.
+
+### Finale Promptvorgabe
+
+```text
+Use case: ui-mockup
+Asset type: shippable 16:9 desktop gameplay mockup for a lightweight 2D HTML Canvas bullet-heaven game
+Project and visual identity: ORBITBLADE, an original solo sci-fantasy arena game. Use deep navy space, a medium-light blue-gray orbital battlefield, violet danger, cyan energy and white-gold player technology.
+Primary request: Create visual direction C, “Tactical Sci-Fantasy”: a balanced middle ground between premium polish and affordable 2D implementation, with boss combat readability as the visual centerpiece. The screen must feel like an actual fun game, not a cinematic painting.
+Scene/backdrop: an open rectangular orbital-deck combat zone whose playable floor reaches every screen edge, avoiding a cropped decorative circular rim. Broad calm metal panels, subtle geometric rings and a few cracks; distant space is visible only through two small broken peripheral gaps. The useful play area is not visually cut off.
+Subject: a clearly animated-looking upright white-gold Orbit Carrier hero below center throwing a cyan energy blade; a large violet Aegis boss above center with two readable floating armor wings; 8 ordinary drones held mostly near the outer third of the field so the boss duel has breathing room.
+Style/medium: stylized hand-painted 2D sci-fantasy game sprites, medium detail, clean strong silhouettes, selective comic-like edge highlights, modest texture, designed for 6-to-8-frame sprite animations; clearly more polished than basic pixel art but achievable without 3D rendering. No photorealism and no cinematic depth-of-field.
+Boss encounter readability: show a true boss phase. A thin segmented violet projectile ring expands from the boss with one large safe wedge; two large red-orange floor lanes telegraph a coming cross attack; the boss armor wings glow as clear vulnerable targets. Keep the number of simultaneous effects low. Add a small white-gold objective arrow above the boss only if helpful.
+Composition/framing: high top-down three-quarter camera, generous negative space around hero and boss, clear safe route, no enemy carpet, no important unit under the HUD.
+Minimal UI: top-left a small portrait, one green health bar and one slim cyan experience bar only; top-center one clean boss bar with exact text “BOSS: AEGIS” plus two tiny phase markers; top-right one pause button; bottom-center five compact semi-transparent weapon tokens with cooldown arcs. The HUD uses less than 15 percent of the screen. No left-side stat text, no side panels, no minimap, no resource counters, no debug data, no redundant labels.
+Lighting/mood: cool controlled deck lighting, strong cyan player trail, restrained violet boss glow and sparing warm gold accents. Calm enough to read, dramatic enough to invite another run.
+Constraints: practical HTML Canvas layout, sprites must remain distinct at modest resolution, no cut-off decorative arena border, no characters cut off, no logos, no watermark, no franchise references, no extra text beyond “BOSS: AEGIS”, no dense swarm, no excessive bloom, no particle fog.
+```
+
+Die ursprünglichen beiden Entwürfe wurden mit dem eingebauten ImageGen-Werkzeug erzeugt. Die
 Vorgaben wurden bewusst ohne vorhandene Orbitblade-Bilddateien als direkte
 Eingaben formuliert; so prüfen sie die beschlossene Richtung, ohne alte
 Kompositionen zu kopieren.

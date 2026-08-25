@@ -1,6 +1,6 @@
 # Asset-Provenienz und Rechtefreigabe
 
-**Stand:** 24.08.2026
+**Stand:** 25.08.2026
 
 Diese Datei begleitet alle neuen visuellen, akustischen und textlichen Assets
 des Projekts. Ein Eintrag bedeutet nicht automatisch, dass ein Asset für eine
@@ -92,6 +92,24 @@ oder die gezielte Imitation lebender Künstler verlangen.
   zusammen 5,8 MB und damit unter der 10-MB-Grenze. Ein Art-Konsistenz- und
   Rechtepass vor Veröffentlichung bleibt offen.
 
+### AP-004 – Kampf- und UI-Richtung V2
+
+- **Pfad:** `docs/concepts/orbitblade-combat-ui-direction-v2.png`
+- **Zweck:** verbindliche interne Zielillustration für den nächsten
+  Kampf-Grafik- und UI-Pass
+- **Ursprung:** KI-generiert
+- **Werkzeug:** OpenAI ImageGen; genaue Modellversion nicht ausgewiesen
+- **Datum:** 25.08.2026
+- **Prompt:** `docs/concepts/README.md`
+- **Referenzen:** textliche Orbitblade-Richtung und die vorherigen internen
+  Konzeptbilder AP-001/AP-002; kein Runtime- oder Fremdasset übernommen
+- **Lizenz/Rechtebasis:** über das Projektkonto erzeugt; kommerzielle
+  Einzelprüfung noch offen
+- **Bearbeitung:** keine dokumentierte Nachbearbeitung
+- **Status:** INTERN
+- **Freigabe:** Repository-Dokumentation ja; Runtime, Demo und Store nein
+- **Hinweis:** Der Besitzer wählte Entwurf 3. Das Bild ist eine Zielrichtung,
+  kein Spriteatlas und wird vom Spiel nicht geladen.
 ## Vorlage
 
 ### AP-XXX – Name
