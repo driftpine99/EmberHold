@@ -39,7 +39,10 @@ function makeElement(id = "") {
   const classes = new Set();
   const node = {
     id,
-    style: {},
+    // Die HUD-Vertraege (EH-2026-08-25-03) lesen updateHUD ueber den echten
+    // Pfad; dafuer genuegen eine leere Kindliste und ein Style-Stummel.
+    style: { setProperty: noop, removeProperty: noop },
+    children: [],
     classList: {
       add: (name) => classes.add(name),
       remove: (name) => classes.delete(name),
@@ -1105,26 +1108,27 @@ try {
   earlyLossError = error instanceof Error ? error.message : String(error);
 }
 
-// --- EH-2026-08-23-02 / D-035: Der Warden ist eine eigene Kampfphase --------
-// Die Zieldichte waechst waehrend eines langen Bosskampfs ungebremst weiter --
-// im Feldlauf bis 273. Ein schwacher Build wird dadurch doppelt bestraft.
-// Geprueft wird das Verhalten des echten Spawnpfads in step(), nicht die
-// Konstante: Mit abgeschalteten Waffen kann nichts sterben, die Menge haengt
-// also ausschliesslich am Nachspawnen.
+// --- EH-2026-08-25-03 / D-041: Bossarenen mit Ziel 50/30 und Rueckzug -------
+// AEGIS ist eine lesbare Arena (Ziel 50 statt 90), NEXUS das Finale (Ziel 30).
+// Ueberschuss zieht sich innerhalb von acht Sekunden sichtbar und ohne jede
+// Belohnung zurueck. Geprueft wird der echte Spawnpfad in step() plus der
+// echte Bewegungs-/Freigabepfad in updateEnemies(), nicht die Konstante.
 let bossCombatPocket = false;
 let bossPocketError = "";
 let bossPocketDiagnostics = null;
 try {
-  const ZIEL = engine.BOSS.BOSS_ADD_TARGET;
+  const ZIEL_AEGIS = engine.BOSS.BOSS_ADD_TARGET;
+  const ZIEL_NEXUS = engine.BOSS.NEXUS_ADD_TARGET;
+  const RETREAT_S = engine.BOSS.ENEMY_RETREAT_S;
   const TICK = engine.CFG.TICK;
   // Waffen aus: kein Schaden, keine Kills, keine Splitter. Was uebrig bleibt,
-  // ist reine Spawnmechanik. Die Drehbuch-Ereignisse werden ebenfalls
-  // stillgelegt, sonst setzt der planmaessige Warden bei 4:10 einen ZWEITEN
-  // Boss und ueberschreibt bossIndex -- der Test wuerde dann etwas anderes
-  // messen als er behauptet.
+  // ist reine Spawn- und Rueckzugsmechanik. Die Drehbuch-Ereignisse werden
+  // stillgelegt, sonst setzt der planmaessige Mittelboss bei 4:10 einen
+  // ZWEITEN Boss und ueberschreibt bossIndex -- der Test wuerde dann etwas
+  // anderes messen als er behauptet.
   const stillLegen = () => {
     engine.S.W = {}; engine.S.hp = engine.S.maxhp = 1e9;
-    engine.S.events.boss = true; engine.S.events.surge = true;
+    engine.S.events.boss = true;
     engine.S.events.elite = engine.CFG.ELITE_AT.length;
   };
   const laufen = (n) => { for (let i=0;i<n;i++) engine.tick(TICK); };
@@ -1135,59 +1139,241 @@ try {
   const ohneBoss = engine.enemyCounts();
   const zielOhneBoss = Math.round(engine.targetEnemies(engine.S.t));
 
-  // B) Mit lebendem Warden bleibt das Nachspawnziel bei hoechstens 90.
+  // B) Mit lebendem AEGIS bleibt das Nachspawnziel bei hoechstens 50.
   //    Eliten stehen bewusst mit im Feld: Sie duerfen das Budget fuer normale
   //    Gegner nicht aufbrauchen und nicht entfernt werden.
   engine.begin(480); engine.S.x = 0; engine.S.y = 0; engine.S.t = 240; stillLegen();
   const bossB = engine.spawnEnemy(240, 4, 2, 260, 0);
-  engine.S.bossIndex = bossB;
+  engine.S.bossIndex = bossB; engine.S.bossId = "aegis";
   for (let k=0;k<5;k++) engine.spawnEnemy(240, 1, 1, 300+k*20, 40);
   laufen(900);
-  const mitBoss = engine.enemyCounts();
+  const mitAegis = engine.enemyCounts();
 
-  // C) Vorhandene Gegner werden NICHT schlagartig geloescht, und dabei
-  //    entstehen weder Kills noch Beute.
+  // C) Der belohnungsfreie Rueckzug: Vor dem Boss wird der Pulk kuenstlich
+  //    ueberfuellt, dann tritt die Arena in Kraft. Innerhalb des Rueckzugs-
+  //    budgets verschwindet der Ueberschuss -- ohne Kill, ohne Beute. Eliten
+  //    bleiben unberuehrt.
   engine.begin(480); engine.S.x = 0; engine.S.y = 0; engine.S.t = 240; stillLegen();
-  laufen(900);
-  const vorBoss = engine.enemyCounts().normal;
+  for (let k=0;k<220;k++){
+    const a=(k/220)*Math.PI*2, r=120+(k%7)*70;
+    engine.spawnEnemy(240, k%5, 0, Math.cos(a)*r, Math.sin(a)*r);
+  }
+  for (let k=0;k<5;k++) engine.spawnEnemy(240, 1, 1, 300+k*20, 40);
+  engine.rebuildGrid();
+  const vorArena = engine.enemyCounts();
   const killsVor = engine.S.kills, gemsVor = engine.gemCount();
-  const bossC = engine.spawnEnemy(engine.S.t, 4, 2, 260, 0);
-  engine.S.bossIndex = bossC;
-  laufen(120);
-  const nachBossEintritt = engine.enemyCounts().normal;
-  const keineLoeschung = nachBossEintritt >= vorBoss - 2;
-  const keineKunstKills = engine.S.kills === killsVor &&
-    engine.gemCount().splitter === gemsVor.splitter &&
-    engine.gemCount().tropfen === gemsVor.tropfen;
+  const xpVor = engine.S.xpTotal;
+  const bossC = engine.spawnEnemy(240, 4, 2, 400, 0);
+  engine.S.bossIndex = bossC; engine.S.bossId = "aegis";
+  laufen(60);                                                  // 1 Sekunde
+  const rueckzugSichtbar = engine.enemyCounts().retreating > 0;
+  const budgetTicks = Math.ceil((RETREAT_S + 1.5) / TICK);
+  laufen(budgetTicks - 60);
+  const nachRueckzug = engine.enemyCounts();
+  const rueckzugAbgeschlossen = nachRueckzug.retreating === 0 &&
+    nachRueckzug.normal <= vorArena.normal - (vorArena.normal - ZIEL_AEGIS) * 0.8;
+  // Sofort einfrieren: Die folgenden Szenarien veraendern Kills/Beute legal.
+  const cKills = engine.S.kills;
+  const cGems = engine.gemCount();
+  const cXp = engine.S.xpTotal;
+  const keineKunstKills = cKills === killsVor;
+  const keineBeute = cGems.splitter === gemsVor.splitter &&
+    cGems.tropfen === gemsVor.tropfen && cXp === xpVor;
+  const elitenBleiben = nachRueckzug.elite === vorArena.elite && vorArena.elite === 5;
 
-  // D) Nach dem Boss-Tod gilt wieder die normale Kurve.
+  // D) Mit lebendem NEXUS gilt das engere Finale-Ziel von 30.
+  engine.begin(480); engine.S.x = 0; engine.S.y = 0; engine.S.t = 300; stillLegen();
+  const bossD = engine.spawnEnemy(300, 4, 2, 260, 0, "nexus");
+  engine.S.bossIndex = bossD; engine.S.bossId = "nexus";
+  laufen(900);
+  const mitNexus = engine.enemyCounts();
+
+  // E) Nach dem Boss-Tod baut sich die Dichte wieder sanft auf.
   engine.begin(480); engine.S.x = 0; engine.S.y = 0; engine.S.t = 240; stillLegen();
-  const bossD = engine.spawnEnemy(240, 4, 2, 260, 0);
-  engine.S.bossIndex = bossD;
+  const bossE = engine.spawnEnemy(240, 4, 2, 260, 0);
+  engine.S.bossIndex = bossE; engine.S.bossId = "aegis";
   laufen(600);
   const waehrend = engine.enemyCounts().normal;
-  engine.killEnemy(bossD);
+  engine.killEnemy(bossE);
   const bossWeg = !engine.bossIsAlive();
   laufen(900);
   const danach = engine.enemyCounts().normal;
 
-  const zielGedeckelt = mitBoss.normal <= ZIEL;
+  const aegisGedeckelt = mitAegis.normal <= ZIEL_AEGIS;
+  const nexusGedeckelt = mitNexus.normal <= ZIEL_NEXUS;
   // Boss und Eliten leben weiter UND haben das Budget nicht verbraucht: Die
-  // normalen Gegner erreichen trotzdem das volle Ziel von 90.
-  const bossZaehltNichtMit = mitBoss.boss === 1 && mitBoss.elite === 5 &&
-    mitBoss.normal >= ZIEL - 2;
-  const normalHoeherOhneBoss = ohneBoss.normal > ZIEL;
+  // normalen Gegner erreichen trotzdem das volle Arena-Ziel von 50.
+  const bossZaehltNichtMit = mitAegis.boss === 1 && mitAegis.elite === 5 &&
+    mitAegis.normal >= ZIEL_AEGIS - 2;
+  const normalHoeherOhneBoss = ohneBoss.normal > ZIEL_AEGIS;
   const baustWiederAuf = danach > waehrend;
 
-  bossCombatPocket = zielGedeckelt && bossZaehltNichtMit && normalHoeherOhneBoss &&
-    keineLoeschung && keineKunstKills && bossWeg && baustWiederAuf;
-  bossPocketDiagnostics = { ziel: ZIEL, zielOhneBoss,
-    ohneBossNormal: ohneBoss.normal, mitBossNormal: mitBoss.normal,
-    vorBoss, nachBossEintritt, waehrend, danach,
-    zielGedeckelt, bossZaehltNichtMit, normalHoeherOhneBoss,
-    keineLoeschung, keineKunstKills, bossWeg, baustWiederAuf };
+  bossCombatPocket = aegisGedeckelt && nexusGedeckelt && bossZaehltNichtMit &&
+    normalHoeherOhneBoss && rueckzugSichtbar && rueckzugAbgeschlossen &&
+    keineKunstKills && keineBeute && elitenBleiben && bossWeg && baustWiederAuf;
+  bossPocketDiagnostics = { zielAegis: ZIEL_AEGIS, zielNexus: ZIEL_NEXUS,
+    zielOhneBoss,
+    ohneBossNormal: ohneBoss.normal, mitAegisNormal: mitAegis.normal,
+    mitNexusNormal: mitNexus.normal,
+    vorArenaNormal: vorArena.normal, rueckzugSichtbar,
+    nachRueckzugNormal: nachRueckzug.normal, retreatingNach: nachRueckzug.retreating,
+    rueckzugBudgetSekunden: RETREAT_S,
+    killsVor, killsNach: cKills,
+    splitterVor: gemsVor.splitter, splitterNach: cGems.splitter,
+    tropfenVor: gemsVor.tropfen, tropfenNach: cGems.tropfen,
+    xpVor, xpNach: cXp,
+    eliteVor: vorArena.elite, eliteNach: nachRueckzug.elite,
+    waehrend, danach,
+    aegisGedeckelt, nexusGedeckelt, bossZaehltNichtMit, normalHoeherOhneBoss,
+    rueckzugAbgeschlossen, keineKunstKills, keineBeute, elitenBleiben,
+    bossWeg, baustWiederAuf };
 } catch (error) {
   bossPocketError = error instanceof Error ? error.message : String(error);
+}
+
+// --- EH-2026-08-25-03 / D-041: Das verpflichtende NEXUS-Finale --------------
+// Der Acht-Minuten-Modus ist erst mit dem echten Tod von NEXUS gemeistert:
+// Warnung ab 7:45, Spawn bei 8:00 im sichtbaren Ausschnitt, Extraktionssperre
+// solange er lebt, Overtime-Multiplikator aus, Tod bleibt "Gefallen". Der
+// Drei-Minuten-Modus behaelt sein bisheriges Ende. Alle Szenarien laufen
+// seed-fest ueber newRun(), damit der Vertrag reproduzierbar ist.
+let finalBossFlow = false;
+let finalBossError = "";
+let finalBossDiagnostics = null;
+try {
+  const TICK = engine.CFG.TICK;
+  const stillLegen = () => {
+    engine.S.W = {}; engine.S.hp = engine.S.maxhp = 1e9;
+    engine.S.events.boss = true;
+    engine.S.events.elite = engine.CFG.ELITE_AT.length;
+  };
+  const laufen = (sek) => { for (let i=0,n=Math.round(sek/TICK);i<n;i++) engine.tick(TICK); };
+  const startRun = (len) => {
+    engine.newRun(len, 20260825, "ring");
+    engine.S.running = true; engine.S.phase = "run";
+  };
+
+  // 1) Drei-Minuten-Modus: kein Finale, Ende unveraendert bei 3:00.
+  startRun(180); stillLegen();
+  laufen(179);
+  const kurzKeinNexusVorEnde = engine.S.nexusState === 0 && !engine.S.nexusWarned;
+  laufen(2);
+  const kurzEndeExtraktion = engine.S.phase === "extract" && engine.S.nexusState === 0;
+
+  // 2) Acht Minuten: Warnung ab 7:45, Spawn bei 8:00, Sperre solange er lebt.
+  startRun(480); stillLegen();
+  laufen(engine.BOSS.FINAL_WARN_AT - 1);
+  const warnNochNicht = !engine.S.nexusWarned && engine.S.nexusState === 0;
+  laufen(1.5);
+  const warnErteilt = engine.S.nexusWarned === true && engine.S.nexusState === 0;
+  laufen(480 - engine.BOSS.FINAL_WARN_AT);
+  const spawnBeiAcht = engine.S.nexusState === 1 && engine.bossIsAlive() &&
+    engine.S.phase === "run" && engine.S.pendingExtract === false;
+  const nexusIdx = engine.S.bossIndex;
+  const nexusHp = engine.enemyMax(nexusIdx);
+  laufen(5);
+  const sperreHaelt = engine.S.phase === "run" && engine.S.nexusState === 1;
+  const keineOvertimeImFinale = engine.S.otActive === false && engine.S.ot === 0;
+  const spawnZeit = engine.S.nexusSpawnT;
+
+  // 3) Dynamische Bossbezeichnung und Finaldauer-Uhr.
+  engine.updateHUD();
+  const titelNexus = globalThis.document.getElementById("bosstitle").textContent === "BOSS: NEXUS";
+  const uhrFinal = globalThis.document.getElementById("clock").textContent.startsWith("FINALE +");
+
+  // 4) Erst der echte Tod oeffnet die Extraktion; danach ist sie da.
+  engine.killEnemy(nexusIdx);
+  laufen(0.05);
+  const extraktionNachKill = engine.S.phase === "extract" && engine.S.nexusState === 2 &&
+    engine.S.nexusSpawnT >= 0 && engine.S.nexusKillT >= 0;
+  const killZeit = engine.S.nexusKillT;
+  const finalDauerPositiv = killZeit > spawnZeit;
+  const berichtZeigtFinale = engine.runReportText().includes("NEXUS besiegt") &&
+    engine.runReportText().includes("Finaldauer");
+  engine.endRun(true);
+  const ergebnisExtrahiert = engine.S.result === "Extrahiert";
+
+  // 5) Spielertod IM Finale bleibt eine Niederlage -- auch mit lebendem NEXUS.
+  //    Der Treffer geht denselben Weg wie im Spiel: Kontakt einer Elite ueber
+  //    den regulären Gegnerpfad -> damagePlayer() -> endRun(false). Eine
+  //    Elite bewusst deshalb, weil normale Gegner in der Arena laufend in
+  //    den belohnungsfreien Rueckzug gezwungen werden und dort keinen
+  //    Kontaktschaden mehr tragen -- genau das soll der Auftrag so.
+  startRun(480); stillLegen();
+  laufen(481);
+  const finaleLebt = engine.S.nexusState === 1;
+  engine.spawnEnemy(481, 1, 1, 1, 0);
+  engine.rebuildGrid();
+  engine.S.hp = 1; engine.S.iframe = 0; engine.S.dashIf = 0;
+  laufen(0.02);
+  const todImFinale = engine.S.result === "Gefallen" && engine.S.phase === "over";
+
+  finalBossFlow = kurzKeinNexusVorEnde && kurzEndeExtraktion && warnNochNicht &&
+    warnErteilt && spawnBeiAcht && sperreHaelt && keineOvertimeImFinale &&
+    titelNexus && uhrFinal && extraktionNachKill && finalDauerPositiv &&
+    berichtZeigtFinale && ergebnisExtrahiert && finaleLebt && todImFinale &&
+    nexusHp >= 9000;
+  finalBossDiagnostics = { kurzKeinNexusVorEnde, kurzEndeExtraktion, warnNochNicht,
+    warnErteilt, spawnBeiAcht, sperreHaelt, keineOvertimeImFinale,
+    titelNexus, uhrFinal, nexusHp, extraktionNachKill, finalDauerPositiv,
+    berichtZeigtFinale, ergebnisExtrahiert, finaleLebt, todImFinale,
+    spawnT: spawnZeit, killT: killZeit };
+} catch (error) {
+  finalBossError = error instanceof Error ? error.message : String(error);
+}
+
+// --- EH-2026-08-25-03 / D-041: NEXUS-Haltbarkeit, deterministisch gemessen --
+// Der Zielkorridor fuer einen Build mit ein bis zwei Evolutionen liegt bei
+// ungefaehr 30–75 Sekunden. Gemessen wird am echten Kampf: fester Seed,
+// eingefrorenes Build (keine Stufen, keine Karten), unsterblicher Spieler,
+// echte Waffen-, Boss-KI- und Todespfade. Ein schwacher Build belegt, dass
+// NEXUS kein Strohmann ist.
+let nexusBenchmark = false;
+let nexusBenchError = "";
+let nexusBenchDiagnostics = null;
+try {
+  const TICK = engine.CFG.TICK;
+  const kamp = (build) => {
+    engine.newRun(480, 20260825, "ring");
+    const S = engine.S;
+    S.running = true; S.phase = "run";
+    S.W = Object.assign({}, build.W);
+    S.Pa = Object.assign({}, build.Pa);
+    S.evo = {}; for (const id of (build.evo||[])) S.evo[id] = 1;
+    S.cool = { bogen:0, splitter:0, kugel:0, blitz:0, klinge:0, frost:0 };
+    S.hp = S.maxhp = 1e9;
+    let spawnT = -1;
+    for (let i=0, n=Math.ceil((480+300)/TICK); i<n; i++){
+      if (spawnT < 0 && S.nexusState === 1) spawnT = S.t;
+      if (S.nexusState === 2) break;
+      S.need = Infinity;          // Build einfrieren: keine Stufen, keine Karten
+      S.hp = 1e9;                 // unsterblich: nur Bosshaltbarkeit messen
+      engine.tick(TICK);
+    }
+    return { dauer: S.nexusKillT > 0 ? S.nexusKillT - spawnT : -1,
+             besiegt: S.nexusState === 2 };
+  };
+  const schwach = { W:{ bogen:2 }, Pa:{} };
+  const reprae = { W:{ bogen:5, splitter:4, kugel:2 },
+                   Pa:{ sehne:3, koecher:3, federung:1 }, evo:["bogen"] };
+
+  const rSchwach = kamp(schwach);
+  const rReprae = kamp(reprae);
+  const rReprae2 = kamp(reprae);
+  const deterministisch = rReprae.dauer === rReprae2.dauer;
+  const korridor = rReprae.besiegt && rReprae.dauer >= 30 && rReprae.dauer <= 75;
+  // Ordnung: der repraesentative Build besiegt NEXUS im Fenster, der schwache
+  // Build schafft es innerhalb von 300 Sekunden nicht.
+  const ordnung = rReprae.besiegt && !rSchwach.besiegt;
+
+  nexusBenchmark = deterministisch && korridor && ordnung;
+  nexusBenchDiagnostics = { schwachDauer: +rSchwach.dauer.toFixed(1),
+    schwachBesiegt: rSchwach.besiegt,
+    repraesentativDauer: +rReprae.dauer.toFixed(1),
+    wiederholungDauer: +rReprae2.dauer.toFixed(1),
+    deterministisch, korridor, ordnung };
+} catch (error) {
+  nexusBenchError = error instanceof Error ? error.message : String(error);
 }
 
 // --- EH-2026-08-23-02: Warden-Ortung ---------------------------------------
@@ -1921,9 +2107,126 @@ try {
   combatUiV2Error = error instanceof Error ? error.message : String(error);
 }
 
+// --- EH-2026-08-25-03 / D-041 Gate C: genau ein Evolutionshinweis -----------
+// Der Hinweis „Nächste EVO“ ist der einzige Fortschrittshinweis im Kampfbild.
+// Fachliche Quelle ist ausschliesslich leadingEvoPath(); er zeigt genau den
+// aktuell fuehrenden Pfad, wechselt sofort nach Abschluss und verschwindet
+// ohne Pfad. Geprueft wird Verhalten am echten DOM-Shim, plus die Lage
+// oberhalb der Waffenleiste und unterhalb der Dialogebene.
+let evolutionFocusHud = false;
+let evoFocusError = "";
+let evoFocusDiagnostics = null;
+try {
+  const hintEl = globalThis.document.getElementById("evohint");
+  const nameEl = globalThis.document.getElementById("ehname");
+  const progEl = globalThis.document.getElementById("ehprog");
+
+  // 1) Statisch: genau ein Element, Quelle fuehrender Pfad, Lage ueber der
+  //    Waffenleiste, unterhalb der Karten-/Dialogebene.
+  const genauEinElement = (html.match(/id="evohint"/g) || []).length === 1 &&
+    html.includes("function updateEvoHint()") &&
+    html.includes("const lead=leadingEvoPath();");
+  const bottomBar = parseInt((html.match(/#weaponbar\{[^}]*bottom:(\d+)px/) || [])[1], 10);
+  const bottomHint = parseInt((html.match(/#evohint\{[^}]*bottom:(\d+)px/) || [])[1], 10);
+  const zHint = parseInt((html.match(/#evohint\{[^}]*z-index:(\d+)/) || [])[1], 10);
+  const zCards = parseInt((html.match(/#cards\{[^}]*z-index:(\d+)/) || [])[1], 10);
+  const lageKorrekt = bottomHint > bottomBar && zHint < zCards;
+
+  // 2) Verhalten: genau der fuehrende Pfad wird angezeigt, nicht der andere.
+  engine.begin(480, "ring");
+  engine.S.W = { bogen: 1, klinge: 2 };
+  engine.S.Pa = { sehne: 1, federung: 1 };
+  engine.S.evo = {};
+  const leadA = engine.leadingEvoPath();
+  engine.updateEvoHint();
+  const anNachLead = hintEl.getAttribute("aria-hidden") === "false";
+  const nameIstFuehrender = nameEl.textContent === leadA.w.evo.name &&
+    !nameEl.textContent.includes(engine.LEX.evo.bogen);
+  const fortschrittDrin = progEl.textContent.includes(leadA.w.name) &&
+    progEl.textContent.includes(leadA.passive.name);
+
+  // 3) Nach Abschluss wechselt der Hinweis sofort zum naechsten Pfad ...
+  engine.S.W.bogen = 5; engine.S.Pa.sehne = 3;   // Bogen-Pfad bereit -> fuehrend
+  const leadB = engine.leadingEvoPath();
+  engine.updateEvoHint();
+  const wechseltSofort = nameEl.textContent === leadB.w.evo.name &&
+    progEl.textContent.includes("bereit");
+
+  // 4) ... und verschwindet, wenn kein Pfad mehr offen ist.
+  engine.S.W = {}; engine.S.Pa = {};
+  engine.updateEvoHint();
+  const verstecktOhnePfad = hintEl.getAttribute("aria-hidden") === "true";
+
+  evolutionFocusHud = genauEinElement && lageKorrekt && anNachLead &&
+    nameIstFuehrender && fortschrittDrin && wechseltSofort && verstecktOhnePfad;
+  evoFocusDiagnostics = { genauEinElement, lageKorrekt,
+    bottomBar, bottomHint, zHint, zCards,
+    fuehrend: leadA.w.id, name: nameEl.textContent,
+    anNachLead, nameIstFuehrender, fortschrittDrin, wechseltSofort, verstecktOhnePfad };
+} catch (error) {
+  evoFocusError = error instanceof Error ? error.message : String(error);
+}
+
+// --- EH-2026-08-25-03 / D-041 Gate B: fuenf Familien, eine Silhouettensprache
+// Farbe allein reicht nicht. Geprueft werden die verbindlichen Profile aus
+// FOE_PROFILE -- dieselbe Tabelle, die drawFoeBody() tatsaechlich zeichnet --
+// plus die daraus gebauten Sprite-Groessen. Alle fuenf Konturen muessen in
+// Proportion und Groesse paarweise unterscheidbar sein.
+let foeSilhouettes = false;
+let foeSilhouetteError = "";
+let foeSilhouetteDiagnostics = null;
+try {
+  const P = engine.FOE_PROFILE;
+  const profilVollstaendig = Array.isArray(P) && P.length === 5 &&
+    Object.isFrozen(P) && P.every(p => Object.isFrozen(p));
+
+  // Paarweise unterschiedliche Konturen (k, breite, hoehe, teile).
+  let paarweiseVerschieden = true;
+  for (let a=0;a<5;a++) for (let b=a+1;b<5;b++){
+    const x=P[a], y=P[b];
+    if (x.k===y.k && x.breite===y.breite && x.hoehe===y.hoehe && x.teile===y.teile)
+      paarweiseVerschieden = false;
+  }
+
+  // Lesbare Qualitaeten je Rolle:
+  const sammlerKlein        = P[0].k === Math.min(...P.map(p=>p.k));
+  const rammjaegerLang      = P[1].hoehe / P[1].breite >= 1.8;
+  const emitterBreitest     = P[2].breite / P[2].hoehe === Math.max(...P.map(p=>p.breite/p.hoehe));
+  const replikatorGeteilt   = P[3].teile === 2;
+  // Flaeche inklusive Grundgroesse: das Bollwerk ist die groesste normale
+  // Einheit, auch gegen den breiten Emitter und den Zwilling.
+  const flaeche = p => p.breite * p.hoehe * p.k * p.k;
+  const bollwerkGross       = P[4].k === Math.max(...P.map(p=>p.k)) &&
+    flaeche(P[4]) === Math.max(...P.map(flaeche));
+
+  // Die Zeichnung konsumiert die Tabelle wirklich (nicht nur der Test).
+  const bodyQuelle = html.slice(html.indexOf("function drawFoeBody"),
+                                html.indexOf("function buildFoeSprites"));
+  const tabelleGenutzt = bodyQuelle.includes("FOE_PROFILE[fam]") &&
+    html.includes("const GROESSE=[40,56,66,60,86]");
+
+  // Die gebauten Sprites tragen die Unterscheidung auch in der Groesse.
+  const groessen = [0,1,2,3,4].map(f => engine.SPR.foe[f][0] ? engine.SPR.foe[f][0].width : 0);
+  const alleVorhanden = groessen.every(g => g > 0);
+  const groessenPaarweise = new Set(groessen).size === 5;
+  const bollwerkAmGroessten = groessen[4] === Math.max(...groessen);
+  const sammlerAmKleinsten = groessen[0] === Math.min(...groessen);
+
+  foeSilhouettes = profilVollstaendig && paarweiseVerschieden && sammlerKlein &&
+    rammjaegerLang && emitterBreitest && replikatorGeteilt && bollwerkGross &&
+    tabelleGenutzt && alleVorhanden && groessenPaarweise &&
+    bollwerkAmGroessten && sammlerAmKleinsten;
+  foeSilhouetteDiagnostics = { profilVollstaendig, paarweiseVerschieden,
+    sammlerKlein, rammjaegerLang, emitterBreitest, replikatorGeteilt,
+    bollwerkGross, tabelleGenutzt, groessen, alleVorhanden, groessenPaarweise,
+    bollwerkAmGroessten, sammlerAmKleinsten };
+} catch (error) {
+  foeSilhouetteError = error instanceof Error ? error.message : String(error);
+}
+
 const output = {
-  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && slotLayout && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && contractFlow && holdExpansion && equipmentFlow && evolutionCatalog && eliteChoices && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling && fpsMetrics && reportHardened && lastRunReportFlow && healOrbFlow && holdGoalLadder && oreCurve && earlyLossGuard && bossCombatPocket && bossLocatorState && compactCombatHud && evolutionCompletion && weaponDamageReport && lateProgression && weaponRoles && presentationLayer && renderCostContract && combatUiV2,
-  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, slotLayout, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, contractFlow, holdExpansion, equipmentFlow, evolutionCatalog, eliteChoices, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling, fpsMetrics, reportHardened, lastRunReportFlow, healOrbFlow, holdGoalLadder, oreCurve, earlyLossGuard, bossCombatPocket, bossLocatorState, compactCombatHud, evolutionCompletion, weaponDamageReport, lateProgression, weaponRoles, presentationLayer, renderCostContract, combatUiV2 },
+  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && slotLayout && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && contractFlow && holdExpansion && equipmentFlow && evolutionCatalog && eliteChoices && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling && fpsMetrics && reportHardened && lastRunReportFlow && healOrbFlow && holdGoalLadder && oreCurve && earlyLossGuard && bossCombatPocket && bossLocatorState && compactCombatHud && evolutionCompletion && weaponDamageReport && lateProgression && weaponRoles && presentationLayer && renderCostContract && combatUiV2 && finalBossFlow && evolutionFocusHud && foeSilhouettes && nexusBenchmark,
+  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, slotLayout, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, contractFlow, holdExpansion, equipmentFlow, evolutionCatalog, eliteChoices, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling, fpsMetrics, reportHardened, lastRunReportFlow, healOrbFlow, holdGoalLadder, oreCurve, earlyLossGuard, bossCombatPocket, bossLocatorState, compactCombatHud, evolutionCompletion, weaponDamageReport, lateProgression, weaponRoles, presentationLayer, renderCostContract, combatUiV2, finalBossFlow, evolutionFocusHud, foeSilhouettes, nexusBenchmark },
   targets: report.targets,
   ueberschuss: report.ueberschuss,
   seeds: report.seeds,
@@ -1945,6 +2248,10 @@ if (oreCurveError) output.oreCurveError = oreCurveError;
 if (earlyLossError) output.earlyLossError = earlyLossError;
 if (bossPocketError) output.bossPocketError = bossPocketError;
 if (bossLocatorError) output.bossLocatorError = bossLocatorError;
+if (finalBossError) output.finalBossError = finalBossError;
+if (nexusBenchError) output.nexusBenchError = nexusBenchError;
+if (evoFocusError) output.evoFocusError = evoFocusError;
+if (foeSilhouetteError) output.foeSilhouetteError = foeSilhouetteError;
 if (compactHudError) output.compactHudError = compactHudError;
 if (evolutionCompletionError) output.evolutionCompletionError = evolutionCompletionError;
 if (weaponDamageError) output.weaponDamageError = weaponDamageError;
@@ -1960,6 +2267,10 @@ if (presentationDiagnostics) output.summary.presentation = presentationDiagnosti
 if (weaponRolesDiagnostics) output.summary.weaponRoles = weaponRolesDiagnostics;
 if (lateProgressionDiagnostics) output.summary.lateProgression = lateProgressionDiagnostics;
 if (bossPocketDiagnostics) output.summary.bossPocket = bossPocketDiagnostics;
+if (finalBossDiagnostics) output.summary.finalBoss = finalBossDiagnostics;
+if (nexusBenchDiagnostics) output.summary.nexusBenchmark = nexusBenchDiagnostics;
+if (evoFocusDiagnostics) output.summary.evoFocus = evoFocusDiagnostics;
+if (foeSilhouetteDiagnostics) output.summary.foeSilhouettes = foeSilhouetteDiagnostics;
 if (bossLocatorDiagnostics) output.summary.bossLocator = bossLocatorDiagnostics;
 if (compactHudDiagnostics) output.summary.compactHud = compactHudDiagnostics;
 if (evolutionCompletionDiagnostics) output.summary.evolutionCompletion = evolutionCompletionDiagnostics;

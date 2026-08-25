@@ -30,6 +30,9 @@ canvas{display:block;position:absolute;inset:0;width:100%;height:100%}
 #clock{position:absolute;right:140px;top:16px;font-variant-numeric:tabular-nums;
   font-size:15px;font-weight:600;letter-spacing:.02em;color:#cfe0f5}
 #clock.ot{color:#ffa04a}
+/* D-041 / Gate E: die Finaldauer nach 8:00 liest sich klar getrennt von der
+   orange markierten freiwilligen Overtime. */
+#clock.final{color:#7fd4e8}
 #lvl{font-size:12px;color:#8fa0bd;letter-spacing:.1em;text-transform:uppercase}
 #lvl b{color:#f0c45a;font-size:15px}
 /* Oben mittig: der aktuelle Sektor — und sobald AEGIS lebt, tritt die
@@ -95,6 +98,21 @@ canvas{display:block;position:absolute;inset:0;width:100%;height:100%}
   font-variant-numeric:tabular-nums}
 .wslot.evo{border-color:#f0c45a;box-shadow:0 0 10px rgba(240,196,90,.28)}
 .wslot.evo .wlv{border-color:#f0c45a;color:#f0c45a}
+/* D-041 / Gate C: genau ein kompakter Hinweis „Nächste EVO“, oberhalb der
+   unteren Waffenleiste. Er schwebt mit klarer Luecke ueber den Symbolen,
+   bleibt zentriert schmal und wird zusammen mit der Leiste eingeblendet.
+   Karten und Dialoge liegen auf einem hoeheren z-index und verdecken ihn. */
+#evohint{position:absolute;left:50%;bottom:72px;transform:translateX(-50%);
+  display:flex;align-items:center;gap:8px;padding:4px 12px;border-radius:9px;
+  background:rgba(13,18,30,.78);border:1px solid #2c3c58;
+  font-size:10px;letter-spacing:.06em;color:#8fa0bd;white-space:nowrap;
+  opacity:0;transition:opacity .18s ease;pointer-events:none;z-index:5}
+#evohint.on{opacity:1}
+#evohint .ehlabel{font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:#7fd4e8}
+#evohint .ehname{font-size:11px;font-weight:650;color:#ffd98a;letter-spacing:.04em}
+#evohint .ehprog{font-variant-numeric:tabular-nums;color:#a8b6cf}
+#evohint.ready{border-color:#e07a3f;box-shadow:0 0 12px rgba(224,122,63,.20)}
+#evohint.ready .ehname{color:#ffb870}
 /* Der Ring zeigt den echten Abklingfortschritt. --cd laeuft von 0 bis 1 und
    wird nur bei sichtbarer Aenderung gesetzt, nicht in jedem Frame. */
 .wcool{position:absolute;inset:-3px;border-radius:50%;
@@ -473,6 +491,9 @@ button.b.danger{background:#c9402e;color:#fff}
 
   <div id="weaponbar" aria-hidden="true"></div>
 
+  <!-- D-041 / Gate C: der einzige Evolutionshinweis im Kampfbild -->
+  <div id="evohint" aria-hidden="true"><span class="ehlabel">Nächste EVO</span><b id="ehname" class="ehname"></b><span id="ehprog" class="ehprog"></span></div>
+
   <div id="slots"></div>
   <div id="clock">0:00</div>
   <button id="pausebtn" class="panel" title="Pause (Esc oder P)" aria-label="Spiel pausieren">Ⅱ</button>
@@ -487,7 +508,7 @@ button.b.danger{background:#c9402e;color:#fff}
     <span id="coachstep">1 / 3</span><div id="coachcopy"><b id="coachtitle">Bewegen</b><span id="coachtext"></span></div>
   </div>
   <div id="bossalert" role="alert" aria-live="assertive" aria-hidden="true"><b id="bossalerttitle"></b><span id="bossalerttext"></span></div>
-  <div id="bossbar" aria-hidden="true"><div id="bossbarhead"><b>BOSS: AEGIS</b><span id="bossphase"><i></i><i></i></span></div><div id="bosshp"><span id="bossfill"></span></div></div>
+  <div id="bossbar" aria-hidden="true"><div id="bossbarhead"><b id="bosstitle">BOSS: AEGIS</b><span id="bossphase"><i></i><i></i></span></div><div id="bosshp"><span id="bossfill"></span></div></div>
   <div id="toast" role="status" aria-live="polite"></div>
 
   <!-- Kartenzug -->
@@ -672,7 +693,9 @@ const CFG = {
   // --- Ereignisse (GDD Kap. 5.4) ---
   ELITE_AT:       [120, 360],
   BOSS_AT:        250,      // 4:10 Mittelboss
-  SURGE_AT:       420,      // 7:00 Schatzflut
+  // D-041 / Gate D+E: Der 70er-Bergungsschub bei 7:00 ist entfallen. Die
+  // Acht-Minuten-Sortie endet nicht mehr in einer Flut, sondern in einer
+  // kontrollierten Finalphase (Warnung ab 7:45, NEXUS bei 8:00).
 
   // --- Overtime ---
   OT_DMG_STEP:    0.15,     // pro 10 Sekunden
@@ -723,7 +746,13 @@ function targetPicks(runLen){ return CFG.PICK_TARGETS[runLen] ?? null; }
 // D-035 hat diese Kurve absichtlich veraendert: Fokus ab 4:00 und unmittelbarer
 // Evolutionsabschluss verschieben den reproduzierbaren Mittelwert von 16,11
 // auf 21,67. Codex hat deshalb den Anker neu referenziert, nicht die Toleranz.
-const BOT_PICK_REF = 21.7, BOT_PICK_TOL = 3;
+//
+// EH-2026-08-25-03 (D-041) erneut nach Messung neu referenziert, nicht
+// gelockert: Der verpflichtend entfernte 70er-Bergungsschub bei 7:00 nimmt dem
+// Bot spaete Erfahrung weg. Vollstaendige Vorher-/Nachher-Tabelle ueber alle
+// neun Seeds steht in docs/WORK_REPORT.md; Mittelwert 19,00 -> 17,56,
+// Toleranz bleibt ±3.
+const BOT_PICK_REF = 17.56, BOT_PICK_TOL = 3;
 // Bewegung darf keinen Gegnerueberschuss mehr erzeugen (D-028, D-029).
 const OVERSHOOT_MAX = 1.10;
 
@@ -845,7 +874,8 @@ const ENEMY_NORMAL_TIER=2, ENEMY_TELEGRAPH_TIER=3;
 const SPR = { enemy:[], elite:null, boss:null, gem:null, gemBig:null,
               arrow:[], orbBlade:[], orb:null, blade:null, frost:null, eproj:null,
               floorTile:null, emberVent:null, wardPillar:null, starField:null,
-              orbiter:null, drone:null, aegis:null, foe:null, eliteA:null, aegisA:null };
+              orbiter:null, drone:null, aegis:null, foe:null, eliteA:null, aegisA:null,
+              nexusA:null };
 const ART = { hero:[], enemy:[], swarmer:[], elite:null, boss:null,
               heroReady:false, enemyReady:false, swarmerReady:false };
 const HERO_ANIM = Object.freeze({
@@ -864,18 +894,18 @@ function visualHash(x,y,salt){
 
 /** Basalt, Glutofen und Pfeiler werden einmal gebaut und danach nur kopiert. */
 function buildArenaSprites(){
-  // Stationsdeck statt Basalt: mittelhelle blaugraue Panelplatten mit
-  // Cyan-Fugen. Bewusst heller als der alte Boden, damit dunkle Gegner und
-  // helle Projektile gleichzeitig lesbar bleiben.
+  // D-041 / Gate A: Der Deckboden kehrt zur dunkleren, feineren Fassung aus
+  // Commit 9190de9 zurueck — blaugruefliche 80er-Paneele mit mehr ruhiger
+  // technischer Struktur. Die nahtlose D-040-Technik (Boden ueber die ganze
+  // Leinwand, Sektortoennung vor dem Clipping, keine Randbalken) bleibt
+  // unveraendert; hier steht nur die Kachel selbst.
   const T=320, tile=mkCanvas(T), g=tile.getContext('2d');
-  g.fillStyle='#5a6684'; g.fillRect(0,0,T,T);
-  // Entwurf 3 zeigt grosse, helle Paneele mit wenigen Fugen. Die Kachel
-  // enthaelt deshalb nur noch vier Platten statt sechzehn.
-  const bw=160, bh=160;
+  g.fillStyle='#39435c'; g.fillRect(0,0,T,T);
+  const bw=80, bh=80;
   for(let row=0;row<T/bh;row++){
     for(let col=0;col<T/bw;col++){
       const x=col*bw, y=row*bh, h=visualHash(col,row,11);
-      const shade=104+((h*16)|0);
+      const shade=62+((h*14)|0);
       g.fillStyle='rgb('+shade+','+(shade+9)+','+(shade+26)+')';
       g.fillRect(x+2,y+2,bw-4,bh-4);
       // Fugenlicht: schmale Cyan-Kante oben und links, dunkle Kante unten.
@@ -884,18 +914,18 @@ function buildArenaSprites(){
       g.moveTo(x+2,y+bh-3); g.lineTo(x+2,y+2); g.lineTo(x+bw-3,y+2); g.stroke();
       g.strokeStyle='rgba(18,23,38,.45)'; g.beginPath();
       g.moveTo(x+bw-2.5,y+2); g.lineTo(x+bw-2.5,y+bh-2.5); g.lineTo(x+2,y+bh-2.5); g.stroke();
-      // Eine ruhige Wartungsmarkierung je Panel, sonst nichts.
-      if(h>0.5){
-        g.fillStyle='rgba(240,196,90,.13)';
-        g.fillRect(x+bw*0.60,y+bh*0.16,bw*0.16,3);
+      // Kleine Wartungsmarkierung, fest pro Panel.
+      if(h>0.78){
+        g.fillStyle='rgba(240,196,90,.16)';
+        g.fillRect(x+bw*0.62,y+bh*0.20,bw*0.20,3);
       }
     }
   }
-  // Wenige feste Leitungsbahnen — einmal gebaut, nie pro Frame gerechnet.
-  for(let i=0;i<10;i++){
+  // Feste Leitungsbahnen — einmal gebaut, nie pro Frame gerechnet.
+  for(let i=0;i<22;i++){
     const x=visualHash(i,3,21)*T, y=visualHash(i,9,22)*T;
     const len=20+visualHash(i,5,23)*40, a=(visualHash(i,7,24)*4|0)*1.5708;
-    g.strokeStyle=i%4===0?'rgba(185,143,224,.14)':'rgba(38,48,72,.26)';
+    g.strokeStyle=i%6===0?'rgba(185,143,224,.20)':'rgba(20,26,42,.34)';
     g.lineWidth=i%6===0?1.4:1;
     g.beginPath(); g.moveTo(x,y);
     g.lineTo(x+Math.cos(a)*len,y+Math.sin(a)*len); g.stroke();
@@ -1057,79 +1087,151 @@ function buildOrbiterSprites(){
 const FOE_ANIM = Object.freeze({FRAMES:6, FPS:11});
 // Kernfarbe je Familie. Bewusst getrennt von den Warnfarben Rot und Orange.
 const FOE_CORE = ['#7fd4e8','#ff8a4a','#b98fe0','#7fe8a0','#f0c45a'];
+// D-041 / Gate B: Verbindliche Silhouettenprofile. Die Tabelle ist die EINZIGE
+// Quelle fuer Proportion und Groesse der Familienkoerper -- sie wird von
+// drawFoeBody() konsumiert und im Test auf Unterscheidbarkeit geprueft. Farbe
+// ist hier bewusst kein Bestandteil: Auch ohne Kernfarbe muessen sich alle
+// fuenf Familien an Kontur, Proportion und Groesse trennen lassen.
+//   k      -> Grundgroesse (Bollwerk groesste normale Einheit)
+//   breite -> horizontale Streckung der Kontur
+//   hoehe  -> vertikale Streckung der Kontur
+//   teile  -> Anzahl getrennter Koerpersegmente (Replikator = Zwilling)
+const FOE_PROFILE = Object.freeze([
+  Object.freeze({form:'sammler',    k:0.82, breite:1.00, hoehe:0.95, teile:1}),
+  Object.freeze({form:'rammjaeger', k:1.00, breite:0.72, hoehe:1.55, teile:1}),
+  Object.freeze({form:'emitter',    k:1.00, breite:1.95, hoehe:0.70, teile:3}),
+  Object.freeze({form:'replikator', k:0.95, breite:1.72, hoehe:0.85, teile:2}),
+  Object.freeze({form:'bollwerk',   k:1.55, breite:1.32, hoehe:1.06, teile:1}),
+]);
 
 /** Zeichnet einen Maschinenkoerper einer Familie in ein Offscreen-Canvas.
- *  `t` laeuft von 0 bis 1 ueber die Schwebephase. */
+ *  `t` laeuft von 0 bis 1 ueber die Schwebephase. Die Silhouette kommt aus
+ *  FOE_PROFILE -- nicht aus der Kernfarbe. */
 function drawFoeBody(g, fam, t, gross){
   const puls = Math.sin(t*6.2832), heb = Math.cos(t*6.2832);
-  const k = gross ? 1.85 : 1;
+  const p = FOE_PROFILE[fam], k = p.k*(gross?1.85:1);
+  const bx = p.breite*k, by = p.hoehe*k;
   const kern = FOE_CORE[fam];
   const panzer = '#26314a', kante = '#8fa8c8', gold = '#d8b46a';
   g.save();
   g.translate(0, heb*1.3*k);
 
-  if(fam===0){                       // Sammlerdrohne: kompaktes Sechseck
+  if(fam===0){                       // Sammlerdrohne: klein und kompakt
     g.fillStyle=panzer;
     g.beginPath();
-    for(let i=0;i<6;i++){ const a=i*1.0472-0.5236, x=Math.cos(a)*8*k, y=Math.sin(a)*6.6*k;
+    for(let i=0;i<6;i++){ const a=i*1.0472-0.5236, x=Math.cos(a)*7*bx, y=Math.sin(a)*6*by;
       i?g.lineTo(x,y):g.moveTo(x,y); }
     g.closePath(); g.fill();
-    g.strokeStyle=kante; g.lineWidth=1.2*k; g.stroke();
-    g.strokeStyle=gold; g.lineWidth=1.8*k; g.lineCap='round';
-    const arm=2.4+puls*1.5;
-    g.beginPath(); g.moveTo(-5*k,2*k); g.lineTo((-8-arm)*k,(4+arm*.4)*k); g.stroke();
-    g.beginPath(); g.moveTo( 5*k,2*k); g.lineTo(( 8+arm)*k,(4+arm*.4)*k); g.stroke();
-  } else if(fam===1){                // Rammjaeger: Keil nach vorn
+    g.strokeStyle=kante; g.lineWidth=1.1*k; g.stroke();
+    g.strokeStyle=gold; g.lineWidth=1.6*k; g.lineCap='round';
+    const arm=2.2+puls*1.4;
+    g.beginPath(); g.moveTo(-4.4*bx,1.8*by); g.lineTo((-7-arm)*bx,(3.6+arm*.4)*by); g.stroke();
+    g.beginPath(); g.moveTo( 4.4*bx,1.8*by); g.lineTo(( 7+arm)*bx,(3.6+arm*.4)*by); g.stroke();
+  } else if(fam===1){                // Rammjaeger: lang, aggressiv keilfoermig
     g.fillStyle=panzer;
     g.beginPath();
-    g.moveTo(0,-11*k); g.lineTo(7.5*k,4*k); g.lineTo(0,8*k); g.lineTo(-7.5*k,4*k);
+    g.moveTo(0,-13*by); g.lineTo(4.6*bx,-2*by); g.lineTo(3.4*bx,9*by);
+    g.lineTo(-3.4*bx,9*by); g.lineTo(-4.6*bx,-2*by);
     g.closePath(); g.fill();
-    g.strokeStyle=kante; g.lineWidth=1.2*k; g.stroke();
+    g.strokeStyle=kante; g.lineWidth=1.1*k; g.stroke();
+    // Heckfinnen betonen den langen Keil.
+    g.strokeStyle=gold; g.lineWidth=1.6*k; g.lineCap='round';
+    g.beginPath(); g.moveTo(-3.4*bx,6*by); g.lineTo(-6.2*bx,11.5*by); g.stroke();
+    g.beginPath(); g.moveTo( 3.4*bx,6*by); g.lineTo( 6.2*bx,11.5*by); g.stroke();
     g.fillStyle=gold;
-    g.beginPath(); g.moveTo(0,-13*k); g.lineTo(2.4*k,-8*k); g.lineTo(-2.4*k,-8*k);
+    g.beginPath(); g.moveTo(0,-15*by); g.lineTo(1.9*bx,-9.5*by); g.lineTo(-1.9*bx,-9.5*by);
     g.closePath(); g.fill();
-  } else if(fam===2){                // Emitterdrohne: Rumpf mit Laufmuendung
+  } else if(fam===2){                // Emitterdrohne: breit, klar getrennte Ausleger
+    // Flacher, breiter Zentralrumpf
     g.fillStyle=panzer;
-    g.beginPath(); g.ellipse(0,0,7.4*k,8.4*k,0,0,6.2832); g.fill();
-    g.strokeStyle=kante; g.lineWidth=1.2*k; g.stroke();
-    g.fillStyle=gold; g.fillRect(-1.6*k,-13*k,3.2*k,5.4*k);
-    g.fillStyle=panzer; g.fillRect(-4.6*k,3*k,9.2*k,3.4*k);
-  } else if(fam===3){                // Replikatorsonde: sichtbare Teilungsnaht
-    g.fillStyle=panzer;
-    g.beginPath(); g.ellipse(0,0,8.6*k,7.2*k,0,0,6.2832); g.fill();
-    g.strokeStyle=kante; g.lineWidth=1.2*k; g.stroke();
-    const naht=1.1+Math.abs(puls)*1.9;
-    g.strokeStyle=kern; g.lineWidth=naht*k;
-    g.beginPath(); g.moveTo(0,-7*k); g.lineTo(0,7*k); g.stroke();
-  } else {                           // Bollwerkeinheit: schweres Achteck
-    g.fillStyle=panzer;
+    g.beginPath(); g.ellipse(0,0,3.2*bx,4.6*by,0,0,6.2832); g.fill();
+    g.strokeStyle=kante; g.lineWidth=1.1*k; g.stroke();
+    // Zwei sichtbar getrennte Auslegerpodeste mit Luecke zum Rumpf.
+    for(const seite of [-1,1]){
+      g.save();
+      g.translate(seite*(5.6+puls*0.35)*bx, -0.6*by);
+      g.fillStyle=panzer;
+      g.beginPath();
+      g.moveTo(-1.7*bx,-2.6*by); g.lineTo(1.7*bx,-2.6*by);
+      g.lineTo(2.3*bx,2.6*by); g.lineTo(-2.3*bx,2.6*by);
+      g.closePath(); g.fill();
+      g.strokeStyle=kante; g.lineWidth=1.1*k; g.stroke();
+      g.fillStyle=kern;
+      g.globalAlpha=.55+.35*puls;
+      g.fillRect(-0.8*bx,-0.9*by,1.6*bx,1.8*by);
+      g.globalAlpha=1;
+      g.restore();
+    }
+    g.fillStyle=gold; g.fillRect(-1.3*bx,-7.6*by,2.6*bx,3.2*by);
+  } else if(fam===3){                // Replikatorsonde: geteilte Zwillingssilhouette
+    const abstand=(6.8+Math.abs(puls)*1.6)*bx*0.55;
+    for(const seite of [-1,1]){
+      g.save();
+      g.translate(seite*abstand,0);
+      g.fillStyle=panzer;
+      g.beginPath();
+      g.moveTo(0,-6.4*by); g.lineTo(4.4*bx*0.52,0); g.lineTo(0,6.4*by); g.lineTo(-4.4*bx*0.52,0);
+      g.closePath(); g.fill();
+      g.strokeStyle=kante; g.lineWidth=1.1*k; g.stroke();
+      g.restore();
+    }
+    // Koppellinie zwischen beiden Haelften: die sichtbare Teilungsnaht.
+    g.strokeStyle=kern; g.lineWidth=(0.9+Math.abs(puls)*1.1)*k;
+    g.beginPath(); g.moveTo(-abstand,0); g.lineTo(abstand,0); g.stroke();
+  } else {                           // Bollwerkeinheit: gross, breit, schwer gepanzert
+    g.fillStyle='#1d2740';
     g.beginPath();
-    for(let i=0;i<8;i++){ const a=i*0.7854+0.3927, x=Math.cos(a)*9.4*k, y=Math.sin(a)*9.4*k;
+    for(let i=0;i<8;i++){ const a=i*0.7854+0.3927,
+      x=Math.cos(a)*(i%2?8.6:10.4)*bx, y=Math.sin(a)*(i%2?7.4:8.6)*by;
       i?g.lineTo(x,y):g.moveTo(x,y); }
     g.closePath(); g.fill();
-    g.strokeStyle=kante; g.lineWidth=1.6*k; g.stroke();
+    g.fillStyle=panzer;
+    g.beginPath();
+    for(let i=0;i<8;i++){ const a=i*0.7854+0.3927,
+      x=Math.cos(a)*(i%2?7.2:8.6)*bx, y=Math.sin(a)*(i%2?6.2:7.2)*by;
+      i?g.lineTo(x,y):g.moveTo(x,y); }
+    g.closePath(); g.fill();
+    g.strokeStyle=kante; g.lineWidth=1.7*k; g.stroke();
+    // Panzerplatten oben und unten: schwer und breit.
+    g.fillStyle='#33405e';
+    g.fillRect(-6.4*bx,-4.2*by,12.8*bx,2.4*by);
+    g.fillRect(-5.2*bx,2.6*by,10.4*bx,2.2*by);
     g.fillStyle=gold;
-    g.fillRect(-9*k,-2*k,3*k,4*k); g.fillRect(6*k,-2*k,3*k,4*k);
+    g.fillRect(-10*bx,-1.6*by,2.6*bx,3.4*by);
+    g.fillRect(7.4*bx,-1.6*by,2.6*bx,3.4*by);
   }
 
-  // Leuchtkern: der gemeinsame Nenner aller Familien.
-  g.fillStyle=kern;
-  g.beginPath(); g.arc(0,0,(2.5+puls*0.45)*k,0,6.2832); g.fill();
-  g.fillStyle='#ffffff';
-  g.beginPath(); g.arc(0,0,(1.1+puls*0.2)*k,0,6.2832); g.fill();
+  // Leuchtkern: der gemeinsame Nenner aller Familien. Beim Replikator traegt
+  // jede Haelfte einen eigenen kleinen Kern.
+  if(fam===3){
+    const abstand=(6.8+Math.abs(puls)*1.6)*bx*0.55;
+    for(const seite of [-1,1]){
+      g.fillStyle=kern;
+      g.beginPath(); g.arc(seite*abstand,0,(1.7+puls*0.3)*k,0,6.2832); g.fill();
+      g.fillStyle='#ffffff';
+      g.beginPath(); g.arc(seite*abstand,0,(0.75+puls*0.15)*k,0,6.2832); g.fill();
+    }
+  } else {
+    g.fillStyle=kern;
+    g.beginPath(); g.arc(0,0,(2.5+puls*0.45)*k,0,6.2832); g.fill();
+    g.fillStyle='#ffffff';
+    g.beginPath(); g.arc(0,0,(1.1+puls*0.2)*k,0,6.2832); g.fill();
+  }
   g.restore();
 }
 
-/** Fuenf Familien mit je sechs Phasen plus die Elitevariante. */
+/** Fuenf Familien mit je sechs Phasen plus die Elitevariante. Die Kachelgroesse
+ *  folgt dem Profil: kleine Sammlerdrohne, breiter Emitter, groszes Bollwerk. */
 function buildFoeSprites(){
+  const GROESSE=[40,56,66,60,86];
   SPR.foe=[];
   for(let f=0;f<5;f++){
     SPR.foe[f]=[];
     for(let k=0;k<FOE_ANIM.FRAMES;k++){
-      const S2=44, cv=mkCanvas(S2), g=cv.getContext('2d');
+      const S2=GROESSE[f], cv=mkCanvas(S2), g=cv.getContext('2d');
       g.translate(S2/2,S2/2);
       g.fillStyle='rgba(8,12,24,.34)';
-      g.beginPath(); g.ellipse(0,10,7,2.4,0,0,6.2832); g.fill();
+      g.beginPath(); g.ellipse(0,S2*0.23,S2*0.16,S2*0.055,0,0,6.2832); g.fill();
       drawFoeBody(g,f,k/FOE_ANIM.FRAMES,false);
       SPR.foe[f][k]=cv;
     }
@@ -1195,6 +1297,64 @@ function buildAegisFrames(){
     g.fillStyle='#ffffff';
     g.beginPath(); g.arc(0,0,3.6+puls*0.4,0,6.2832); g.fill();
     SPR.aegisA[k]=cv;
+  }
+}
+
+/** D-041 / Gate E: NEXUS -- das Finale. Klar von AEGIS unterscheidbar:
+ *  breites Trägerkreuz mit drei drehenden Fangarmen über einem abwärts
+ *  gerichteten Keilrumpf, cyanweißer Kern statt Violett, deutlich größer
+ *  als AEGIS und jede normale Einheit. Sechs eigene Phasen. */
+function buildNexusFrames(){
+  SPR.nexusA=[];
+  for(let k=0;k<FOE_ANIM.FRAMES;k++){
+    const t=k/FOE_ANIM.FRAMES;
+    const drift=Math.sin(t*6.2832), puls=Math.cos(t*6.2832);
+    const S2=152, cv=mkCanvas(S2), g=cv.getContext('2d'), c=S2/2;
+    g.translate(c,c);
+    g.fillStyle='rgba(6,10,20,.46)';
+    g.beginPath(); g.ellipse(0,42,40,11,0,0,6.2832); g.fill();
+
+    // Drei drehende Fangarme ueber dem Rumpf -- die Signatur des NEXUS.
+    const rot=t*1.0472;
+    for(let a=0;a<3;a++){
+      const w=rot+a*2.0944;
+      g.save();
+      g.translate(0,-14);
+      g.rotate(w);
+      g.fillStyle='#223454';
+      g.beginPath();
+      g.moveTo(-5,-34-drift*2); g.lineTo(5,-34-drift*2);
+      g.lineTo(9,-16); g.lineTo(-9,-16);
+      g.closePath(); g.fill();
+      g.strokeStyle='#7fd4e8'; g.lineWidth=1.8; g.stroke();
+      g.fillStyle='#b8f0ff';
+      g.beginPath(); g.arc(0,-24-drift*2,2.6+puls*0.5,0,6.2832); g.fill();
+      g.restore();
+    }
+
+    // Breites Traegerkreuz: horizontaler Balken ueber einem Keilrumpf.
+    g.fillStyle='#1e2a44';
+    g.beginPath();
+    g.moveTo(-44,-8); g.lineTo(44,-8); g.lineTo(38,6); g.lineTo(-38,6);
+    g.closePath(); g.fill();
+    g.strokeStyle='#9fdcef'; g.lineWidth=2.2; g.stroke();
+    // Abwaerts gerichteter Keilrumpf mit Panzerkante.
+    g.beginPath();
+    g.moveTo(-20,4); g.lineTo(20,4); g.lineTo(6,36); g.lineTo(-6,36);
+    g.closePath(); g.fill();
+    g.strokeStyle='#7fd4e8'; g.lineWidth=1.6; g.stroke();
+    g.fillStyle='#16203a';
+    g.fillRect(-30,-4,60,4);
+
+    // Cyanweisser Leuchtkern im Zentrum des Kreuzes.
+    g.fillStyle='#b8f0ff';
+    g.beginPath(); g.arc(0,-1,9+puls*1.0,0,6.2832); g.fill();
+    g.fillStyle='#ffffff';
+    g.beginPath(); g.arc(0,-1,4+puls*0.5,0,6.2832); g.fill();
+    // Goldene Zielmarken an den Balkenenden.
+    g.fillStyle='#d8b46a';
+    g.fillRect(-46,-10,5,6); g.fillRect(41,-10,5,6);
+    SPR.nexusA[k]=cv;
   }
 }
 
@@ -1271,6 +1431,7 @@ function buildSprites(){
   buildAegisSprite();
   buildFoeSprites();
   buildAegisFrames();
+  buildNexusFrames();
   const sizes=[7,8,8,7,9];
   for (let f=0; f<5; f++){
     SPR.enemy[f]=[];
@@ -1432,6 +1593,10 @@ const E = {                                   // Gegner
   ang:new Float32Array(CFG.CAP_ENEMY), face:new Float32Array(CFG.CAP_ENEMY),
   kind:new Uint8Array(CFG.CAP_ENEMY),          // 0 normal 1 elite 2 boss
   alive:new Uint8Array(CFG.CAP_ENEMY), lit:new Uint8Array(CFG.CAP_ENEMY),
+  // D-041 / Gate D: Rueckzugsbudget in Sekunden; >0 bedeutet, dass die Einheit
+  // sichtbar und belohnungsfrei aus der Arena abzieht (nur normale Gegner).
+  ret:new Float32Array(CFG.CAP_ENEMY),
+  ph:new Uint8Array(CFG.CAP_ENEMY),            // NEXUS: Musterzaehler (Salven)
   n:0, free:[]
 };
 const PROJ_HIT_WORDS=(CFG.CAP_ENEMY+31)>>5;
@@ -1470,6 +1635,9 @@ function fx(x,y,r,life,col,kind){
 const BOLT = {ax:[],ay:[],bx:[],by:[],t:[]};   // Kettenblitz-Segmente
 const CHAIN_HITS = new Int16Array(8);           // ein Ziel nur einmal je Kette
 const GROUND = {x:[],y:[],r:[],t:[],life:[],dmg:[],src:[]};  // brennender Boden
+// D-041 / Gate E: Zielbomben des NEXUS. Wenige Slots, telegraphiert und einmalig
+// ausloesend -- die Ausweichmoeglichkeit ist die eine Sekunde Vorwarnung.
+const HZ = {x:[],y:[],r:[],t:[],life:[],dmg:[]};
 
 // --- Allokationsfreie Slot-Vergabe -----------------------------------------
 function alloc(A, cap){
@@ -1687,7 +1855,10 @@ function newRun(runLen, seed, contractId){
     evoAt:new Float64Array(WEAPONS.length).fill(-1),
     rerolls:1,
     pickTimes:[],                           // für den Pacing-Bericht
-    events:{elite:0, boss:false, surge:false}, bossIndex:-1, bossKills:0,
+    // D-041 / Gate E: Finale-Zustand. nexusState: 0 wartet, 1 lebt, 2 besiegt.
+    bossId:null, nexusState:0, nexusWarned:false,
+    nexusSpawnT:-1, nexusKillT:-1, pendingExtract:false,
+    events:{elite:0, boss:false}, bossIndex:-1, bossKills:0,
     bladeAng:0, ot:0, otActive:false,
     reward:0, baseReward:0,
     rewardGranted:false, holdOre:0,
@@ -1703,7 +1874,7 @@ function newRun(runLen, seed, contractId){
     fps:60, worstFps:999, fpsLog:[],
   };
   S.W['bogen']=1; S.cool['bogen']=0; S.wFirst[W_IDX.bogen]=0;
-  E.n=0;E.free.length=0;E.alive.fill(0);
+  E.n=0;E.free.length=0;E.alive.fill(0);E.ret.fill(0);E.ph.fill(0);
   P.n=0;P.free.length=0;P.alive.fill(0);
   Q.n=0;Q.free.length=0;Q.alive.fill(0);
   G.n=0;G.free.length=0;G.alive.fill(0);
@@ -1711,6 +1882,7 @@ function newRun(runLen, seed, contractId){
   for(const k in FX) FX[k].length=0;
   for(const k in BOLT) BOLT[k].length=0;
   for(const k in GROUND) GROUND[k].length=0;
+  for(const k in HZ) HZ[k].length=0;
   DMG_SRC=-1;
   pendingPicks=0; currentOffer=[]; cardMode='level';
 }
@@ -1759,17 +1931,35 @@ const SIM_W=1000, SIM_H=700, SIM_DIAG=Math.hypot(SIM_W,SIM_H)/2;
 const ASPECT_MAX=16/9, COMBAT_H_MIN=SIM_W/ASPECT_MAX;      // 562,5
 // Boss-Einstieg: fest, damit er auf jedem Format im Kampfausschnitt liegt.
 const BOSS_ENTRY=Math.min(300, SIM_H*0.40);                // 280
-// Der Warden ist eine eigene Kampfphase, keine Kulisse im Dauerstrom. Die
-// Zieldichte liegt beim Einstieg um 4:10 erst bei rund 122, waechst aber
-// waehrend eines langen Bosskampfs ungebremst weiter -- im Feldlauf bis 273.
-// Das bestraft einen schwachen Build doppelt: Er braucht laenger fuer den Boss
-// und bekommt gerade deshalb immer mehr Verstaerkung (D-035).
-//
-// Solange der Warden lebt, gilt dieses Ziel fuer NORMALE Gegner. Boss und
-// Eliten zaehlen nicht mit und werden nicht entfernt. Vorhandene Gegner
-// verschwinden nicht schlagartig: Es wird nur nicht mehr nachgespawnt, bis
-// Kills und Recycling die Menge natuerlich abgesenkt haben.
-const BOSS_ADD_TARGET=90;
+// Der Mittelboss ist eine eigene Kampfphase, keine Kulisse im Dauerstrom.
+// D-041 / Gate D: Solange AEGIS lebt, gilt fuer NORMALE Gegner das Ziel 50
+// statt 90 -- eine lesbare Arena statt Schwarm plus Boss. Eliten zaehlen nicht
+// mit und werden nicht entfernt. Ueberschuessige normale Gegner ziehen sich
+// kontrolliert zurueck (siehe ENEMY_RETREAT_S); der Wiederaufbau nach dem
+// Boss bleibt unveraendert sanft, weil nur nachgespawnt wird.
+const BOSS_ADD_TARGET=50;
+// D-041 / Gate E: das Finale ist ebenfalls eine Arena -- waehrend NEXUS lebt,
+// bleiben hoechstens 30 normale Begleiter im Feld.
+const NEXUS_ADD_TARGET=30;
+// Finale-Zeitmarken des Acht-Minuten-Modus: Warnung ab 7:45 (nicht
+// blockierend), Einstieg von NEXUS bei 8:00 innerhalb des sichtbaren
+// Kampfausschnitts. Der Drei-Minuten-Modus behaelt sein bisheriges Ende.
+const FINAL_WARN_AT=465;
+const NEXUS_AT=480;
+// NEXUS ist kein umgefaerbter AEGIS: eigene Silhouette, eigene Phasen und
+// zwei klar telegraphierte Muster (Zielbomben + rotierende Ringsalve). Die
+// Zaehigkeit ist bewusst hoch: Gemessen am deterministischen Benchmark
+// (tools/run-balance-suite.mjs) erreicht ein Build mit ein bis zwei
+// Evolutionen damit den geforderten Korridor von 30–75 Sekunden, waehrend
+// ein schwacher Build am Finale scheitert. Kalibriert am 25.08.2026.
+const NEXUS_HP_MULT=660;
+// Rueckzugsbudget in Sekunden. Ein Gegner schafft aus dem Zaehlkreis
+// (Radius SIM_DIAG*1.15 = 702) bis zum Recyclingrand (SIM_DIAG*1.20 = 842)
+// im schlechtesten Fall rund 1545 Welteinheiten; bei 230 u/s sind das
+// hoechstens 6,8 von 8 Sekunden -- der Rückzug bleibt also sichtbar und
+// haelt den vorgegebenen Zeitkorridor ein.
+const ENEMY_RETREAT_S=8;
+const ENEMY_RETREAT_SPEED=230;
 // Recyclingrand fuer normale Gegner, als Vielfaches von SIM_DIAG.
 // Frueher 1.55 (946 Welteinheiten). Zwischen Zaehlkreis (1.15 = 702) und
 // Recyclingrand lag damit ein ungezaehlter Vorrat von 82 Prozent der
@@ -1827,7 +2017,7 @@ function direction16(dx,dy){
   return dy>=0?8-o:8+o;
 }
 
-function spawnEnemy(t, fam, kind, atx, aty){
+function spawnEnemy(t, fam, kind, atx, aty, art){
   const i = alloc(E, CFG.CAP_ENEMY); if (i<0) return -1;
   if (atx===undefined){
     // Spawns liegen bevorzugt HINTER dem Spieler. Ohne diesen Bias erscheinen
@@ -1851,10 +2041,15 @@ function spawnEnemy(t, fam, kind, atx, aty){
   const scale = 1 + (t/CFG.RUN_LEN)*CFG.HP_SCALE + (S ? S.level*CFG.HP_PER_LVL : 0);
   E.x[i]=atx; E.y[i]=aty; E.vx[i]=0; E.vy[i]=0;
   E.fam[i]=fam; E.kind[i]=kind||0; E.st[i]=0; E.tm[i]=0; E.slow[i]=0; E.ang[i]=0;
+  E.ret[i]=0; E.ph[i]=0;
   E.face[i]=direction16(S.x-atx,S.y-aty);
   let hp = FAM_HP[fam]*scale;
   hp*=S?.contract?.hp||1;
-  if (kind===1) hp*=26; if (kind===2) hp*=120;
+  if (kind===1) hp*=26;
+  // NEXUS ist das verpflichtende Finale und folgt der Bosszaehigkeit; beide
+  // Bosse teilen den Multiplikator, unterscheiden sich aber in Mustern und
+  // Silhouette (D-041).
+  if (kind===2) hp*=(art==='nexus'?NEXUS_HP_MULT:120);
   E.hp[i]=hp; E.max[i]=hp; E.alive[i]=1; E.lit[i]=0;
   if(S?.famSpawns) S.famSpawns[fam]++;
   return i;
@@ -1872,6 +2067,7 @@ function spawnGem(x,y,val,kind){
 function nearestEnemy(maxR){
   let best=-1, bd=1e18;
   nearEnemies(S.x,S.y,maxR,(i)=>{
+    if (E.ret[i]>0) return;                        // Rückzugende nicht ins Visier
     const dx=E.x[i]-S.x, dy=E.y[i]-S.y, d=dx*dx+dy*dy;
     if (d<bd){ bd=d; best=i; }
   });
@@ -1882,6 +2078,7 @@ function nearestEnemy(maxR){
 function priorityEnemy(maxR){
   let boss=-1, bossD=1e18, elite=-1, eliteD=1e18, normal=-1, normalD=1e18;
   nearEnemies(S.x,S.y,maxR,(i)=>{
+    if (E.ret[i]>0) return;                        // Rückzugende nie im Visier
     const dx=E.x[i]-S.x, dy=E.y[i]-S.y, d=dx*dx+dy*dy;
     if(E.kind[i]===2){ if(d<bossD){bossD=d;boss=i;} }
     else if(E.kind[i]===1){ if(d<eliteD){eliteD=d;elite=i;} }
@@ -2061,6 +2258,9 @@ let DMG_SRC=-1;
 let hitFlash = 0;
 function hurt(i, dmg){
   if (!E.alive[i]) return;
+  // D-041 / Gate D: Rueckzugende Einheiten sind unverwundbar und unangreifbar.
+  // Ihr Abzug darf niemals zu Kill, Erfahrung oder Beute werden.
+  if (E.ret[i]>0) return;
   // Overkill zaehlt nur bis zu den verbleibenden Lebenspunkten. Ohne das waere
   // eine Waffe mit hohem Einzelschlag allein durch Ueberschuss "staerker".
   if (DMG_SRC>=0){
@@ -2094,7 +2294,14 @@ function killEnemy(i){
     S.bossIndex=-1; S.bossKills++;
     fx(x,y,150,0.7,COL.boss,1);
     for(let k=0;k<30;k++) spawnGem(x+(rand()-.5)*260, y+(rand()-.5)*260, 5);
-    toast(LEX.bossRolle+' zerstört');
+    if (S.bossId==='nexus'){
+      // D-041 / Gate E: erst der echte Tod von NEXUS meistert den Run und
+      // oeffnet unmittelbar die bestehende Extraktions-/Overtime-Entscheidung.
+      S.nexusState=2; S.nexusKillT=S.t; S.pendingExtract=true;
+      toast('NEXUS zerstört — Extraktion offen');
+    } else {
+      toast(LEX.bossRolle+' zerstört');
+    }
   } else if (kind===1){                            // Elite
     fx(x,y,80,0.5,COL.elite,1);
     for(let k=0;k<14;k++) spawnGem(x+(rand()-.5)*60, y+(rand()-.5)*60, 6);
@@ -2140,6 +2347,27 @@ function updateEnemies(dt){
     let sp = FAM_SPEED[fam]*scale*(S.contract?.speed||1);
     if (kind===1) sp*=1.15; if (kind===2) sp*=0.8;
     if (E.slow[i]>0){ E.slow[i]-=dt; sp*=0.35; }
+
+    // D-041 / Gate D: kontrollierter Rueckzug. Die Einheit dreht sichtbar ab,
+    // nimmt keinen Kontaktschaden mehr, kann nicht getroffen werden und wird
+    // am Recyclingrand still freigegeben -- ohne Kill und ohne Beute. Der
+    // Ablauf ist deterministisch (feste Geschwindigkeit, fester Zeitpuffer)
+    // und allokiert nichts.
+    if (E.ret[i]>0){
+      E.ret[i]-=dt;
+      const rs=ENEMY_RETREAT_SPEED*(0.75+0.25*Math.min(1,(ENEMY_RETREAT_S-E.ret[i])*2));
+      E.vx[i]=-dx*rs; E.vy[i]=-dy*rs;
+      E.x[i]+=E.vx[i]*dt; E.y[i]+=E.vy[i]*dt;
+      if(!HEADLESS){
+        const faceTarget=direction16(E.vx[i],E.vy[i]);
+        let faceDelta=(faceTarget-E.face[i]+8)%16;
+        if(faceDelta<0) faceDelta+=16;
+        faceDelta-=8;
+        E.face[i]=(E.face[i]+faceDelta*Math.min(1,dt*9)+16)%16;
+      }
+      if (E.ret[i]<=0){ freeSlot(E,i); continue; }
+      continue;
+    }
 
     if (fam===1 && kind===0){                       // Stürmer: telegrafiert, dann Sprint
       E.tm[i]-=dt;
@@ -2213,6 +2441,7 @@ function updateEnemies(dt){
 }
 
 function bossAI(i,dt,dx,dy,d,sp,scale){
+  if (S.bossId==='nexus'){ nexusAI(i,dt,dx,dy,d,sp,scale); return; }
   E.tm[i]-=dt;
   if (E.st[i]===0){                                  // langsam folgen
     E.vx[i]=dx*sp; E.vy[i]=dy*sp;
@@ -2241,6 +2470,85 @@ function bossAI(i,dt,dx,dy,d,sp,scale){
       E.vx[i]=Math.cos(E.ang[i])*sp*7; E.vy[i]=Math.sin(E.ang[i])*sp*7;
       E.st[i]=0; E.tm[i]=3.0;
     } else { E.vx[i]*=0.86; E.vy[i]*=0.86; }
+  }
+}
+
+// D-041 / Gate E: die zwei NEXUS-Muster. Beide sind voll telegraphiert
+// (>= 1 Sekunde Vorwarnung), beide haben eine faire, erkennbare Ausweich-
+// moeglichkeit -- es gibt keinen unvermeidbaren Vollbildtreffer.
+//   st 3  Zielbomben (spielerisch neu): drei Zielkreise an der eingefrorenen
+//         Spielerposition; nach 1,25 s schlagen sie ein. Ausweichen durch
+//         Wegbewegen aus den Kreisen.
+//   st 4  Ringsalven-Vorbereitung: 1,15 s zeigt der Zeichner die drei
+//         sicheren Luecken der folgenden Salven.
+//   st 5  Ringsalven: drei aufeinanderfolgende Ringe, deren Luecke je Salve
+//         um 120 Grad weiterrotiert -- Stehenbleiben straft, Mitrotieren
+//         belohnt.
+function nexusAI(i,dt,dx,dy,d,sp,scale){
+  E.tm[i]-=dt;
+  if (E.st[i]===0){                                  // langsam um den Spieler kreisen
+    const seitlich=0.35;
+    E.vx[i]=(dx - dy*seitlich)*sp*0.9;
+    E.vy[i]=(dy + dx*seitlich)*sp*0.9;
+    if (E.tm[i]<=0){
+      E.st[i]=rand()<0.5?3:4;
+      if (E.st[i]===3){
+        E.tm[i]=1.25;
+        // Drei Zielkreise: eingefrorene Spielerposition plus zwei versetzte
+        // Punkte. Die Vorwarnzeit laeuft pro Zone in HZ.life mit.
+        zoneEintragen(S.x,S.y,62,1.25,26*scale);
+        const b=Math.atan2(S.aimy,S.aimx)+1.5708;
+        zoneEintragen(S.x+Math.cos(b)*95,S.y+Math.sin(b)*95,62,1.45,26*scale);
+        zoneEintragen(S.x-Math.cos(b)*95,S.y-Math.sin(b)*95,62,1.65,26*scale);
+      } else {
+        E.tm[i]=1.15;
+        E.ang[i]=rand()*6.2832;                      // Basiswinkel der ersten Luecke
+        E.ph[i]=3;                                   // drei Salven folgen
+      }
+      fx(E.x[i],E.y[i],52,0.9,'#7fd4e8',2);
+    }
+  } else if (E.st[i]===3){                           // Zielbomben: Vorbereitung läuft
+    E.vx[i]*=0.85; E.vy[i]*=0.85;
+    if (E.tm[i]<=0){ E.st[i]=0; E.tm[i]=2.2+rand()*0.8; }
+  } else if (E.st[i]===4){                           // Ringsalven: Vorbereitung
+    E.vx[i]*=0.88; E.vy[i]*=0.88;
+    if (E.tm[i]<=0){ E.st[i]=5; E.tm[i]=0; }
+  } else {                                           // st 5: Salve fuer Salve feuern
+    E.vx[i]*=0.92; E.vy[i]*=0.92;
+    if (E.tm[i]<=0){
+      const gap=E.ang[i];
+      for(let k=0;k<24;k++){
+        const a=k/24*6.2832;
+        const da=Math.abs(Math.atan2(Math.sin(a-gap),Math.cos(a-gap)));
+        if (da<0.40) continue;
+        const j=alloc(Q,CFG.CAP_EPROJ); if(j<0) break;
+        Q.x[j]=E.x[i];Q.y[j]=E.y[i];Q.vx[j]=Math.cos(a)*175;Q.vy[j]=Math.sin(a)*175;
+        Q.life[j]=4.0;Q.dmg[j]=12*scale;Q.alive[j]=1;
+      }
+      E.ph[i]--;
+      E.ang[i]+=2.0944;                              // Luecke rotiert 120 Grad
+      if (E.ph[i]>0){ E.tm[i]=0.22; }
+      else { E.st[i]=0; E.tm[i]=2.6+rand()*0.6; }
+    }
+  }
+}
+/** Eine Zielzone eintragen. Kleine feste Liste, keine Allokation im Tick-Pfad. */
+function zoneEintragen(x,y,r,life,dmg){
+  if (HZ.t.length>7){ HZ.x.shift();HZ.y.shift();HZ.r.shift();HZ.t.shift();
+    HZ.life.shift();HZ.dmg.shift(); }
+  HZ.x.push(x);HZ.y.push(y);HZ.r.push(r);HZ.t.push(0);HZ.life.push(life);HZ.dmg.push(dmg);
+}
+/** Zielzonen laufen mit ihrem eigenen Countdown; der Einschlag trifft nur,
+ *  wenn der Spieler nach der vollen Vorwarnzeit noch in Radius ist. */
+function updateHazards(dt){
+  for (let i=HZ.t.length-1;i>=0;i--){
+    HZ.t[i]+=dt;
+    if (HZ.t[i]>=HZ.life[i]){
+      const ddx=S.x-HZ.x[i], ddy=S.y-HZ.y[i];
+      if (ddx*ddx+ddy*ddy < HZ.r[i]*HZ.r[i]) damagePlayer(HZ.dmg[i]);
+      fx(HZ.x[i],HZ.y[i],HZ.r[i],0.34,'#ff8a4a',1);
+      for(const k in HZ) HZ[k].splice(i,1);
+    }
   }
 }
 
@@ -2590,23 +2898,26 @@ function updateEvents(){
     S.events.boss = true;
     // Innerhalb des sichtbaren Kampfraums statt auf dem normalen Spawnring.
     const i = spawnEnemy(S.t, 4, 2,S.x+S.aimx*BOSS_ENTRY,S.y+S.aimy*BOSS_ENTRY);
-    if (i>=0){ E.tm[i]=1.4; S.bossIndex=i; }
+    if (i>=0){ E.tm[i]=1.4; S.bossIndex=i; S.bossId='aegis'; }
     bossAlert(LEX.bossRolle+': '+LEX.boss,'Goldene Lücke suchen · roten Korridor meiden');
   }
-  if (!S.events.surge && S.t >= CFG.SURGE_AT){
-    S.events.surge = true;
-    for (let k=0;k<70;k++){
-      const a=rand()*6.2832, r=90+rand()*330;
-      spawnGem(S.x+Math.cos(a)*r, S.y+Math.sin(a)*r, 5);
+  // D-041 / Gate E: das verpflichtende Finale. Nur der Acht-Minuten-Modus
+  // erhaelt NEXUS; das 3-Minuten-Scharmuetzel endet unveraendert.
+  if (S.runLen>=CFG.RUN_LEN){
+    if (!S.nexusWarned && S.t>=FINAL_WARN_AT && S.nexusState===0){
+      S.nexusWarned=true;
+      toast('WARNUNG: NEXUS-Signatur naht');
     }
-    // Magnetpuls — der ganze Bildschirm fliegt dir entgegen
-    for (let i=0;i<G.n;i++){
-      if (!G.alive[i]) continue;
-      const dx=S.x-G.x[i], dy=S.y-G.y[i], d=Math.hypot(dx,dy)||1;
-      G.vx[i]=dx/d*420; G.vy[i]=dy/d*420;
+    if (S.nexusState===0 && !bossIsAlive() && S.t>=NEXUS_AT){
+      const i = spawnEnemy(S.t, 4, 2, S.x+S.aimx*BOSS_ENTRY, S.y+S.aimy*BOSS_ENTRY, 'nexus');
+      if (i>=0){
+        E.tm[i]=1.4; S.bossIndex=i; S.bossId='nexus';
+        S.nexusState=1; S.nexusSpawnT=S.t;
+        bossAlert('BOSS: NEXUS','Zielkreise verlassen · Lücke der Ringe folgen');
+      }
+      // Schlägt die Slotvergabe einmal fehl, wird im nächsten Tick erneut
+      // versucht -- die Extraktion bleibt solange zu Recht gesperrt.
     }
-    fx(S.x,S.y,520,0.8,'#6bb8d4',1);
-    toast('Bergungsflut');
   }
 }
 
@@ -2681,11 +2992,32 @@ function step(dt){
   // Telemetrie bleibt die Gesamtzahl im Zaehlkreis -- sie ist der Balancewert
   // und darf sich durch die Bossphase nicht in ihrer Bedeutung veraendern.
   S.nearbyEnemies = nearby;
-  // Waehrend eines lebenden Wardens zaehlt fuer das Nachspawnen nur die Menge
-  // NORMALER Gegner gegen ein festes, niedrigeres Ziel (D-035).
+  // Bossarenen (D-041): Waehrend AEGIS leben hoechstens 50 normale Gegner,
+  // waehrend NEXUS hoechstens 30. Eliten und der Boss zaehlen nicht mit.
   const bossAlive = bossIsAlive();
-  const want = bossAlive ? Math.min(BOSS_ADD_TARGET, targetEnemies(S.t)) : targetEnemies(S.t);
+  const arenaZiel = bossAlive
+    ? (S.bossId==='nexus' ? NEXUS_ADD_TARGET : BOSS_ADD_TARGET)
+    : CFG.CAP_ENEMY;
+  let ziel = targetEnemies(S.t);
+  // Ab 7:45 kontrollierte Dichtereduktion als sichtbare Vorbereitung des
+  // Finales; sie greift nur im Acht-Minuten-Modus und nie in der Overtime.
+  const finaleBereit = S.runLen>=CFG.RUN_LEN && !S.otActive &&
+                       S.t>=FINAL_WARN_AT && S.nexusState!==2;
+  if (finaleBereit){
+    const anteil = Math.min(1,(S.t-FINAL_WARN_AT)/(CFG.RUN_LEN-FINAL_WARN_AT));
+    ziel = ziel*(1-0.40*anteil);
+  }
+  const want = bossAlive ? Math.min(arenaZiel, ziel) : ziel;
   const have = bossAlive ? nearbyAdds : nearby;
+  // D-041 / Gate D: Ueberschuss ueber dem Arena-Ziel zieht sich zurueck --
+  // deterministisch in aufsteigender Slotreihenfolge, allokationsfrei und
+  // ohne jede Belohnung. Die Bewegung selbst steht in updateEnemies().
+  if (bossAlive && have>want){
+    let ueber = have-want;
+    for (let i=0;i<E.n && ueber>0;i++){
+      if (E.alive[i] && E.kind[i]===0 && E.ret[i]<=0){ E.ret[i]=ENEMY_RETREAT_S; ueber--; }
+    }
+  }
   // Deckel pro Tick: ohne ihn steht nach zwei Sekunden eine Wand aus
   // 42 Gegnern statt eines Stroms, der sich aufbaut.
   let toSpawn = Math.min(Math.ceil((want-have)*0.16), 9);
@@ -2696,6 +3028,7 @@ function step(dt){
   updateProjectiles(dt);
   updateGems(dt);
   updateEvents();
+  updateHazards(dt);
 
   for (let i=FX.t.length-1;i>=0;i--){
     FX.t[i]+=dt;
@@ -2706,10 +3039,22 @@ function step(dt){
     if (BOLT.t[i]<=0){ for(const k in BOLT) BOLT[k].splice(i,1); }
   }
 
-  // Extraktion
-  if (!S.otActive && S.t >= S.runLen && S.phase==='run'){
+  // Extraktion / Finale (D-041 / Gate E):
+  // - 3-Minuten-Scharmuetzel: unveraendert bei S.runLen.
+  // - 8-Minuten-Sortie: solange NEXUS fehlt oder lebt, gibt es kein
+  //   Extraktionsfenster. Erst sein echter Tod oeffnet die bestehende
+  //   Extraktions-/Overtime-Entscheidung.
+  if (!S.otActive && S.phase==='run' && S.pendingExtract){
+    S.pendingExtract=false;
+    S.phase='extract'; if (!HEADLESS) showExtract();
+  } else if (!S.otActive && !finaleBlocker() && S.t >= S.runLen && S.phase==='run'){
     S.phase='extract'; if (!HEADLESS) showExtract();
   }
+}
+/** Das verpflichtende Finale blockiert die Extraktion: Im Acht-Minuten-Modus
+ *  gilt der Run ab 8:00 als nicht gemeistert, solange NEXUS nicht besiegt ist. */
+function finaleBlocker(){
+  return S.runLen>=CFG.RUN_LEN && S.nexusState!==2;
 }
 
 // ===========================================================================
@@ -2820,12 +3165,64 @@ function drawArenaFloor(vx0,vx1,vy0,vy1){
 
 /** Bossmuster im Stil des rechten Konzepts: rote Runen, Pfeile und Angriffskorridor. */
 function drawBossTelegraphs(vx0,vx1,vy0,vy1){
+  // D-041 / Gate E: Zielzonen des NEXUS -- rot-orange Zielkreise, deren
+  // fuellender Ring die Restvorwarnzeit zeigt. Sie liegen unter den Figuren.
+  for(let hz=0;hz<HZ.t.length;hz++){
+    const x=HZ.x[hz], y=HZ.y[hz], r=HZ.r[hz];
+    if(x<vx0-160||x>vx1+160||y<vy0-160||y>vy1+160) continue;
+    const p=Math.min(1,HZ.t[hz]/HZ.life[hz]);
+    ctx.save(); ctx.translate(x,y);
+    ctx.fillStyle='rgba(240,96,40,'+(0.10+p*0.14).toFixed(3)+')';
+    ctx.beginPath();ctx.arc(0,0,r,0,6.2832);ctx.fill();
+    ctx.strokeStyle='rgba(255,122,63,'+(0.55+p*0.35).toFixed(3)+')';
+    ctx.lineWidth=2.4/SCALE;
+    ctx.beginPath();ctx.arc(0,0,r,0,6.2832);ctx.stroke();
+    ctx.strokeStyle='rgba(255,200,150,'+(0.45+p*0.4).toFixed(3)+')';
+    ctx.lineWidth=3.2/SCALE;
+    ctx.beginPath();ctx.arc(0,0,r*(1-p),-1.5708,-1.5708+6.2832);ctx.stroke();
+    ctx.restore();
+  }
   for(let i=0;i<E.n;i++){
     if(!E.alive[i]||E.kind[i]!==2) continue;
     const x=E.x[i], y=E.y[i];
     if(x<vx0-480||x>vx1+480||y<vy0-480||y>vy1+480) continue;
     const active=E.st[i]!==0, charge=Math.max(0,Math.min(1,1-E.tm[i]));
     const pulse=.5+.5*Math.sin(S.t*7);
+    const nexus=S.bossId==='nexus';
+    if(nexus&&E.st[i]===4){
+      // Vorbereitung der Ringsalven: die drei sicheren Luecken werden
+      // weissgolden vorgezeichnet -- genau dort sind die Salven passierbar.
+      ctx.save(); ctx.translate(x,y);
+      ctx.strokeStyle='rgba(185,143,224,'+(active?0.22:0.07).toFixed(3)+')';
+      ctx.lineWidth=2.2/SCALE;
+      ctx.beginPath();ctx.arc(0,0,120,0,6.2832);ctx.stroke();
+      const alpha=.40+charge*.40;
+      ctx.strokeStyle='rgba(255,243,208,'+alpha.toFixed(3)+')';
+      ctx.lineWidth=6/SCALE;
+      for(let s=0;s<3;s++){
+        const gap=E.ang[i]+s*2.0944;
+        ctx.beginPath();ctx.arc(0,0,120,gap-.38,gap+.38);ctx.stroke();
+      }
+      ctx.restore();
+      continue;
+    }
+    if(nexus&&E.st[i]===5){
+      // Waehrend der Salven bleibt die AKTUELLE Luecke markiert.
+      ctx.save(); ctx.translate(x,y);
+      ctx.strokeStyle='rgba(255,243,208,.72)'; ctx.lineWidth=7/SCALE;
+      ctx.beginPath();ctx.arc(0,0,120,E.ang[i]-.38,E.ang[i]+.38);ctx.stroke();
+      ctx.restore();
+      continue;
+    }
+    if(nexus&&E.st[i]!==3){
+      // NEXUS folgt ohne aktives Muster: ruhige Fuehrungsringe in Cyan.
+      ctx.save(); ctx.translate(x,y);
+      ctx.strokeStyle='rgba(127,212,232,'+(pulse*0.10+0.05).toFixed(3)+')';
+      ctx.lineWidth=2/SCALE;
+      ctx.beginPath();ctx.arc(0,0,96,0,6.2832);ctx.stroke();
+      ctx.restore();
+      continue;
+    }
     ctx.save(); ctx.translate(x,y);
 
     // Ruhige violette Fuehrungsringe statt roter Alarmkreise. Rot bleibt
@@ -3130,6 +3527,8 @@ function render(){
         spr=artSet?artSet[dir]:SPR.enemy[f][tier];
         if(artSet){ const phase=(S.visualT*(f===1?112:71))|0; bob=ENEMY_BOB[(phase+i*8)&63]; }
       }
+    } else if(E.kind[i]===2&&SPR.nexusA&&S.bossId==='nexus'){
+      spr=SPR.nexusA[((S.visualT*FOE_ANIM.FPS*.5+i*.37)|0)%FOE_ANIM.FRAMES];
     } else if(E.kind[i]===2&&SPR.aegisA){
       spr=SPR.aegisA[((S.visualT*FOE_ANIM.FPS*.5+i*.37)|0)%FOE_ANIM.FRAMES];
     } else if(E.kind[i]===1&&SPR.eliteA){
@@ -3141,7 +3540,7 @@ function render(){
     ctx.drawImage(spr,x-hw,y-hw+bob);
     if(E.kind[i]===0) continue;
     const w=E.kind[i]===2?90:52, h=E.kind[i]===2?6:4;
-    const yy=y-(E.kind[i]===2?(SPR.aegisA?72:(ART.enemyReady?75:46)):(SPR.eliteA?44:(ART.enemyReady?43:28)));
+    const yy=y-(E.kind[i]===2?(SPR.nexusA&&S.bossId==='nexus'?84:(SPR.aegisA?72:(ART.enemyReady?75:46))):(SPR.eliteA?44:(ART.enemyReady?43:28)));
     ctx.fillStyle='rgba(0,0,0,.55)'; ctx.fillRect(x-w/2,yy,w,h);
     ctx.fillStyle=E.kind[i]===2?COL.boss:COL.elite;
     ctx.fillRect(x-w/2,yy,w*Math.max(E.hp[i]/E.max[i],0),h);
@@ -3901,21 +4300,56 @@ function bossLocator(){
   return {modus:'pfeil', x:S.x+dx*s, y:S.y+dy*s, dx, dy, richtung,
           winkel:Math.atan2(dy,dx), abstand:Math.hypot(dx,dy)};
 }
+let evoHintSig=null;
+/** D-041 / Gate C: genau ein kompakter Hinweis auf den aktuell fuehrenden
+ *  Evolutionspfad. Fachliche Quelle ist ausschliesslich leadingEvoPath() --
+ *  dieselbe Funktion, die auch Fokuskarte und Pausenbericht lesen. Der Hinweis
+ *  veraendert weder Kartenmechanik noch EVO_FOCUS_AT; er zeigt nur an. */
+function updateEvoHint(){
+  const hint=el('evohint');
+  if(!S||!S.running||(S.phase!=='run'&&S.phase!=='pause')){
+    hint.classList.remove('on'); hint.setAttribute('aria-hidden','true'); return;
+  }
+  const lead=leadingEvoPath();
+  if(!lead){ hint.classList.remove('on'); hint.setAttribute('aria-hidden','true'); return; }
+  const sig=lead.w.id+'|'+lead.wl+'|'+lead.pl+'|'+lead.ready;
+  if(sig!==evoHintSig){
+    evoHintSig=sig;
+    el('ehname').textContent=lead.w.evo.name;
+    el('ehprog').textContent=
+      lead.w.name+' '+lead.wl+'/'+MAXLV+' · '+lead.passive.name+' '+lead.pl+'/'+EVO_PASSIVE_LV+
+      (lead.ready?' · bereit':'');
+    hint.classList.toggle('ready',lead.ready);
+  }
+  hint.classList.add('on'); hint.setAttribute('aria-hidden','false');
+}
 function updateHUD(){
   if (!S) return;
   const c=el('clock');
-  if (S.otActive){ c.textContent='+'+fmtTime(S.ot); c.classList.add('ot'); }
-  else { c.textContent=fmtTime(Math.min(S.t,S.runLen)); c.classList.remove('ot'); }
+  const nexusLebt=S.runLen>=CFG.RUN_LEN && S.bossId==='nexus' && S.nexusState===1 && S.t>=S.runLen;
+  if (S.otActive){ c.textContent='+'+fmtTime(S.ot); c.classList.add('ot'); c.classList.remove('final'); }
+  else if (nexusLebt){
+    // D-041 / Gate E: nach 8:00 zeigt die Uhr verstaendlich die Finaldauer.
+    // Das ist keine Overtime -- der Schadensmultiplikator bleibt aus.
+    c.textContent='FINALE +'+fmtTime(S.t-S.runLen);
+    c.classList.add('final'); c.classList.remove('ot');
+  }
+  else { c.textContent=fmtTime(Math.min(S.t,S.runLen)); c.classList.remove('ot','final'); }
   el('lvl').innerHTML='Stufe <b>'+S.level+'</b>';
   renderWeaponBar();
+  updateEvoHint();
   el('xpbar').style.width=Math.min(S.xp/S.need*100,100)+'%';
   el('hpbar').style.width=Math.max(S.hp/S.maxhp*100,0)+'%';
   const bi=S.bossIndex, bossAlive=bossIsAlive();
   // Oben mittig steht ausschliesslich die Bossleiste (D-040). Der Sektorname
   // ist keine Dauerinformation mehr und bleibt in Pause und Run-Bericht.
+  // D-041: Der Bossname ist dynamisch -- AEGIS als Mittelboss, NEXUS im Finale.
   const bb=el('bossbar'); bb.classList.toggle('on',bossAlive);
   bb.setAttribute('aria-hidden',bossAlive?'false':'true');
-  if(bossAlive) el('bossfill').style.width=Math.max(0,E.hp[bi]/E.max[bi]*100)+'%';
+  if(bossAlive){
+    el('bosstitle').textContent='BOSS: '+(S.bossId==='nexus'?'NEXUS':LEX.boss);
+    el('bossfill').style.width=Math.max(0,E.hp[bi]/E.max[bi]*100)+'%';
+  }
   const d=el('dash'), ready=S.dashCd<=0;
   d.classList.toggle('ready', ready);
   const dc=el('dashfill').getContext('2d');
@@ -4154,6 +4588,18 @@ function equippedGearText(){
   }
   return out.join(', ')||'keine';
 }
+/** D-041 / Gate E: Status des verpflichtenden Finales mit Spawnzeit,
+ *  Tötungszeit und Finaldauer. Nur lesbare Namen, keine internen IDs. */
+function finalbossText(){
+  if (S.runLen<CFG.RUN_LEN) return 'keiner · kurze Sortie';
+  if (S.nexusState===2 && S.nexusKillT>=0)
+    return 'NEXUS besiegt · Spawn '+fmtTime(Math.max(0,S.nexusSpawnT))+
+           ' · Tötung '+fmtTime(S.nexusKillT)+
+           ' · Finaldauer '+fmtTime(Math.max(0,S.nexusKillT-S.nexusSpawnT));
+  if (S.nexusState===1) return 'NEXUS lebt · Spawn '+fmtTime(Math.max(0,S.nexusSpawnT));
+  if (S.nexusWarned) return 'NEXUS kündigt sich an';
+  return 'wartet bei 8:00';
+}
 function runReportText(){
   if(!S) return 'Kein Run vorhanden.';
   const duration=fmtTime(S.otActive?S.runLen+S.ot:Math.min(S.t,S.runLen));
@@ -4173,6 +4619,7 @@ function runReportText(){
     'Erster Kartenzug: '+(S.pickTimes.length?S.pickTimes[0].toFixed(1)+' s':'–'),
     LEX.res.loot+': '+S.baseReward,
     'Overtime-Bonus: '+bonus,
+    'Finalboss: '+finalbossText(),
     'Sektor: '+S.contract.name+' · '+LEX.res.ore+' ×'+S.contract.reward.toFixed(2),
     LEX.res.ore+' für '+LEX.hold+': '+(S.holdOre||0),
     'Build: '+buildText(),
@@ -4718,6 +5165,7 @@ window.__EH = { get S(){return S;}, get H(){return META;}, CFG, HOLD_CFG, CONTRA
                 pacingReport, runReportText, headlessRun, runBalanceSuite, nearEnemies,
                 priorityEnemy, spawnEnemy, rebuildGrid, shoot, updateProjectiles,
                 buildOffer, buildEliteOffer, applyOffer, applyBoon, fireWeapons,
+                newRun,
                 stats:stat, dashCooldown,
                 enemyHp:(i)=>E.hp[i], enemyMax:(i)=>E.max[i],
                 advanceHold, saveHold, loadHold, depositRunReward, selectContract,
@@ -4727,6 +5175,7 @@ window.__EH = { get S(){return S;}, get H(){return META;}, CFG, HOLD_CFG, CONTRA
                 ORE: {RUN_MIN_S, ORE_RATE_REF},
                 arcanumAction, yardAction, prepareReroll, trainMastery,
                 grantGear, equipGear, upgradeGear, salvageGear, gearUpgradeCost,
+                endRun, damagePlayer,
                 contractById, showHold:showStartMenu,
                 tick:(d)=>{HEADLESS=true; step(d);
                   while(pendingPicks>0){currentOffer=buildOffer(); applyOffer(currentOffer[0]); pendingPicks--;}
@@ -4736,7 +5185,9 @@ window.__EH = { get S(){return S;}, get H(){return META;}, CFG, HOLD_CFG, CONTRA
                 combatSlots, metaBoni, renderSlots, renderPauseDetail, togglePause,
                 weaponDamageText, weaponTimelineText, xpNeed, hurt, W_IDX, GROUND,
                 LEX, FAMNAME, weaponLabel,
-                BOSS: {BOSS_ADD_TARGET, EVO_FOCUS_AT, MAXLV, EVO_PASSIVE_LV,
+                FOE_PROFILE, SPR, finalbossText, updateEvoHint, updateHUD,
+                BOSS: {BOSS_ADD_TARGET, NEXUS_ADD_TARGET, FINAL_WARN_AT, NEXUS_AT,
+                       ENEMY_RETREAT_S, EVO_FOCUS_AT, MAXLV, EVO_PASSIVE_LV,
                        BOSS_MARK_PAD, BOSS_CHEV_HALF},
                 targetEnemies, resize, render, spawnGem, updateGems, killEnemy,
                 gemCount:()=>{let a=0,b=0;
@@ -4745,11 +5196,13 @@ window.__EH = { get S(){return S;}, get H(){return META;}, CFG, HOLD_CFG, CONTRA
                 viewport:()=>({W,H,SCALE,VIEW_W,VIEW_H,SIM_W,SIM_H,SIM_DIAG,
                                CLIP_X,CLIP_Y,CLIP_W,CLIP_H,ASPECT_MAX,
                                COMBAT_H_MIN,BOSS_ENTRY,DESPAWN_F}),
-                enemyCounts:()=>{let normal=0,elite=0,boss=0;
+                enemyCounts:()=>{let normal=0,elite=0,boss=0,retreating=0;
                   for(let i=0;i<E.n;i++) if(E.alive[i]){
-                    if(E.kind[i]===2) boss++; else if(E.kind[i]===1) elite++; else normal++;
+                    if(E.kind[i]===2) boss++; else if(E.kind[i]===1) elite++;
+                    else { normal++; if(E.ret[i]>0) retreating++; }
                   }
-                  return {normal,elite,boss};},
+                  return {normal,elite,boss,retreating};},
+                hazards:()=>HZ.t.length,
                 counts:()=>{let e=0,p=0,g=0;
                   for(let i=0;i<E.n;i++) if(E.alive[i])e++;
                   for(let i=0;i<P.n;i++) if(P.alive[i])p++;
