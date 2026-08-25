@@ -6,250 +6,267 @@
 
 ## Steuerung
 
-- **Task-ID:** EH-2026-08-24-02 — Orbitblade, visueller und semantischer
-  Vertikalschnitt (D-038)
+- **Task-ID:** EH-2026-08-25-02 — Kampf-Grafik und UI nach Entwurf 3 (D-040)
 - **Status:** FERTIG, bereit für Codex-Review
-- **Ausgangscommit:** `dd68982fbb2a048004cd082d78beb18292aeec77`
+- **Ausgangscommit:** `9190de94707f210b0ca1d7559f27fae4180f3c84`
 - **Anfangsstatus:** `## main...origin/main`, Arbeitsbaum sauber, keine fremden
-  Änderungen; `npm test` 45/45 grün, Exitcode 0
-- **Endstand:** `npm test` **47/47 grün**, Exitcode 0; `git diff --check` sauber
-- **Lokale Commits:** vier Gate-Commits, **nicht gepusht**
+  Änderungen; `npm test` 48/48 grün, Exitcode 0
+- **Endstand:** `npm test` **49/49 grün**, Exitcode 0; `git diff --check` sauber
+- **Lokale Commits:** einer (`46088fc`), **nicht gepusht**
 
 ## Ergebnis in einem Satz
 
-Der Prototyp heißt, klingt und sieht auf allen sichtbaren Flächen nach
-Orbitblade, während neun serialisierte Referenzläufe mit Runs, Toden,
-Hold-Auszahlung, XP-Kurve, Dichte und `CFG` **bitidentisch** geblieben sind.
-
-## Zeitnutzung je Gate
-
-Grobe Aufteilung der Sitzung, nicht gestoppt, sondern nach Arbeitsschritten
-geschätzt:
-
-| Gate | Anteil | Schwerpunkt |
-|---|---|---|
-| 0 – Baseline und Plan | ~10 % | Dokumente lesen, Paritäts-Harness bauen, Inventur |
-| 1 – Präsentationsschicht | ~30 % | `LEX`, alle Umbenennungen, neuer Check, Testabgleich |
-| 2 – Kampfoberfläche | ~25 % | Palette, Boden, Safe-Area, HUD, zwei Browserfunde |
-| 3 – Orbitalstation | ~12 % | Kopfressourcen, Modulzustände, Browserdurchlauf |
-| 4 – Grafik-Slice | ~18 % | Figuren, Klingenprojektil, Renderkosten-Check |
-| Bericht und Doku | ~5 % | Changelog, Provenienz, dieser Bericht |
+Der Kampf sieht auf beiden Pflichtgrößen sichtbar nach Entwurf 3 aus — Deck bis
+an den Rand, minimale Rand-UI, `BOSS: AEGIS` mittig, Waffen unten — und der
+serialisierte Referenzlauf über neun Seeds ist dabei **bitidentisch** geblieben.
 
 ## Ergebnis je Gate
 
 | Gate | Status | Beleg |
 |---|---|---|
-| 0 – Baseline | erfüllt | 45/45 grün vor der ersten Änderung; Referenzlauf serialisiert, SHA256 `978beffd…` |
-| 1 – Präsentationsschicht | erfüllt | `presentationLayer` grün; Parität unverändert |
-| 2 – Kampfoberfläche | erfüllt | Beide Pflichtformate kollisionsfrei gemessen; zwei echte Überlagerungen behoben |
-| 3 – Orbitalstation A | erfüllt | Alle zehn Stationsaktionen im Browser durchgespielt, Kosten und Erträge unverändert |
-| 4 – Grafik-Slice | erfüllt | Vier Kernelemente code-native; `renderCostContract` grün |
+| A – Bestandsaufnahme | erfüllt | 48/48 vor der ersten Änderung; Referenzlauf serialisiert; Ausgangsmessung im Browser bei beiden Größen |
+| B – minimale Kampf-UI | erfüllt | Keine linke Liste, sechs Waffensymbole, `BOSS: AEGIS`, Pause allein rechts; null Kollisionen gemessen |
+| C – durchgehendes Deck | erfüllt | Rand 95 gegen Innen 113 bei 844×390; 77 statt 32 Bodenkacheln auf 21:9 |
+| D – einheitliche Figuren | erfüllt | Vorgerenderte Phasen von 28 auf 64 |
+| E – Gefahren | erfüllt | Violette Segmente, weißgoldene Lücke, rot-orange Laufbahn, violetter Bossmarker |
 
-## Dateien und lokale Commits
+## Sichtbare Unterschiede gegenüber D-038
 
-| Commit | Inhalt |
-|---|---|
-| `d3cdd3b` | Gate 1 – Präsentationsschicht `LEX`, alle Umbenennungen, Check `presentationLayer` |
-| `39a22f6` | Gate 2 – Palette, Stationsdeck, Safe-Area, HUD-Hierarchie |
-| `5ada6ab` | Gate 3 – Orbitalstation Stufe A |
-| Gate-4-Commit | Figuren, Klingenprojektil, `renderCostContract`, Changelog, Provenienz, dieser Bericht, Statuswechsel |
+| Element | vorher (D-038) | jetzt (D-040) |
+|---|---|---|
+| Bildränder | Safe-Area-Balken mit Sternenkacheln und harter Cyan-Trennlinie | Deck läuft durchgehend bis an alle Ränder |
+| Randhelligkeit 844×390 | 20 (fast schwarzer Balken) | **95** gegen 113 im Inneren |
+| Linke Seite | permanente Textliste aus Waffen, Passiven und Fokuspfad | leer; Build nur noch in der Pause |
+| Oben links | Stufe, Erfahrung, Leben | kompakter Block: grüne Lebens- und cyane Erfahrungsleiste plus Stufe |
+| Oben mittig | Sektorname **oder** Bossleiste | ausschließlich `BOSS: AEGIS` mit violetter Leiste und zwei Phasenmarkern |
+| Oben rechts | Pause, Uhr, FPS, Tuning | Pause und Uhr; FPS und Tuning nach unten links |
+| Unten mittig | nichts | bis zu sechs Waffensymbole mit Stufe und echtem Abklingring |
+| Boden | 16 kleine Paneele je Kachel, dominanter Arena-Rahmen mit fünf Ringen | vier große helle Paneele, drei feine Ringe, acht radiale Fugen |
+| Gegnerfamilien | eine statische Silhouette je Familie (nur Familie 0 animiert) | fünf Maschinenkörper mit je sechs versetzten Phasen |
+| AEGIS | eine statische Silhouette | sechs Phasen, violetter Kern, zwei getrennte Seitenpanzer |
+| Bosswarnung | rote Linien mit Pfeilspitzen | flache violette Segmente, weißgoldene sichere Lücke |
+| Bossmarker | rot-golden | violett/weißgold, klar von cyanen Projektilen getrennt |
 
-Geändert wurden ausschließlich erlaubte Dateien: `prototype/web/index.html`,
-`tools/run-balance-suite.mjs`, `CHANGELOG.md`, `docs/ASSET_PROVENANCE.md`,
-`docs/WORK_REPORT.md` und der Status in `docs/CURRENT_TASK.md`.
-`ROADMAP.md`, `docs/DECISIONS.md`, `docs/TESTPLAN.md`, `README.md`,
-`AGENTS.md`, `CLAUDE.md` und `docs/WORKFLOW.md` sind unverändert.
+## Bewusst nur angenähert
 
-## Subagent: Auftrag, Ergebnis und eigene Prüfung
+Entwurf 3 ist eine Zielrichtung, keine pixelgenaue Vorlage. Diese Punkte habe
+ich absichtlich **nicht** übernommen:
 
-**Auftrag.** Ein günstiger Haiku-Subagent sollte eine reine Lese-Inventur aller
-sichtbaren deutschen Begriffe in `prototype/web/index.html` erstellen: eine
-Tabelle mit Zeilennummer, Kategorie, Text und Fundort, plus eine getrennte
-Liste der nicht sichtbaren Treffer (IDs, Save-Key, Kommentare). Ausdrücklich
-verboten: jede Dateiänderung, jede Produktentscheidung, jeder Umbenennungs-
-vorschlag, Commit und Push.
+1. **Die acht Gegner und die geringe Dichte des Bildes.** Der Auftrag verbietet
+   Spawn- und Mechanikänderungen ausdrücklich. Der reale Kampf zeigt weiterhin
+   rund 150 bis 280 Gegner.
+2. **Die Kreuzattacke und die verwundbaren Seitenmodule.** Beides ist laut
+   D-040 keine freigegebene Mechanik. Die Seitenpanzer sind reine Darstellung
+   ohne eigene Trefferfläche.
+3. **Das Porträt oben links.** Es bräuchte ein neues Rasterasset; der Auftrag
+   verlangt code-native Umsetzung und keine neuen Dateien. Der Zustandsblock
+   trägt stattdessen nur die beiden Balken und die Stufe.
+4. **Die Bildschärfe und Materialtiefe des Konzepts.** Sie stammt aus einem
+   generierten Rendering. Der Prototyp bleibt bewusst flach und niedrig
+   aufgelöst, damit ein Pulk lesbar bleibt und nichts pro Gegner kostet.
+5. **Runde Waffensymbole mit eigener Illustration.** Die Symbole tragen aktuell
+   ein farbiges Feld je Waffe. Eigene Piktogramme wären ein eigener Schritt.
 
-**Ergebnis.** Der Subagent hat korrekt nichts verändert und keine
-Produktentscheidung getroffen. Die Inventur selbst war jedoch **nicht
-verwendbar**: Statt der verlangten Zeilentabelle kamen nur Aggregatzahlen; die
-Kategorie „HTML-Markup 227+" zählte offensichtlich Kommentare mit, und die
-Bossleiste in Zeile 402 wurde als „nicht sichtbar (aria-hidden)" eingestuft,
-obwohl genau dort `Warden`/`Aschenhüter` für den Spieler stehen.
+## Phasen und Runtime-Assets, vorher und nachher
 
-**Meine Prüfung und Konsequenz.** Ich habe die Einstufung stichprobenartig
-gegen den Quelltext geprüft, den Widerspruch bei Zeile 402 gefunden und die
-Inventur daraufhin **selbst** mit gezielten Greps über alle Begriffe der
-Mandatsliste erstellt. Aus dem Subagentenergebnis habe ich nur zwei Hinweise
-übernommen und beide selbst verifiziert: die Toast-Zeilen und die
-Berichtszeilen. Es wurde **kein Subagentencode** in das Repository übernommen.
+| Größe | vorher | nachher |
+|---|---:|---:|
+| Orbitträger (Idle/Lauf/Wurf) | 4 + 6 + 6 = **16** | 6 + 8 + 8 = **22** |
+| Gegnerfamilien | Familie 0 mit 6, Familien 1–4 je 1 statisch = **10** | 5 × 6 = **30** |
+| Elite | 1 statisch | **6** |
+| AEGIS | 1 statisch | **6** |
+| **Summe vorgerendert** | **28** | **64** |
+| Runtime-PNG-Dateien | 4 Dateien, 5,8 MB | **unverändert** 4 Dateien, 5,8 MB |
 
-## Vorher-/Nachher-Parität
+**Es wurde keine neue Rasterdatei angelegt.** Alle Figuren, das Deck, die
+Waffensymbole und die Gefahrenflächen sind code-native Canvas-Grafik, einmal
+vorgerendert. `docs/ASSET_PROVENANCE.md` bleibt deshalb unverändert; der
+bestehende Eintrag AP-003 deckt code-native Laufzeitfiguren bereits ab.
+
+## Beleg für unveränderte Simulation
 
 Serialisiert werden neun Referenzseeds in drei Varianten (8-Minuten-Lauf,
-3-Minuten-Lauf mit `breach`, absichtlicher Frühverlust), dazu vier
-Hold-Auszahlungen über den echten Weg, die XP-Kurve an acht Stufen, die
-Zieldichte an fünf Zeitpunkten sowie `CFG`, `HOLD_CFG`, Vertragswerte,
-Waffen-, Passiv- und Ausrüstungs-IDs.
+3-Minuten-Lauf mit `breach`, absichtlicher Frühverlust), vier Hold-Auszahlungen
+über den echten Weg, die XP-Kurve an acht Stufen, die Zieldichte an fünf
+Zeitpunkten sowie `CFG`, `HOLD_CFG`, Vertragswerte und alle IDs.
 
-| Messpunkt | vorher | nach Gate 1 | nach Gate 2 | nach Gate 4 |
+| Messpunkt | vorher | nach Gate C | nach Gate E | final |
 |---|---|---|---|---|
-| SHA256 der Serialisierung | `978beffd…b6f9` | identisch | identisch | **identisch** |
+| SHA256 | `978beffd…b6f9` | identisch | identisch | **identisch** |
 | Bytes | 30.808 | 30.808 | 30.808 | 30.808 |
-| Vertragswerte `reward`/`hp`/`bias` | — | unverändert | unverändert | unverändert |
 
-Nur die **Namen** der drei Verträge unterscheiden sich; alle Zahlen sind
-gleich. Damit sind Seeds, RNG-Reihenfolge, Kartenzüge, Evolutionen, Kills,
-Beute, Dichte, Boss und Hold-Auszahlung nachweislich unberührt.
+Damit sind feste Seeds, RNG-Reihenfolge, Kartenzüge, Evolutionen, Kills, Beute,
+Dichte, Spawnziel, Bossverstärkung, Save v4 und die Ökonomie nachweislich
+unberührt. `renderCostContract` blieb über alle Gates bei **zwei Gradienten,
+null `shadowBlur` und null neuen Canvas pro Frame** bei 281 sichtbaren Gegnern.
 
-## Befehle, Exitcodes und grüne Checks
+## Befehle, Exitcodes und Checks
 
 | Befehl | Ergebnis | Exitcode |
 |---|---|---:|
-| `npm test` (Baseline vor Gate 1) | 45/45 grün | 0 |
-| `npm test` (final) | **47/47 grün** | **0** |
+| `npm test` (Baseline) | 48/48 grün | 0 |
+| `npm test` (final) | **49/49 grün** | **0** |
 | `git diff --check` | keine Ausgabe | 0 |
 | Paritätsvergleich nach jedem Gate | Hash unverändert | 0 |
 
-Neu hinzugekommen sind zwei Checks:
+**Neuer Check `combatUiV2`**, sieben Teilprüfungen:
 
-**`presentationLayer`** — prüft die Abbildung als Verhalten, nicht als
-Quelltext: Vollständigkeit gegen die Laufzeitarrays, tatsächliche Anwendung der
-Namen, unveränderte interne IDs, den Save-Key `emberhold:hold:v1`, einen
-verlustfreien v4-Rundlauf durch `localStorage`, einen Run-Bericht mit neuen
-Namen und **ohne** interne IDs sowie dass `LEX` eingefroren ist.
+| Teilprüfung | Ergebnis |
+|---|---|
+| `keineLinkeListe` | grün |
+| `waffenleisteVorhanden` (inklusive Obergrenze sechs) | grün |
+| `bossTitelKorrekt` (`BOSS: AEGIS`, kein `SEKTORBOSS`) | grün |
+| `keineSafeAreaBalken` | grün |
+| `deckVorDemClip` | grün |
+| `phasenzahlen` (idle 6, walk 8, throw 8, foe 6) | grün |
+| `deckBisZumRand` — **Verhaltensmessung** | grün: 77 Kacheln auf 21:9 gegen 32 auf 16:9, Safe-Area 320 px |
 
-**`renderCostContract`** — misst am echten `render()`-Aufruf mit 300 gespawnten
-und 281 sichtbaren Gegnern plus AEGIS:
-
-| Größe | gemessen | Bedeutung |
-|---|---:|---|
-| `drawImage` im ersten Frame | 308 | es wird wirklich gezeichnet |
-| Gradienten je Frame | **2** | konstant, wächst nicht mit der Gegnerzahl |
-| `shadowBlur`-Setzungen je Frame | **0** | keine teure Weichzeichnung im Pulk |
-| neue Canvas je Frame | **0** | alle Sprites sind vorgerendert |
-
-Bestehende Paritäts-, Boss-, HUD-, Hold-, Vertrags-, Ausrüstungs- und
-Save-Checks sind unverändert grün: `configStable`, `aspectIndependent`,
-`densityOvershoot`, `bossTargeting`, `bossDurability`, `bossCombatPocket`,
-`bossLocatorState`, `compactCombatHud`, `holdFlow`, `holdExpansion`,
-`contractFlow`, `equipmentFlow`, `earlyLossGuard`, `lateProgression`,
-`weaponRoles`, `evolutionCompletion`, `weaponDamageReport`.
-
-Drei bestehende Checks leiten ihre Namenserwartung jetzt aus `LEX` ab statt aus
-fest eingetippten Begriffen: `holdGoalLadder`, `compactCombatHud` und
-`weaponDamageReport`. Keine Schwelle wurde gelockert, kein Anker neu
-referenziert.
+Die siebte Teilprüfung habe ich ergänzt, weil die ersten sechs reine
+Quelltextsuchen sind. Sie misst am echten `render()`-Aufruf, dass das Deck
+tatsächlich über den Kampfausschnitt hinausreicht — das könnte keine Textsuche
+belegen.
 
 ## Browserprüfungen
 
-Der sichtbare Browser rendert in dieser Umgebung **echte Frames**. Alle
-folgenden Zahlen stammen aus `getImageData` am laufenden Canvas, nicht aus
-einem Screenshot.
+Der Browser rendert in dieser Umgebung echte Frames. Alle Zahlen stammen aus
+`getBoundingClientRect` und `getImageData` am laufenden Canvas.
 
-**1280×720** — Canvas 1920×1080, 24 Frames gezeichnet:
+**1280×720** (Canvas 1920×1080, 60 Frames):
 
-- keine einzige Überlagerung zwischen `topbar`, `sectorhud`, `clock`,
-  `pausebtn`, `slots`, `dash`, `bossbar`, `hpwrap`, `xpwrap`, `devbtn`,
-  `tunebtn`; nichts außerhalb des Fensters, kein horizontaler Überlauf
-- **94 %** der Stichproben heller als Schwellwert 60; mittlere Bodenfarbe
-  RGB(77, 73, 78) mit Blaustich — der Kampfboden ist messbar mittelhell
-- Spielerbereich: 289 goldene, 520 weiße und 28 cyanfarbene Bildpunkte —
-  eine weißgoldene Figur, kein Kreis
+- **null Kollisionen** zwischen `topbar`, `vitals`, `clock`, `pausebtn`,
+  `bossbar`, `weaponbar`, `dash`, `devbtn`, `tunebtn`; nichts außerhalb des
+  Fensters, kein horizontaler Überlauf
+- 91 % helle Bildpunkte; Rand links 61, rechts 62, innen 69
+- 1,22 ms je Frame bei 182 sichtbaren Gegnern
+- sechs Waffensymbole, `BOSS: AEGIS`, zwei Phasenmarker
 
-**844×390** — Canvas 1266×585, Safe-Area 75 px je Seite:
+**844×390** (Canvas 1266×585, 60 Frames):
 
-- keine Überlagerung, weder mit noch ohne aktive Bossleiste
-- Kampfausschnitt unverändert 1000×563 Welteinheiten
-- Safe-Area-Farbe RGB(20, 26, 42) mit gekacheltem Sternenfeld
+- **null Kollisionen**, nichts außerhalb, kein Überlauf
+- 99 % helle Bildpunkte; Rand links und rechts 95, innen 113
+- 0,87 ms je Frame bei 152 sichtbaren Gegnern
+- Kampfausschnitt unverändert 1000 × 563 Welteinheiten
 
-**Sichtbar bestätigt im Screenshot:** Bossleiste „AEGIS", Warnung
-„SEKTORBOSS: AEGIS", Toast „Elite-Einheit nähert sich", Kartennamen
-„Munitionsmatrix", „Fokussierlinse", „Orbitklinge", Stationsdeck mit
-Panelfugen, Bossmarker-Chevron, kompaktes linkes HUD.
+**Zustände geprüft:** Start, Run, Kartenwahl, Elite-Modulwahl, Pause,
+Ergebnisbildschirm und Rückkehr zur Station. **Keine Browserfehler** in allen
+Durchläufen (`window.onerror` blieb leer).
 
-**Stationsdurchlauf im Browser:** Sonde reparieren, Asterit einsammeln,
-Fabrikator reparieren, Legierungsplatten einsammeln, Orbitklinge verstärken,
-Fluxlabor reparieren, Reroll vorbereiten, Simulationsdeck reparieren,
-Meisterschaft lernen, Sektor wählen — alle zehn Aktionen mit unveränderten
-Kosten und Erträgen.
+**Bildrate:** Die gemessenen 0,87 bis 1,22 ms je Frame entsprechen rechnerisch
+über 800 Bildern pro Sekunde. Das ist eine reine Zeichenmessung ohne
+Spiellogik, Vsync und Compositing — **kein FPS-Wert eines echten Laufs**. Ein
+belastbarer 1-%-Low aus einem späten Laufabschnitt ist so nicht zu gewinnen;
+der bleibt dem Besitzerlauf vorbehalten.
+
+**Screenshots:** Ich habe in der Sitzung Bildschirmaufnahmen beider Größen
+erstellt und ausgewertet; sie zeigen Deck bis zum Rand, `BOSS: AEGIS` mittig,
+Waffenleiste unten, AEGIS mit Seitenpanzern und die violetten Warnsegmente.
+**Es wurden keine Bilddateien im Repository abgelegt** — der Auftrag verlangt
+ausdrücklich, Bilder nicht ungefragt zu committen.
 
 ### Nicht durchgeführte Prüfungen
 
-- **Kein Save-Neuladen im Browser.** Die Vorschau lädt die Datei als
-  `data:`-URL; `localStorage` ist dort gesperrt (`SecurityError`). Der
-  v4-Rundlauf ist stattdessen im Node-Check `presentationLayer` sowie in
-  `holdFlow`, `holdExpansion`, `contractFlow` und `equipmentFlow` abgedeckt.
-- **Keine subjektive Grafikfreigabe.** Ich habe gemessen, dass gezeichnet wird
-  und womit — ob die Figuren im Gefecht *gut aussehen*, ob der Boden angenehm
-  ist und ob AEGIS im Pulk wirklich sofort auffällt, ist nicht gemessen und
-  bleibt beim Besitzer.
-- **Kein achtminütiger Spiellauf**, keine echte FPS-Messung auf Zielgeräten.
+- **Kein achtminütiger Spiellauf**, daher kein echter FPS-Wert und kein
+  1-%-Low aus einem späten Abschnitt.
+- **Keine subjektive Freigabe.** Ich habe gemessen, dass gezeichnet wird, womit
+  und wo — ob es dem Besitzer gefällt, ist nicht gemessen.
+- **Kein Save-Neuladen im Browser**: Die Vorschau lädt als `data:`-URL,
+  `localStorage` ist dort gesperrt. Abgedeckt durch `presentationLayer`,
+  `holdFlow`, `holdExpansion`, `contractFlow` und `equipmentFlow` im Node-Lauf.
+- **Kein Test auf echter Mobilhardware**; 844×390 wurde nur als Fenstergröße
+  geprüft.
 
-## Assetgrößen und Provenienz
+## Subagenten und eigene Prüfung
 
-**Es wurde keine einzige neue Bilddatei hinzugefügt.** Alle vier Kernelemente
-sind code-native Canvas-Grafik, einmal vorgerendert:
+**Subagent 1 — Waffenleiste (Haiku).** Auftrag: Markup, CSS und eine
+`renderWeaponBar()`-Funktion, exakte Einfügestellen vorgegeben, alles andere
+verboten. Ergebnis brauchbar, aber mit zwei Abweichungen, die ich beim
+Diff-Lesen gefunden habe:
 
-| Element | Umsetzung |
-|---|---|
-| Orbitträger | 16 Posen (4 Idle, 6 Lauf, 6 Wurf), aufrecht, nur horizontal gespiegelt |
-| Sammlerdrohne | 6 asynchrone Phasen, sechseckiger Körper, heller Kern, Sammelarme |
-| AEGIS | eine große mechanische Silhouette mit Ring, Schultern und hellem Kern |
-| Klingenprojektil | 24 vorgedrehte Sicheln mit physischem Kern |
+1. Das Markup landete vor `#slots` statt vor `#dash`. Beide Elemente sind
+   absolut positioniert und die Leiste hat `pointer-events:none`; die
+   Abweichung ist funktional folgenlos. Ich habe sie belassen und dokumentiere
+   sie hier.
+2. Der Abklingring war **statisch** — eine feste Randfarbe, die keinen Zustand
+   zeigt. Das erfüllt „verständlicher Abklingzustand" nicht. Ich habe ihn durch
+   einen echten Ring ersetzt, der `S.cool` liest, auf Zwanzigstel rundet und
+   nur bei sichtbarer Änderung ins DOM schreibt. Gemessen zeigt er
+   unterschiedliche Werte je Waffe (0,05 bis 1,00).
 
-Runtime-Assetstand unverändert: vier PNG-Atlanten mit zusammen **5,8 MB**,
-größte Einzeldatei 1,87 MB. Beide Grenzen (rund 2 MB je Atlas, unter 10 MB
-gesamt) sind eingehalten. Neuer Provenienzeintrag **AP-003**, Status PROTOTYP;
-aus AP-001 und AP-002 wurde nichts ausgeschnitten.
+**Subagent 2 — Check `combatUiV2` (Haiku).** Auftrag: ein neuer Testblock in
+`tools/run-balance-suite.mjs`, sechs genau spezifizierte Teilprüfungen,
+Verdrahtung an drei Stellen. Der Diff war korrekt und vollständig
+spezifikationstreu. Meine Ergänzung: die siebte, verhaltensbasierte
+Teilprüfung, weil sechs reine Quelltextsuchen für eine UI-Aussage zu schwach
+sind.
+
+Nach jeder Integration habe ich die volle Suite selbst ausgeführt. Kein
+Subagent hat committet, gepusht oder Projektdokumentation angefasst. Art
+Direction, Deck, Figuren, Gefahren, HUD-Struktur und dieser Bericht stammen vom
+Hauptagenten.
+
+## Selbst gefundene und behobene Fehler
+
+Drei Defekte fielen erst durch Messung auf, nicht beim Ansehen:
+
+1. **HUD-Kollision:** Meine Regeln für die Entwicklertasten standen **vor** den
+   Originalen und verloren die Spezifitätsfrage. `#devbtn` behielt `top:14px`
+   und lag dadurch auf dem Zustandsblock. Die Regeln stehen jetzt dahinter.
+2. **Verbotene Randabdunklung:** Mein erster Deckentwurf hatte weiche
+   Randverläufe. Das ist genau die von D-014 untersagte Randvignette. Entfernt;
+   die Ränder sind jetzt nur noch 26 Pixel Sternenstreifen mit 16 % Deckkraft.
+3. **Überlappung mit dem Onboarding:** Die Einführungsbox lag über der neuen
+   Waffenleiste. Sie sitzt jetzt 74 Pixel höher.
+
+Zusätzlich: `slotLayout` wurde kurzzeitig rot, weil meine neue `#slots`-Regel
+die ursprüngliche im regulären Ausdruck überdeckte. Ich habe die Regel **hinter**
+die Originalregel gelegt, statt den Check anzupassen — der Layoutvertrag bleibt
+damit im Quelltext unverändert prüfbar.
 
 ## Risiken und offene Punkte
 
-1. **Nicht umbenannt, weil nicht im Mandat:** die sechs Ausrüstungsteile
-   (Glutsehne, Krähenbogen, Sammlersiegel, Runenfibel, Pfadstiefel,
-   Rußmantel), die vier Elite-Relikte (Glutkern, Schrittzeichen, Sammlerauge,
-   Aschenhaut), die Kartensaat Runenfunke und die drei Meisterschaftsnamen
-   (Pfadkunde, Reichgriff, Stoßschule). Sie tragen weiterhin Fantasy-Vokabular
-   und sind damit die einzige verbliebene Bruchstelle im Ziel „konsistent
-   Sci-Fantasy". **Das ist eine Produktentscheidung für Codex.**
-2. **Abgeleitete Namen, die Codex bestätigen sollte:** Klingenverstärkung
-   (Stationsausbau), Impulsstoß (früher Ember-Stoß), Reparaturzelle (früher
-   Glutherz), Flux neu ausrichten (früher Schicksal neu deuten), Aufklärung
-   (früher Scharmützel) sowie die Überschriften „Systeme angehalten",
-   „Bergung sichern?" und „Signal verloren". Sie folgen direkt aus dem
-   Mandat, stehen aber nicht wörtlich darin.
-3. **Ein echter Namenskonflikt wurde behoben:** Der dauerhafte Stationsausbau
-   hieß zunächst exakt wie die Waffe „Orbitklinge" und war im HUD nicht mehr
-   von einem Waffenslot zu unterscheiden. Er heißt jetzt Klingenverstärkung.
-4. **Zwei echte Layoutfehler wurden nur durch Messung gefunden**, nicht durch
-   Ansehen: die Bossleiste über der linken HUD-Spalte bei 844×390 und die Uhr
-   auf dem Entwickler-Button bei 1280×720. Beide sind behoben — das ist ein
-   Hinweis darauf, dass weitere Formate ebenfalls gemessen werden sollten.
-5. **Die alten PNG-Atlanten zeigen weiterhin Fantasy-Figuren.** Sobald sie
-   laden, überschreiben sie Orbitträger und Sammlerdrohne. Die neuen
-   code-nativen Figuren greifen deshalb heute vor allem dort, wo die Atlanten
-   fehlen. AEGIS und das Klingenprojektil sind davon **nicht** betroffen — sie
-   haben Vorrang. Eine Ablösung der Atlanten ist ein eigener Auftrag.
-6. **Die Frostnova-Farbe** bleibt cyan wie die Orbittechnik. Bei dichtem Pulk
-   könnte das mit den Kernen der Sammlerdrohnen verschwimmen; das ist eine
-   Sichtfrage für den Feldlauf.
+1. **Der Sektorname ist im Kampf nicht mehr sichtbar.** D-040 verlangt oben
+   mittig ausschließlich `BOSS: AEGIS`. Der Vertragsname steht weiterhin in
+   Pause und Run-Bericht. Falls der Besitzer ihn im Kampf vermisst, ist das
+   eine Produktentscheidung für Codex.
+2. **Die Waffensymbole tragen nur ein Farbfeld**, kein eigenes Piktogramm.
+   Ausreichend zur Unterscheidung, aber deutlich schlichter als Entwurf 3.
+3. **Die alten PNG-Atlanten liegen weiterhin im Runtime-Ordner** und zeigen
+   Fantasy-Figuren. Der neue Gegnerpfad hat Vorrang, solange `SPR.foe`
+   existiert — beim Orbitträger greift dagegen weiterhin der Atlas, sobald er
+   lädt. Eine Ablösung ist ein eigener Auftrag.
+4. **Keine echte FPS-Zahl.** Die Renderzeit sieht sehr gut aus, ersetzt aber
+   keine Messung im laufenden Spiel auf Zielhardware.
+5. **Die Balancebefunde aus D-040 bleiben offen** — Gegnerflut, Bossdruck und
+   Sternenhagel. Das war ausdrücklich nicht Teil dieses Auftrags.
+
+## Abschließender Git-Status
+
+```text
+## main...origin/main [ahead 1]
+ M CHANGELOG.md
+ M docs/WORK_REPORT.md
+```
+
+`prototype/web/index.html` und `tools/run-balance-suite.mjs` sind in
+`46088fc` committet. `docs/CURRENT_TASK.md` wurde **nicht** angefasst — es
+steht in diesem Auftrag ausdrücklich auf der Schutzliste. Ebenso unverändert:
+`ROADMAP.md`, `docs/DECISIONS.md`, `docs/TESTPLAN.md`,
+`docs/ASSET_PROVENANCE.md` und die Konzeptbilder.
 
 ## Empfehlung an Codex
 
-**Abnehmen und den D-036-Feldlauf ansetzen.**
+**Abnehmen, dann den Besitzer sehen lassen.**
 
-Alle vier Gates sind umgesetzt, 47/47 Checks sind grün, die Simulation ist über
-neun Seeds bitidentisch geblieben, und beide Pflichtformate sind messbar
-kollisionsfrei. Zwei neue Checks sichern genau das ab, was dieser Auftrag
-verspricht: die Namensabbildung ohne ID-Bruch und die Renderkosten im Pulk.
+Alle fünf Gates sind umgesetzt, 49/49 Checks grün, die Simulation über neun
+Seeds bitidentisch, beide Pflichtgrößen messbar kollisionsfrei und ohne
+Browserfehler. Der sichtbare Sprung gegenüber D-038 ist groß: keine
+abgeschnittenen Seiten mehr, keine linke Textwand, ein klar benannter Boss und
+eine einheitliche Figurensprache mit mehr als doppelt so vielen Phasen.
 
-Vor dem Push bitte drei Dinge entscheiden:
+Zwei Punkte gehören dir:
 
-1. Sollen Ausrüstung, Relikte und Meisterschaften ebenfalls umbenannt werden
-   (Risiko 1)? Solange nicht, ist „konsistent Sci-Fantasy" nur teilweise
-   erreicht.
-2. Sind die abgeleiteten Namen aus Risiko 2 so in Ordnung?
-3. Soll ein eigener Auftrag die alten Fantasy-Atlanten ablösen (Risiko 5)?
+1. Soll der Sektorname im Kampf sichtbar bleiben (Risiko 1)?
+2. Sollen die Waffensymbole eigene Piktogramme bekommen (Risiko 2)?
 
-Danach ist der nächste Schritt laut Produktionsreihenfolge der menschliche
-Acht-Minuten-Lauf — und erst danach die echte Rückflugmechanik der
-Orbitklinge.
+Danach ist der nächste Schritt laut D-040 der Boss- und Dichtepass — und erst
+danach der Waffenrollenpass.

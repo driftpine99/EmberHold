@@ -15,6 +15,11 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 - Kanonische Dateien für aktiven Auftrag und standardisierten Arbeitsbericht
 ### Added
 
+- Neuer Check `combatUiV2` mit sieben Teilprüfungen für minimale Rand-UI,
+  durchgehendes Deck und Animationsphasen. Darunter ein echter
+  Verhaltensbeleg: Auf 21:9 zeichnet dieselbe Szene 77 Bodenkacheln gegen 32
+  auf 16:9
+
 - Der letzte abgeschlossene Run-Bericht wird unter einem eigenen lokalen
   Schlüssel automatisch gesichert und kann in der Orbitalstation erneut
   kopiert werden. Der neue Verhaltenscheck `lastRunReportFlow` prüft
@@ -137,6 +142,24 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 - Automatische Prüfung der aktiven lokalen RGBA-Assets und des Bogen-Animationszustands
 
 ### Changed
+
+- **Kampf-Grafik und UI nach Entwurf 3 (D-040):** rein visueller Pass, die
+  Simulation bleibt bitidentisch
+- Minimale Rand-UI: links kompakt Leben und Erfahrung, mittig ausschließlich
+  `BOSS: AEGIS` mit Lebensleiste und zwei visuellen Phasenmarkern, rechts
+  allein die Pause, unten mittig bis zu sechs Waffensymbole mit Stufe und
+  echtem Abklingring. Die permanente linke Textliste ist im Kampf entfallen;
+  alle Werte bleiben über Pause und Run-Bericht erreichbar
+- Durchgehendes Orbitaldeck: Der Boden wird vor dem Clip über die ganze
+  Leinwand gezeichnet. Safe-Area-Balken, Sternenkacheln am Rand und die harte
+  Cyan-Trennlinie sind entfallen; große helle Paneele mit wenigen Fugen und
+  dezenter Kreisgeometrie ersetzen den Arena-Rahmen
+- Einheitliche Figurensprache: vorgerenderte Phasen von 28 auf 64 erhöht —
+  Orbitträger 22, fünf Gegnerfamilien je sechs, Elite und AEGIS je sechs.
+  AEGIS erhält violetten Kern und zwei visuell getrennte Seitenpanzer
+- Gefahren neu gezeichnet: Bossringe und Salvensegmente flach violett, die
+  sichere Lücke weißgolden und breit, die Laufbahn als einzige treffende
+  Fläche rot-orange; Bossmarker violett/weißgold
 
 - **Orbitblade-Vertikalschnitt (D-038):** Der Prototyp trägt sichtbar die neue
   Sci-Fantasy-Identität, ohne dass sich ein Run mechanisch ändert. Eine
