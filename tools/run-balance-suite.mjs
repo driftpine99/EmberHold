@@ -1834,9 +1834,83 @@ try {
   renderCostError = error instanceof Error ? error.message : String(error);
 }
 
+// --- D-040: Kampf-UI V2, durchgehendes Deck und Animationsphasen ---------
+// Minimale Rand-UI, Boden vor Clipping, Animationen mit mehr Phasen.
+let combatUiV2 = false;
+let combatUiV2Error = "";
+let combatUiV2Diagnostics = null;
+try {
+  // 1. Linke Buildliste nicht sichtbar im Kampf
+  const keineLinkeListe = html.includes("#slots{display:none}");
+
+  // 2. Waffenleiste vorhanden mit Obergrenze von sechs Symbolen
+  const waffenleisteVorhanden = html.includes('id="weaponbar"') &&
+    html.includes("function renderWeaponBar()") &&
+    html.includes("aktiv.slice(0,6)");
+
+  // 3. Boss-Titel korrekt
+  const bossTitelKorrekt = html.includes("BOSS: AEGIS") &&
+    !html.includes("<span>SEKTORBOSS</span>");
+
+  // 4. Keine Safe-Area-Balken mit starField
+  const keineSafeAreaBalken = !/CLIP_X\+CLIP_W[^\n]*starField/.test(html) &&
+    html.includes("function drawDeckEdges()");
+
+  // 5. Boden vor dem Clipping
+  const indexDrawFloor = html.indexOf("drawArenaFloor(dx0,dx1,dy0,dy1)");
+  const indexClipRect = html.indexOf("ctx.rect(CLIP_X,CLIP_Y,CLIP_W,CLIP_H)");
+  const deckVorDemClip = indexDrawFloor >= 0 && indexClipRect >= 0 &&
+    indexDrawFloor < indexClipRect;
+
+  // 6. Animationsphasen nach D-040
+  const orbiterMatch = html.match(/ORBITER_ANIM = Object\.freeze\(\{IDLE:(\d+), WALK:(\d+), THROW:(\d+)/);
+  const foeMatch = html.match(/FOE_ANIM = Object\.freeze\(\{FRAMES:(\d+)/);
+  const phasenzahlen = orbiterMatch && foeMatch &&
+    parseInt(orbiterMatch[1]) >= 6 &&
+    parseInt(orbiterMatch[2]) >= 8 &&
+    parseInt(orbiterMatch[3]) >= 8 &&
+    parseInt(foeMatch[1]) >= 6;
+
+  const idle = orbiterMatch ? parseInt(orbiterMatch[1]) : 0;
+  const walk = orbiterMatch ? parseInt(orbiterMatch[2]) : 0;
+  const throwPhase = orbiterMatch ? parseInt(orbiterMatch[3]) : 0;
+  const foe = foeMatch ? parseInt(foeMatch[1]) : 0;
+
+  // 7. Verhaltensbeleg statt Quelltextsuche: Auf einem 21:9-Fenster entsteht
+  //    eine Safe-Area. Wenn das Deck wirklich bis an den Bildrand laeuft, muss
+  //    dieselbe Szene dort mehr Bodenkacheln zeichnen als auf 16:9 -- eine
+  //    Textsuche koennte das nie belegen.
+  const deckKacheln = (breite, hoehe) => {
+    canvasElement.clientWidth = breite; canvasElement.clientHeight = hoehe;
+    engine.resize();
+    engine.begin(480, "ring");
+    engine.S.x = 0; engine.S.y = 0; engine.S.W = {}; engine.S.level = 40;
+    zaehler.reset();
+    engine.render();
+    return { gezeichnet: zaehler.werte().drawImage, safeArea: Math.round(engine.viewport().CLIP_X) };
+  };
+  const schmal = deckKacheln(1280, 720);
+  const breit  = deckKacheln(2560, 1080);
+  const deckBisZumRand = breit.safeArea > 100 && breit.gezeichnet > schmal.gezeichnet;
+  canvasElement.clientWidth = 1000; canvasElement.clientHeight = 700;
+  engine.resize();
+
+  combatUiV2 = keineLinkeListe && waffenleisteVorhanden && bossTitelKorrekt &&
+    keineSafeAreaBalken && deckVorDemClip && phasenzahlen && deckBisZumRand;
+  combatUiV2Diagnostics = {
+    keineLinkeListe, waffenleisteVorhanden, bossTitelKorrekt,
+    keineSafeAreaBalken, deckVorDemClip, phasenzahlen, deckBisZumRand,
+    kacheln16zu9: schmal.gezeichnet, kacheln21zu9: breit.gezeichnet,
+    safeArea21zu9: breit.safeArea,
+    phasen: { idle, walk, throw: throwPhase, foe }
+  };
+} catch (error) {
+  combatUiV2Error = error instanceof Error ? error.message : String(error);
+}
+
 const output = {
-  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && slotLayout && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && contractFlow && holdExpansion && equipmentFlow && evolutionCatalog && eliteChoices && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling && fpsMetrics && reportHardened && lastRunReportFlow && healOrbFlow && holdGoalLadder && oreCurve && earlyLossGuard && bossCombatPocket && bossLocatorState && compactCombatHud && evolutionCompletion && weaponDamageReport && lateProgression && weaponRoles && presentationLayer && renderCostContract,
-  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, slotLayout, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, contractFlow, holdExpansion, equipmentFlow, evolutionCatalog, eliteChoices, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling, fpsMetrics, reportHardened, lastRunReportFlow, healOrbFlow, holdGoalLadder, oreCurve, earlyLossGuard, bossCombatPocket, bossLocatorState, compactCombatHud, evolutionCompletion, weaponDamageReport, lateProgression, weaponRoles, presentationLayer, renderCostContract },
+  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && slotLayout && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && contractFlow && holdExpansion && equipmentFlow && evolutionCatalog && eliteChoices && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling && fpsMetrics && reportHardened && lastRunReportFlow && healOrbFlow && holdGoalLadder && oreCurve && earlyLossGuard && bossCombatPocket && bossLocatorState && compactCombatHud && evolutionCompletion && weaponDamageReport && lateProgression && weaponRoles && presentationLayer && renderCostContract && combatUiV2,
+  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, slotLayout, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, contractFlow, holdExpansion, equipmentFlow, evolutionCatalog, eliteChoices, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling, fpsMetrics, reportHardened, lastRunReportFlow, healOrbFlow, holdGoalLadder, oreCurve, earlyLossGuard, bossCombatPocket, bossLocatorState, compactCombatHud, evolutionCompletion, weaponDamageReport, lateProgression, weaponRoles, presentationLayer, renderCostContract, combatUiV2 },
   targets: report.targets,
   ueberschuss: report.ueberschuss,
   seeds: report.seeds,
@@ -1865,7 +1939,9 @@ if (lateProgressionError) output.lateProgressionError = lateProgressionError;
 if (weaponRolesError) output.weaponRolesError = weaponRolesError;
 if (presentationError) output.presentationError = presentationError;
 if (renderCostError) output.renderCostError = renderCostError;
+if (combatUiV2Error) output.combatUiV2Error = combatUiV2Error;
 if (renderCostDiagnostics) output.summary.renderCost = renderCostDiagnostics;
+if (combatUiV2Diagnostics) output.summary.combatUiV2 = combatUiV2Diagnostics;
 if (lastRunReportDiagnostics) output.summary.lastRunReport = lastRunReportDiagnostics;
 if (presentationDiagnostics) output.summary.presentation = presentationDiagnostics;
 if (weaponRolesDiagnostics) output.summary.weaponRoles = weaponRolesDiagnostics;

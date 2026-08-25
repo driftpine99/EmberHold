@@ -19,6 +19,9 @@ canvas{display:block;position:absolute;inset:0;width:100%;height:100%}
 /* ---------- HUD ---------- */
 #hud{position:absolute;top:0;left:0;right:0;padding:10px 14px;
   --hudw:min(26vw,300px)}
+/* Oben links: kompakter Zustandsblock aus Leben, Erfahrung und Stufe. */
+#vitals{display:flex;flex-direction:column;gap:4px;width:170px}
+#lvl{white-space:nowrap}
 /* Oben links trägt nur noch Zustand: Stufe, Erfahrung, Leben. */
 #topbar{display:flex;align-items:center;gap:12px;max-width:var(--hudw)}
 /* Uhr ist der eine kompakte Kontextindikator oben rechts. */
@@ -42,12 +45,16 @@ canvas{display:block;position:absolute;inset:0;width:100%;height:100%}
   transition:width .08s linear}
 #hpwrap{height:6px;background:#1c2233;border-radius:3px;margin-top:5px;overflow:hidden;
   max-width:var(--hudw)}
-#hpbar{height:100%;width:100%;background:linear-gradient(90deg,#ff5a8a,#f0c45a);
+#hpbar{height:100%;width:100%;background:linear-gradient(90deg,#3fbf6a,#7fe8a0);
   transition:width .12s ease}
 
 /* Waffenleiste */
 #slots{position:absolute;top:78px;left:14px;bottom:14px;display:flex;flex-direction:column;
   flex-wrap:wrap;align-content:flex-start;gap:5px 10px;max-width:min(50vw,460px)}
+/* D-040: Im Kampf ist diese Liste nicht mehr sichtbar. Die Regel darueber
+   bleibt unveraendert stehen, weil sie den Layoutvertrag der Liste beschreibt;
+   sichtbar ist der Build jetzt nur noch in der Pause. */
+#slots{display:none}
 .slot{display:flex;align-items:center;gap:7px;font-size:11px;color:#8b8577;
   background:rgba(23,23,33,.72);border:1px solid #262633;border-radius:6px;
   padding:3px 8px 3px 5px;backdrop-filter:blur(3px)}
@@ -69,6 +76,27 @@ canvas{display:block;position:absolute;inset:0;width:100%;height:100%}
   transition:width .22s ease}
 .evopath.ready{border-color:#e07a3f;box-shadow:0 0 14px rgba(224,122,63,.18)}
 .evopath.ready .evohead span{color:#e07a3f}
+
+/* Waffenleiste unten mittig: bis zu sechs Symbole mit Stufe und Abklingring. */
+#weaponbar{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);
+  display:flex;gap:10px;pointer-events:none;opacity:0;transition:opacity .18s ease}
+#weaponbar.on{opacity:1}
+.wslot{position:relative;width:46px;height:46px;border-radius:50%;
+  background:radial-gradient(circle at 50% 38%,rgba(38,52,80,.94),rgba(16,22,38,.94));
+  border:1px solid #35486a;display:flex;align-items:center;justify-content:center}
+.wslot .wglyph{width:20px;height:20px;border-radius:4px}
+.wslot .wlv{position:absolute;right:-2px;bottom:-2px;min-width:15px;height:15px;
+  border-radius:8px;background:#101626;border:1px solid #35486a;color:#e6f2ff;
+  font-size:9px;line-height:13px;text-align:center;font-weight:700;
+  font-variant-numeric:tabular-nums}
+.wslot.evo{border-color:#f0c45a;box-shadow:0 0 10px rgba(240,196,90,.28)}
+.wslot.evo .wlv{border-color:#f0c45a;color:#f0c45a}
+/* Der Ring zeigt den echten Abklingfortschritt. --cd laeuft von 0 bis 1 und
+   wird nur bei sichtbarer Aenderung gesetzt, nicht in jedem Frame. */
+.wcool{position:absolute;inset:-3px;border-radius:50%;
+  background:conic-gradient(#7fd4e8 calc(var(--cd,1)*360deg),rgba(127,212,232,.12) 0);
+  -webkit-mask:radial-gradient(circle,transparent 62%,#000 64%);
+          mask:radial-gradient(circle,transparent 62%,#000 64%)}
 
 /* Ember-Stoß */
 #dash{position:absolute;right:18px;bottom:26px;width:74px;height:74px;border-radius:50%;
@@ -317,6 +345,11 @@ button.b.danger{background:#c9402e;color:#fff}
   pointer-events:auto;cursor:pointer;font-weight:700;letter-spacing:-.08em}
 #pausebtn:hover,#pausebtn.on{color:#ffc48a;border-color:#e07a3f}
 #pausebtn:disabled{opacity:.35;cursor:default;border-color:#262633;color:#5a5a68}
+/* D-040: Oben rechts steht allein die Pause. Die beiden Entwicklertasten
+   wandern nach unten links; F3 und T funktionieren unveraendert. Diese Regeln
+   stehen bewusst NACH den Originalen, damit sie gewinnen. */
+#devbtn{left:14px;bottom:14px;right:auto;top:auto}
+#tunebtn{left:58px;bottom:14px;right:auto;top:auto}
 #joyring{position:absolute;width:104px;height:104px;border-radius:50%;
   border:1.5px solid rgba(224,122,63,.26);display:none;pointer-events:none;
   transform:translate(-50%,-50%)}
@@ -328,7 +361,7 @@ button.b.danger{background:#c9402e;color:#fff}
   pointer-events:none;text-shadow:0 2px 24px rgba(0,0,0,.9);text-align:center;z-index:10}
 
 /* ---------- Nicht blockierende Spielhinweise ---------- */
-#coach{position:absolute;left:50%;bottom:max(24px,env(safe-area-inset-bottom));
+#coach{position:absolute;left:50%;bottom:max(74px,calc(env(safe-area-inset-bottom) + 74px));
   transform:translate(-50%,18px);width:min(430px,calc(100% - 124px));padding:10px 14px;
   border:1px solid rgba(224,122,63,.38);border-radius:10px;background:rgba(14,14,21,.9);
   backdrop-filter:blur(5px);display:flex;align-items:center;gap:11px;opacity:0;
@@ -346,17 +379,20 @@ button.b.danger{background:#c9402e;color:#fff}
 #bossalert.on{opacity:1;transform:translate(-50%,0)}
 #bossalert b{display:block;color:#ff765e;font-size:17px;letter-spacing:.18em}
 #bossalert span{display:block;color:#b9a29c;font-size:12px;margin-top:2px}
-#bossbar{position:absolute;left:50%;top:30px;transform:translate(-50%,-8px);max-width:min(42vw,360px);
-  width:min(360px,calc(100% - 170px));padding:7px 11px 9px;border:1px solid rgba(255,90,138,.34);
+#bossbar{position:absolute;left:50%;top:12px;transform:translate(-50%,-8px);max-width:min(52vw,460px);
+  width:min(460px,calc(100% - 190px));padding:6px 12px 8px;border:1px solid rgba(185,143,224,.40);
   border-radius:8px;background:linear-gradient(180deg,rgba(26,14,30,.88),rgba(16,20,34,.80));
   box-shadow:0 5px 25px rgba(0,0,0,.26);opacity:0;transition:opacity .2s ease,transform .2s ease;
   pointer-events:none;z-index:9}
 #bossbar.on{opacity:1;transform:translate(-50%,0)}
-#bossbarhead{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+#bossbarhead{display:flex;align-items:center;justify-content:center;gap:9px}
+#bossphase{display:flex;gap:4px}
+#bossphase i{width:7px;height:7px;background:#b98fe0;transform:rotate(45deg);
+  border-radius:1px;opacity:.9}
 #bossbarhead span{font-size:8px;letter-spacing:.2em;color:#ff5a8a;text-transform:uppercase}
-#bossbarhead b{font-size:11px;color:#e8e4dc;letter-spacing:.04em;font-weight:650}
-#bosshp{height:3px;margin-top:5px;background:#29202a;border-radius:2px;overflow:hidden}
-#bossfill{display:block;height:100%;width:100%;background:linear-gradient(90deg,#8a2b52,#ff5a8a);
+#bossbarhead b{font-size:12px;color:#f3f6ff;letter-spacing:.14em;font-weight:700}
+#bosshp{height:6px;margin-top:5px;background:#1a1626;border-radius:3px;overflow:hidden}
+#bossfill{display:block;height:100%;width:100%;background:linear-gradient(90deg,#7a4fb0,#c9a2f0);
   box-shadow:0 0 8px rgba(238,79,56,.45);transition:width .1s linear}
 
 .copyline{margin-top:13px;background:none;border:0;color:#8b8577;font:inherit;
@@ -423,11 +459,15 @@ button.b.danger{background:#c9402e;color:#fff}
 
   <div id="hud">
     <div id="topbar">
+      <div id="vitals">
+        <div id="hpwrap"><div id="hpbar"></div></div>
+        <div id="xpwrap"><div id="xpbar"></div></div>
+      </div>
       <div id="lvl">Stufe <b>1</b></div>
     </div>
-    <div id="xpwrap"><div id="xpbar"></div></div>
-    <div id="hpwrap"><div id="hpbar"></div></div>
   </div>
+
+  <div id="weaponbar" aria-hidden="true"></div>
 
   <div id="slots"></div>
   <div id="clock">0:00</div>
@@ -443,8 +483,7 @@ button.b.danger{background:#c9402e;color:#fff}
     <span id="coachstep">1 / 3</span><div id="coachcopy"><b id="coachtitle">Bewegen</b><span id="coachtext"></span></div>
   </div>
   <div id="bossalert" role="alert" aria-live="assertive" aria-hidden="true"><b id="bossalerttitle"></b><span id="bossalerttext"></span></div>
-  <div id="sectorhud" aria-hidden="false">Trümmerring</div>
-  <div id="bossbar" aria-hidden="true"><div id="bossbarhead"><span>SEKTORBOSS</span><b>AEGIS</b></div><div id="bosshp"><span id="bossfill"></span></div></div>
+  <div id="bossbar" aria-hidden="true"><div id="bossbarhead"><b>BOSS: AEGIS</b><span id="bossphase"><i></i><i></i></span></div><div id="bosshp"><span id="bossfill"></span></div></div>
   <div id="toast" role="status" aria-live="polite"></div>
 
   <!-- Kartenzug -->
@@ -802,7 +841,7 @@ const ENEMY_NORMAL_TIER=2, ENEMY_TELEGRAPH_TIER=3;
 const SPR = { enemy:[], elite:null, boss:null, gem:null, gemBig:null,
               arrow:[], orbBlade:[], orb:null, blade:null, frost:null, eproj:null,
               floorTile:null, emberVent:null, wardPillar:null, starField:null,
-              orbiter:null, drone:null, aegis:null };
+              orbiter:null, drone:null, aegis:null, foe:null, eliteA:null, aegisA:null };
 const ART = { hero:[], enemy:[], swarmer:[], elite:null, boss:null,
               heroReady:false, enemyReady:false, swarmerReady:false };
 const HERO_ANIM = Object.freeze({
@@ -825,12 +864,14 @@ function buildArenaSprites(){
   // Cyan-Fugen. Bewusst heller als der alte Boden, damit dunkle Gegner und
   // helle Projektile gleichzeitig lesbar bleiben.
   const T=320, tile=mkCanvas(T), g=tile.getContext('2d');
-  g.fillStyle='#39435c'; g.fillRect(0,0,T,T);
-  const bw=80, bh=80;
+  g.fillStyle='#5a6684'; g.fillRect(0,0,T,T);
+  // Entwurf 3 zeigt grosse, helle Paneele mit wenigen Fugen. Die Kachel
+  // enthaelt deshalb nur noch vier Platten statt sechzehn.
+  const bw=160, bh=160;
   for(let row=0;row<T/bh;row++){
     for(let col=0;col<T/bw;col++){
       const x=col*bw, y=row*bh, h=visualHash(col,row,11);
-      const shade=62+((h*14)|0);
+      const shade=104+((h*16)|0);
       g.fillStyle='rgb('+shade+','+(shade+9)+','+(shade+26)+')';
       g.fillRect(x+2,y+2,bw-4,bh-4);
       // Fugenlicht: schmale Cyan-Kante oben und links, dunkle Kante unten.
@@ -839,18 +880,18 @@ function buildArenaSprites(){
       g.moveTo(x+2,y+bh-3); g.lineTo(x+2,y+2); g.lineTo(x+bw-3,y+2); g.stroke();
       g.strokeStyle='rgba(18,23,38,.45)'; g.beginPath();
       g.moveTo(x+bw-2.5,y+2); g.lineTo(x+bw-2.5,y+bh-2.5); g.lineTo(x+2,y+bh-2.5); g.stroke();
-      // Kleine Wartungsmarkierung, fest pro Panel.
-      if(h>0.78){
-        g.fillStyle='rgba(240,196,90,.16)';
-        g.fillRect(x+bw*0.62,y+bh*0.20,bw*0.20,3);
+      // Eine ruhige Wartungsmarkierung je Panel, sonst nichts.
+      if(h>0.5){
+        g.fillStyle='rgba(240,196,90,.13)';
+        g.fillRect(x+bw*0.60,y+bh*0.16,bw*0.16,3);
       }
     }
   }
   // Wenige feste Leitungsbahnen — einmal gebaut, nie pro Frame gerechnet.
-  for(let i=0;i<22;i++){
+  for(let i=0;i<10;i++){
     const x=visualHash(i,3,21)*T, y=visualHash(i,9,22)*T;
     const len=20+visualHash(i,5,23)*40, a=(visualHash(i,7,24)*4|0)*1.5708;
-    g.strokeStyle=i%6===0?'rgba(185,143,224,.20)':'rgba(20,26,42,.34)';
+    g.strokeStyle=i%4===0?'rgba(185,143,224,.14)':'rgba(38,48,72,.26)';
     g.lineWidth=i%6===0?1.4:1;
     g.beginPath(); g.moveTo(x,y);
     g.lineTo(x+Math.cos(a)*len,y+Math.sin(a)*len); g.stroke();
@@ -911,7 +952,8 @@ function buildArenaSprites(){
 //  Konzeptillustration wurde ausgeschnitten, kein zusaetzliches PNG geladen.
 //  Der Node-Testpfad ohne `Image` erzeugt exakt dieselben Figuren.
 // ===========================================================================
-const ORBITER_ANIM = Object.freeze({IDLE:4, WALK:6, THROW:6, FPS:11});
+// D-040 verlangt sechs Idle-, acht Bewegungs- und acht Wurfphasen.
+const ORBITER_ANIM = Object.freeze({IDLE:6, WALK:8, THROW:8, FPS:12});
 const DRONE_ANIM   = Object.freeze({FRAMES:6, FPS:11});
 
 /** Eine aufrechte Figur: Kopf, Rumpf, zwei Arme, zwei Beine. Sie wird nie
@@ -939,6 +981,9 @@ function drawOrbiterPose(g, modus, t){
   g.save();
   g.translate(0, huefte);
   g.rotate(neigung*0.12);
+  // Cyaner Energiekern hinter der Figur -- die Signatur des Orbittraegers.
+  g.fillStyle='rgba(127,212,232,.22)';
+  g.beginPath(); g.ellipse(0,-2,9.5,12,0,0,6.2832); g.fill();
 
   // Beine
   g.strokeStyle=schatten; g.lineWidth=4.6; g.lineCap='round';
@@ -967,6 +1012,14 @@ function drawOrbiterPose(g, modus, t){
   g.beginPath(); g.arc(0,-13.0,4.5,3.34,6.08); g.fill();
   g.fillStyle=visier;
   g.fillRect(-2.6,-12.2,5.2,1.9);
+  // Schulterfinnen: die weissgoldene Silhouette bleibt auch klein lesbar.
+  g.fillStyle=gold;
+  g.beginPath(); g.moveTo(-6.6,-7.2); g.lineTo(-10.4,-10.6); g.lineTo(-6.0,-4.2);
+  g.closePath(); g.fill();
+  g.beginPath(); g.moveTo(6.6,-7.2); g.lineTo(10.4,-10.6); g.lineTo(6.0,-4.2);
+  g.closePath(); g.fill();
+  g.fillStyle=visier;
+  g.beginPath(); g.arc(0,-1.5,1.9,0,6.2832); g.fill();
   g.restore();
 }
 
@@ -986,6 +1039,159 @@ function buildOrbiterSprites(){
   };
   mach('idle',A.IDLE); mach('walk',A.WALK); mach('throw',A.THROW);
   SPR.orbiter=out;
+}
+
+
+// ===========================================================================
+//  FIGURENSPRACHE V2 (D-040)
+//  Gemeinsame Sprache fuer alle Maschinen des Nullschwarms: dunkler
+//  Panzerkoerper, helle Kante, ein farbiger Leuchtkern und goldene Finnen.
+//  Die Familien unterscheiden sich in der Silhouette, nicht nur in der Farbe.
+//  Jede Familie hat sechs versetzte Schwebephasen, damit ein Pulk nicht im
+//  Gleichschritt atmet.
+// ===========================================================================
+const FOE_ANIM = Object.freeze({FRAMES:6, FPS:11});
+// Kernfarbe je Familie. Bewusst getrennt von den Warnfarben Rot und Orange.
+const FOE_CORE = ['#7fd4e8','#ff8a4a','#b98fe0','#7fe8a0','#f0c45a'];
+
+/** Zeichnet einen Maschinenkoerper einer Familie in ein Offscreen-Canvas.
+ *  `t` laeuft von 0 bis 1 ueber die Schwebephase. */
+function drawFoeBody(g, fam, t, gross){
+  const puls = Math.sin(t*6.2832), heb = Math.cos(t*6.2832);
+  const k = gross ? 1.85 : 1;
+  const kern = FOE_CORE[fam];
+  const panzer = '#26314a', kante = '#8fa8c8', gold = '#d8b46a';
+  g.save();
+  g.translate(0, heb*1.3*k);
+
+  if(fam===0){                       // Sammlerdrohne: kompaktes Sechseck
+    g.fillStyle=panzer;
+    g.beginPath();
+    for(let i=0;i<6;i++){ const a=i*1.0472-0.5236, x=Math.cos(a)*8*k, y=Math.sin(a)*6.6*k;
+      i?g.lineTo(x,y):g.moveTo(x,y); }
+    g.closePath(); g.fill();
+    g.strokeStyle=kante; g.lineWidth=1.2*k; g.stroke();
+    g.strokeStyle=gold; g.lineWidth=1.8*k; g.lineCap='round';
+    const arm=2.4+puls*1.5;
+    g.beginPath(); g.moveTo(-5*k,2*k); g.lineTo((-8-arm)*k,(4+arm*.4)*k); g.stroke();
+    g.beginPath(); g.moveTo( 5*k,2*k); g.lineTo(( 8+arm)*k,(4+arm*.4)*k); g.stroke();
+  } else if(fam===1){                // Rammjaeger: Keil nach vorn
+    g.fillStyle=panzer;
+    g.beginPath();
+    g.moveTo(0,-11*k); g.lineTo(7.5*k,4*k); g.lineTo(0,8*k); g.lineTo(-7.5*k,4*k);
+    g.closePath(); g.fill();
+    g.strokeStyle=kante; g.lineWidth=1.2*k; g.stroke();
+    g.fillStyle=gold;
+    g.beginPath(); g.moveTo(0,-13*k); g.lineTo(2.4*k,-8*k); g.lineTo(-2.4*k,-8*k);
+    g.closePath(); g.fill();
+  } else if(fam===2){                // Emitterdrohne: Rumpf mit Laufmuendung
+    g.fillStyle=panzer;
+    g.beginPath(); g.ellipse(0,0,7.4*k,8.4*k,0,0,6.2832); g.fill();
+    g.strokeStyle=kante; g.lineWidth=1.2*k; g.stroke();
+    g.fillStyle=gold; g.fillRect(-1.6*k,-13*k,3.2*k,5.4*k);
+    g.fillStyle=panzer; g.fillRect(-4.6*k,3*k,9.2*k,3.4*k);
+  } else if(fam===3){                // Replikatorsonde: sichtbare Teilungsnaht
+    g.fillStyle=panzer;
+    g.beginPath(); g.ellipse(0,0,8.6*k,7.2*k,0,0,6.2832); g.fill();
+    g.strokeStyle=kante; g.lineWidth=1.2*k; g.stroke();
+    const naht=1.1+Math.abs(puls)*1.9;
+    g.strokeStyle=kern; g.lineWidth=naht*k;
+    g.beginPath(); g.moveTo(0,-7*k); g.lineTo(0,7*k); g.stroke();
+  } else {                           // Bollwerkeinheit: schweres Achteck
+    g.fillStyle=panzer;
+    g.beginPath();
+    for(let i=0;i<8;i++){ const a=i*0.7854+0.3927, x=Math.cos(a)*9.4*k, y=Math.sin(a)*9.4*k;
+      i?g.lineTo(x,y):g.moveTo(x,y); }
+    g.closePath(); g.fill();
+    g.strokeStyle=kante; g.lineWidth=1.6*k; g.stroke();
+    g.fillStyle=gold;
+    g.fillRect(-9*k,-2*k,3*k,4*k); g.fillRect(6*k,-2*k,3*k,4*k);
+  }
+
+  // Leuchtkern: der gemeinsame Nenner aller Familien.
+  g.fillStyle=kern;
+  g.beginPath(); g.arc(0,0,(2.5+puls*0.45)*k,0,6.2832); g.fill();
+  g.fillStyle='#ffffff';
+  g.beginPath(); g.arc(0,0,(1.1+puls*0.2)*k,0,6.2832); g.fill();
+  g.restore();
+}
+
+/** Fuenf Familien mit je sechs Phasen plus die Elitevariante. */
+function buildFoeSprites(){
+  SPR.foe=[];
+  for(let f=0;f<5;f++){
+    SPR.foe[f]=[];
+    for(let k=0;k<FOE_ANIM.FRAMES;k++){
+      const S2=44, cv=mkCanvas(S2), g=cv.getContext('2d');
+      g.translate(S2/2,S2/2);
+      g.fillStyle='rgba(8,12,24,.34)';
+      g.beginPath(); g.ellipse(0,10,7,2.4,0,0,6.2832); g.fill();
+      drawFoeBody(g,f,k/FOE_ANIM.FRAMES,false);
+      SPR.foe[f][k]=cv;
+    }
+  }
+  // Elite: dieselbe Sprache, groesser, mit weissgoldenem Prioritaetsrahmen.
+  SPR.eliteA=[];
+  for(let k=0;k<FOE_ANIM.FRAMES;k++){
+    const S2=78, cv=mkCanvas(S2), g=cv.getContext('2d');
+    g.translate(S2/2,S2/2);
+    g.fillStyle='rgba(8,12,24,.40)';
+    g.beginPath(); g.ellipse(0,18,14,4.4,0,0,6.2832); g.fill();
+    drawFoeBody(g,1,k/FOE_ANIM.FRAMES,true);
+    g.strokeStyle='#fff3d0'; g.lineWidth=2;
+    g.beginPath(); g.arc(0,0,22,0,6.2832); g.stroke();
+    g.strokeStyle='#f0c45a'; g.lineWidth=1.4;
+    for(let i=0;i<4;i++){ const a=i*1.5708+0.7854;
+      g.beginPath(); g.moveTo(Math.cos(a)*19,Math.sin(a)*19);
+      g.lineTo(Math.cos(a)*26,Math.sin(a)*26); g.stroke(); }
+    SPR.eliteA[k]=cv;
+  }
+}
+
+/** AEGIS: deutlich groesser, violetter Kern, zwei visuell getrennte
+ *  Seitenpanzer. Die Panzer sind reine Darstellung -- es gibt keine zweite
+ *  Trefferflaeche und keine neue Bossmechanik (D-040). */
+function buildAegisFrames(){
+  SPR.aegisA=[];
+  for(let k=0;k<FOE_ANIM.FRAMES;k++){
+    const t=k/FOE_ANIM.FRAMES, drift=Math.sin(t*6.2832), puls=Math.cos(t*6.2832);
+    const S2=132, cv=mkCanvas(S2), g=cv.getContext('2d'), c=S2/2;
+    g.translate(c,c);
+    g.fillStyle='rgba(6,8,18,.44)';
+    g.beginPath(); g.ellipse(0,34,32,9,0,0,6.2832); g.fill();
+
+    // Zwei getrennte Seitenpanzer, sie schweben leicht gegenlaeufig.
+    for(const seite of [-1,1]){
+      g.save();
+      g.translate(seite*(30+drift*2.2), -6-drift*1.6);
+      g.fillStyle='#3a2a55';
+      g.beginPath();
+      g.moveTo(0,-20); g.lineTo(seite*9,-6); g.lineTo(seite*7,16); g.lineTo(0,22);
+      g.lineTo(seite*-6,4); g.closePath(); g.fill();
+      g.strokeStyle='#c9a2f0'; g.lineWidth=1.8; g.stroke();
+      g.fillStyle='#b98fe0';
+      g.beginPath(); g.arc(seite*1.5,-1,3.4+puls*0.5,0,6.2832); g.fill();
+      g.restore();
+    }
+
+    // Hauptkoerper: kristalliner Panzer mit heller Kante.
+    g.fillStyle='#2c2242';
+    g.beginPath();
+    g.moveTo(0,-30); g.lineTo(15,-12); g.lineTo(13,16); g.lineTo(0,30);
+    g.lineTo(-13,16); g.lineTo(-15,-12); g.closePath(); g.fill();
+    g.strokeStyle='#d8c4f5'; g.lineWidth=2.2; g.stroke();
+    g.fillStyle='#4a3a6b';
+    g.beginPath();
+    g.moveTo(0,-19); g.lineTo(9,-7); g.lineTo(8,11); g.lineTo(0,19);
+    g.lineTo(-8,11); g.lineTo(-9,-7); g.closePath(); g.fill();
+
+    // Violetter Kern, der ruhig pulsiert.
+    g.fillStyle='#c9a2f0';
+    g.beginPath(); g.arc(0,0,8+puls*0.9,0,6.2832); g.fill();
+    g.fillStyle='#ffffff';
+    g.beginPath(); g.arc(0,0,3.6+puls*0.4,0,6.2832); g.fill();
+    SPR.aegisA[k]=cv;
+  }
 }
 
 /** Sammlerdrohne: koerperliche Maschine mit hellem Kern, sechs asynchrone
@@ -1059,6 +1265,8 @@ function buildSprites(){
   buildOrbiterSprites();
   buildDroneSprites();
   buildAegisSprite();
+  buildFoeSprites();
+  buildAegisFrames();
   const sizes=[7,8,8,7,9];
   for (let f=0; f<5; f++){
     SPR.enemy[f]=[];
@@ -2535,37 +2743,49 @@ const ARENA_STEP=1500, ARENA_RADIUS=690;
 /** Zeichnet einen der grossen, in die Festung eingelassenen Warden-Kreise. */
 function drawWardenSeal(cx,cy,rot){
   ctx.save(); ctx.translate(cx,cy); ctx.rotate(rot);
-  ctx.fillStyle='rgba(8,10,14,.10)';
-  ctx.beginPath(); ctx.arc(0,0,ARENA_RADIUS,0,6.2832); ctx.fill();
-
-  const rings=[118,255,405,555,676];
+  // Entwurf 3 zeigt nur eine angedeutete Kreisgeometrie im Deck, keinen
+  // Arena-Rahmen. Drei feine Ringe und ein paar radiale Fugen genuegen.
+  const rings=[255,470,676];
   for(let i=0;i<rings.length;i++){
     const r=rings[i];
-    ctx.strokeStyle='rgba(8,10,14,.48)'; ctx.lineWidth=(i===4?18:13)/SCALE;
+    ctx.strokeStyle='rgba(30,40,62,.30)'; ctx.lineWidth=3/SCALE;
     ctx.beginPath(); ctx.arc(0,0,r,0,6.2832); ctx.stroke();
-    ctx.strokeStyle=i===4?'rgba(103,76,66,.38)':'rgba(91,94,103,.34)';
-    ctx.lineWidth=2/SCALE; ctx.beginPath(); ctx.arc(0,0,r,0,6.2832); ctx.stroke();
-    ctx.strokeStyle='rgba(176,57,34,'+(i===0?'.20':'.10')+')';
-    ctx.lineWidth=1.2/SCALE; ctx.beginPath(); ctx.arc(0,0,r-6,0,6.2832); ctx.stroke();
+    ctx.strokeStyle='rgba(150,175,215,.16)'; ctx.lineWidth=1.2/SCALE;
+    ctx.beginPath(); ctx.arc(0,0,r-3,0,6.2832); ctx.stroke();
   }
-
-  // Radiale Plattenfugen machen den Boden zur Arena statt zu einem Raster.
-  ctx.strokeStyle='rgba(94,97,106,.24)'; ctx.lineWidth=1.3/SCALE;
-  for(let k=0;k<24;k++){
-    const a=k/24*6.2832, inner=(k&1)?118:255;
+  ctx.strokeStyle='rgba(30,40,62,.20)'; ctx.lineWidth=1.4/SCALE;
+  for(let k=0;k<8;k++){
+    const a=k/8*6.2832;
     ctx.beginPath();
-    ctx.moveTo(Math.cos(a)*inner,Math.sin(a)*inner);
+    ctx.moveTo(Math.cos(a)*255,Math.sin(a)*255);
     ctx.lineTo(Math.cos(a)*676,Math.sin(a)*676); ctx.stroke();
   }
-
-  // Das zentrale Warden-Siegel bleibt bewusst dezent: Lesbarkeit vor Dekor.
-  ctx.strokeStyle='rgba(190,73,42,.28)'; ctx.lineWidth=3/SCALE;
-  ctx.beginPath();
-  ctx.moveTo(0,-80); ctx.lineTo(58,0); ctx.lineTo(0,80); ctx.lineTo(-58,0); ctx.closePath(); ctx.stroke();
-  ctx.beginPath(); ctx.arc(0,0,38,0,6.2832); ctx.stroke();
   ctx.restore();
 }
 
+/** Ruhige periphere Deckkante. Zeichnet nur an den aeussersten Raendern einen
+ *  weichen Uebergang ins Schwarz und ein paar feste Sterne -- kein Balken,
+ *  keine Trennlinie, kein Vollbild-Glow. Laeuft in Bildschirmkoordinaten und
+ *  erzeugt pro Frame nichts Neues. */
+const DECK_EDGE = 26;
+function drawDeckEdges(){
+  const sky=SPR.starField;
+  if(sky){
+    // Nur die aeussersten Streifen bekommen einen Hauch Tiefe.
+    ctx.save();
+    ctx.globalAlpha=.16;
+    ctx.beginPath();
+    ctx.rect(0,0,DECK_EDGE,H); ctx.rect(W-DECK_EDGE,0,DECK_EDGE,H);
+    ctx.rect(0,0,W,DECK_EDGE); ctx.rect(0,H-DECK_EDGE,W,DECK_EDGE);
+    ctx.clip();
+    const ST=sky.width;
+    for(let y=0;y<H;y+=ST) for(let x=0;x<W;x+=ST) ctx.drawImage(sky,x,y);
+    ctx.restore();
+  }
+  // Bewusst KEINE Randabdunklung: D-014 verbietet sie, und Entwurf 3 zeigt ein
+  // Deck, das ohne Rahmen bis an den Bildrand laeuft. Die Sterne oben liegen
+  // nur in den aeussersten Streifen und bleiben dezent.
+}
 function drawArenaFloor(vx0,vx1,vy0,vy1){
   const tile=SPR.floorTile, T=tile.width;
   ctx.globalAlpha=.98;
@@ -2583,8 +2803,8 @@ function drawArenaFloor(vx0,vx1,vy0,vy1){
       drawWardenSeal(cx,cy,rot);
 
       // Feste Randbauten zitieren das Crater-Hold-Design, sind aber nur Kulisse.
-      for(let k=0;k<8;k++){
-        const a=rot+k*.7854, r=ARENA_RADIUS+18;
+      for(let k=0;k<4;k++){
+        const a=rot+k*1.5708, r=ARENA_RADIUS+18;
         const x=cx+Math.cos(a)*r, y=cy+Math.sin(a)*r;
         if(x<vx0-55||x>vx1+55||y<vy0-55||y>vy1+55) continue;
         const spr=(k&1)?SPR.wardPillar:SPR.emberVent;
@@ -2604,33 +2824,43 @@ function drawBossTelegraphs(vx0,vx1,vy0,vy1){
     const pulse=.5+.5*Math.sin(S.t*7);
     ctx.save(); ctx.translate(x,y);
 
-    ctx.strokeStyle='rgba(217,55,39,'+(active ? 0.25 : 0.075)+')';
-    ctx.lineWidth=(active ? 3 : 2)/SCALE;
+    // Ruhige violette Fuehrungsringe statt roter Alarmkreise. Rot bleibt
+    // ausschliesslich der Laufbahn vorbehalten (D-040).
+    ctx.strokeStyle='rgba(185,143,224,'+(active ? 0.24 : 0.07)+')';
+    ctx.lineWidth=(active ? 2.6 : 1.8)/SCALE;
     for(const r of [78,116,154]){ ctx.beginPath();ctx.arc(0,0,r,0,6.2832);ctx.stroke(); }
 
     if(E.st[i]===1){
-      const alpha=.24+charge*.34+pulse*.08, gap=E.ang[i];
-      ctx.fillStyle='rgba(224,58,39,'+alpha.toFixed(3)+')';
-      ctx.strokeStyle='rgba(238,65,43,'+Math.min(alpha+.16,.82).toFixed(3)+')';
-      ctx.lineWidth=2.2/SCALE;
+      // Flache violette Segmente statt Linien mit Pfeilspitzen. Winkel,
+      // Reichweite und die Groesse der Luecke sind unveraendert -- nur die
+      // Zeichnung ist ruhiger und im Pulk schneller lesbar.
+      const alpha=.26+charge*.34+pulse*.08, gap=E.ang[i];
+      ctx.fillStyle='rgba(185,143,224,'+alpha.toFixed(3)+')';
       for(let k=0;k<22;k++){
         const a=k/22*6.2832;
         const da=Math.abs(Math.atan2(Math.sin(a-gap),Math.cos(a-gap)));
         if(da<.43) continue;
-        const c=Math.cos(a),s=Math.sin(a);
-        ctx.beginPath();ctx.moveTo(c*48,s*48);ctx.lineTo(c*142,s*142);ctx.stroke();
-        ctx.save();ctx.translate(c*142,s*142);ctx.rotate(a);
-        ctx.beginPath();ctx.moveTo(9,0);ctx.lineTo(-5,-4);ctx.lineTo(-5,4);ctx.closePath();ctx.fill();ctx.restore();
+        const c=Math.cos(a),s=Math.sin(a), br=.055;
+        ctx.beginPath();
+        ctx.moveTo(Math.cos(a-br)*52,Math.sin(a-br)*52);
+        ctx.lineTo(Math.cos(a+br)*52,Math.sin(a+br)*52);
+        ctx.lineTo(Math.cos(a+br)*142,Math.sin(a+br)*142);
+        ctx.lineTo(Math.cos(a-br)*142,Math.sin(a-br)*142);
+        ctx.closePath(); ctx.fill();
       }
-      // Goldener Bogen = die lesbare sichere Luecke in der Salve.
-      ctx.strokeStyle='rgba(255,197,111,'+(.46+charge*.24).toFixed(3)+')';
-      ctx.lineWidth=5/SCALE;ctx.beginPath();ctx.arc(0,0,154,gap-.39,gap+.39);ctx.stroke();
+      // Die sichere Luecke ist die wichtigste Information der Salve und
+      // deshalb weissgolden und breit gezeichnet.
+      ctx.strokeStyle='rgba(255,243,208,'+(.52+charge*.26).toFixed(3)+')';
+      ctx.lineWidth=6/SCALE;ctx.beginPath();ctx.arc(0,0,150,gap-.39,gap+.39);ctx.stroke();
+      ctx.strokeStyle='rgba(240,196,90,'+(.30+charge*.20).toFixed(3)+')';
+      ctx.lineWidth=2/SCALE;ctx.beginPath();ctx.arc(0,0,120,gap-.39,gap+.39);ctx.stroke();
     } else if(E.st[i]===2){
       const alpha=.11+charge*.17+pulse*.035, len=430;
       ctx.rotate(E.ang[i]);
-      ctx.fillStyle='rgba(218,48,34,'+alpha.toFixed(3)+')';
+      // Laufbahn bleibt rot-orange: die einzige Flaeche, die wirklich trifft.
+      ctx.fillStyle='rgba(240,96,40,'+alpha.toFixed(3)+')';
       ctx.beginPath();ctx.moveTo(30,-24);ctx.lineTo(len,-42);ctx.lineTo(len,42);ctx.lineTo(30,24);ctx.closePath();ctx.fill();
-      ctx.strokeStyle='rgba(238,67,43,'+(.40+charge*.36).toFixed(3)+')';ctx.lineWidth=2.5/SCALE;
+      ctx.strokeStyle='rgba(255,122,63,'+(.44+charge*.36).toFixed(3)+')';ctx.lineWidth=2.8/SCALE;
       ctx.beginPath();ctx.moveTo(30,-24);ctx.lineTo(len,-42);ctx.moveTo(30,24);ctx.lineTo(len,42);ctx.stroke();
       for(let p=120;p<390;p+=90){
         ctx.beginPath();ctx.moveTo(p-18,-12);ctx.lineTo(p,0);ctx.lineTo(p-18,12);ctx.stroke();
@@ -2791,6 +3021,22 @@ function render(){
   if (!S) return;
 
   const cxs = W/2, cys = H/2;
+
+  // --- Deck zuerst, ueber die GANZE Leinwand ------------------------------
+  // Das Deck ist Kulisse, nicht Spielflaeche. Es reicht bis an alle Raender,
+  // damit rechts und links kein abgeschnittener Kampf mehr entsteht. Der
+  // Simulationsausschnitt darunter bleibt unveraendert -- SCALE, VIEW_W,
+  // VIEW_H und das Culling rechnen weiterhin mit denselben Werten (D-040).
+  const fullW=W/SCALE, fullH=H/SCALE;
+  const dx0=S.x-fullW/2-80, dx1=S.x+fullW/2+80;
+  const dy0=S.y-fullH/2-80, dy1=S.y+fullH/2+80;
+  ctx.save();
+  ctx.translate(cxs,cys); ctx.scale(SCALE,SCALE); ctx.translate(-S.x,-S.y);
+  drawArenaFloor(dx0,dx1,dy0,dy1);
+  ctx.restore();
+  // Periphere Weltraumbrueche: nur ganz aussen, ruhig und ohne harte Kante.
+  drawDeckEdges();
+
   ctx.save();
   // Welt, Gegner und Telegrafien enden am Kampfausschnitt. Auf Formaten
   // breiter als 16:9 darf seitlich nichts vom Kampf hinauslaufen.
@@ -2801,8 +3047,6 @@ function render(){
   const vx0=S.x-VIEW_W/2-60, vx1=S.x+VIEW_W/2+60;
   const vy0=S.y-VIEW_H/2-60, vy1=S.y+VIEW_H/2+60;
 
-  // --- Boden: Basaltplatten und konzentrische Warden-Arenen --------------
-  drawArenaFloor(vx0,vx1,vy0,vy1);
   if(S.contract?.tint){
     ctx.fillStyle=S.contract.tint;
     ctx.fillRect(vx0,vy0,vx1-vx0,vy1-vy0);
@@ -2868,17 +3112,22 @@ function render(){
       const f=E.fam[i], artSet=ART.enemyReady?ART.enemy[f][tier]:null;
       // Sichtbare Gegner bleiben immer vollstaendige Figuren. Nur die kurze
       // Stuermer-Warnphase darf eine alternative Darstellung verwenden.
-      if(f===0&&!SPR.drone&&ART.swarmerReady){
+      if(f===0&&!SPR.foe&&!SPR.drone&&ART.swarmerReady){
         const frame=((S.visualT*SWARMER_ANIM.FPS+i*.73)|0)%SWARMER_ANIM.FRAMES;
         spr=ART.swarmer[frame][dir];
-      } else if(f===0&&SPR.drone){
-        // Sammlerdrohne, code-native: sechs Phasen, durch den Index versetzt,
-        // damit der Pulk nicht im Gleichschritt pulsiert.
-        spr=SPR.drone[((S.visualT*DRONE_ANIM.FPS+i*.61)|0)%DRONE_ANIM.FRAMES];
+      } else if(SPR.foe&&tier===ENEMY_NORMAL_TIER){
+        // Alle fuenf Familien, code-native: sechs Phasen, ueber den Index
+        // versetzt, damit ein Pulk nicht im Gleichschritt atmet. Genau ein
+        // drawImage je Gegner, nichts wird pro Gegner erzeugt (D-040).
+        spr=SPR.foe[f][((S.visualT*FOE_ANIM.FPS+i*.61)|0)%FOE_ANIM.FRAMES];
       } else {
         spr=artSet?artSet[dir]:SPR.enemy[f][tier];
         if(artSet){ const phase=(S.visualT*(f===1?112:71))|0; bob=ENEMY_BOB[(phase+i*8)&63]; }
       }
+    } else if(E.kind[i]===2&&SPR.aegisA){
+      spr=SPR.aegisA[((S.visualT*FOE_ANIM.FPS*.5+i*.37)|0)%FOE_ANIM.FRAMES];
+    } else if(E.kind[i]===1&&SPR.eliteA){
+      spr=SPR.eliteA[((S.visualT*FOE_ANIM.FPS+i*.53)|0)%FOE_ANIM.FRAMES];
     } else if(E.kind[i]===2&&SPR.aegis) spr=SPR.aegis;
     else if(ART.enemyReady) spr=E.kind[i]===2?ART.boss[dir]:ART.elite[dir];
     else spr=E.kind[i]===2?SPR.boss:SPR.elite;
@@ -2886,7 +3135,7 @@ function render(){
     ctx.drawImage(spr,x-hw,y-hw+bob);
     if(E.kind[i]===0) continue;
     const w=E.kind[i]===2?90:52, h=E.kind[i]===2?6:4;
-    const yy=y-(E.kind[i]===2?(ART.enemyReady?75:46):(ART.enemyReady?43:28));
+    const yy=y-(E.kind[i]===2?(SPR.aegisA?72:(ART.enemyReady?75:46)):(SPR.eliteA?44:(ART.enemyReady?43:28)));
     ctx.fillStyle='rgba(0,0,0,.55)'; ctx.fillRect(x-w/2,yy,w,h);
     ctx.fillStyle=E.kind[i]===2?COL.boss:COL.elite;
     ctx.fillRect(x-w/2,yy,w*Math.max(E.hp[i]/E.max[i],0),h);
@@ -2960,38 +3209,11 @@ function render(){
   drawBossLocator();
   ctx.restore();
 
-  // --- Seitliche Safe-Area auf Formaten breiter als 16:9 -----------------
-  // Bewusst flach und ohne Verlauf: das ist keine Randvignette (D-014),
-  // sondern eine sichtbare Rahmung des Kampfausschnitts.
-  if (CLIP_X > 0.5){
-    // Kein leerer Balken mehr: Ein einmal vorgerendertes Sternenfeld wird hier
-    // gekachelt. Das ist reine Dekoration -- keine Entities, keine Simulation,
-    // keine Allokation pro Frame.
-    ctx.fillStyle = COL.safe;
-    ctx.fillRect(0,0,CLIP_X,H);
-    ctx.fillRect(CLIP_X+CLIP_W,0,W-CLIP_X-CLIP_W,H);
-    const sky=SPR.starField;
-    if(sky){
-      // Kacheln duerfen nicht ueber die schmale Safe-Area hinausragen. Bei
-      // 844×390 ist eine Kachel breiter als der Rand; ohne Clip uebermalte sie
-      // links 181 Pixel des eigentlichen Kampfausschnitts.
-      ctx.save();
-      ctx.beginPath();
-      ctx.rect(0,0,CLIP_X,H);
-      ctx.rect(CLIP_X+CLIP_W,0,W-CLIP_X-CLIP_W,H);
-      ctx.clip();
-      const ST=sky.width;
-      for(let y=0;y<H;y+=ST){
-        for(let x=0;x<CLIP_X;x+=ST) ctx.drawImage(sky,x,y);
-        for(let x=CLIP_X+CLIP_W;x<W;x+=ST) ctx.drawImage(sky,x,y);
-      }
-      ctx.restore();
-    }
-    // Ruhige Rahmenkante in Cyan statt hartem Schnitt.
-    ctx.fillStyle = 'rgba(127,212,232,0.16)';
-    ctx.fillRect(CLIP_X-1,0,1,H);
-    ctx.fillRect(CLIP_X+CLIP_W,0,1,H);
-  }
+  // --- Kein Balken mehr ---------------------------------------------------
+  // Frueher lagen hier flache Safe-Area-Balken mit Sternenfeld und einer
+  // harten Cyan-Trennlinie. Beides ist entfallen: Das Deck laeuft jetzt
+  // durchgehend bis an den Bildrand (D-040). Der Kampfausschnitt bleibt
+  // technisch identisch, er ist nur nicht mehr sichtbar eingerahmt.
 }
 
 /** Rot-goldene Warden-Ortung. Bewusst schwer und kantig gezeichnet, damit sie
@@ -3006,18 +3228,18 @@ function drawBossLocator(){
     // ihn am oberen Bildrand, wo der Warden bei 16:9 fast ohne Reserve eintritt.
     ctx.translate(loc.x,loc.markY);
     ctx.globalAlpha=puls;
-    ctx.fillStyle='#c8331f';
+    ctx.fillStyle='#8a5fc0';
     ctx.beginPath();
     ctx.moveTo(0,14); ctx.lineTo(-15,-6); ctx.lineTo(-8,-13);
     ctx.lineTo(0,-2);  ctx.lineTo(8,-13);  ctx.lineTo(15,-6);
     ctx.closePath(); ctx.fill();
-    ctx.strokeStyle='#f0c45a'; ctx.lineWidth=2.4; ctx.stroke();
+    ctx.strokeStyle='#fff3d0'; ctx.lineWidth=2.4; ctx.stroke();
   } else {
     // Randpfeil in Richtung Warden.
     ctx.translate(loc.x,loc.y);
     ctx.rotate(loc.winkel);
     ctx.globalAlpha=puls;
-    ctx.fillStyle='#c8331f';
+    ctx.fillStyle='#8a5fc0';
     ctx.beginPath();
     ctx.moveTo(24,0); ctx.lineTo(-12,-17); ctx.lineTo(-4,0); ctx.lineTo(-12,17);
     ctx.closePath(); ctx.fill();
@@ -3562,7 +3784,45 @@ function pathHTML(p){
     `${p.passive.name} <em>${p.pl}/${EVO_PASSIVE_LV}</em></div>`+
     `<div class="evometer"><span style="width:${pct}%"></span></div></div>`;
 }
+/** Bis zu sechs aktive Waffen als Symbole unten mittig. Der Aufbau erfolgt nur
+ *  bei echter Änderung, damit im laufenden Kampf kein DOM pro Frame entsteht. */
+let weaponBarSig='';
+function renderWeaponBar(){
+  const bar=el('weaponbar'), aktiv=WEAPONS.filter(w=>S.W[w.id]);
+  const sig=aktiv.map(w=>w.id+(S.evo[w.id]?'E':'')+S.W[w.id]).join('|');
+  if(sig!==weaponBarSig){
+    weaponBarSig=sig;
+    bar.innerHTML=aktiv.slice(0,6).map(w=>{
+      const evo=!!S.evo[w.id];
+      return '<div class="wslot'+(evo?' evo':'')+'" title="'+weaponLabel(w.id,evo)+'">'+
+        '<span class="wglyph" style="background:'+(evo?w.evo.col:w.col)+'"></span>'+
+        '<span class="wcool"></span>'+
+        '<span class="wlv">'+(evo?'E':S.W[w.id])+'</span></div>';
+    }).join('');
+  }
+  // Abklingzustand: nur bei sichtbarer Aenderung schreiben. Die Rundung auf
+  // Zwanzigstel haelt die DOM-Schreibzugriffe klein.
+  const ringe=bar.children;
+  for(let i=0;i<ringe.length&&i<aktiv.length;i++){
+    const w=aktiv[i], c=S.cool[w.id];
+    const cd=(c===undefined||c<=0)?1:Math.max(0,Math.min(1,1-c));
+    const stufe=(cd*20)|0;
+    if(ringe[i]._cd!==stufe){
+      ringe[i]._cd=stufe;
+      ringe[i].style.setProperty('--cd',(stufe/20).toFixed(2));
+    }
+  }
+  // Waehrend der Kartenwahl bleibt die Leiste stehen -- ein Aus- und
+  // Einblenden bei jedem Stufenaufstieg waere ein Flackern.
+  const an=aktiv.length>0&&S.running&&S.phase!=='over'&&S.phase!=='extract';
+  bar.classList.toggle('on',an);
+  bar.setAttribute('aria-hidden',an?'false':'true');
+}
+
 let slotSig='';
+/** Die frueher dauerhaft sichtbare linke Liste ist im Kampf entfallen (D-040).
+ *  Sie wird weiterhin aufgebaut, weil Pause und Tests sie lesen -- sichtbar
+ *  ist sie nur noch dort. */
 function renderSlots(){
   const parts=combatSlots(), lead=leadingEvoPath();
   const sig=parts.map(p=>p.n+p.l).join('|')+'#'+
@@ -3631,15 +3891,12 @@ function updateHUD(){
   if (S.otActive){ c.textContent='+'+fmtTime(S.ot); c.classList.add('ot'); }
   else { c.textContent=fmtTime(Math.min(S.t,S.runLen)); c.classList.remove('ot'); }
   el('lvl').innerHTML='Stufe <b>'+S.level+'</b>';
+  renderWeaponBar();
   el('xpbar').style.width=Math.min(S.xp/S.need*100,100)+'%';
   el('hpbar').style.width=Math.max(S.hp/S.maxhp*100,0)+'%';
   const bi=S.bossIndex, bossAlive=bossIsAlive();
-  // Oben mittig steht entweder der Sektor oder die Bossleiste, nie beides.
-  const sec=el('sectorhud');
-  const secName=S.contract?.name||LEX.sektor.ring;
-  if(sec.textContent!==secName) sec.textContent=secName;
-  sec.classList.toggle('hidden',bossAlive);
-  sec.setAttribute('aria-hidden',bossAlive?'true':'false');
+  // Oben mittig steht ausschliesslich die Bossleiste (D-040). Der Sektorname
+  // ist keine Dauerinformation mehr und bleibt in Pause und Run-Bericht.
   const bb=el('bossbar'); bb.classList.toggle('on',bossAlive);
   bb.setAttribute('aria-hidden',bossAlive?'false':'true');
   if(bossAlive) el('bossfill').style.width=Math.max(0,E.hp[bi]/E.max[bi]*100)+'%';
