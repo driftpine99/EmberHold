@@ -4,6 +4,36 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 
 ## Unreleased
 
+- EH-2026-08-25-03 / D-041 — Kampflesbarkeit V3 und verpflichtendes
+  NEXUS-Finale:
+  - Der Deckboden kehrt zur dunkleren, feineren Fassung aus Commit 9190de9
+    zurück (80er-Paneele, mehr ruhige Leitungen) und behält die nahtlose
+    D-040-Randtechnik bis an alle Bildschirmränder
+  - Alle fünf Gegnerfamilien sind über eine verbindliche Profiltabelle an
+    Außenkontur, Proportion und Größe unterscheidbar; Farbe allein genügt
+    nicht mehr. KI, Trefferflächen, Werte und Spawnwahrscheinlichkeit sind
+    unverändert, der Schwarm zeichnet weiterhin genau ein drawImage je Figur
+  - Genau ein kompakter Hinweis „Nächste EVO“ steht oberhalb der Waffenleiste,
+    liest ausschließlich leadingEvoPath() und wechselt sofort nach Abschluss
+  - AEGIS ist eine Arena: Ziel von 50 normalen Begleitern statt 90;
+    Überschuss zieht sich innerhalb von acht Sekunden sichtbar, deterministisch
+    und völlig ohne Kill, Erfahrung oder Beute zurück. Der 70er-Bergungsschub
+    bei 7:00 ist entfallen
+  - NEXUS ist der neue verpflichtende Endboss der Acht-Minuten-Sortie:
+    Warnung ab 7:45, Spawn bei 8:00 im sichtbaren Ausschnitt, Ziel von 30
+    normalen Begleitern, Extraktion erst nach seinem echten Tod. Zwei klar
+    telegraphierte Muster (Zielbomben neu, rotierende Ringsalven), dynamische
+    Bossleiste `BOSS: AEGIS`/`BOSS: NEXUS`, FINALE-Uhr ohne Overtime-Multiplikator,
+    Run-Bericht mit Spawn-, Tötungszeit und Finaldauer. Benchmark: Build mit
+    ein bis zwei Evolutionen besiegt ihn in 47,3 s (Korridor 30–75 s),
+    schwacher Build scheitert; deterministisch über festen Seed
+- Neue Verträge in der Suite: `finalBossFlow`, erweiterter `bossCombatPocket`
+  (Ziele 50/30 plus belohnungsfreier Rückzug), `nexusBenchmark`,
+  `evolutionFocusHud` und Silhouetten-Presentationscheck; zusammen 53/53 Checks
+- Botanker nach Messung neu referenziert: 21,7 auf 17,56 (Toleranz unverändert
+  ±3), weil der entfernte 7:00-Schub dem Bot späte Erfahrung nahm. Vorher-
+  und Nachher-Tabelle je Seed im Arbeitsbericht
+
 
 - Entwurf 3 ist als interne Kampf- und UI-Zielrichtung V2 dokumentiert:
   durchgehendes Orbitaldeck, minimale Rand-UI, klarer AEGIS und
