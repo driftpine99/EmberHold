@@ -2126,16 +2126,24 @@ try {
   const foe = foeMatch ? parseInt(foeMatch[1]) : 0;
 
   // 7. Verhaltensbeleg statt Quelltextsuche: Auf einem 21:9-Fenster entsteht
-  //    eine Safe-Area. Wenn das Deck wirklich bis an den Bildrand laeuft, muss
-  //    dieselbe Szene dort mehr Bodenkacheln zeichnen als auf 16:9 -- eine
-  //    Textsuche koennte das nie belegen.
+  //    eine Safe-Area. Wenn der Boden wirklich bis an den Bildrand laeuft,
+  //    muss dieselbe Szene dort mehr BODENKACHELN zeichnen als auf 16:9.
+  //    D-043 misst dazu gezielt nur den Kachel-Pass: Die Deko-Ebenen (Sterne,
+  //    Landmarks, Planet) werden temporär abgehängt und danach restauriert,
+  //    damit seltene Strukturen das Ergebnis nicht zufällig nivellieren.
   const deckKacheln = (breite, hoehe) => {
     canvasElement.clientWidth = breite; canvasElement.clientHeight = hoehe;
     engine.resize();
     engine.begin(480, "ring");
-    engine.S.x = 0; engine.S.y = 0; engine.S.W = {}; engine.S.level = 40;
+    // Kamera bewusst versetzt: Bei x=0 liegen beide Fenster symmetrisch zu
+    // 512er-Kachelgrenzen; der Versatz macht den breiten Mehrraum messbar.
+    engine.S.x = 137; engine.S.y = 0; engine.S.W = {}; engine.S.level = 40;
+    const spr = engine.SPR;
+    const gesichert = { st: spr.starTile, lm: spr.landmarks, pl: spr.planet };
+    spr.starTile = null; spr.landmarks = null; spr.planet = null;
     zaehler.reset();
     engine.render();
+    spr.starTile = gesichert.st; spr.landmarks = gesichert.lm; spr.planet = gesichert.pl;
     return { gezeichnet: zaehler.werte().drawImage, safeArea: Math.round(engine.viewport().CLIP_X) };
   };
   const schmal = deckKacheln(1280, 720);

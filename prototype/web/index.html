@@ -91,6 +91,10 @@ canvas{display:block;position:absolute;inset:0;width:100%;height:100%}
 .wslot .wglyph svg{width:100%;height:100%;overflow:visible}
 .wslot .wglyph path,.wslot .wglyph line,.wslot .wglyph circle,.wslot .wglyph polyline{
   fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+/* D-043 Gate A: die Klinge im Glyph traegt ihre eigenen Farben (Cyan-Schneide
+   in der Waffenfarbe, weiss-goldener Kern), unabhaengig der Grundregel. */
+.wslot .wglyph path.blade{fill:var(--wcol,#7fd4e8);stroke:none}
+.wslot .wglyph path.bladekern{fill:none;stroke:#f5e6b8;stroke-width:1.6}
 .wslot .wglyph .fill{fill:currentColor;stroke:none}
 .wslot .wlv{position:absolute;right:-2px;bottom:-2px;min-width:15px;height:15px;
   border-radius:8px;background:#101626;border:1px solid #35486a;color:#e6f2ff;
@@ -154,6 +158,10 @@ canvas{display:block;position:absolute;inset:0;width:100%;height:100%}
 .card:hover{background:#1d1d29;border-color:#3a3a4a;border-top-color:var(--c,#e07a3f)}
 .card .kind{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--c);
   font-weight:600}
+/* D-043 Gate A: Karten-Glyph oben rechts, gleiche Klingensilhouette wie HUD. */
+.cardglyph{position:absolute;top:14px;right:14px;width:26px;height:26px;color:var(--c)}
+.cardglyph svg{width:100%;height:100%;overflow:visible}
+.card{position:relative}
 .card h3{font-size:19px;margin:7px 0 3px;letter-spacing:-.01em}
 .card .lvtxt{font-size:11px;color:#8b8577;font-variant-numeric:tabular-nums}
 .card p{font-size:13.5px;color:#a8a396;margin-top:11px;flex:1}
@@ -1030,7 +1038,7 @@ function famSprite(fam, color, size, glow){
 
 const ENEMY_NORMAL_TIER=2, ENEMY_TELEGRAPH_TIER=3;
 const SPR = { enemy:[], elite:null, boss:null, gem:null, gemBig:null,
-              arrow:[], orbBlade:[], orb:null, blade:null, frost:null, eproj:null,
+              arrow:[], orbBlade:[], orbBladeEvo:[], orb:null, blade:null, frost:null, eproj:null,
               floorTile:null, emberVent:null, wardPillar:null,
               starTile:null, landmarks:null, planet:null,
               orbiter:null, drone:null, aegis:null, foe:null, eliteA:null, aegisA:null,
@@ -1053,71 +1061,48 @@ function visualHash(x,y,salt){
 
 /** Basalt, Glutofen und Pfeiler werden einmal gebaut und danach nur kopiert. */
 function buildArenaSprites(){
-  // D-042 / Gate A: Der gleichfoermige 80er-Kastenboden weicht einer ruhigen
-  // Orbitalszene. Formensprache adaptiert aus der lokalen Referenz
-  // (drawStarLayers/drawNebulae/drawFadedGrid/drawLandmark): tiefe Navy-
-  // Flaeche mit weichen Nebelschleiern, wenigen Sternen, haarfeinen Fugen,
-  // grossen gebrochenen Ring- und Leitstrukturen -- alles EINMAL vorgerendert,
-  // pro Frame nur drawImage. Keine lückenlose Kistenwand, kein Randbalken,
-  // und die Flaeche bleibt mittelhell genug fuer dunkle Silhouetten.
+  // D-043 / Gate B: ruhige Kampfkulisse. Die D-042-Ebene war zu voll
+  // (Mikrosterne, Leitungen, Landmarks in fast jeder Zelle). Jetzt: grosse
+  // ruhige Navy-Flaeche, wenige unregelmaessige Fugen, dezenter Nebel;
+  // Sterne nur noch sehr spaerlich und schwach, Strukturen selten und
+  // kontrastarm. Alles weiterhin einmalig vorgerendert, pro Frame nur
+  // drawImage, kein Gameplay-RNG.
   const T=512, tile=mkCanvas(T), g=tile.getContext('2d');
-  g.fillStyle='#2c3653'; g.fillRect(0,0,T,T);
-  // Unregelmaessige, GROSSE Schattierungsflaechen statt gleichmaessiger Paneele.
-  for(let i=0;i<7;i++){
+  g.fillStyle='#38445f'; g.fillRect(0,0,T,T);
+  // Wenige, GROSSE Schattierungsflaechen mit geringem Kontrast.
+  for(let i=0;i<6;i++){
     const hx=visualHash(i,1,31), hy=visualHash(i,2,32);
-    const w=T*(0.30+hx*0.45), h=T*(0.26+hy*0.42);
-    g.fillStyle=hx>0.5?'rgba(36,48,73,.55)':'rgba(51,64,95,.50)';
+    const w=T*(0.34+hx*0.42), h=T*(0.30+hy*0.38);
+    g.fillStyle=hx>0.5?'rgba(52,64,92,.34)':'rgba(62,76,108,.30)';
     g.beginPath();
     g.ellipse(hx*T,hy*T,w*0.5,h*0.5,(hx-0.5)*1.2,0,6.2832);
     g.fill();
   }
-  // Nebelschleier: drei weiche Farbfelder (einmalig gebacken).
-  const nebel=[[64,58,132,.11],[40,90,170,.08],[96,28,120,.06]];
+  // Zwei unregelmaessige, sehr feine Fugen statt eines Rasters.
+  g.strokeStyle='rgba(127,212,232,.035)'; g.lineWidth=1;
+  g.beginPath(); g.moveTo(T*0.31,0); g.lineTo(T*0.27,T); g.stroke();
+  g.beginPath(); g.moveTo(0,T*0.66); g.lineTo(T,T*0.61); g.stroke();
+  // Dezenter Nebelschleier (einmalig gebacken).
+  const nebel=[[64,58,132,.08],[40,90,170,.06]];
   for(let i=0;i<nebel.length;i++){
-    const cx=visualHash(i,3,33)*T, cy=visualHash(i,4,34)*T, R=T*(0.30+i*0.10);
+    const cx=visualHash(i,3,33)*T, cy=visualHash(i,4,34)*T, R=T*(0.34+i*0.12);
     const ng=g.createRadialGradient(cx,cy,R*0.1,cx,cy,R);
     const n=nebel[i];
     ng.addColorStop(0,'rgba('+n[0]+','+n[1]+','+n[2]+','+n[3]+')');
     ng.addColorStop(1,'rgba('+n[0]+','+n[1]+','+n[2]+',0)');
     g.fillStyle=ng; g.beginPath(); g.arc(cx,cy,R,0,6.2832); g.fill();
   }
-  // Haarfeine Deckfugen: angedeutete Struktur ohne Kastenwand-Wirkung.
-  g.strokeStyle='rgba(127,212,232,.05)'; g.lineWidth=1;
-  for(let q=0;q<T;q+=128){
-    g.beginPath(); g.moveTo(q,0); g.lineTo(q,T); g.stroke();
-    g.beginPath(); g.moveTo(0,q); g.lineTo(T,q); g.stroke();
-  }
-  // Ein paar feste Leitungsbahnen mit Knotenpunkten.
-  for(let i=0;i<9;i++){
-    const x=visualHash(i,5,35)*T, y=visualHash(i,6,36)*T;
-    const len=60+visualHash(i,7,37)*130, a=(visualHash(i,8,38)*4|0)*1.5708;
-    g.strokeStyle=i%5===0?'rgba(185,143,224,.16)':'rgba(20,26,42,.22)';
-    g.lineWidth=i%5===0?1.4:1;
-    g.beginPath(); g.moveTo(x,y);
-    g.lineTo(x+Math.cos(a)*len,y+Math.sin(a)*len); g.stroke();
-    if(i%3===0){
-      g.fillStyle='rgba(127,212,232,.20)';
-      g.fillRect(x-2,y-2,4,4);
-    }
-  }
-  // Sparsame Mikrosterne direkt in der Basis (die groessere Sternebene
-  // liegt darueber mit leichter Parallaxe).
-  for(let i=0;i<26;i++){
-    const sx=visualHash(i,9,39)*T, sy=visualHash(i,10,40)*T;
-    const br=visualHash(i,11,41);
-    g.fillStyle='rgba(214,228,255,'+(0.16+br*0.30).toFixed(2)+')';
-    g.beginPath(); g.arc(sx,sy,br>0.8?1.1:0.7,0,6.2832); g.fill();
-  }
   SPR.floorTile=tile;
 
-  // Eigene Sternebene fuer leichte Parallaxe (0.12): etwas groessere Sterne,
-  // deterministisch verteilt, nahtlos kachelbar.
+  // Sehr spaerliche Sternebene (Parallaxe 0.12): wenige, kleine, schwache
+  // Punkte -- die Kampfflaeche bleibt ruhig, der Weltraum liest sich nur
+  // am Rand und in Bewegung.
   const ST=256, skyT=mkCanvas(ST), sg2=skyT.getContext('2d');
-  for(let i=0;i<44;i++){
+  for(let i=0;i<12;i++){
     const sx=visualHash(i,12,42)*ST, sy=visualHash(i,13,43)*ST;
-    const b=visualHash(i,14,44), r=b>0.92?1.6:(b>0.66?1.1:0.75);
-    sg2.fillStyle=b>0.92?'rgba(240,243,255,.80)'
-              :(b>0.66?'rgba(184,220,255,.52)':'rgba(150,170,210,.30)');
+    const b=visualHash(i,14,44), r=b>0.92?1.4:(b>0.66?1.0:0.7);
+    sg2.fillStyle=b>0.92?'rgba(240,243,255,.55)'
+              :(b>0.66?'rgba(184,220,255,.35)':'rgba(150,170,210,.20)');
     sg2.beginPath(); sg2.arc(sx,sy,r,0,6.2832); sg2.fill();
   }
   SPR.starTile=skyT;
@@ -1713,6 +1698,107 @@ function buildAegisSprite(){
   SPR.aegis=cv;
 }
 
+// ===========================================================================
+//  D-043 / Gate A: WURFKLINGE V2
+//  Asymmetrische gebogene Energiewaffe mit weiss-goldenem physischem
+//  Mittelteil, heller Innenkante mit wanderndem Glanz, klarer Spitze und
+//  kurzer richtungsgebundener Flugspur im selben Sprite. Adaptiert aus dem
+//  geprüften Entwurf test-results/d043-blade-entwurf.js (Subagent), dort
+//  Koordinatenbudget r<=24 verifiziert. Alles vorgerendert: 24 Richtungen
+//  x 4 Glanzphasen, Standard plus Photonenschneide-Variante (Goldkante,
+//  breitere Schneide). Im Flug faellt pro Projektil genau EIN drawImage an.
+//  Kein shadowBlur, keine Gradienten, keine Allokation pro Frame.
+// ===========================================================================
+const BLADE_V2_SIZE = 48;
+const BLADE_EA      = [0.85, 0.90, 0.95, 1.00];
+const BLADE_TRAIL_L = [0.85, 1.15, 0.92, 1.08];
+const BLADE_GLOSS_T = [0.16, 0.38, 0.60, 0.80];
+
+function qpBlade(ax, ay, bx, by, cx, cy, t){
+  const u = 1 - t;
+  return [u*u*ax + 2*u*t*bx + t*t*cx,
+          u*u*ay + 2*u*t*by + t*t*cy];
+}
+
+function drawBladeV2(g, phase, evo){
+  const ea      = BLADE_EA[phase];
+  const tl      = BLADE_TRAIL_L[phase];
+  const wid     = evo ? 1.15 : 1;
+  g.lineJoin = 'round';
+  g.lineCap  = 'round';
+
+  // (a) Flugspur: duenner, nach hinten auslaufender Doppelbogen, dezent.
+  {
+    const L = 7 * tl;
+    g.beginPath();
+    g.moveTo(-6, -0.6);
+    g.quadraticCurveTo(-9 - 0.5*L, 1.6, -13 - L, 5.0);
+    g.quadraticCurveTo(-9.5 - 0.5*L, 3.4, -6, 1.4);
+    g.closePath();
+    g.fillStyle = evo ? 'rgba(232,234,188,0.30)'
+                      : 'rgba(191,233,255,0.30)';
+    g.fill();
+  }
+
+  // (b) Aeussere Cyan-Schneide mit scharfer Spitze (asymmetrischer Saebel).
+  g.beginPath();
+  g.moveTo(-12, -3.8);
+  g.quadraticCurveTo(0, -5.2, 20, 2);
+  g.quadraticCurveTo(4, 7.6 * wid, -10, 5 * wid);
+  g.closePath();
+  g.fillStyle = 'rgba(72,206,240,' + ea + ')';
+  g.fill();
+  if (evo){
+    g.strokeStyle = 'rgba(240,196,90,0.9)';
+    g.lineWidth = 1.5;
+    g.stroke();
+  }
+
+  // (c) Helle Innenkante mit wanderndem Glanzfleck (4 Viertel-Positionen).
+  {
+    const ax = -9,    ay = 2.6;
+    const bx = 4,     by = 6.0;
+    const cx = 18.6,  cy = 2.15;
+    g.beginPath();
+    g.moveTo(ax, ay);
+    g.quadraticCurveTo(bx, by, cx, cy);
+    g.strokeStyle = 'rgba(220,250,255,0.85)';
+    g.lineWidth = 1.4;
+    g.stroke();
+    const t0 = BLADE_GLOSS_T[phase], t1 = Math.min(t0 + 0.16, 1);
+    const p0 = qpBlade(ax, ay, bx, by, cx, cy, t0);
+    const p1 = qpBlade(ax, ay, bx, by, cx, cy, t1);
+    g.beginPath();
+    g.moveTo(p0[0], p0[1]);
+    g.lineTo(p1[0], p1[1]);
+    g.strokeStyle = 'rgba(255,255,255,0.95)';
+    g.lineWidth = 2.2;
+    g.stroke();
+  }
+
+  // (d) Physischer Mittelteil (weiss-golden, zum Griff verdickt) + Knauf.
+  g.beginPath();
+  g.moveTo(-13.8, -2.4);
+  g.quadraticCurveTo(-7, -2.9, -2, -1.2);
+  g.quadraticCurveTo(0.5, 0, -2, 1.2);
+  g.quadraticCurveTo(-7, 2.9, -13.8, 2.4);
+  g.closePath();
+  g.fillStyle = 'rgba(255,250,232,0.96)';
+  g.fill();
+  g.strokeStyle = 'rgba(240,196,90,0.50)';
+  g.lineWidth = 1;
+  g.stroke();
+
+  g.beginPath();
+  g.arc(-15.4, 0, 1.7, 0, 6.2832);
+  g.fillStyle = 'rgba(240,196,90,0.95)';
+  g.fill();
+  g.beginPath();
+  g.arc(-15.4, 0, 0.7, 0, 6.2832);
+  g.fillStyle = 'rgba(255,250,232,0.9)';
+  g.fill();
+}
+
 function buildSprites(){
   buildArenaSprites();
   buildOrbiterSprites();
@@ -1754,24 +1840,22 @@ function buildSprites(){
     g.moveTo(10,0); g.lineTo(4,-3.2); g.lineTo(4,3.2); g.closePath(); g.fill();
     SPR.arrow[i]=cv;
   }
-  // Orbitklinge: gebogene Photonenschneide mit physischem Kern. Ebenfalls in
-  // 24 Richtungen vorgedreht, damit im Flug nur ein drawImage anfaellt.
+  // D-043 / Gate A: Wurfklinge V2. 24 Richtungen x 4 Glanzphasen, Standard-
+  // variante plus Photonenschneide (Goldkante, breitere Schneide). Rotation
+  // VOR dem Zeichnen -- im Flug bleibt es bei genau einem drawImage.
+  SPR.orbBlade=[]; SPR.orbBladeEvo=[];
   for (let i=0;i<24;i++){
-    const a=i/24*6.2832, S=34, cv=mkCanvas(S), g=cv.getContext('2d');
-    g.translate(S/2,S/2); g.rotate(a);
-    // Schneide: zwei gegenlaeufige Boegen bilden eine schlanke Sichel.
-    g.fillStyle='rgba(127,212,232,.30)';
-    g.beginPath(); g.arc(0,0,13,-0.95,0.95); g.arc(6,0,9.5,0.95,-0.95,true);
-    g.closePath(); g.fill();
-    g.strokeStyle='#e6fcff'; g.lineWidth=1.7; g.lineJoin='round';
-    g.beginPath(); g.arc(0,0,13,-0.95,0.95); g.stroke();
-    // Kern: der physische Teil der Waffe, klar vom Leuchten getrennt.
-    g.fillStyle='#f0c45a';
-    g.beginPath(); g.moveTo(-7,0); g.lineTo(-1,-3.1); g.lineTo(3,0); g.lineTo(-1,3.1);
-    g.closePath(); g.fill();
-    g.fillStyle='#fff3d0';
-    g.beginPath(); g.arc(-1,0,1.7,0,6.2832); g.fill();
-    SPR.orbBlade[i]=cv;
+    SPR.orbBlade.push([]); SPR.orbBladeEvo.push([]);
+    for (let p=0;p<4;p++){
+      let cv=mkCanvas(BLADE_V2_SIZE), g=cv.getContext('2d');
+      g.translate(BLADE_V2_SIZE/2,BLADE_V2_SIZE/2); g.rotate(i/24*6.2832);
+      drawBladeV2(g,p,false);
+      SPR.orbBlade[i].push(cv);
+      cv=mkCanvas(BLADE_V2_SIZE); g=cv.getContext('2d');
+      g.translate(BLADE_V2_SIZE/2,BLADE_V2_SIZE/2); g.rotate(i/24*6.2832);
+      drawBladeV2(g,p,true);
+      SPR.orbBladeEvo[i].push(cv);
+    }
   }
 }
 
@@ -3144,7 +3228,10 @@ function showCards(mode){
       desc=o.p.desc;
     }
     el.style.setProperty('--c',col);
-    el.innerHTML=`<div class="kind">${kind}</div><h3>${name}</h3>
+    // D-043 / Gate A: Waffenkarten tragen dasselbe Klingenglyph wie HUD und
+    // Projektil -- Waffe, Karte und Flugbild gehoeren zusammen.
+    const glyph=o.type==='w'?'<span class="cardglyph">'+weaponGlyph(o.w.id)+'</span>':'';
+    el.innerHTML=`<div class="kind">${kind}</div>${glyph}<h3>${name}</h3>
       <div class="lvtxt">${lvtxt}</div><p>${desc}</p>${path?`<div class="evolink">${path}</div>`:''}
       <div class="key">Taste ${idx+1}</div>`;
     el.onclick=()=>takeCard(idx);
@@ -3511,19 +3598,19 @@ function drawArenaFloor(vx0,vx1,vy0,vy1){
 
   // Sternebene mit leichter Parallaxe: der Versatz haengt nur an der
   // Kamera, nicht an der Zeit -- deterministisch und ohne Allokation.
-  const st=SPR.starTile, ST=st.width;
+  const st=SPR.starTile;
   if(st){
+    const ST=st.width;
     const ox=S.x*0.12, oy=S.y*0.12;
-    const px0=vx0*0.88-ox, py0=vy0*0.88-oy;
     ctx.globalAlpha=.9;
     for(let y=Math.floor((vy0-oy)/ST)*ST+oy;y<vy1;y+=ST)
       for(let x=Math.floor((vx0-ox)/ST)*ST+ox;x<vx1;x+=ST) ctx.drawImage(st,x,y);
     ctx.globalAlpha=1;
   }
 
-  // Grosse Weltraumstrukturen in festen 2000er-Weltzellen. Der Hash nutzt
-  // nur die Zellindizes (wie drawLandmark in der Referenz) -- nichts
-  // springt, nichts verbraucht den Spiel-RNG.
+  // D-043 / Gate B: Strukturen sind SEHR selten und kontrastarm -- keine
+  // Landmarke mehr in jeder Zelle, der Ringplanet bleibt eine Ausnahme am
+  // Horizont. Alpha deutlich unter Cyan-Angriffen und Warnfarben.
   const LZ=2000;
   const gx0=Math.floor((vx0-LZ)/LZ), gx1=Math.floor((vx1+LZ)/LZ);
   const gy0=Math.floor((vy0-LZ)/LZ), gy1=Math.floor((vy1+LZ)/LZ);
@@ -3531,8 +3618,10 @@ function drawArenaFloor(vx0,vx1,vy0,vy1){
     for(let gx=gx0;gx<=gx1;gx++){
       const h=visualHash(gx,gy,77);
       let spr=null, skale=1, alpha=1;
-      if(h>0.90){ spr=SPR.planet; skale=1.15; alpha=.95; }
-      else if(h>0.55){ spr=SPR.landmarks[((h*97)|0)%3]; skale=0.85+h*0.5; alpha=.8; }
+      // Guard auf Sprite-Existenz: Ohne gebackene Ebenen (Fallback/Tests)
+      // bleibt der Boden trotzdem stabil.
+      if(h>0.965&&SPR.planet){ spr=SPR.planet; skale=1.05; alpha=.55; }
+      else if(h>0.88&&SPR.landmarks){ spr=SPR.landmarks[((h*97)|0)%3]; skale=0.8+h*0.4; alpha=.42; }
       else continue;
       const ax=gx*LZ+visualHash(gx,gy,78)*LZ;
       const ay=gy*LZ+visualHash(gx,gy,79)*LZ;
@@ -3552,18 +3641,22 @@ function drawArenaFloor(vx0,vx1,vy0,vy1){
       if(cx+ARENA_RADIUS<vx0||cx-ARENA_RADIUS>vx1||cy+ARENA_RADIUS<vy0||cy-ARENA_RADIUS>vy1) continue;
       const gx=Math.round(cx/ARENA_STEP), gy=Math.round(cy/ARENA_STEP);
       const rot=visualHash(gx,gy,70)*.26-.13;
-      drawWardenSeal(cx,cy,rot);
-
-      // Feste Randbauten zitieren das Crater-Hold-Design, sind aber nur Kulisse.
-      for(let k=0;k<4;k++){
-        const a=rot+k*1.5708, r=ARENA_RADIUS+18;
+      // D-043 / Gate B: keine Props-Reihen mehr. Nur noch selten eine
+      // angedeutete Gravur und sehr selten ein einzelner Randbau.
+      const zelle=visualHash(gx,gy,71);
+      if(zelle>0.78) drawWardenSeal(cx,cy,rot);
+      if(zelle<0.10){
+        const a=rot+0.6, r=ARENA_RADIUS+18;
         const x=cx+Math.cos(a)*r, y=cy+Math.sin(a)*r;
-        if(x<vx0-55||x>vx1+55||y<vy0-55||y>vy1+55) continue;
-        const spr=(k&1)?SPR.wardPillar:SPR.emberVent;
-        ctx.drawImage(spr,x-spr.width/2,y-spr.height/2);
+        if(x>vx0-55&&x<vx1+55&&y>vy0-55&&y<vy1+55){
+          const spr=(gx+gy)&1?SPR.wardPillar:SPR.emberVent;
+          ctx.globalAlpha=.8;
+          ctx.drawImage(spr,x-spr.width/2,y-spr.height/2);
+          ctx.globalAlpha=1;
+        }
       }
     }
-  }
+}
 }
 
 /** Bossmuster im Stil des rechten Konzepts: rote Runen, Pfeile und Angriffskorridor. */
@@ -3903,16 +3996,18 @@ function render(){
   const vy0=S.y-VIEW_H/2-60, vy1=S.y+VIEW_H/2+60;
 
 
-  // --- Lichtkreis: die Farbe kehrt mit deiner Macht zurück ---------------
-  const grd = ctx.createRadialGradient(S.x,S.y,0,S.x,S.y,lr);
-  grd.addColorStop(0,   'rgba(240,196,90,0.115)');
-  grd.addColorStop(0.42,'rgba(150,200,235,0.062)');
-  grd.addColorStop(0.78,'rgba(120,170,225,0.026)');
+  // --- Lokale, kantenlose Aura (D-043 / Gate B) --------------------------
+  // Die permanente Aussenkontur des Lichtkreises ist entfernt: kein
+  // Stroke-Ring mehr, und der weiche Schein ist auf eine kleine Flaeche
+  // direkt am Lichthueter reduziert. lightRadius() selbst bleibt nichtig-
+  // frei fuer Signal-/Telegraphie-Logik unveraendert.
+  const grd = ctx.createRadialGradient(S.x,S.y,0,S.x,S.y,lr*0.55);
+  grd.addColorStop(0,   'rgba(240,196,90,0.10)');
+  grd.addColorStop(0.42,'rgba(150,200,235,0.05)');
+  grd.addColorStop(0.78,'rgba(120,170,225,0.02)');
   grd.addColorStop(1,   'rgba(120,170,225,0)');
   ctx.fillStyle=grd;
-  ctx.beginPath(); ctx.arc(S.x,S.y,lr,0,6.2832); ctx.fill();
-  ctx.strokeStyle='rgba(127,212,232,0.05)'; ctx.lineWidth=8/SCALE;
-  ctx.beginPath(); ctx.arc(S.x,S.y,lr*0.985,0,6.2832); ctx.stroke();
+  ctx.beginPath(); ctx.arc(S.x,S.y,lr*0.55,0,6.2832); ctx.fill();
 
   // Boss-Vorschauen liegen unter Figuren und Projektilen, aber ueber dem Boden.
   drawBossTelegraphs(vx0,vx1,vy0,vy1);
@@ -4016,8 +4111,15 @@ function render(){
       const idx = ((a/6.2832*24)|0)%24;
       // Nur die Orbitklinge fliegt als Klinge; alles andere bleibt Geschoss.
       // Reine Darstellung: P.src aendert weder Flug noch Treffer.
-      if (P.src[i]===W_IDX.bogen && SPR.orbBlade.length)
-        ctx.drawImage(SPR.orbBlade[idx], P.x[i]-17, P.y[i]-17);
+      // D-043 Gate A: neue Klinge mit 4 Glanzphasen und deterministischem
+      // Phasenversatz je Projektil (kein synchrones Blinken); die EVO-
+      // Photonenschneide nutzt die Goldkanten-Variante. Genau EIN drawImage.
+      if (P.src[i]===W_IDX.bogen && SPR.orbBlade.length){
+        const reihe = S.evo.bogen ? SPR.orbBladeEvo : SPR.orbBlade;
+        const ph = ((S.visualT*3 + i*0.41)*4 | 0) % 4;
+        const spr = reihe[idx][ph];
+        ctx.drawImage(spr, P.x[i]-spr.width/2, P.y[i]-spr.height/2);
+      }
       else ctx.drawImage(SPR.arrow[idx], P.x[i]-15, P.y[i]-15);
     }
   }
@@ -4776,8 +4878,13 @@ function pathHTML(p){
     `${p.passive.name} <em>${p.pl}/${EVO_PASSIVE_LV}</em></div>`+
     `<div class="evometer"><span style="width:${pct}%"></span></div></div>`;
 }
+// D-043 / Gate A: Waffe, Karte und Projektil teilen EINE Klingensilhouette.
+// Der Glyph ist die verkleinerte Form der Wurfklinge (asymmetrische Cyan-
+// Schneide, weiss-goldener Kern); die EVO-Farbe kommt ueber --wcol.
+const BLADE_GLYPH = '<path class="blade" d="M3.2 13.4 Q8.6 8.2 20.4 10.8 Q10.6 15.4 4.6 15.2 Z"/>'+
+  '<path class="bladekern" d="M4.6 12.7 Q8.8 10.6 14.6 11.2"/>';
 const WEAPON_GLYPHS=Object.freeze({
-  bogen:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19L18 5"/><path d="M11 5h7v7"/><path d="M5 14l5 5"/></svg>',
+  bogen:'<svg viewBox="0 0 24 24" aria-hidden="true">'+BLADE_GLYPH+'</svg>',
   splitter:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19L18 5"/><path d="M4 19L12 4"/><path d="M4 19L20 12"/><circle class="fill" cx="4" cy="19" r="2"/></svg>',
   kugel:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5"/><circle class="fill" cx="12" cy="12" r="2.3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>',
   blitz:'<svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="14,2 6,13 11,13 8,22 19,9 13,9 16,2"/></svg>',
