@@ -4,6 +4,34 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
 
 ## Unreleased
 
+- EH-2026-08-25-05 / D-043 — Orbitklinge V2, ruhige Kampfkulisse und
+  Orbitalstation V2:
+  - Die Orbitklinge ist eine lesbare geworfene Waffe: asymmetrische Cyan-
+    Schneide mit Spitze, weiß-goldener physischer Mittelteil, helle
+    Innenkante mit vier wandernden Glanzphasen und kurze richtungsgebundene
+    Flugspur im selben Sprite. 24 Richtungen × 4 Phasen vorgerendert, dazu
+    die Photonenschneide mit Goldkante; genau ein drawImage pro Projektil,
+    deterministischer Phasenversatz. Karte und HUD teilen dieselbe Silhouette
+  - Die permanente Außenkontur des Lichtkreises um den Lichthüter ist
+    entfernt; die weiche Aura ist lokal verkleinert. Die Kulisse wurde
+    deutlich beruhigt: keine Mikrosterne/Leitungen mehr im Deckkachel,
+    unregelmäßige Fugen statt Raster, Sternebene von 44 auf 12 schwache
+    Punkte reduziert, Landmarks nur noch selten und kontrastarm
+  - Die Station ist jetzt ein Inline-SVG-Ort: Kernplattform mit Lichthüter-
+    Maßstab, drei sichtbaren Ausbaustufen, Datenfüllstand (6 Diamanten) und
+    Protokollprojektion; sechs Baukörper-Module (Sonde, Fabrikator, violette
+    Glaskammer, Simulations-Dome, Hangar, Kartentisch) verbunden durch Stege
+    und Energieleitungen mit sichtbaren Unterbrechern. Overlay-Klickflächen
+    folgen den Modulformen, genau ein Drawer (klein: Bottom-Sheet)
+  - Stationsgameplay sichtbar gemacht: Reparatur/Produktion/Einsammeln/
+    Kernupgrade/Protokollwahl schalten sofort die Szenenzustände; Einsammeln
+    fliegt kurz zur Ressource (transform/opacity, reduced-motion); eine
+    überspringbare Ankunftsrückmeldung führt gesicherte Daten und NEXUS-
+    Ergebnis an den Kern (eigener Anzeige-Schlüssel, kein Save-Feld)
+  - Suite auf 60 Checks: neue Verträge combatArtV4 und stationSceneV2
+    (inkl. Interaktionsnachweisen); combatUiV2-Kachelmessung verhaltens-
+    basiert präzisiert; alle 18 Baseline-Fingerprints weiter bitidentisch
+
 - EH-2026-08-25-04 / D-042 — Lichthüter, Bergungssignal und Stationsring V1:
   - Der Orbitträger trägt die Lichthüter-Silhouette der lokalen Referenz
     (geschlossener Helm mit Goldraute, cyane V-Bahn, Goldhalo mit vier Ticks,

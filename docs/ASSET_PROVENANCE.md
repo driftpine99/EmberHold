@@ -143,6 +143,41 @@ oder die gezielte Imitation lebender Künstler verlangen.
 - **Hinweis:** Es wurden KEINE neuen Bilddateien hinzugefügt; der Runtime-
   Assetstand bleibt bei den vier PNG-Atlanten.
 
+### AP-006 – Wurfklinge V2 und Orbitalstation-SVG (code-native)
+
+- **Pfad:** keine Datei – prozedural in `prototype/web/index.html`
+  (`drawBladeV2`/`buildSprites`-Klingenblock, `BLADE_GLYPH`; Stations-SVG als
+  Inline-`<svg id="stationSvg">` im Start-Sheet, adaptiert aus dem geprüften
+  Entwurf `test-results/d043-station-entwurf.svg`)
+- **Zweck:** Runtime – Wurfklinge (Projektil 24 Richtungen × 4 Phasen,
+  EVO-Variante, Karten-/HUD-Glyph) und Orbitalstation V2 (Planet,
+  Trümmerring, Kernplattform mit Lichthüter-Maßstab, sechs Modul-Baukörper,
+  Stege/Leitungen, Zustandsklassen)
+- **Ursprung:** selbst erstellt, vollständig Canvas-/SVG-/CSS-Code. Die
+  Klinge wurde aus einem Subagenten-Entwurf übernommen (geprüft:
+  Koordinatenbudget r ≤ 24, keine Schatten-API); die Station basiert auf dem
+  Subagenten-SVG-Gerüst (nachbearbeitet: Root-ID/Klassen, title/desc entfernt,
+  Leitungspfade mit IDs). Formensprache anhand der drei Konzeptbilder
+  (AP-001/AP-002/AP-004) und der lokalen Referenz (`zeichneKlinge`,
+  `zeichneLichthueterNeu`, Hintergrundebenen — schreibgeschützt)
+- **Ersteller/Werkzeug:** OpenCode im Auftrag EH-2026-08-25-05; drei
+  Subagenten (Konzept-Audit, Klingenentwurf, SVG-Gerüst) plus unabhängige
+  Abschlussprüfung
+- **Datum:** 25.08.2026
+- **Prompt:** keiner – kein generatives Bildmodell beteiligt
+- **Referenzen:** Konzeptbilder wie oben; keine Franchise-Formen; die alte
+  Sichel-Klinge (AP-003-Anteil) wurde vollständig ersetzt
+- **Lizenz/Rechtebasis:** eigener Quellcode des Projekts; Referenzordner
+  unverändert und nicht Teil des Commits
+- **Bearbeitung:** Klinge auf 48 px und die bestehenden Trefferpfade
+  angepasst (Trefferbox unverändert); SVG-Zustände ausschließlich über
+  CSS-Klassen aus dem echten Save (mod-offline/run/ready/repairable/active,
+  core-0..3, daten-1..6, proto-*)
+- **Status:** PROTOTYP
+- **Freigabe:** Testspiel ja; kommerzielle Freigabe weiterhin offen
+- **Hinweis:** Keine neuen Bilddateien; `orbitblade-blade-v2.png` war nicht
+  nötig (Canvas-Lösung kleiner und wartbarer).
+
 ## Vorlage
 
 ### AP-XXX – Name
