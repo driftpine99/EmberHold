@@ -2596,7 +2596,9 @@ try {
     const n = globalThis.document.getElementById(id);
     return /st-(off|run|ready)/.test(n.className || "");
   });
-  const kernStufen = /class="core st-\d"/.test(html);
+  // D-043: Der Kern ist ein Overlay auf dem SVG-Baukörper; die Stufenklasse
+  // sitzt am Button (class="hs core st-N") und spiegelt META.coreStage.
+  const kernStufen = /class="hs core st-\d"/.test(html);
   const protokollZeile = html.includes('id="protocolchips"') &&
     html.includes('id="protocolnote"');
   stationDomContract = sechsHotspots && panelVorhanden && aktionen && keineDoppelteKartenwand &&
@@ -2665,9 +2667,147 @@ try {
   baselineIsoError = error instanceof Error ? error.message : String(error);
 }
 
+// --- EH-2026-08-25-05 / D-043: combatArtV4 ----------------------------------
+// Neue Wurfklinge in Projektil, Karte und HUD; 4 Glanzphasen x 24 Richtungen
+// mit deterministischem Phasenversatz; genau ein komponiertes drawImage je
+// Klingenprojektil; keine permanente lightRadius-Kontur; Kulisse beruhigt
+// (keine Mikrosterne/Leitungen in der Kachel, seltene Landmarks); Hot-Loop
+// ohne Zeitquelle/Zufall im Klingenpfad.
+let combatArtV4 = false;
+let artV4Error = "";
+let artV4Diagnostics = null;
+try {
+  // 1) Klinge: neuer Sprite-Bau, EVO-Variante, alte Sichel restlos entfernt.
+  const bladeBau = html.slice(html.indexOf("const BLADE_V2_SIZE"),
+                              html.indexOf("const ENEMY_DIRECTIONS"));
+  const neueForm = html.includes("function drawBladeV2") &&
+    bladeBau.includes("SPR.orbBlade.push([])") &&
+    bladeBau.includes("for (let p=0;p<4;p++)") &&
+    bladeBau.includes("SPR.orbBladeEvo[i].push(cv)") &&
+    !html.includes("g.arc(0,0,13,-0.95,0.95)");
+  // 2) Flug: genau ein drawImage, EVO-Reihe, deterministischer Phasenversatz.
+  const flugStart = html.indexOf("if (P.src[i]===W_IDX.bogen && SPR.orbBlade.length)");
+  const flugEnde = html.indexOf("else ctx.drawImage(SPR.arrow[idx]", flugStart);
+  const flug = flugStart >= 0 ? html.slice(flugStart, flugEnde) : "";
+  const flugSauber = flug.includes("const ph = ((S.visualT*3 + i*0.41)*4 | 0) % 4") &&
+    flug.includes("SPR.orbBladeEvo : SPR.orbBlade") &&
+    (flug.match(/ctx\.drawImage/g) || []).length === 1 &&
+    !flug.includes("Math.random") && !flug.includes("Date.now");
+  // 3) Karte + HUD teilen die Silhouette.
+  const glyphGeteilt = html.includes("const BLADE_GLYPH") &&
+    html.includes("bogen:'<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\">'+BLADE_GLYPH") &&
+    html.includes('class="cardglyph"') && html.includes("weaponGlyph(o.w.id)");
+  // 4) Kein permanenter Avatar-Radiusring mehr; lokale kantenlose Aura bleibt.
+  const ringWeg = !html.includes("lr*0.985") &&
+    !html.includes("'rgba(127,212,232,0.05)'") &&
+    html.includes("lr*0.55");
+  // 5) Kulisse beruhigt: keine Mikrosterne/Leitungen in der Kachel,
+  //    Landmarks selten, Sternebene klein und schwach.
+  const kulisseRuhig = !html.includes("for(let i=0;i<26;i++)") &&
+    !html.includes("const len=60+visualHash") &&
+    html.includes("h>0.88") && html.includes("h>0.965") &&
+    /for\(let i=0;i<12;i\+\+\)/.test(html) &&
+    !html.includes("rgba(214,228,255,");
+  combatArtV4 = neueForm && flugSauber && glyphGeteilt && ringWeg && kulisseRuhig;
+  artV4Diagnostics = { neueForm, flugSauber, glyphGeteilt, ringWeg, kulisseRuhig };
+} catch (error) {
+  artV4Error = error instanceof Error ? error.message : String(error);
+}
+
+// --- EH-2026-08-25-05 / D-043: stationSceneV2 -------------------------------
+// Genau ein Stations-Szenengraph (Inline-SVG) mit sechs physischen Modulen,
+// Kern mit sichtbaren Ausbaustufen, Datenfuellstand und Protokollprojektion.
+// Keine generischen Kreisbuttons mehr als Hauptdarstellung; genau ein Drawer;
+// alle bisherigen Aktions-IDs genau einmal. Interaktionstests pruefen Fach-
+// wirkung UND den unmittelbar aktualisierten Szenenzustand.
+let stationSceneV2 = false;
+let stationSceneError = "";
+let stationSceneDiagnostics = null;
+try {
+  const svgKlassen = (enthaelt) => {
+    const svg = globalThis.document.getElementById("stationSvg");
+    return svg.className.split(" ").includes(enthaelt);
+  };
+  const modKlasse = (id) => {
+    const n = globalThis.document.getElementById(id);
+    return n ? n.className : "";
+  };
+
+  // 1) Struktur: ein Szenengraph, sechs Baukoerper, Kern, Stufen, Daten,
+  //    Protokoll; alte D-042-Deko und Kreisbutton-Optik restlos entfernt.
+  const szenenGraph = (html.match(/id="stationSvg"/g) || []).length === 1 &&
+    ["modMine","modForge","modArcanum","modYard","modArmory","modMap",
+     "coreBody","stage1","stage2","stage3","datenLeiste","protoProjektion",
+     "leitung-mine","leitung-forge","leitung-arcanum","leitung-yard",
+     "leitung-armory","leitung-map"].every(id => html.includes('id="'+id+'"'));
+  const alteDekoWeg = !html.includes("scene-stars") && !html.includes("scene-ring") &&
+    !html.includes("conduit-l") && !html.includes('class="hotspot') &&
+    !html.includes("core-orb");
+  // 2) Genau ein Drawer; Bottom-Sheet auf kleinen Breiten.
+  const drawerEin = (html.match(/class="dpanel"/g) || []).length === 7 &&
+    html.includes(".detailpanels{position:absolute;right:10px") &&
+    html.includes("@media (max-width:700px)") &&
+    html.includes("bottom:8px");
+  // 3) Aktions-IDs genau einmal vorhanden.
+  const aktionenEinmal = ["btnMine","btnForge","btnArcanum","btnYard","btnBowUpgrade",
+    "btnPrepareReroll","btnMasteryPath","btnMasteryReach","btnMasteryDash",
+    "btnStart","btnStart3","btnCopyLast","btnCoreUpgrade","contractgrid",
+    "protocolchips","protocolnote","btnLaunch","btnArrivalOk"].every(id =>
+    (html.match(new RegExp('id="'+id+'"',"g")) || []).length === 1);
+
+  // 4) Interaktion: Reparatur schaltet Baukoerper + Leitung sofort um.
+  engine.begin(180, "ring");                 // neutraler Zustand, kein Run
+  engine.H.mineLevel = 0; engine.H.forgeLevel = 1;
+  engine.H.forgeWorking = true; engine.H.forgeProgress = 8; engine.H.forgeStored = 0;
+  engine.H.ore = 0; engine.renderHold();
+  const mineOffline = modKlasse("modMine").includes("mod-offline") &&
+    modKlasse("leitung-mine").includes("off");
+  engine.mineAction();                        // kostenlose Reparatur
+  const mineOnline = !modKlasse("modMine").includes("mod-offline") &&
+    !modKlasse("leitung-mine").includes("off");
+  // 5) Produzierend -> abholbereit -> eingesammelt, jeweils am Baukoerper.
+  const forgeLaeuft = modKlasse("modForge").includes("mod-run");
+  engine.H.forgeStored = 2; engine.renderHold();
+  const forgeBereit = modKlasse("modForge").includes("mod-ready");
+  engine.forgeAction();                       // einsammeln (ore 0 -> wartet danach)
+  const forgeWartet = modKlasse("modForge").includes("mod-run") &&
+    !modKlasse("modForge").includes("mod-ready");
+  // 6) Kernupgrade baut sichtbare Stufen aus.
+  Object.assign(engine.H, { stationData: 9, ore: 99, bars: 99, coreStage: 0 });
+  const k1 = engine.upgradeCore(), k2 = engine.upgradeCore(), k3 = engine.upgradeCore();
+  const kernSichtbar = k1 && k2 && k3 && svgKlassen("core-3") &&
+    !engine.upgradeCore();
+  // 7) Protokollwahl projiziert am Kern (nur zwischen Sortien moeglich).
+  engine.S.running = false;
+  engine.setProtocol("klingenfokus");
+  const protoSichtbar = svgKlassen("proto-klingenfokus");
+  engine.setProtocol("none");
+  // 8) Ankunftsrueckmeldung: erscheint einmal, markiert gesehen, fuehrt zum Kern.
+  localStorage.setItem("emberhold:arrival:v1", JSON.stringify({
+    savedAt: 777, dateien: 1, signal: "gesichert", nexus: true, ore: 12, seen: false }));
+  engine.showStartMenu();
+  const ankunftGezeigt = (globalThis.document.getElementById("arrival").className||"").includes("on");
+  const ankunftGesehen = JSON.parse(localStorage.getItem("emberhold:arrival:v1")).seen === true;
+  globalThis.document.getElementById("btnArrivalOk").onclick();
+  const fuehrtZumKern = (globalThis.document.getElementById("start")
+    .getAttribute("data-panel")) === "core";
+  const ankunftEinmal = JSON.parse(localStorage.getItem("emberhold:arrival:v1")).seen === true;
+
+  stationSceneV2 = szenenGraph && alteDekoWeg && drawerEin && aktionenEinmal &&
+    mineOffline && mineOnline && forgeLaeuft && forgeBereit && forgeWartet &&
+    kernSichtbar && protoSichtbar && ankunftGezeigt && ankunftGesehen &&
+    fuehrtZumKern && ankunftEinmal;
+  stationSceneDiagnostics = { szenenGraph, alteDekoWeg, drawerEin, aktionenEinmal,
+    mineOffline, mineOnline, forgeLaeuft, forgeBereit, forgeWartet,
+    kernSichtbar, protoSichtbar, ankunftGezeigt, ankunftGesehen,
+    fuehrtZumKern, ankunftEinmal };
+} catch (error) {
+  stationSceneError = error instanceof Error ? error.message : String(error);
+}
+
 const output = {
-  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && slotLayout && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && contractFlow && holdExpansion && equipmentFlow && evolutionCatalog && eliteChoices && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling && fpsMetrics && reportHardened && lastRunReportFlow && healOrbFlow && holdGoalLadder && oreCurve && earlyLossGuard && bossCombatPocket && bossLocatorState && compactCombatHud && evolutionCompletion && weaponDamageReport && lateProgression && weaponRoles && presentationLayer && renderCostContract && combatUiV2 && finalBossFlow && evolutionFocusHud && foeSilhouettes && nexusBenchmark && combatArtV3 && sectorObjectiveFlow && stationCoreFlow && stationDomContract && baselineIsolated,
-  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, slotLayout, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, contractFlow, holdExpansion, equipmentFlow, evolutionCatalog, eliteChoices, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling, fpsMetrics, reportHardened, lastRunReportFlow, healOrbFlow, holdGoalLadder, oreCurve, earlyLossGuard, bossCombatPocket, bossLocatorState, compactCombatHud, evolutionCompletion, weaponDamageReport, lateProgression, weaponRoles, presentationLayer, renderCostContract, combatUiV2, finalBossFlow, evolutionFocusHud, foeSilhouettes, nexusBenchmark, combatArtV3, sectorObjectiveFlow, stationCoreFlow, stationDomContract, baselineIsolated },
+  pass: report.pass && evolutionReachable && reproducible && stationaryPressure && artAssets && visualState && uprightCharacters && singlePassRendering && combatReadability && slotLayout && uniqueChainTargets && bossTargeting && bossDurability && singleProjectileHit && uniqueSpatialQuery && singleExplosion && uxFlow && holdFlow && contractFlow && holdExpansion && equipmentFlow && evolutionCatalog && eliteChoices && aspectIndependent && minCombatHeight && bossInsideCombat && telemetrySeparated && visibleCountsCulling && fpsMetrics && reportHardened && lastRunReportFlow && healOrbFlow && holdGoalLadder && oreCurve && earlyLossGuard && bossCombatPocket && bossLocatorState && compactCombatHud && evolutionCompletion && weaponDamageReport && lateProgression && weaponRoles && presentationLayer && renderCostContract && combatUiV2 && finalBossFlow && evolutionFocusHud && foeSilhouettes && nexusBenchmark && combatArtV3 && sectorObjectiveFlow && stationCoreFlow && stationDomContract && baselineIsolated && combatArtV4 && stationSceneV2,
+  checks: { ...report.checks, evolutionReachable, reproducible, stationaryPressure, artAssets, visualState, uprightCharacters, singlePassRendering, combatReadability, slotLayout, uniqueChainTargets, bossTargeting, bossDurability, singleProjectileHit, uniqueSpatialQuery, singleExplosion, uxFlow, holdFlow, contractFlow, holdExpansion, equipmentFlow, evolutionCatalog, eliteChoices, aspectIndependent, minCombatHeight, bossInsideCombat, telemetrySeparated, visibleCountsCulling, fpsMetrics, reportHardened, lastRunReportFlow, healOrbFlow, holdGoalLadder, oreCurve, earlyLossGuard, bossCombatPocket, bossLocatorState, compactCombatHud, evolutionCompletion, weaponDamageReport, lateProgression, weaponRoles, presentationLayer, renderCostContract, combatUiV2, finalBossFlow, evolutionFocusHud, foeSilhouettes, nexusBenchmark, combatArtV3, sectorObjectiveFlow, stationCoreFlow, stationDomContract, baselineIsolated, combatArtV4, stationSceneV2 },
   targets: report.targets,
   ueberschuss: report.ueberschuss,
   seeds: report.seeds,
@@ -2700,6 +2840,8 @@ if (sectorError) output.sectorError = sectorError;
 if (stationError) output.stationCoreError = stationError;
 if (stationDomError) output.stationDomError = stationDomError;
 if (baselineIsoError) output.baselineIsoError = baselineIsoError;
+if (artV4Error) output.artV4Error = artV4Error;
+if (stationSceneError) output.stationSceneError = stationSceneError;
 if (compactHudError) output.compactHudError = compactHudError;
 if (evolutionCompletionError) output.evolutionCompletionError = evolutionCompletionError;
 if (weaponDamageError) output.weaponDamageError = weaponDamageError;
@@ -2724,6 +2866,8 @@ if (sectorDiagnostics) output.summary.sectorObjective = sectorDiagnostics;
 if (stationCoreDiagnostics) output.summary.stationCore = stationCoreDiagnostics;
 if (stationDomDiagnostics) output.summary.stationDom = stationDomDiagnostics;
 if (baselineIsoDiagnostics) output.summary.baselineIsolated = baselineIsoDiagnostics;
+if (artV4Diagnostics) output.summary.combatArtV4 = artV4Diagnostics;
+if (stationSceneDiagnostics) output.summary.stationSceneV2 = stationSceneDiagnostics;
 if (bossLocatorDiagnostics) output.summary.bossLocator = bossLocatorDiagnostics;
 if (compactHudDiagnostics) output.summary.compactHud = compactHudDiagnostics;
 if (evolutionCompletionDiagnostics) output.summary.evolutionCompletion = evolutionCompletionDiagnostics;

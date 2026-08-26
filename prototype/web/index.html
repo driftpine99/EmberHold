@@ -222,104 +222,61 @@ button.b.danger{background:#c9402e;color:#fff}
 .help kbd{background:#1d1d29;border:1px solid #2e2e3c;border-radius:5px;padding:2px 8px;
   font:inherit;font-size:11.5px;color:#e8e4dc;flex-shrink:0;min-width:74px;text-align:center}
 
-/* ---------- D-042 / Gate C: Stationsring statt Kartenwand ----------
-   Die Startansicht ist eine zusammenhaengende Szene: Planet, Sterne,
-   gebrochene Ringsegmente, Leitungen, sechs Hotspots und der zentrale Kern.
-   Alle Zustaende sind code-nativ (CSS-Formen), keine neuen Assets. */
+/* ---------- D-043 / Gate C: Orbitalstation V2 — ein echter Ort ----------
+   Die Szene ist ein Inline-SVG (Station über violettem Planeten, Kern mit
+   Lichthüter-Maßstab, sechs Baukörper, Stege und Energieleitungen). Die
+   Overlay-Buttons folgen den sichtbaren Modulformen; genau ein Drawer zeigt
+   die Aktionen. Keine zweite Station, keine Kartenwand unterhalb. */
 #start.holdsheet{justify-content:flex-start;background:
   radial-gradient(circle at 78% -6%,rgba(70,58,140,.20),transparent 34%),
   radial-gradient(circle at 12% 108%,rgba(40,90,170,.14),transparent 30%),
-  linear-gradient(rgba(7,9,16,.94),rgba(8,10,18,.97));padding:18px 20px 28px}
+  linear-gradient(rgba(7,9,16,.94),rgba(8,10,18,.97));padding:14px 16px 20px}
 .holdhead{order:0;width:min(1100px,100%);display:flex;align-items:flex-end;justify-content:space-between;
-  gap:16px;text-align:left}.holdhead .kick{margin:0}.holdhead h1{font-size:clamp(25px,5vw,42px)}
+  gap:16px;text-align:left}.holdhead .kick{margin:0}.holdhead h1{font-size:clamp(22px,4vw,34px)}
 .holdresources{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
 .holdres{background:rgba(23,23,33,.9);border:1px solid #2b2b38;border-radius:8px;
-  padding:6px 11px;min-width:92px}.holdres b{display:block;color:#e8e4dc;font-size:17px;
-  font-variant-numeric:tabular-nums}.holdres span{display:block;color:#777164;font-size:9px;
+  padding:5px 10px;min-width:84px}.holdres b{display:block;color:#e8e4dc;font-size:15px;
+  font-variant-numeric:tabular-nums}.holdres span{display:block;color:#777164;font-size:8.5px;
   letter-spacing:.12em;text-transform:uppercase}
 
-.holdscene{order:1;position:relative;width:min(880px,100%);height:308px;margin:12px auto 0;
-  border-radius:16px;overflow:hidden;background:
-  radial-gradient(ellipse at 50% 62%,rgba(52,66,102,.55),rgba(13,17,28,.92) 72%);
-  border:1px solid #232c44}
-.holdstatus{order:2;width:min(680px,92vw);margin:10px auto 0;font-size:11px;
+.holdscene{order:1;position:relative;width:min(1180px,100%);
+  height:min(72vh,640px);margin:8px auto 0;border-radius:16px;overflow:hidden;
+  background:#0b0e1c;border:1px solid #232c44}
+#stationSvg{position:absolute;inset:0;width:100%;height:100%;display:block}
+/* Statuszeile + Ziel bleiben klein am Rand; die Fläche gehört der Station. */
+.holdstatus{order:2;width:auto;align-self:center;margin:8px 12px 0;font-size:11px;
   color:#a88672;text-align:center}
-.holdgoal{order:3;width:min(680px,92vw);margin:6px auto 12px;padding:11px 14px 12px;text-align:left;
+.holdgoal{order:3;width:min(560px,94vw);margin:4px auto 8px;padding:8px 12px 9px;text-align:left;
   background:rgba(24,20,26,.94);border:1px solid #3a2b2c;border-left:3px solid #e07a3f;
-  border-radius:10px}
-.scene-stars{position:absolute;inset:0;background-image:
-  radial-gradient(1.2px 1.2px at 12% 22%,rgba(220,232,255,.85),transparent 60%),
-  radial-gradient(1px 1px at 31% 68%,rgba(190,214,255,.6),transparent 60%),
-  radial-gradient(1.4px 1.4px at 47% 14%,rgba(255,243,208,.75),transparent 60%),
-  radial-gradient(1px 1px at 63% 41%,rgba(214,228,255,.55),transparent 60%),
-  radial-gradient(1.3px 1.3px at 76% 76%,rgba(184,240,255,.65),transparent 60%),
-  radial-gradient(1px 1px at 89% 27%,rgba(220,232,255,.5),transparent 60%),
-  radial-gradient(1.1px 1.1px at 22% 86%,rgba(200,222,255,.45),transparent 60%),
-  radial-gradient(1px 1px at 55% 90%,rgba(220,232,255,.4),transparent 60%)}
-.scene-planet{position:absolute;left:-96px;bottom:-150px;width:280px;height:280px;border-radius:50%;
-  background:radial-gradient(circle at 36% 32%,#4a6a9a,#2c4266 52%,#141f38 88%);
-  box-shadow:inset -18px -22px 48px rgba(0,0,0,.55),0 0 42px rgba(40,70,120,.35)}
-.scene-ring{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);border-radius:50%;
-  border:2px solid transparent}
-.scene-ring.ring-a{width:330px;height:330px;
-  border-top-color:rgba(127,212,232,.30);border-right-color:rgba(127,212,232,.12);
-  transform:translate(-50%,-50%) rotate(24deg)}
-.scene-ring.ring-b{width:452px;height:452px;
-  border-bottom-color:rgba(217,180,90,.22);border-left-color:rgba(185,143,224,.14);
-  transform:translate(-50%,-50%) rotate(-38deg)}
-.scene-conduit{position:absolute;top:56%;height:2px;width:31%;
-  background:linear-gradient(90deg,transparent,rgba(127,212,232,.34))}
-.conduit-l{left:0}.conduit-r{right:0;transform:scaleX(-1)}
+  border-radius:10px;font-size:12px}
 
-/* Zentraler Kern mit drei sichtbaren Ausbaustufen */
-.core{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);
-  display:grid;justify-items:center;gap:3px;padding:11px 15px 9px;border-radius:14px;
-  background:radial-gradient(circle at 50% 38%,rgba(38,52,80,.95),rgba(14,20,34,.95));
-  border:1px solid #35486a;color:#d8e4f5;font:inherit;cursor:pointer;pointer-events:auto}
-.core:hover{border-color:#7fd4e8}
-.core-orb{position:relative;width:44px;height:44px;border-radius:50%;
-  background:radial-gradient(circle at 42% 36%,#b8f0ff,#2c4266 68%);
-  box-shadow:0 0 22px rgba(127,212,232,.35);display:grid;place-items:center}
-.core-orb i{width:14px;height:14px;border-radius:50%;background:#e9fbff;
-  box-shadow:0 0 14px rgba(184,240,255,.9)}
-@keyframes kernpuls{50%{filter:brightness(1.25)}}
-.core-orb{animation:kernpuls 3.2s ease-in-out infinite}
-@media (prefers-reduced-motion:reduce){.core-orb{animation:none}}
-.core-lights{display:flex;gap:5px;margin-top:2px}
-.core-lights i{width:9px;height:9px;border-radius:50%;background:#20293c;border:1px solid #35486a}
-.core.st-1 .core-lights i:nth-child(1),
-.core.st-2 .core-lights i:nth-child(-n+2),
-.core.st-3 .core-lights i{background:#ffd98a;border-color:#d9b45a;
-  box-shadow:0 0 8px rgba(240,196,90,.55)}
-.core b{font-size:11px;letter-spacing:.06em}
-.core em{font-style:normal;font-size:9px;color:#8fd8e8;font-variant-numeric:tabular-nums}
+/* Overlay-Steuerung: transparente Flächen über den Baukörpern, Label-Chip
+   nur bei Fokus/Hover/Auswahl. Mindestens 44 CSS-Pixel Klickfläche. */
+.hs{position:absolute;left:var(--x);top:var(--y);transform:translate(-50%,-50%);
+  width:64px;height:56px;border-radius:14px;border:2px solid transparent;
+  background:transparent;color:transparent;font:inherit;cursor:pointer;
+  pointer-events:auto;padding:0}
+.hs:hover,.hs:focus-visible{border-color:rgba(127,212,232,.75);outline:none}
+.hs:focus-visible{box-shadow:0 0 0 3px rgba(127,212,232,.35)}
+.hs.active{border-color:#7fd4e8;box-shadow:0 0 16px rgba(127,212,232,.35)}
+.hs .hslabel{position:absolute;left:50%;bottom:-24px;transform:translateX(-50%);
+  white-space:nowrap;font-size:10px;letter-spacing:.08em;color:#cfe4f5;
+  background:rgba(10,14,24,.85);border:1px solid #2c3c58;border-radius:6px;
+  padding:2px 8px;opacity:0;transition:opacity .15s ease;pointer-events:none}
+.hs:hover .hslabel,.hs:focus-visible .hslabel,.hs.active .hslabel{opacity:1}
+.hs.launch{width:72px;height:72px;border-radius:50%;
+  background:radial-gradient(circle at 50% 38%,rgba(20,58,68,.92),rgba(10,26,34,.92));
+  border-color:rgba(127,212,232,.5)}
+.hs.launch svg{width:34px;height:34px}
+.hs.launch .hslabel{bottom:-26px}
 
-/* Sechs Hotspots auf dem Ring; Lampen zeigen den Reparaturzustand */
-.hotspot{position:absolute;display:grid;justify-items:center;gap:2px;min-width:96px;min-height:62px;
-  padding:8px 10px;border-radius:12px;background:rgba(15,21,36,.88);
-  border:1px solid #2c3c58;color:#cfe0f5;font:inherit;cursor:pointer;pointer-events:auto}
-.hotspot:hover{border-color:#7fd4e8}
-.hotspot b{font-size:11.5px;letter-spacing:.04em}
-.hotspot em{font-style:normal;font-size:9px;color:#8fa0bd;font-variant-numeric:tabular-nums;
-  white-space:nowrap}
-.hotspot .lamp{width:10px;height:10px;border-radius:50%;background:#3a2030;border:1px solid #57303c}
-.hotspot.st-off .lamp{background:#7a3040;box-shadow:0 0 8px rgba(180,60,80,.45)}
-.hotspot.st-run .lamp{background:#d98a3c;box-shadow:0 0 9px rgba(224,138,60,.6);
-  animation:lampulse 1.6s ease-in-out infinite}
-.hotspot.st-ready .lamp{background:#7fe8ff;box-shadow:0 0 12px rgba(127,232,255,.8)}
-@keyframes lampulse{50%{opacity:.55}}
-@media (prefers-reduced-motion:reduce){.hotspot.st-run .lamp{animation:none}}
-.hs-mine{left:9%;top:8%}
-.hs-forge{right:9%;top:8%}
-.hs-arcanum{left:3%;top:52%}
-.hs-yard{right:3%;top:52%}
-.hs-armory{left:22%;bottom:5%}
-.hs-map{right:22%;bottom:5%}
-
-/* Genau ein Detailpanel gleichzeitig offen; Panel darf intern scrollen */
-.detailpanels{order:3;width:min(880px,100%);margin:10px auto 0}
-.dpanel{display:none;max-height:318px;overflow-y:auto;text-align:left;
-  background:rgba(13,16,27,.94);border:1px solid #26304a;border-radius:12px;padding:12px 14px}
+/* Genau ein kontextueller Drawer; auf kleinen Breiten Bottom-Sheet. Die
+   Station bleibt dahinter als Ort erkennbar. */
+.detailpanels{position:absolute;right:10px;top:64px;bottom:12px;width:min(380px,44vw);
+  margin:0;z-index:6;pointer-events:none}
+.dpanel{display:none;height:100%;overflow-y:auto;text-align:left;pointer-events:auto;
+  background:rgba(11,15,26,.93);border:1px solid #26304a;border-radius:14px;
+  padding:12px 14px;backdrop-filter:blur(4px)}
 #start[data-panel="core"]   .dpanel[data-panel="core"],
 #start[data-panel="mine"]   .dpanel[data-panel="mine"],
 #start[data-panel="forge"]  .dpanel[data-panel="forge"],
@@ -328,7 +285,6 @@ button.b.danger{background:#c9402e;color:#fff}
 #start[data-panel="armory"] .dpanel[data-panel="armory"],
 #start[data-panel="map"]    .dpanel[data-panel="map"]{display:block}
 .panelnote{font-size:11px;color:#8fa0bd;margin:6px 0 8px;line-height:1.45}
-.hotspot.active{border-color:#7fd4e8;box-shadow:0 0 14px rgba(127,212,232,.25)}
 .protocolrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0}
 .protocolrow>b{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#8fa0bd}
 .protocolchips{display:flex;gap:6px;flex-wrap:wrap}
@@ -336,16 +292,21 @@ button.b.danger{background:#c9402e;color:#fff}
   padding:5px 11px;font:inherit;font-size:10.5px;cursor:pointer;pointer-events:auto}
 .pchip.selected{border-color:#ffd98a;color:#ffd98a;box-shadow:0 0 10px rgba(240,196,90,.22)}
 .pchip.locked{opacity:.38;cursor:default}
-.inlinegrid{grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-bottom:6px}
-.holdstatus{width:min(680px,92vw);margin:10px auto 0;font-size:11px;
-  color:#a88672;text-align:center}
-/* Ein einziges hervorgehobenes Ziel. Der Hold zeigt sechs Ressourcen, vier
-   Gebaeude, Vertraege, Ausruestung und Meisterschaften gleichzeitig; es fehlt
-   kein Inhalt, es fehlt eine Rangfolge (D-033). */
-/* Ein einziges hervorgehobenes Ziel. Der Hold zeigt sechs Ressourcen, vier
-   Gebaeude, Vertraege, Ausruestung und Meisterschaften gleichzeitig; es fehlt
-   kein Inhalt, es fehlt eine Rangfolge (D-033). Container-Satz liegt oben bei
-   der Stationszene (D-042); hier folgen nur die Inhaltstile. */
+
+/* D-043 / Gate D: Ankunftsrückmeldung nach der Rückkehr (überspringbar). */
+#arrival{position:absolute;left:50%;top:14px;transform:translateX(-50%);
+  display:none;gap:10px;align-items:center;max-width:min(560px,92%);
+  background:rgba(11,15,26,.94);border:1px solid #2c4a58;border-radius:12px;
+  padding:9px 12px;z-index:7;font-size:11.5px;color:#cfe0f5}
+#arrival.on{display:flex}
+#arrival b{color:#8fd8e8;font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  white-space:nowrap}
+#arrivaltext{color:#a8b6cf}
+
+/* Einsammel-Flug (Gate D): rein visuell, transform/opacity only. */
+.flyres{position:fixed;z-index:60;width:14px;height:14px;border-radius:4px;
+  pointer-events:none;transition:transform .65s cubic-bezier(.4,0,.6,1),opacity .65s ease}
+@media (prefers-reduced-motion:reduce){.flyres{transition:none;opacity:0}}
 .holdgoal .goalhead{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
 .holdgoal .goalhead>span{font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:#8b8577}
 .holdgoal .goalhead>b{font-size:14px;color:#e8e4dc;font-weight:650}
@@ -418,16 +379,15 @@ button.b.danger{background:#c9402e;color:#fff}
 .pathrow{display:flex;flex-wrap:wrap;gap:8px}
 .pauseleer{font-size:11.5px;color:#6d6862;font-style:italic}
 
-@media (max-width:620px){
-  #start.holdsheet{padding:14px 12px 24px}.holdhead{align-items:flex-start;flex-direction:column}
-  .holdresources{justify-content:flex-start}.holdres{min-width:82px;padding:5px 9px}
-  .holdscene{height:236px}
-  .hs-mine{left:4%;top:6%}.hs-forge{right:4%;top:6%}
-  .hs-arcanum{left:2%;top:50%}.hs-yard{right:2%;top:50%}
-  .hs-armory{left:16%;bottom:4%}.hs-map{right:16%;bottom:4%}
-  .hotspot{min-width:84px;min-height:54px;padding:6px 8px}
-  .scene-ring.ring-a{width:250px;height:250px}
-  .scene-ring.ring-b{width:330px;height:330px}
+@media (max-width:700px){
+  #start.holdsheet{padding:12px 10px 18px}.holdhead{align-items:flex-start;flex-direction:column}
+  .holdresources{justify-content:flex-start}.holdres{min-width:78px;padding:4px 8px}
+  .holdscene{height:min(52vh,420px)}
+  /* Bottom-Sheet statt Seiten-Drawer; die Station bleibt sichtbar. */
+  .detailpanels{left:8px;right:8px;top:auto;bottom:8px;width:auto;height:auto}
+  .dpanel{max-height:44vh}
+  .hs{width:52px;height:48px}
+  .hs.launch{width:60px;height:60px}
   .holdlower{grid-template-columns:1fr}.holdbuilding{padding:11px 12px}
   .holdupgrade{align-items:flex-start}.masterygrid,.geargrid{grid-template-columns:1fr}
   .contractgrid{grid-template-columns:1fr}.contractcard{padding:9px 10px}
@@ -561,9 +521,9 @@ button.b.danger{background:#c9402e;color:#fff}
    lange Inhalte scrollen ab oben statt durch vertikale Zentrierung abzuschneiden. */
 .stationkick{display:none}
 @media (max-height:480px){
-  .holdscene{height:200px}
-  .hotspot{min-width:80px;min-height:50px}
-  .dpanel{max-height:190px}
+  .holdscene{height:min(56vh,300px)}
+  .hs{width:50px;height:46px}
+  .dpanel{max-height:38vh}
   #cards{justify-content:flex-start;padding:8px 20px;gap:6px;overflow-y:auto}
   #cardhead h2{font-size:10px}
   #cardhead p{font-size:21px;margin-top:1px}
@@ -643,35 +603,555 @@ button.b.danger{background:#c9402e;color:#fff}
         <div class="holdstat"><b id="holdruns">0</b><span>Sortien geflogen</span></div>
       </div>
     </div>
-    <div class="holdscene" id="holdscene" aria-label="Orbitalstation · sechs Module um den zentralen Kern">
-      <div class="scene-stars" aria-hidden="true"></div>
-      <div class="scene-planet" aria-hidden="true"></div>
-      <div class="scene-ring ring-a" aria-hidden="true"></div>
-      <div class="scene-ring ring-b" aria-hidden="true"></div>
-      <div class="scene-conduit conduit-l" aria-hidden="true"></div>
-      <div class="scene-conduit conduit-r" aria-hidden="true"></div>
+    <div class="holdscene" id="holdscene" aria-label="Orbitalstation über dem Trümmergürtel: zentraler Kern, sechs Module, Startkontrolle">
+<!-- D-043 Gate C/D: Stations-Szene, adaptiert aus test-results/d043-station-entwurf.svg (Subagent-Entwurf, geprueft). --><svg id="stationSvg" class="core-0 daten-0 proto-none" viewBox="0 0 1000 560" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+  <style>
+    /* ===== Kern-Ausbau: core-0..3 schalten stage1..3 kumulativ sichtbar ===== */
+    #stage1,#stage2,#stage3{opacity:0}
+    .core-1 #stage1{opacity:1}
+    .core-2 #stage1,.core-2 #stage2{opacity:1}
+    .core-3 #stage1,.core-3 #stage2,.core-3 #stage3{opacity:1}
 
-      <!-- Zentraler Stationskern: Stufen, Stationsdaten und Ausbau -->
-      <button class="core st-0" id="hsCore" data-modul="core" aria-label="Zentraler Kern: Stationdaten und Ausbau öffnen">
-        <span class="core-orb" aria-hidden="true"><i></i></span>
-        <span class="core-lights" aria-hidden="true"><i></i><i></i><i></i></span>
-        <b id="corelabel">Kern · Stufe 0</b>
-        <em id="coredata">0 Stationsdaten</em>
-      </button>
+    /* ===== Datenleiste: daten-1..6 fuellen die ersten N Diamanten ===== */
+    .diament{fill:#333a4c;transition:fill .3s}
+    .daten-1 .d1{fill:#7fd4e8}
+    .daten-2 .d1,.daten-2 .d2{fill:#7fd4e8}
+    .daten-3 .d1,.daten-3 .d2,.daten-3 .d3{fill:#7fd4e8}
+    .daten-4 .d1,.daten-4 .d2,.daten-4 .d3,.daten-4 .d4{fill:#7fd4e8}
+    .daten-5 .d1,.daten-5 .d2,.daten-5 .d3,.daten-5 .d4,.daten-5 .d5{fill:#7fd4e8}
+    .daten-6 .d1,.daten-6 .d2,.daten-6 .d3,.daten-6 .d4,.daten-6 .d5,.daten-6 .d6{fill:#b8f0ff}
 
-      <!-- Sechs Hotspots; Lampen zeigen Offline/Produziert/Bereit -->
-      <button class="hotspot hs-mine" id="hsMine" data-modul="mine" aria-label="Asteroidensonde öffnen">
-        <i class="lamp" aria-hidden="true"></i><b>Sonde</b><em id="hsmineinfo">Offline</em></button>
-      <button class="hotspot hs-forge" id="hsForge" data-modul="forge" aria-label="Materiefabrikator öffnen">
-        <i class="lamp" aria-hidden="true"></i><b>Fabrikator</b><em id="hsforgeinfo">Offline</em></button>
-      <button class="hotspot hs-arcanum" id="hsArcanum" data-modul="arcanum" aria-label="Fluxlabor öffnen">
-        <i class="lamp" aria-hidden="true"></i><b>Fluxlabor</b><em id="hsarcanuminfo">Offline</em></button>
-      <button class="hotspot hs-yard" id="hsYard" data-modul="yard" aria-label="Simulationsdeck öffnen">
-        <i class="lamp" aria-hidden="true"></i><b>Simulation</b><em id="hsyardinfo">Offline</em></button>
-      <button class="hotspot hs-armory" id="hsArmory" data-modul="armory" aria-label="Ausrüstungsbucht öffnen">
-        <i class="lamp" aria-hidden="true"></i><b>Ausrüstung</b><em id="hsarmoryinfo">Rüstkammer</em></button>
-      <button class="hotspot hs-map" id="hsMap" data-modul="map" aria-label="Sternenkarte und Sortiestart öffnen">
-        <i class="lamp" aria-hidden="true"></i><b>Sternenkarte</b><em id="hsmapinfo">Sortie</em></button>
+    /* ===== Prototyp-Projektion: genau eine Variante sichtbar ===== */
+    #protoProjektion > g{opacity:0}
+    .proto-none #proto-none{opacity:1}
+    .proto-klingenfokus #proto-klingenfokus{opacity:1}
+    .proto-fluxreserve #proto-fluxreserve{opacity:1}
+    .proto-bergungsscanner #proto-bergungsscanner{opacity:1}
+
+    /* ===== Leitungen und Unterbrecher ===== */
+    .leitung{fill:none;stroke:#7fd4e8;stroke-opacity:.35;stroke-width:4}
+    .leitung.off{stroke:#3d4457;stroke-opacity:.55;stroke-dasharray:10 8}
+    .bruch circle{fill:#10131f;stroke:#7fd4e8;stroke-opacity:.8;stroke-width:1.5}
+    .leitung.off + .bruch circle{stroke:#d9b45a}
+    .riss{opacity:0;stroke:#d9b45a;stroke-width:1.6;fill:none;stroke-linecap:round}
+    .leitung.off + .bruch .riss{opacity:1}
+
+    /* ===== Modul-Zustaende ===== */
+    .kontur{fill:none;stroke:#7fd4e8;stroke-width:2;stroke-dasharray:7 6;opacity:0}
+    .zielmarken{opacity:0}
+    .foerderlicht{opacity:.85}
+    .behaelter{transition:filter .25s}
+    .mod-active .kontur{opacity:.85}
+    .mod-repairable .zielmarken{opacity:.95}
+    .mod-run .foerderlicht{animation:puls 1.6s ease-in-out infinite}
+    .mod-ready .behaelter{filter:drop-shadow(0 0 5px rgba(127,212,232,.85));stroke:#b8f0ff}
+    .mod-offline .koerper{filter:brightness(.55)}
+
+    @keyframes puls{0%,100%{opacity:.25}50%{opacity:1}}
+    .energiekranz{animation:kreislauf 7s linear infinite}
+    @keyframes kreislauf{to{stroke-dashoffset:-28}}
+
+    /* Barrierefreiheit: Bewegung auf Wunsch aus */
+    @media (prefers-reduced-motion:reduce){
+      .mod-run .foerderlicht,.energiekranz{animation:none}
+    }
+  </style>
+
+  <defs>
+    <!-- Farbverlaeufe: Weltraum, Planet, Glutkern, Glaskammer, Hologrammstrahl -->
+    <linearGradient id="raumVerlauf" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0b0e1c"/>
+      <stop offset="1" stop-color="#151b31"/>
+    </linearGradient>
+    <radialGradient id="planetVerlauf" cx=".5" cy=".18" r=".95">
+      <stop offset="0" stop-color="#c9a6ec"/>
+      <stop offset=".35" stop-color="#b98fe0"/>
+      <stop offset=".7" stop-color="#7a5fb0"/>
+      <stop offset="1" stop-color="#3c2f61"/>
+    </radialGradient>
+    <radialGradient id="glutKern" cx=".5" cy=".45" r=".65">
+      <stop offset="0" stop-color="#ffe9b0"/>
+      <stop offset=".45" stop-color="#f0b45c"/>
+      <stop offset="1" stop-color="#d9843a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="glasViolett" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c9a6ec" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#7a5fb0" stop-opacity=".28"/>
+    </linearGradient>
+    <linearGradient id="strahlCyan" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#7fd4e8" stop-opacity=".45"/>
+      <stop offset="1" stop-color="#b8f0ff" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- Vorlage: goldene Ziel-Ecken fuer mod-repairable, je Modul skaliert -->
+    <g id="zielEcken" fill="none" stroke="#d9b45a" stroke-width="2.5" stroke-linecap="round">
+      <path vector-effect="non-scaling-stroke" d="M-120 -62 V-80 H-102"/>
+      <path vector-effect="non-scaling-stroke" d="M102 -80 H120 V-62"/>
+      <path vector-effect="non-scaling-stroke" d="M120 62 V80 H102"/>
+      <path vector-effect="non-scaling-stroke" d="M-102 80 H-120 V62"/>
+    </g>
+  </defs>
+
+  <!-- Ebene 1: Weltraum mit wenigen Sternen -->
+  <g id="hintergrund">
+    <rect x="0" y="0" width="1000" height="560" fill="url(#raumVerlauf)"/>
+    <circle cx="60" cy="40" r="1.2" fill="#e8f4ff" opacity=".8"/>
+    <circle cx="140" cy="92" r=".9" fill="#b8f0ff" opacity=".6"/>
+    <circle cx="228" cy="30" r="1.4" fill="#e8f4ff" opacity=".9"/>
+    <circle cx="330" cy="72" r="1" fill="#b8f0ff" opacity=".55"/>
+    <circle cx="420" cy="24" r="1.1" fill="#e8f4ff" opacity=".7"/>
+    <circle cx="585" cy="36" r="1.3" fill="#e8f4ff" opacity=".8"/>
+    <circle cx="700" cy="80" r="1" fill="#b8f0ff" opacity=".55"/>
+    <circle cx="800" cy="28" r="1.4" fill="#e8f4ff" opacity=".9"/>
+    <circle cx="900" cy="64" r="1" fill="#b8f0ff" opacity=".6"/>
+    <circle cx="955" cy="152" r="1.2" fill="#e8f4ff" opacity=".7"/>
+    <circle cx="40" cy="182" r="1" fill="#b8f0ff" opacity=".55"/>
+    <circle cx="118" cy="252" r="1.1" fill="#e8f4ff" opacity=".6"/>
+    <circle cx="976" cy="322" r=".9" fill="#b8f0ff" opacity=".5"/>
+    <circle cx="30" cy="362" r="1" fill="#e8f4ff" opacity=".55"/>
+    <path d="M262 56 H270 M266 52 V60" stroke="#e8f4ff" stroke-width="1" opacity=".8"/>
+    <path d="M852 96 H860 M856 92 V100" stroke="#b8f0ff" stroke-width="1" opacity=".7"/>
+  </g>
+
+  <!-- Ebene 2: Violetter Planet unten -->
+  <g id="planet">
+    <ellipse cx="500" cy="935" rx="730" ry="485" fill="url(#planetVerlauf)"/>
+    <path d="M150 505 Q500 462 850 502" stroke="#8a6fc0" stroke-width="12" fill="none" opacity=".3"/>
+    <path d="M240 560 Q520 520 820 556" stroke="#5c4a8a" stroke-width="16" fill="none" opacity=".35"/>
+    <path d="M780 480 q30 -12 58 -4" stroke="#c9aef0" stroke-width="3" fill="none" opacity=".4"/>
+    <ellipse cx="500" cy="935" rx="733" ry="488" fill="none" stroke="#b8f0ff" stroke-opacity=".14" stroke-width="2"/>
+  </g>
+
+  <!-- Ebene 3: Truemmerring, hinterer Bogen mit Brocken -->
+  <g id="truemmerHinten">
+    <path d="M-30 448 C240 366 760 366 1030 448 L1030 472 C760 392 240 392 -30 472 Z" fill="#6b5f92" opacity=".26"/>
+    <polygon points="108,432 116,422 130,424 134,434 126,442 112,441" fill="#7d6fa3" stroke="#49405e" stroke-width="1"/>
+    <polygon points="116,428 126,426 128,434 118,436" fill="#55496f"/>
+    <polygon points="290,402 297,394 308,396 311,404 303,410 293,409" fill="#7d6fa3" stroke="#49405e" stroke-width="1"/>
+    <polygon points="700,398 707,391 717,393 719,401 712,406 702,405" fill="#6f6588" stroke="#49405e" stroke-width="1"/>
+    <polygon points="880,434 888,426 900,428 903,437 895,443 884,442" fill="#7d6fa3" stroke="#49405e" stroke-width="1"/>
+    <polygon points="888,430 898,429 899,437 890,438" fill="#55496f"/>
+    <circle cx="210" cy="418" r="2.4" fill="#6f6588"/>
+    <circle cx="512" cy="392" r="2" fill="#7d6fa3"/>
+    <circle cx="640" cy="396" r="2.6" fill="#6f6588"/>
+    <circle cx="820" cy="416" r="2.2" fill="#7d6fa3"/>
+  </g>
+
+  <!-- Ebene 4: Energieleitungen Kern zu Modul, je ein Unterbrecherkreis -->
+  <g id="svg-conduits">
+    <path id="leitung-mine" class="leitung leitung-mine" d="M408 290 C348 306 288 314 222 310"/>
+    <g class="bruch" transform="translate(312,308)">
+      <circle r="6"/>
+      <path class="riss" d="M-4 -3 L-1 0 L-3 3"/>
+      <path class="riss" d="M4 -2 L1 1 L3 3"/>
+    </g>
+    <path id="leitung-forge" class="leitung leitung-forge" d="M442 248 C414 212 400 186 394 158"/>
+    <g class="bruch" transform="translate(418,204)">
+      <circle r="6"/>
+      <path class="riss" d="M-4 -3 L-1 0 L-3 3"/>
+      <path class="riss" d="M4 -2 L1 1 L3 3"/>
+    </g>
+    <path id="leitung-arcanum" class="leitung leitung-arcanum" d="M558 248 C586 212 600 186 606 158"/>
+    <g class="bruch" transform="translate(582,204)">
+      <circle r="6"/>
+      <path class="riss" d="M-4 -3 L-1 0 L-3 3"/>
+      <path class="riss" d="M4 -2 L1 1 L3 3"/>
+    </g>
+    <path id="leitung-yard" class="leitung leitung-yard" d="M592 290 C652 306 712 314 782 308"/>
+    <g class="bruch" transform="translate(688,308)">
+      <circle r="6"/>
+      <path class="riss" d="M-4 -3 L-1 0 L-3 3"/>
+      <path class="riss" d="M4 -2 L1 1 L3 3"/>
+    </g>
+    <path id="leitung-armory" class="leitung leitung-armory" d="M444 294 C420 334 404 370 392 398"/>
+    <g class="bruch" transform="translate(424,344)">
+      <circle r="6"/>
+      <path class="riss" d="M-4 -3 L-1 0 L-3 3"/>
+      <path class="riss" d="M4 -2 L1 1 L3 3"/>
+    </g>
+    <path id="leitung-map" class="leitung leitung-map" d="M556 294 C580 334 596 370 608 398"/>
+    <g class="bruch" transform="translate(576,344)">
+      <circle r="6"/>
+      <path class="riss" d="M-4 -3 L-1 0 L-3 3"/>
+      <path class="riss" d="M4 -2 L1 1 L3 3"/>
+    </g>
+  </g>
+
+  <!-- Ebene 5: Sechs Module als Baukoerper (Plattform + Aufbau, keine schwebenden Kreise) -->
+  <g id="module">
+
+    <!-- Modul Sonde/Dock: Landeplattform, Mini-Shuttle, Ausleger, 2 Asteroiden -->
+    <g id="modMine" transform="translate(148,306)">
+      <ellipse class="kontur" cx="20" cy="-4" rx="108" ry="56"/>
+      <g class="koerper">
+        <rect x="-74" y="-16" width="16" height="26" rx="3" fill="#b9c2d0"/>
+        <path d="M-76 -16 L-56 -16 L-60 -24 L-72 -24 Z" fill="#dfe6ee"/>
+        <rect x="-71" y="-11" width="10" height="5" fill="#7fd4e8" opacity=".8"/>
+        <rect x="-62" y="-8" width="124" height="14" rx="4" fill="#dfe6ee"/>
+        <path d="M-56 6 L56 6 L50 20 L-50 20 Z" fill="#b9c2d0"/>
+        <rect x="-54" y="8" width="108" height="3" fill="#7fd4e8" opacity=".5"/>
+        <path d="M-34 20 L-26 36 L-14 36 L-20 20 Z" fill="#1c2230"/>
+        <path d="M34 20 L26 36 L14 36 L20 20 Z" fill="#1c2230"/>
+        <rect x="-14" y="34" width="28" height="8" rx="2" fill="#2b3140"/>
+        <ellipse cx="0" cy="43" rx="7" ry="2.6" fill="#10131f"/>
+        <rect x="-3" y="41.5" width="6" height="2" fill="#7fd4e8" opacity=".7"/>
+        <path d="M-30 -4 A30 6 0 0 1 30 -4" stroke="#b9c2d0" fill="none" opacity=".6"/>
+        <ellipse cx="-16" cy="-4" rx="26" ry="3" fill="#2b3140" opacity=".25"/>
+        <g transform="translate(-16,-16)">
+          <path d="M-24 8 L8 8 L17 2 L9 -4 L-19 -4 L-27 2 Z" fill="#2b3140"/>
+          <path d="M9 -3 L16 1 L10 3 Z" fill="#b8f0ff"/>
+          <path d="M-10 -4 L-4 -13 L0 -4 Z" fill="#dfe6ee"/>
+          <path d="M-7 -6 L-3 -6" stroke="#d9b45a" stroke-width="1.5"/>
+          <rect x="-29" y="0" width="5" height="5" rx="1" fill="#d9b45a" opacity=".85"/>
+          <path d="M-16 8 L-16 12 M4 8 L4 12" stroke="#1c2230" stroke-width="2"/>
+        </g>
+        <path d="M46 8 L78 -28" stroke="#2b3140" stroke-width="5" stroke-linecap="round"/>
+        <circle cx="46" cy="8" r="4.5" fill="#d9b45a" stroke="#2b3140"/>
+        <path d="M50 4 C62 10 70 8 76 0" stroke="#49405e" stroke-width="1.5" fill="none"/>
+        <rect x="72" y="-32" width="12" height="9" rx="2" fill="#2b3140"/>
+        <path d="M78 -23 L78 -12" stroke="#49405e" stroke-width="1.5"/>
+        <path d="M72 -12 L84 -12 L81 -6 L75 -6 Z" fill="#b9c2d0"/>
+        <rect x="44" y="-2" width="4" height="10" fill="#2b3140"/>
+        <circle class="foerderlicht" cx="46" cy="-4" r="2.6" fill="#b8f0ff"/>
+        <path d="M79 -8 L96 -38" stroke="#7fd4e8" stroke-width="1.5" opacity=".45" stroke-dasharray="3 4"/>
+        <g transform="translate(102,-44)">
+          <polygon points="-8,2 -3,-8 7,-9 12,-1 7,7 -4,8" fill="#7d6fa3" stroke="#49405e"/>
+          <circle cx="-1" cy="-1" r="2.4" fill="#55496f"/>
+        </g>
+        <path d="M82 -4 L104 8" stroke="#7fd4e8" stroke-width="1.5" opacity=".45" stroke-dasharray="3 4"/>
+        <g transform="translate(110,14)">
+          <polygon points="-6,1 -2,-5 5,-6 8,0 4,5 -3,5" fill="#6f6588" stroke="#49405e"/>
+          <circle cx="0" cy="0" r="1.6" fill="#55496f"/>
+        </g>
+      </g>
+      <g class="zielmarken" transform="translate(22,-4)">
+        <use href="#zielEcken" transform="scale(0.86,0.62)"/>
+      </g>
+    </g>
+
+    <!-- Modul Kuppel-Fabrikator: Reaktor mit Glutkern und Energiezellen -->
+    <g id="modForge" transform="translate(352,146)">
+      <ellipse class="kontur" cx="6" cy="-18" rx="68" ry="54"/>
+      <g class="koerper">
+        <rect x="-48" y="12" width="96" height="10" rx="3" fill="#b9c2d0"/>
+        <circle cx="-40" cy="17" r="1.3" fill="#7e8798"/>
+        <circle cx="-20" cy="17" r="1.3" fill="#7e8798"/>
+        <circle cx="0" cy="17" r="1.3" fill="#7e8798"/>
+        <circle cx="20" cy="17" r="1.3" fill="#7e8798"/>
+        <circle cx="40" cy="17" r="1.3" fill="#7e8798"/>
+        <rect x="-42" y="-10" width="84" height="24" rx="3" fill="#2b3140"/>
+        <rect x="-42" y="-10" width="10" height="24" fill="#333a4c"/>
+        <rect x="32" y="-10" width="10" height="24" fill="#333a4c"/>
+        <path d="M-42 -10 A42 42 0 0 1 42 -10 Z" fill="#dfe6ee"/>
+        <path d="M-22 -12 Q-20 -40 0 -51 M22 -12 Q20 -40 0 -51" stroke="#b9c2d0" stroke-width="1.5" fill="none"/>
+        <path d="M-42 -18 A42 8 0 0 0 42 -18" stroke="#b9c2d0" stroke-width="2" fill="none" opacity=".8"/>
+        <rect x="-9" y="-58" width="18" height="8" rx="2" fill="#b9c2d0"/>
+        <path d="M0 -58 L0 -70" stroke="#2b3140" stroke-width="2"/>
+        <circle class="foerderlicht" cx="0" cy="-72" r="2.6" fill="#b8f0ff"/>
+        <rect x="-12" y="-38" width="24" height="26" rx="4" fill="#1c2230"/>
+        <rect x="-9" y="-35" width="18" height="20" rx="3" fill="url(#glutKern)"/>
+        <path d="M0 -32 C4 -26 4 -20 0 -16 C-4 -20 -4 -26 0 -32 Z" fill="#ffe9b0" opacity=".9"/>
+        <path d="M-42 -4 C-56 -4 -56 10 -48 14" stroke="#2b3140" stroke-width="5" fill="none"/>
+        <circle cx="-52" cy="4" r="3.5" fill="#d9b45a" stroke="#1c2230"/>
+        <path d="M42 -4 C56 -4 56 10 48 14" stroke="#2b3140" stroke-width="5" fill="none"/>
+        <rect x="50" y="2" width="7" height="6" rx="1" fill="#12303a" stroke="#7fd4e8"/>
+        <rect x="20" y="-30" width="11" height="12" rx="2" fill="#1c2230"/>
+        <rect x="18" y="-32" width="15" height="3" rx="1.5" fill="#2b3140"/>
+        <rect class="behaelter" x="52" y="0" width="11" height="16" rx="2" fill="#16323c" stroke="#7fd4e8" stroke-width="1.5"/>
+        <rect x="56" y="4" width="3" height="8" fill="#7fd4e8" opacity=".8"/>
+        <rect class="behaelter" x="65" y="4" width="8" height="12" rx="2" fill="#16323c" stroke="#7fd4e8" stroke-width="1.5"/>
+        <circle class="foerderlicht" cx="-36" cy="17" r="2.2" fill="#b8f0ff"/>
+      </g>
+      <g class="zielmarken" transform="translate(6,-18)">
+        <use href="#zielEcken" transform="scale(0.56,0.62)"/>
+      </g>
+    </g>
+
+    <!-- Modul Arkanum: violette Glaskammer mit Geruest -->
+    <g id="modArcanum" transform="translate(648,146)">
+      <ellipse class="kontur" cx="4" cy="-6" rx="66" ry="44"/>
+      <g class="koerper">
+        <rect x="-48" y="16" width="96" height="9" rx="3" fill="#b9c2d0"/>
+        <rect x="-14" y="25" width="28" height="5" fill="#97a1b3"/>
+        <rect x="-46" y="-32" width="7" height="50" fill="#2b3140"/>
+        <rect x="39" y="-32" width="7" height="50" fill="#2b3140"/>
+        <rect x="-48" y="-38" width="96" height="8" rx="3" fill="#dfe6ee"/>
+        <path d="M-39 -30 L39 16 M39 -30 L-39 16" stroke="#2b3140" stroke-width="2" opacity=".55"/>
+        <path d="M-5 -38 L0 -50 L5 -38 Z" fill="#dfe6ee"/>
+        <circle cx="0" cy="-52" r="2.6" fill="#d9b45a"/>
+        <rect x="-37" y="-28" width="74" height="42" rx="3" fill="url(#glasViolett)" stroke="#7a5fb0" stroke-width="1.5"/>
+        <path d="M-26 -24 L-38 10" stroke="#ffffff" stroke-width="4" opacity=".18"/>
+        <path d="M-16 -24 L-30 12" stroke="#ffffff" stroke-width="3" opacity=".12"/>
+        <circle cx="0" cy="-8" r="11" fill="#b98fe0" opacity=".9"/>
+        <circle cx="0" cy="-8" r="6" fill="#d9c2f2" opacity=".8"/>
+        <ellipse cx="0" cy="-8" rx="16" ry="5" stroke="#d9b45a" stroke-width="1.5" fill="none" opacity=".85"/>
+        <circle cx="-16" cy="-18" r="1.8" fill="#d9c2f2" opacity=".85"/>
+        <circle cx="14" cy="-22" r="1.8" fill="#d9c2f2" opacity=".85"/>
+        <circle cx="6" cy="2" r="1.8" fill="#d9c2f2" opacity=".85"/>
+        <path d="M52 -30 L52 22 M64 -22 L64 22" stroke="#49405e" stroke-width="3"/>
+        <path d="M50 -18 L66 -18 M50 -4 L66 -4 M50 10 L66 10" stroke="#49405e" stroke-width="2.5"/>
+        <path d="M52 -18 L64 -4" stroke="#49405e" stroke-width="1.5"/>
+        <circle cx="58" cy="-30" r="2.5" fill="#d9b45a"/>
+        <rect class="behaelter" x="-34" y="4" width="11" height="12" rx="2" fill="#16323c" stroke="#7fd4e8" stroke-width="1.5"/>
+        <rect x="-30" y="7" width="3" height="6" fill="#b98fe0"/>
+        <circle class="foerderlicht" cx="42" cy="-42" r="2.6" fill="#b8f0ff"/>
+      </g>
+      <g class="zielmarken" transform="translate(4,-6)">
+        <use href="#zielEcken" transform="scale(0.52,0.46)"/>
+      </g>
+    </g>
+
+    <!-- Modul Werft: ringfoermige Plattform mit Hologramm-Dome und Kran -->
+    <g id="modYard" transform="translate(852,300)">
+      <ellipse class="kontur" cx="0" cy="0" rx="78" ry="48"/>
+      <g class="koerper">
+        <path d="M-12 16 L12 16 L9 30 L-9 30 Z" fill="#1c2230"/>
+        <rect x="-11" y="28" width="22" height="10" rx="2" fill="#2b3140"/>
+        <ellipse cx="0" cy="40" rx="7" ry="2.6" fill="#10131f"/>
+        <ellipse cx="0" cy="39" rx="4.5" ry="1.8" fill="#7fd4e8" opacity=".7"/>
+        <ellipse cx="0" cy="12" rx="60" ry="16" fill="#1c2230"/>
+        <ellipse cx="0" cy="8" rx="60" ry="16" fill="#7e8798"/>
+        <ellipse cx="0" cy="2" rx="60" ry="16" fill="#dfe6ee"/>
+        <ellipse cx="0" cy="4" rx="40" ry="10" fill="#1c2230"/>
+        <ellipse cx="0" cy="2" rx="50" ry="13" stroke="#f5f8fc" stroke-width="1" fill="none" opacity=".5"/>
+        <path d="M-40 2 L-14 2 M14 2 L40 2" stroke="#b9c2d0" stroke-width="3"/>
+        <ellipse cx="0" cy="2" rx="26" ry="8" stroke="#7fd4e8" stroke-width="1.3" fill="none" opacity=".8"/>
+        <path d="M-26 2 A26 26 0 0 1 26 2" stroke="#7fd4e8" stroke-width="1.5" fill="none" opacity=".9"/>
+        <path d="M-21 -12 A21 6 0 0 0 21 -12 M-13 -21 A13 4 0 0 0 13 -21" stroke="#b8f0ff" stroke-width="1.1" fill="none" opacity=".75"/>
+        <path d="M0 -24 C9 -22 15 -12 15 2 M0 -24 C-9 -22 -15 -12 -15 2" stroke="#b8f0ff" stroke-width="1.1" fill="none" opacity=".6"/>
+        <circle cx="0" cy="-24" r="1.6" fill="#b8f0ff"/>
+        <path d="M6 -13 L6 -7 M3 -10 L9 -10" stroke="#ffffff" stroke-width="1" opacity=".7"/>
+        <rect x="44" y="-16" width="4" height="20" fill="#2b3140"/>
+        <path d="M46 -14 L66 -24" stroke="#2b3140" stroke-width="4" stroke-linecap="round"/>
+        <path d="M63 -22 L63 -12" stroke="#49405e" stroke-width="1.5"/>
+        <rect x="57" y="-12" width="12" height="4" fill="#b9c2d0" stroke="#7e8798"/>
+        <circle class="foerderlicht" cx="46" cy="-18" r="2.6" fill="#b8f0ff"/>
+        <rect class="behaelter" x="-46" y="-2" width="12" height="9" rx="2" fill="#16323c" stroke="#7fd4e8" stroke-width="1.5"/>
+        <rect class="behaelter" x="-31" y="1" width="10" height="8" rx="2" fill="#16323c" stroke="#7fd4e8" stroke-width="1.5"/>
+      </g>
+      <g class="zielmarken">
+        <use href="#zielEcken" transform="scale(0.64,0.5)"/>
+      </g>
+    </g>
+
+    <!-- Modul Waffenkammer/Hangar: Halle mit offenen Toren, Rampe, Werkbank -->
+    <g id="modArmory" transform="translate(352,432)">
+      <ellipse class="kontur" cx="10" cy="-6" rx="86" ry="46"/>
+      <g class="koerper">
+        <rect x="-58" y="-32" width="116" height="46" rx="4" fill="#dfe6ee"/>
+        <rect x="38" y="-32" width="20" height="46" rx="4" fill="#b9c2d0"/>
+        <rect x="-64" y="-42" width="128" height="12" rx="4" fill="#b9c2d0"/>
+        <circle cx="-40" cy="-36" r="1.6" fill="#7fd4e8" opacity=".8"/>
+        <circle cx="-14" cy="-36" r="1.6" fill="#7fd4e8" opacity=".8"/>
+        <circle cx="12" cy="-36" r="1.6" fill="#7fd4e8" opacity=".8"/>
+        <circle cx="38" cy="-36" r="1.6" fill="#7fd4e8" opacity=".8"/>
+        <circle class="foerderlicht" cx="-58" cy="-46" r="2.8" fill="#b8f0ff"/>
+        <path d="M-58 -44 L-74 -30 L-50 -30 Z" fill="#b8f0ff" opacity=".18"/>
+        <rect x="-52" y="-22" width="8" height="36" fill="#b9c2d0" stroke="#7e8798"/>
+        <rect x="44" y="-22" width="8" height="36" fill="#b9c2d0" stroke="#7e8798"/>
+        <path d="M-50 -14 l4 4 m-4 6 l4 4 M46 -14 l4 4 m-4 6 l4 4" stroke="#d9b45a" stroke-width="1.5"/>
+        <rect x="-44" y="-22" width="32" height="36" fill="#10131f" stroke="#2b3140" stroke-width="3"/>
+        <rect x="12" y="-22" width="32" height="36" fill="#10131f" stroke="#2b3140" stroke-width="3"/>
+        <rect x="-41" y="-16" width="26" height="3" fill="#7fd4e8" opacity=".5"/>
+        <rect x="-41" y="-8" width="26" height="3" fill="#7fd4e8" opacity=".5"/>
+        <rect x="15" y="-16" width="26" height="3" fill="#7fd4e8" opacity=".5"/>
+        <rect x="15" y="-8" width="26" height="3" fill="#7fd4e8" opacity=".5"/>
+        <path d="M-36 -18 L-36 -2 M-28 -18 L-28 -2" stroke="#49405e" stroke-width="2"/>
+        <path d="M-33 -16 L-33 -6" stroke="#d9b45a" stroke-width="1.6"/>
+        <rect x="-41" y="-2" width="9" height="7" fill="#2b3140"/>
+        <rect x="18" y="-4" width="10" height="8" fill="#333a4c" stroke="#1c2230"/>
+        <rect x="29" y="-4" width="9" height="8" fill="#333a4c" stroke="#1c2230"/>
+        <circle cx="24" cy="-11" r="3" fill="#49405e"/>
+        <path d="M-26 14 L38 14 L46 30 L-34 30 Z" fill="#b9c2d0"/>
+        <path d="M-20 18 L40 18 M-16 23 L42 23" stroke="#97a1b3" stroke-width="1.5"/>
+        <rect x="64" y="-20" width="30" height="14" rx="2" fill="#2b3140"/>
+        <path d="M69 -17 L69 -9 M75 -17 L77 -9 M83 -17 L83 -9" stroke="#7fd4e8" stroke-width="2"/>
+        <path d="M75 -17 L77 -9" stroke="#d9b45a" stroke-width="2"/>
+        <rect x="64" y="-2" width="30" height="4" rx="1" fill="#b9c2d0"/>
+        <path d="M70 2 L70 12 M88 2 L88 12" stroke="#2b3140" stroke-width="3"/>
+        <rect x="68" y="-7" width="5" height="4" fill="#d9b45a"/>
+        <rect class="behaelter" x="-56" y="2" width="14" height="10" rx="2" fill="#16323c" stroke="#7fd4e8" stroke-width="1.5"/>
+        <rect class="behaelter" x="-49" y="-6" width="12" height="9" rx="2" fill="#16323c" stroke="#7fd4e8" stroke-width="1.5"/>
+      </g>
+      <g class="zielmarken" transform="translate(12,-6)">
+        <use href="#zielEcken" transform="scale(0.68,0.52)"/>
+      </g>
+    </g>
+
+    <!-- Modul Kartografie: Antenne mit Schuessel und holografischer Kartentisch -->
+    <g id="modMap" transform="translate(648,432)">
+      <ellipse class="kontur" cx="2" cy="-20" rx="62" ry="50"/>
+      <g class="koerper">
+        <rect x="-34" y="-4" width="48" height="24" rx="3" fill="#b9c2d0"/>
+        <rect x="-38" y="-9" width="56" height="7" rx="3" fill="#dfe6ee"/>
+        <rect x="-12" y="4" width="10" height="16" rx="1.5" fill="#1c2230"/>
+        <path d="M-28 2 L-20 2 M-28 7 L-20 7" stroke="#7e8798" stroke-width="1.5"/>
+        <circle class="foerderlicht" cx="-32" cy="-13" r="2.2" fill="#b8f0ff"/>
+        <rect x="-16" y="-14" width="12" height="8" rx="2" fill="#2b3140"/>
+        <path d="M-10 -14 L-4 -22" stroke="#2b3140" stroke-width="3"/>
+        <path d="M-30 -30 L4 -30 L12 -20 L-22 -20 Z" fill="#12303a" stroke="#7fd4e8" stroke-width="1.3"/>
+        <path d="M-24 -27 L7 -27 M-18 -23.5 L9.5 -23.5" stroke="#7fd4e8" stroke-width=".8" opacity=".7"/>
+        <path d="M-20 -30 L-12 -20 M-6 -30 L2 -20" stroke="#7fd4e8" stroke-width=".8" opacity=".5"/>
+        <path d="M-30 -30 L4 -30 L-8 -50 L-22 -50 Z" fill="url(#strahlCyan)" opacity=".8"/>
+        <path d="M-15 -46 l4 -5 l4 5 Z" fill="#7fd4e8" opacity=".7"/>
+        <path d="M-8 -44 l3 -4 l3 4 Z" fill="#b98fe0" opacity=".8"/>
+        <circle cx="-14" cy="-52" r="1.5" fill="#b8f0ff"/>
+        <rect x="22" y="-46" width="4" height="44" rx="1.5" fill="#2b3140"/>
+        <path d="M24 -30 L8 -6 M24 -30 L42 -6" stroke="#49405e" stroke-width="1.2"/>
+        <path d="M8 -50 A20 20 0 0 1 40 -62" stroke="#dfe6ee" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <path d="M12 -50 A16 16 0 0 1 36 -59" stroke="#b9c2d0" stroke-width="1.5" fill="none"/>
+        <path d="M24 -55 L24 -46" stroke="#7e8798" stroke-width="1.5"/>
+        <circle class="foerderlicht" cx="24" cy="-57" r="2" fill="#b8f0ff"/>
+        <path d="M34 -66 A14 14 0 0 1 40 -54" stroke="#b8f0ff" stroke-width="1.5" fill="none" opacity=".5"/>
+        <path d="M40 -70 A22 22 0 0 1 48 -52" stroke="#b8f0ff" stroke-width="1.5" fill="none" opacity=".3"/>
+        <rect class="behaelter" x="-52" y="8" width="10" height="12" rx="2" fill="#16323c" stroke="#7fd4e8" stroke-width="1.5"/>
+        <circle cx="-47" cy="14" r="1.5" fill="#7fd4e8"/>
+        <rect class="behaelter" x="-40" y="10" width="8" height="10" rx="2" fill="#16323c" stroke="#7fd4e8" stroke-width="1.5"/>
+      </g>
+      <g class="zielmarken" transform="translate(2,-20)">
+        <use href="#zielEcken" transform="scale(0.5,0.55)"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- Ebene 6: Kern mit Ringplattform, Aufbau, Lichthueter, Ausbaustufen, Datenleiste, Projektion -->
+  <g id="kern" transform="translate(500,272)">
+
+    <!-- Kernkoerper: Kiel, dreistufige Ringplattform, Aufbau mit Kuppel, Energiekranz, Lichthueter -->
+    <g id="coreBody">
+      <path d="M-18 16 L18 16 L13 44 L-13 44 Z" fill="#1c2230"/>
+      <ellipse cx="0" cy="46" rx="8" ry="3" fill="#2b3140"/>
+      <rect x="-3" y="44" width="6" height="2.5" fill="#7fd4e8" opacity=".7"/>
+      <ellipse cx="0" cy="13" rx="92" ry="26" fill="#7e8798"/>
+      <ellipse cx="0" cy="6.5" rx="92" ry="26" fill="#b9c2d0"/>
+      <ellipse cx="0" cy="0" rx="92" ry="26" fill="#dfe6ee"/>
+      <ellipse cx="0" cy="0" rx="92" ry="26" stroke="#f5f8fc" stroke-width="1" fill="none" opacity=".6"/>
+      <path d="M-64 -8 Q0 -26 64 -8 M-30 -19 Q0 -25 30 -19" stroke="#b9c2d0" stroke-width="1" fill="none"/>
+      <ellipse cx="-78" cy="6" rx="11" ry="5.5" fill="#2b3140"/>
+      <ellipse cx="78" cy="6" rx="11" ry="5.5" fill="#2b3140"/>
+      <circle cx="-78" cy="3" r="2" fill="#d9b45a"/>
+      <circle cx="78" cy="3" r="2" fill="#d9b45a"/>
+      <rect x="-36" y="-38" width="72" height="26" rx="4" fill="#dfe6ee"/>
+      <rect x="16" y="-38" width="20" height="26" rx="4" fill="#b9c2d0"/>
+      <path d="M-36 -25 L36 -25" stroke="#b9c2d0" stroke-width="1"/>
+      <path d="M-20 -38 A20 20 0 0 1 20 -38 Z" fill="#eef2f7"/>
+      <rect x="-13" y="-50" width="26" height="5" rx="2.5" fill="#7fd4e8" opacity=".85"/>
+      <path d="M0 -58 L0 -70" stroke="#2b3140" stroke-width="2"/>
+      <circle cx="0" cy="-72" r="2.2" fill="#b8f0ff"/>
+      <ellipse class="energiekranz" cx="0" cy="1" rx="101" ry="29.5" stroke="#7fd4e8" stroke-width="2" stroke-dasharray="5 9" fill="none" opacity=".85"/>
+      <ellipse cx="0" cy="0" rx="86" ry="24" stroke="#b8f0ff" stroke-width="1" fill="none" opacity=".35"/>
+      <g transform="translate(30,-8)">
+        <ellipse cx="0" cy="2" rx="5" ry="1.6" fill="#2b3140" opacity=".3"/>
+        <path d="M0 2 C-5.5 0 -6.5 -8 -3.5 -12 L0 -10.5 L3.5 -12 C6.5 -8 5.5 0 0 2 Z" fill="#f4f7fb"/>
+        <circle cx="0" cy="-13.5" r="2.7" fill="#ffffff"/>
+        <path d="M-2.8 -15.5 L0 -18.5 L2.8 -15.5" stroke="#d9b45a" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <path d="M-3.6 -11 Q0 -8.6 3.6 -11" stroke="#d9b45a" stroke-width="1.2" fill="none"/>
+      </g>
+    </g>
+
+    <!-- Ausbaustufe 1: innerer Energiekranz mit Knoten und Leitungsabzweigen -->
+    <g id="stage1">
+      <ellipse cx="0" cy="1" rx="118" ry="36" stroke="#7fd4e8" stroke-width="1.5" stroke-dasharray="4 10" fill="none" opacity=".8"/>
+      <circle cx="-118" cy="1" r="3" fill="#b8f0ff"/>
+      <circle cx="118" cy="1" r="3" fill="#b8f0ff"/>
+      <circle cx="0" cy="-35" r="3" fill="#b8f0ff"/>
+      <circle cx="0" cy="37" r="3" fill="#b8f0ff"/>
+      <path d="M0 44 C-8 58 -22 62 -36 63 M0 44 C8 58 22 62 36 63" stroke="#7fd4e8" stroke-width="2.5" fill="none" opacity=".6"/>
+      <circle cx="-36" cy="63" r="2.5" fill="#7fd4e8"/>
+      <circle cx="36" cy="63" r="2.5" fill="#7fd4e8"/>
+    </g>
+
+    <!-- Ausbaustufe 2: doppelter Ring plus zwei Masten -->
+    <g id="stage2">
+      <ellipse cx="0" cy="1" rx="142" ry="44" stroke="#b98fe0" stroke-width="1.5" stroke-dasharray="12 7" fill="none" opacity=".7"/>
+      <ellipse cx="0" cy="1" rx="154" ry="48" stroke="#7fd4e8" stroke-width="1" fill="none" opacity=".4"/>
+      <rect x="-144" y="-36" width="5" height="36" rx="2" fill="#2b3140"/>
+      <rect x="139" y="-36" width="5" height="36" rx="2" fill="#2b3140"/>
+      <circle cx="-141.5" cy="-38" r="2.5" fill="#b8f0ff"/>
+      <circle cx="141.5" cy="-38" r="2.5" fill="#b8f0ff"/>
+    </g>
+
+    <!-- Ausbaustufe 3: goldener Aussenring mit Speichen und Halo-Bogen -->
+    <g id="stage3">
+      <ellipse cx="0" cy="1" rx="172" ry="53" stroke="#d9b45a" stroke-width="1.5" stroke-dasharray="2 7" fill="none" opacity=".8"/>
+      <path d="M118 1 H172 M-118 1 H-172 M83.4 26.5 L121.6 38.5 M-83.4 26.5 L-121.6 38.5 M83.4 -24.5 L121.6 -36.5 M-83.4 -24.5 L-121.6 -36.5 M0 37 V54 M0 -35 V-52" stroke="#d9b45a" stroke-width="1" opacity=".5"/>
+      <path d="M-30 -80 A34 34 0 0 1 30 -80" stroke="#b8f0ff" stroke-width="1.5" fill="none" opacity=".6"/>
+    </g>
+
+    <!-- Datenleiste: sechs Diamanten auf der Vorderkante der Plattform -->
+    <g id="datenLeiste">
+      <path class="diament d1" transform="translate(-45,16)" d="M0 -5 L4.2 0 L0 5 L-4.2 0 Z"/>
+      <path class="diament d2" transform="translate(-27,16)" d="M0 -5 L4.2 0 L0 5 L-4.2 0 Z"/>
+      <path class="diament d3" transform="translate(-9,16)" d="M0 -5 L4.2 0 L0 5 L-4.2 0 Z"/>
+      <path class="diament d4" transform="translate(9,16)" d="M0 -5 L4.2 0 L0 5 L-4.2 0 Z"/>
+      <path class="diament d5" transform="translate(27,16)" d="M0 -5 L4.2 0 L0 5 L-4.2 0 Z"/>
+      <path class="diament d6" transform="translate(45,16)" d="M0 -5 L4.2 0 L0 5 L-4.2 0 Z"/>
+    </g>
+
+    <!-- Prototyp-Projektion: Emitter am Kuppelrand, Strahl und vier Symbolvarianten -->
+    <g id="protoProjektion">
+      <rect x="30" y="-46" width="4" height="8" rx="1" fill="#2b3140"/>
+      <polygon points="30,-46 46,-46 58,-70 18,-70" fill="url(#strahlCyan)" opacity=".8"/>
+      <ellipse cx="38" cy="-73" rx="17" ry="6" fill="#7fd4e8" opacity=".14"/>
+      <ellipse cx="38" cy="-73" rx="17" ry="6" stroke="#7fd4e8" stroke-opacity=".6" fill="none"/>
+      <g id="proto-none" transform="translate(38,-78)">
+        <circle r="7.5" stroke="#b8f0ff" stroke-width="2" fill="none"/>
+        <path d="M-5.3 5.3 L5.3 -5.3" stroke="#b8f0ff" stroke-width="2"/>
+      </g>
+      <g id="proto-klingenfokus" transform="translate(38,-78)">
+        <path d="M0 -9 C3 -5 3 2 1.6 7 L0 9 L-1.6 7 C-3 2 -3 -5 0 -9 Z" fill="#b8f0ff" opacity=".9"/>
+        <path d="M-4 4 L4 4" stroke="#d9b45a" stroke-width="1.5"/>
+        <path d="M0 9 L0 12" stroke="#d9b45a" stroke-width="2"/>
+      </g>
+      <g id="proto-fluxreserve" transform="translate(38,-78)">
+        <rect x="-2" y="-11" width="4" height="5" fill="none" stroke="#b8f0ff" stroke-width="1.8"/>
+        <path d="M-2 -6 C-7 -3 -8 4 -5 8 L5 8 C8 4 7 -3 2 -6 Z" stroke="#b8f0ff" stroke-width="1.8" fill="rgba(127,212,232,.15)"/>
+        <path d="M-6 3 L6 3" stroke="#7fd4e8"/>
+        <circle cx="0" cy="-1" r="1" fill="#b8f0ff"/>
+        <circle cx="2" cy="4.5" r=".8" fill="#b8f0ff"/>
+      </g>
+      <g id="proto-bergungsscanner" transform="translate(38,-78)">
+        <path d="M-3.8 4.8 A5 5 0 0 1 3.8 4.8 M-6.9 2.2 A9 9 0 0 1 6.9 2.2 M-10 -0.4 A13 13 0 0 1 10 -0.4" stroke="#b8f0ff" stroke-width="1.6" fill="none"/>
+        <path d="M0 8 L0 -5" stroke="#b8f0ff" stroke-width="1.4"/>
+        <circle cx="0" cy="8" r="1.6" fill="#b8f0ff"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- Ebene 7: Truemmer vor der Station fuer Tiefenwirkung -->
+  <g id="truemmerVorn">
+    <polygon points="42,462 54,452 68,456 71,468 60,477 46,474" fill="#6f6588" stroke="#49405e"/>
+    <polygon points="52,460 64,458 66,468 56,470" fill="#49405e"/>
+    <polygon points="944,450 953,444 962,448 962,457 952,461 945,457" fill="#6f6588" stroke="#49405e"/>
+    <polygon points="24,520 38,510 54,516 55,532 40,542 26,534" fill="#5d5178" stroke="#3f3654"/>
+  </g>
+</svg>
+
+      <!-- Overlay-Steuerung: Klickflächen folgen den sichtbaren Modulformen.
+           Positionen aus der SVG-Geometrie (siehe d043-station-notiz). -->
+      <button class="hs core st-0" id="hsCore" data-modul="core" style="--x:50%;--y:48.6%" aria-label="Zentraler Kern: Ausbau, Stationsdaten und Protokoll">
+        <span class="hslabel">Kern</span></button>
+      <button class="hs st-off" id="hsMine" data-modul="mine" style="--x:14.8%;--y:54.6%" aria-label="Asteroidensonde: Ausleger, Dock und Abbaukörper">
+        <span class="hslabel">Sonde</span></button>
+      <button class="hs st-off" id="hsForge" data-modul="forge" style="--x:35.2%;--y:26.1%" aria-label="Materiefabrikator: Reaktor und Fertiger">
+        <span class="hslabel">Fabrikator</span></button>
+      <button class="hs st-off" id="hsArcanum" data-modul="arcanum" style="--x:64.8%;--y:26.1%" aria-label="Fluxlabor: violette Glaskammer">
+        <span class="hslabel">Fluxlabor</span></button>
+      <button class="hs st-off" id="hsYard" data-modul="yard" style="--x:85.2%;--y:53.6%" aria-label="Simulationsdeck: Trainingsplattform mit Hologramm">
+        <span class="hslabel">Simulation</span></button>
+      <button class="hs st-run" id="hsArmory" data-modul="armory" style="--x:35.2%;--y:77.1%" aria-label="Ausrüstungsbucht: Hangar und Werkbank">
+        <span class="hslabel">Ausrüstung</span></button>
+      <button class="hs st-run" id="hsMap" data-modul="map" style="--x:64.8%;--y:77.1%" aria-label="Sternenkarte: Antenne und holografischer Kartentisch">
+        <span class="hslabel">Sternenkarte</span></button>
+      <button class="hs launch" id="btnLaunch" style="--x:88.5%;--y:84%" aria-label="Sortie vorbereiten: Sektor, Protokoll und Start öffnen">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 C15 6 15 12 13.6 16 L10.4 16 C9 12 9 6 12 2 Z" fill="#eef6ff"/><path d="M10.4 16 L8.6 20 L12 18 L15.4 20 L13.6 16 Z" fill="#7fd4e8"/><circle cx="12" cy="9" r="1.7" fill="#2b3140"/></svg>
+        <span class="hslabel">Sortie</span></button>
+
+      <!-- Ankunftsrückmeldung nach einer Sortie (überspringbar, rein lesend) -->
+      <div id="arrival" role="status" aria-hidden="true">
+        <b>Ankunft an der Station</b><span id="arrivaltext"></span>
+        <button class="smallaction" id="btnArrivalOk">Weiter</button>
+      </div>
     </div>
 
     <div class="holdstatus" id="holdstatus">Die Station wartet auf Reparaturen.</div>
@@ -4223,6 +4703,10 @@ const el = id=>document.getElementById(id);
 // ===========================================================================
 const HOLD_KEY='emberhold:hold:v1';
 const RUN_REPORT_KEY='emberhold:run-report:v1';
+// D-043 / Gate D: eigener Anzeige-Schlüssel für die Ankunftsrückmeldung.
+// Bewusst NICHT Teil des Save v5 -- rein präsentativ, keine Auszahlungslogik.
+const ARRIVAL_KEY='emberhold:arrival:v1';
+let arrivalShownAt=0;
 const RUN_REPORT_VERSION=1, RUN_REPORT_MAX=24000;
 const HOLD_CFG=Object.freeze({
   OFFLINE_CAP:86400, MINE_SEC:15, MINE_CAP:20,
@@ -4331,6 +4815,19 @@ function saveFinishedRunReport(){
   const persist=()=>{
     if(S!==finished||finished.phase!=='over') return;
     try { saveLastRunReport(runReportText(),Date.now()); } catch(_){}
+    // D-043 / Gate D: Ankunfts-Rückmeldung vorbereiten. Separater Anzeige-
+    // Schlüssel (kein Save-v5-Feld): enthält nur bereits berechnete Ergebnisse
+    // und wird nach der ersten Anzeige als gesehen markiert -- sie erscheint
+    // dadurch nicht erneut bei jedem Seiten-Reload und ändert keine Auszahlung.
+    try {
+      localStorage.setItem(ARRIVAL_KEY,JSON.stringify({
+        savedAt:Date.now(),
+        dateien:finished.securedData||0,
+        signal:(finished.signal&&finished.signal.status)||'keiner',
+        nexus:(finished.bossId==='nexus'&&finished.nexusState===2)||false,
+        ore:finished.holdOre||0,
+        seen:false}));
+    } catch(_){}
   };
   // Sofort sichern; nach Abschluss des aktuellen Frames einmal aktualisieren.
   // So bleibt auch der bekannte Todesframe-Randfall mit dem später kopierbaren
@@ -4584,29 +5081,77 @@ function upgradeCore(){
   META.coreStage=st+1; saveHold(); renderHold('Der zentrale Kern erreicht Stufe '+(st+1)+'.');
   return true;
 }
-/** Sync der Szene: Lampen je Zustand, Kernstufen, Protokollchips. */
+/** Sync der Szene (D-043 Gate C/D): Die SVG-Station ist die Hauptdarstellung.
+ *  Buttons tragen weiter die st-* Klassen (Vertrag/Tastatur), die SVG-Gruppen
+ *  bekommen die sichtbaren Baukörper-Zustände, Leitungen, Kernstufen,
+ *  Datenfüllstand und Protokollprojektion. */
 function renderStationMap(){
   const zustand=(on,ready)=>!on?'st-off':(ready?'st-ready':'st-run');
-  const hs=(id,infoId,on,ready,text)=>{
+  const hs=(id,on,ready)=>{
     const n=el(id); n.classList.remove('st-off','st-run','st-ready');
     n.classList.add(zustand(on,ready));
-    if(text) el(infoId).textContent=text;
   };
   const mineN=Math.floor(META.mineStored), forgeN=META.forgeStored,
         arcN=Math.floor(META.arcanumStored), yardN=Math.floor(META.yardStored);
-  hs('hsMine','hsmineinfo',META.mineLevel>0,mineN>0,META.mineLevel>0?(mineN?'bereit · '+mineN:'produziert'):'offline');
-  hs('hsForge','hsforgeinfo',META.forgeLevel>0,forgeN>0,META.forgeLevel>0?(forgeN?'bereit · '+forgeN:(META.forgeWorking?'fabriziert':'wartet')):'offline');
-  hs('hsArcanum','hsarcanuminfo',META.arcanumLevel>0,arcN>0,META.arcanumLevel>0?(arcN?'bereit · '+arcN:'verdichtet'):'offline');
-  hs('hsYard','hsyardinfo',META.yardLevel>0,yardN>0,META.yardLevel>0?(yardN?'bereit · '+yardN:'rechnet'):'offline');
-  hs('hsArmory','hsarmoryinfo',true,Object.keys(META.gearOwned||{}).length>0,'Rüstkammer');
-  hs('hsMap','hsmapinfo',true,true,CONTRACT_BY_ID[META.selectedContract]?.name||'Sortie');
+  hs('hsMine',META.mineLevel>0,mineN>0);
+  hs('hsForge',META.forgeLevel>0,forgeN>0);
+  hs('hsArcanum',META.arcanumLevel>0,arcN>0);
+  hs('hsYard',META.yardLevel>0,yardN>0);
+  hs('hsArmory',true,Object.keys(META.gearOwned||{}).length>0);
+  hs('hsMap',true,true);
+
+  const svg=el('stationSvg');
+  if(svg){
+    // Kernstufen, Datenfüllstand (max 6 sichtbar) und Protokollprojektion.
+    svg.classList.remove('core-0','core-1','core-2','core-3',
+      'daten-0','daten-1','daten-2','daten-3','daten-4','daten-5','daten-6',
+      'proto-none','proto-klingenfokus','proto-fluxreserve','proto-bergungsscanner');
+    svg.classList.add('core-'+META.coreStage,
+      'daten-'+Math.min(6,META.stationData|0),
+      'proto-'+(META.sortieProtocol||'none'));
+
+    // Modulzustände am Baukörper + Leitungen + aktive Kontur.
+    const modul=(id,leitungId,on,ready,reparierbar)=>{
+      const grp=document.getElementById(id);
+      if(!grp) return;
+      grp.classList.remove('mod-offline','mod-run','mod-ready','mod-repairable','mod-active');
+      grp.classList.add(!on?'mod-offline':(ready?'mod-ready':'mod-run'));
+      if(!on&&reparierbar) grp.classList.add('mod-repairable');
+      if(openPanelId===id.replace('mod','').toLowerCase()) grp.classList.add('mod-active');
+      const leitung=document.getElementById(leitungId);
+      if(leitung) leitung.classList.toggle('off',!on);
+    };
+    modul('modMine','leitung-mine',META.mineLevel>0,mineN>0,true);
+    modul('modForge','leitung-forge',META.forgeLevel>0,forgeN>0,
+      META.mineLevel>0&&META.ore>=HOLD_CFG.FORGE_COST);
+    modul('modArcanum','leitung-arcanum',META.arcanumLevel>0,arcN>0,
+      META.forgeLevel>0&&META.ore>=HOLD_CFG.ARCANUM_COST);
+    modul('modYard','leitung-yard',META.yardLevel>0,yardN>0,
+      META.forgeLevel>0&&META.bars>=HOLD_CFG.YARD_COST);
+    modul('modArmory','leitung-armory',true,true,false);
+    modul('modMap','leitung-map',true,true,false);
+    for(const id of ['modMine','modForge','modArcanum','modYard','modArmory','modMap']){
+      const grp=document.getElementById(id);
+      if(grp) grp.classList.toggle('mod-active',
+        openPanelId===id.replace('mod','').toLowerCase());
+    }
+
+    // Genau ein räumliches Ziel: das nächste sinnvolle Stationsthema leuchtet.
+    const ziel=holdGoal().titel||'';
+    let zielId=null;
+    if(ziel.includes(LEX.modul.mine)) zielId='modMine';
+    else if(ziel.includes(LEX.modul.forge)) zielId='modForge';
+    else if(ziel.includes(LEX.modul.arcanum)) zielId='modArcanum';
+    else if(ziel.includes(LEX.modul.yard)) zielId='modYard';
+    else if(ziel.includes(LEX.modul.map)) zielId='modMap';
+    else zielId='coreBody';
+    const zielGrp=document.getElementById(zielId);
+    if(zielGrp) zielGrp.classList.add('is-goal');
+  }
 
   const core=el('hsCore');
   core.classList.remove('st-0','st-1','st-2','st-3');
   core.classList.add('st-'+META.coreStage);
-  el('corelabel').textContent='Kern · Stufe '+META.coreStage;
-  const daten=META.stationData.toLocaleString('de-DE');
-  el('coredata').textContent=daten+' Stationsdaten';
   el('coredata2').textContent=META.stationData;
   const st=META.coreStage, upBtn=el('btnCoreUpgrade');
   if(st>=3){
@@ -4766,11 +5311,34 @@ function salvageGear(id){
   delete META.gearOwned[id]; META.dust+=item.salvage; gearSig=''; saveHold();
   renderHold(item.name+' zerlegt: +'+item.salvage+' '+LEX.res.dust+'.'); return item.salvage;
 }
+/** D-043 / Gate D: kurzer visueller Flug vom Modul zur passenden Ressource
+ *  in der Kopfzeile. Rein präsentativ (transform/opacity), ändert keine
+ *  Werte, respektiert prefers-reduced-motion. */
+function flyResource(modulId,resId,farbe){
+  if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const von=document.getElementById(modulId), zu=document.getElementById(resId);
+  if(!von||!zu||!von.getBoundingClientRect||!zu.getBoundingClientRect) return;
+  const a=von.getBoundingClientRect(), b=zu.getBoundingClientRect();
+  const n=document.createElement('div');
+  n.className='flyres';
+  n.style.left=(a.left+a.width/2-7)+'px';
+  n.style.top=(a.top+a.height/2-7)+'px';
+  n.style.background=farbe;
+  n.style.boxShadow='0 0 10px '+farbe;
+  document.body.appendChild(n);
+  requestAnimationFrame(()=>{
+    n.style.transform='translate('+(b.left+b.width/2-(a.left+a.width/2))+'px,'+
+      (b.top+b.height/2-(a.top+a.height/2))+'px) scale(.5)';
+    n.style.opacity='0.15';
+  });
+  setTimeout(()=>n.remove(),720);
+}
 function mineAction(){
   advanceHold(Date.now());
   if(!META.mineLevel){ META.mineLevel=1; META.lastAt=Date.now(); saveHold(); renderHold('Die '+LEX.modul.mine+' ist online. Die erste Förderung beginnt.'); return; }
   const n=Math.floor(META.mineStored); if(!n) return;
   META.mineStored-=n; META.ore+=n; advanceHold(Date.now()); saveHold(); renderHold(n+' '+LEX.res.ore+' eingesammelt.');
+  flyResource('hsMine','holdore','#6bd4e8');
 }
 function forgeAction(){
   advanceHold(Date.now());
@@ -4781,6 +5349,7 @@ function forgeAction(){
   }
   const n=META.forgeStored; if(!n) return;
   META.forgeStored=0; META.bars+=n; advanceHold(Date.now()); saveHold(); renderHold(n+' '+LEX.res.bars+' eingesammelt.');
+  flyResource('hsForge','holdbars','#d9b45a');
 }
 function upgradeBow(){
   advanceHold(Date.now());
@@ -4797,6 +5366,7 @@ function arcanumAction(){
   }
   const n=Math.floor(META.arcanumStored); if(!n) return;
   META.arcanumStored-=n; META.essence+=n; saveHold(); renderHold(n+' '+LEX.res.essence+' eingesammelt.');
+  flyResource('hsArcanum','holdessence','#b98fe0');
 }
 function yardAction(){
   advanceHold(Date.now());
@@ -4807,6 +5377,7 @@ function yardAction(){
   }
   const n=Math.floor(META.yardStored); if(!n) return;
   META.yardStored-=n; META.marks+=n; saveHold(); renderHold(n+' '+LEX.res.marks+' eingesammelt.');
+  flyResource('hsYard','holdmarks','#b8f0ff');
 }
 function prepareReroll(){
   advanceHold(Date.now());
@@ -5401,7 +5972,7 @@ async function copyLastRunReport(){
 function showStartMenu(){
   openPanelId=null;
   const st=el('start'); if(st) st.removeAttribute('data-panel');
-  for(const b of document.querySelectorAll('.hotspot,.core'))
+  for(const b of document.querySelectorAll('.hs'))
     b.classList.remove('active');
   if(!S) return;
   S.running=false; setSheet('over',false); setSheet('extract',false); setSheet('pause',false);
@@ -5410,6 +5981,32 @@ function showStartMenu(){
   const gained=S.holdOre?('Bergung eingelagert: +'+S.holdOre+' '+LEX.res.ore+'.'):'';
   advanceHold(Date.now()); saveHold(); renderHold(gained);
   setSheet('start',true,'hsMap');
+  zeigeAnkunft();
+}
+/** D-043 / Gate D: kurze, überspringbare Ankunftsrückmeldung. Nur wenn ein
+ *  noch nicht angesehener Eintrag existiert; führt per Button an den Kern. */
+function zeigeAnkunft(){
+  let a=null;
+  try { a=JSON.parse(localStorage.getItem(ARRIVAL_KEY)||'null'); } catch(_){}
+  if(!a||a.seen) return;
+  a.seen=true;
+  try { localStorage.setItem(ARRIVAL_KEY,JSON.stringify(a)); } catch(_){}
+  arrivalShownAt=a.savedAt;
+  const teile=[];
+  if(a.dateien>0) teile.push(a.dateien+' Stationsdatei'+(a.dateien===1?'':'en')+' gesichert');
+  if(a.signal==='gesichert') teile.push('SIGNAL gesichert');
+  if(a.signal==='verpasst') teile.push('SIGNAL verpasst');
+  if(a.nexus) teile.push('NEXUS zerstört');
+  if(a.ore>0) teile.push('+'+a.ore+' '+LEX.res.ore);
+  el('arrivaltext').textContent=teile.join(' · ')||'Sortie beendet.';
+  const box=el('arrival');
+  box.classList.add('on'); box.setAttribute('aria-hidden','false');
+}
+function verbergeAnkunft(){
+  const box=el('arrival');
+  box.classList.remove('on'); box.setAttribute('aria-hidden','true');
+  // Sichtbares räumliches Ergebnis: der Kern trägt die neuen Daten.
+  openPanel('core');
 }
 
 // --------------------------------------------------------------- Pacing-Bericht
@@ -5626,6 +6223,9 @@ function begin(len,contractId){
 }
 el('btnStart').onclick   = ()=>begin(480);
 el('btnStart3').onclick  = ()=>begin(RUN_MIN_S);
+// D-043 / Gate C: Startkontrolle an der Station öffnet Sternenkarte+Start.
+el('btnLaunch').onclick  = ()=>openPanel('map');
+el('btnArrivalOk').onclick = verbergeAnkunft;
 el('btnLeave').onclick   = ()=>endRun(true);
 el('btnOT').onclick      = startOvertime;
 el('pausebtn').onclick   = togglePause;
@@ -5907,7 +6507,8 @@ window.__EH = { get S(){return S;}, get H(){return META;}, CFG, HOLD_CFG, CONTRA
                 ORE: {RUN_MIN_S, ORE_RATE_REF},
                 arcanumAction, yardAction, prepareReroll, trainMastery,
                 grantGear, equipGear, upgradeGear, salvageGear, gearUpgradeCost,
-                endRun, startOvertime, damagePlayer,
+                endRun, startOvertime, damagePlayer, renderHold,
+                mineAction, forgeAction, arcanumAction, yardAction,
                 contractById, showHold:showStartMenu,
                 showExtract, showStartMenu,
                 tick:(d)=>{HEADLESS=true; step(d);
