@@ -2,43 +2,54 @@
 
 ## Aktueller Arbeitsfokus
 
-**Verbindlicher Stand 26.08.2026:** D-043 /
-EH-2026-08-25-05 ist durch OpenCode umgesetzt und durch Codex technisch
-abgenommen. Die Suite steht bei **60/60 grünen Checks**, der Botanker bleibt
-19,78 ±3 und alle 18 Baseline-Fingerprints sind bitidentisch.
+**Verbindlicher Stand 26.08.2026:** Die sichtbare D-043-Abnahme ist
+abgeschlossen, aber nicht als Produktfreigabe bestanden. Technisch bleiben
+60/60 Checks, die ruhige Kulisse und die SVG-Station erhalten. Der Besitzer
+hat vier klare Restprobleme benannt:
 
-Der sichtbare Qualitäts- und Stationspass umfasst:
+1. Die Orbitklinge ist nur ein gerades Projektil mit neuen Bildern statt der
+   konzipierten Kreis- und Rückkehrbewegung.
+2. Der Hintergrund ist besser, aber noch nicht ganz modern und spacig.
+3. Die Stationsnavigation fühlt sich hakelig und wie eine kurze Drawer-
+   Klickstrecke an.
+4. Begrenzte kleine Boni erzeugen keinen ausreichenden Grund für weitere Runs.
 
-1. eine markante 48-Pixel-Orbitklinge mit 24 Richtungen, vier Flugphasen und
-   gemeinsamem Piktogramm in Projektil, Karte und HUD;
-2. eine deutlich ruhigere Kampfkulisse ohne permanenten Avatar-Radiusring;
-3. eine zusammenhängende Orbitalstation als SVG-Szene mit sechs Baukörpern,
-   Stegen, Leitungen, Kernstufen, Datenanzeige und Protokollprojektion;
-4. sofort sichtbare Zustände für Reparatur, Produktion, Einsammeln,
-   Kernupgrade, Protokollwahl und Rückkehr aus einer Sortie;
-5. responsive Bedienung mit genau einem Drawer beziehungsweise Bottom-Sheet.
+D-044 / EH-2026-08-26-01 ist deshalb der einzige aktive Auftrag. Er ersetzt
+den bislang vorgemerkten allgemeinen Waffenrollenpass.
 
-Codex hat vier Integrationsdetails vor der Freigabe korrigiert: SVG und
-Klickflächen teilen dasselbe 1000:560-Verhältnis, ein gewähltes Modul wird im
-selben Frame aktiv, Fortschritt hinterlässt exakt eine Zielmarke und die
-verbleibende lokale Avatar-Aura ist auf 70 Welteinheiten begrenzt.
+Der Slice umfasst:
 
-Waffenwerte, XP, Dichte, AEGIS, NEXUS, Ökonomie und Save v5 blieben
-unangetastet. Die Browsersteuerung der Codex-Umgebung scheiterte erneut am
-Windows-Sandboxfehler. Offen ist deshalb nur die sichtbare Besitzerabnahme
-auf Desktop beziehungsweise Handy.
+- echte Orbitklinge mit HINAUS-, ORBIT- und RÜCKKEHR-Phase, sichtbarer
+  Eigenrotation und normalisiertem Hin-/Rückschaden;
+- kleinen modernen Hintergrund-Feinschliff ohne neue visuelle Überladung;
+- Save v6 mit zwölf sichtbaren Modulprojekten über sechs Stationsteile;
+- ungefähr ein relevantes Projekt je ein bis zwei erfolgreichen Runs;
+- Fokuswaffe, Banish, Impulsstoß-Sidegrades, gezielte Ausrüstung und
+  bestehende Signal-/AEGIS-/NEXUS-Missionen als freischaltbare Entscheidungen;
+- genau eine kompakte Stations-Tray, automatisches einmaliges Einsammeln und
+  ein angeheftetes nächstes Projekt.
+
+Asterit und Stationsdaten bleiben die einzigen Rekonstruktionsmittel.
+Waffen außer der internen `bogen`-Orbitklinge, Dichte, XP, AEGIS und NEXUS
+werden nicht numerisch verändert.
 
 Nächste verbindliche Reihenfolge:
 
-1. [x] OpenCode setzt D-043 vollständig um und dokumentiert vier lokale Commits.
-2. [x] Codex prüft Diff, Runtime, Renderverträge und Baseline unabhängig,
-   korrigiert die Integrationsfehler und nimmt D-043 technisch ab.
-3. [ ] Besitzer prüft Orbitklinge, Hintergrundruhe, fehlenden Avatar-Ring und
-   die Station als räumlichen Ort auf Desktop oder Handy.
-4. [ ] Erst nach diesem Feldtest den getrennten Waffenrollenpass planen.
+1. [x] D-043-Besitzerbefund auswerten und Scopefehler bei Klinge/Station
+   anerkennen.
+2. [x] D-044 mit Mechanik, Save-v6-Migration, Kosten, Freischaltungen,
+   Navigationsbudget und Testverträgen freigeben.
+3. [ ] OpenCode arbeitet EH-2026-08-26-01 vollständig ab, nutzt günstige
+   Subagenten für begrenzte Teilaufgaben, prüft deren Arbeit und pusht nicht.
+4. [ ] Codex prüft Diff, Migration, Balancevergleich, Progressionssimulation
+   und Tests unabhängig und entscheidet über Nacharbeit/Push.
+5. [ ] Besitzer prüft danach Klingenflug, Stationsfluss, sichtbaren Ausbau,
+   Hintergrund und Motivation für den nächsten Run.
+6. [ ] Erst nach diesem Feldtest weitere Waffenbalance oder Content planen.
 
-Bis zu dieser sichtbaren Abnahme keine weitere Grafik-, Balance- oder
-Contentänderung stapeln.
+Bis zur D-044-Abnahme keine parallele Grafik-, Waffen-, Boss-, Audio- oder
+Monetarisierungsbaustelle eröffnen.
+
 
 **Historischer Stand 23.08.2026:** EH-2026-08-23-02 ist durch Claude
 umgesetzt und durch Codex technisch abgenommen. Der Warden hat jetzt ein

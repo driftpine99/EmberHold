@@ -2078,3 +2078,95 @@ nicht geändert. Wegen des Windows-Sandboxfehlers konnte Codex die sichtbare
 Browserabnahme nicht durchführen. Vor einem Waffenrollen- oder weiteren
 Grafikpass prüft der Besitzer Klinge, Kulissenruhe, fehlenden Dauerring,
 Stationslesbarkeit, responsive Bedienung und echte FPS.
+
+
+## D-044 – Signaturwaffe und Rekonstruktion ersetzen reine Präsentationspolitur
+
+**Status:** beschlossen und als EH-2026-08-26-01 für OpenCode freigegeben
+(26.08.2026).
+
+Die sichtbare D-043-Abnahme hat zwei verschiedene Ursachen freigelegt:
+
+1. Die Bildreferenz verlangte eine Klinge, die ein Prioritätsziel bogenförmig
+   umkreist und auf einer zweiten Bahn zurückkehrt. D-043 fror jedoch
+   Projektilbewegung, Reichweite und Trefferpfad ein. OpenCode baute deshalb
+   korrekt nur eine neue Projektildarstellung auf der alten geraden Bahn.
+2. Die Station durfte in D-043 ihre Funktionen, Kosten und Timer nicht
+   erweitern. Sie wurde räumlicher dargestellt, blieb aber eine kurze
+   Sammlung begrenzter Menühandlungen ohne langfristigen Run-Zweck.
+
+Beides ist eine Scope-Fehlentscheidung, kein Grund zum Rückbau der technisch
+sauberen D-043-Grundlage.
+
+### Orbitklingen-Vertrag
+
+Die interne Waffe `bogen` erhält drei echte Bewegungszustände:
+HINAUS, ORBIT und RÜCKKEHR. Sie fliegt gekrümmt zum bestehenden
+Boss-/Elite-/Nahziel, umläuft es kurz um 180 bis 270 Grad und kehrt auf einer
+zweiten Kurve zur aktuellen Spielerposition zurück. Zielverlust startet die
+Rückkehr; eine Sicherheitszeit verhindert verlorene Projektile.
+
+Die Klinge rotiert unabhängig von ihrer Bahn sichtbar um sich selbst.
+Ein Gegner darf je Flugbein höchstens einmal getroffen werden. Ausgangspunkt
+sind 55 Prozent des heutigen Schadens pro Flugbein; Einzelzielschaden bleibt
+im Korridor 95 bis 120 Prozent, Crowdwirkung höchstens 130 Prozent des
+D-043-Vergleichs. Andere Waffen, Dichte, XP und Bosse bleiben unangetastet.
+
+### Rekonstruktionsvertrag
+
+Save v5 migriert additiv auf v6. Sechs Stationsmodule erhalten je zwei
+Rekonstruktionsränge; zusammen mit den drei Kernstufen entsteht ein sichtbarer
+Gesamtstand von 0 bis 15. Rang 1 kostet 8 Asterit + 1 Stationsdatei, Rang 2
+16 Asterit + 2 Stationsdaten. Es gibt keine neue Währung.
+
+Jeder sinnvolle Run ab 3:00 liefert einmalig eine Basis-Stationsdatei. Signal
+und NEXUS liefern weiterhin je eine, eine freigeschaltete Stationsmission kann
+eine vierte liefern. Kurzabbrüche, Reload und mehrfaches `endRun()` dürfen
+keine Daten farmen.
+
+Die zwölf Projekte sollen ungefähr acht bis zwölf erfolgreiche
+Referenzruns tragen. Zwischen zwei finanzierbaren relevanten Projekten liegen
+höchstens zwei vergleichbare vollständige Runs.
+
+### Freischaltungsrichtung
+
+Die Projekte öffnen Entscheidungen statt einer endlosen Prozentleiter:
+
+- Sonde: schnelleres Signal und kleiner Signal-Asteritbonus;
+- Fabrikator: garantierter Waffen- und später Passivfokus ohne Extrapick;
+- Fluxlabor: ein beziehungsweise zwei Banishes pro Run;
+- Simulationsdeck: drei Impulsstoß-Sidegrades, Rang 2 halbiert den Nachteil;
+- Ausrüstungsbucht: Zielslot und später Zielteil gewichten;
+- Sternenkarte: bestehende Signal-/AEGIS-/NEXUS-Mission und optionales
+  +15-Prozent-Schadensrisiko gegen ×1,25 Asterit.
+
+Jeder Rang verändert sichtbar den echten SVG-Baukörper. Asterit,
+Stationsdaten, bestehende Produktion und bestehende Ausrüstung bleiben die
+gemeinsame Ökonomie.
+
+### Stationsfluss
+
+Fertige Produktion wird beim echten Stationseintritt genau einmal gemeinsam
+eingesammelt. Ein angeheftetes Projekt zeigt Kosten, Wirkung und Fortschritt.
+Genau eine kompakte Aktions-Tray ersetzt die Folge mehrerer großer Drawer.
+Ohne Ausbauentscheidung sind höchstens zwei bewusste Klicks bis zum nächsten
+Run vorgesehen, mit Projektwahl und Bau höchstens vier.
+
+### Technische Leitplanken
+
+Der einzelne HTML-Prototyp, GitHub Pages und der abhängigkeitfreie Testpfad
+bleiben. Die Klinge nutzt vorallozierte Felder und genau ein `drawImage` pro
+sichtbarem Projektil. Save-Migration, Datenquellen, zwölf Projektstufen,
+Freischaltungen, Navigation, Klingenbahn und Damage-Benchmarks erhalten neue
+Verhaltensverträge.
+
+Die 18 D-043-Fingerprints dürfen wegen der absichtlichen Änderung der
+Standardwaffe kontrolliert neu referenziert werden. Vorher/Nachher je Seed
+muss im Arbeitsbericht stehen. Der Botanker 19,78 ±3 und seine Toleranz dürfen
+von OpenCode nicht verändert werden.
+
+### Reihenfolge
+
+D-044 ersetzt den zuvor geplanten allgemeinen Waffenrollenpass. Erst nach
+technischer Codex-Review und sichtbarem Besitzerlauf wird entschieden, ob
+Splitter, Blitz, Plasmakern oder weitere Waffen numerisch angepasst werden.

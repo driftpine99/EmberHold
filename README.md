@@ -19,25 +19,28 @@ Asteroidensonde, Materiefabrikator, Fluxlabor, Simulationsdeck,
 Ausrüstungsbucht und Sternenkarte mit lokalem Save v5 und begrenzter
 Offline-Produktion.
 
-D-043 ist durch OpenCode umgesetzt und durch Codex technisch abgenommen. Die
-Orbitklinge ist jetzt eine markante weiß-goldene Cyan-Wurfwaffe mit
-vorgerenderten Flugphasen; der permanente Avatar-Ring ist entfernt und die
-kosmische Kampfkulisse deutlich ruhiger.
+D-043 ist technisch umgesetzt, hat die sichtbare Produktabnahme aber nicht
+vollständig bestanden. Die neue Kulisse und SVG-Station bleiben als Grundlage.
+Die Orbitklinge fliegt bislang jedoch geradlinig statt wie im Konzept um ein
+Ziel und zum Spieler zurück. Die Station sieht räumlicher aus, bietet aber
+noch keinen ausreichend langen oder bedeutsamen Fortschritt.
 
-Die Orbitalstation ist keine Ansammlung runder Menüpunkte mehr, sondern eine
-zusammenhängende SVG-Szene über einem violetten Planeten. Sechs Baukörper,
-Stege, Energieleitungen, Kernstufen, Stationsdaten und Protokollprojektion
-reagieren sichtbar auf die vorhandenen Aktionen. `SIGNAL SICHERN` und der
-echte NEXUS-Kill liefern weiterhin je eine todsichere Stationsdatei. Save v5
-und alle bisherigen Ressourcen-, Ausrüstungs- und Produktionspfade bleiben
-erhalten.
+D-044 / EH-2026-08-26-01 ist deshalb der aktive nächste Slice:
 
-Die unabhängige Suite steht bei **60/60 grünen Checks**, der Botanker bleibt
-19,78 ±3 und die Baseline ist über 18 Fingerprints bitidentisch. Codex hat
-zusätzlich responsive Klickflächen, sofortige Modulaktivierung, genau eine
-Stations-Zielmarke und die lokale Avatar-Aura nachgehärtet. Die sichtbare
-Besitzerabnahme auf Desktop und Handy steht noch aus; Backend, Ton und
-Monetarisierung bleiben außerhalb des Scopes.
+- echte HINAUS-/ORBIT-/RÜCKKEHR-Bewegung der namensgebenden Waffe;
+- kleiner moderner Space-Feinschliff des ruhigen Hintergrunds;
+- Save v6 mit zwölf sichtbaren Modulprojekten und angeheftetem Ausbauziel;
+- ungefähr eine relevante Freischaltung je ein bis zwei erfolgreiche Runs;
+- Waffenfokus, Banish, Impulsstoß-Sidegrades, gezielte Ausrüstung und
+  bestehende Signal-/AEGIS-/NEXUS-Missionen;
+- flüssiger Stationsbesuch mit einer Aktions-Tray und einmaligem
+  Auto-Einsammeln statt mehrerer Drawer-Wechsel.
+
+Asterit und Stationsdaten bleiben die Rekonstruktionsmittel; es entsteht keine
+neue Währung. Backend, Ton und Monetarisierung bleiben außerhalb des Scopes.
+Der aktuell ausgelieferte Stand steht weiterhin bei 60/60 grünen Checks,
+Botanker 19,78 ±3 und 18 bitidentischen D-043-Baseline-Fingerprints.
+
 
 Die Produktfrage der Phase 0 lautet:
 

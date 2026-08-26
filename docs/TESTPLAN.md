@@ -69,52 +69,89 @@ Orbitklinge, Hintergrundruhe, permanenten Avatar-Ring und die aus runden
 Menüpunkten bestehende Station abgelehnt. Diese Punkte bilden D-043; D-042
 wird nicht zurückgerollt.
 
-## Besitzerabnahme D-043 – technisch freigegeben, sichtbar offen
+## Besitzerabnahme D-043 – abgeschlossen, Produktgate nicht bestanden
 
-Die unabhängige Codex-Review von EH-2026-08-25-05 ist abgeschlossen:
-`npm test` steht bei 60/60, 18 Baseline-Fingerprints sind bitidentisch und
-der Botanker bleibt 19,78 ±3. Responsive Stationsgeometrie, sofortige
-Modulaktivierung und genau eine Zielmarke sind zusätzlich regressionsgeprüft.
-Wegen des Windows-Sandboxfehlers ist folgender Besitzerlauf verbindlich:
+Der Besitzer hat D-043 am 26.08.2026 sichtbar geprüft:
 
-1. Station im Querformat öffnen. Sie muss als ein großer zusammenhängender
-   Ort über dem violetten Planeten lesbar sein: zentraler Kern, sechs
-   unterschiedliche Baukörper, Stege und Energieleitungen statt sechs
-   schwebender Menüknöpfe.
-2. Jedes Modul einmal antippen. Klickfläche und sichtbarer Baukörper müssen
-   übereinanderliegen; sofort leuchtet nur das gewählte Modul und genau ein
-   Drawer beziehungsweise Bottom-Sheet bleibt offen.
-3. Eine verfügbare Reparatur, Produktion/Abholung, Kernstufe oder
-   Protokollwahl ausführen. Gebäudezustand, Leitung, Daten- oder
-   Protokollanzeige müssen im selben Moment sichtbar reagieren. Es darf
-   gleichzeitig nur eine goldene Zielmarke geben.
-4. Trümmerring starten. In der ersten Minute Einzel- und Mehrfachwurf der
-   Orbitklinge prüfen: klare physische Waffe, kurze Spur, keine simple Sichel.
-   Bei Photonenschneise muss dieselbe Form stärker, nicht wie eine zweite
-   Trefferfläche wirken.
-5. Während Bewegung und Gegnerpulk prüfen: kein permanenter großer Ring um
-   den Avatar, nur eine kleine lokale Aura; der Hintergrund bleibt ruhig und
-   Gegner, Signal, rote Warnflächen, AEGIS und NEXUS stehen klar davor.
-6. Für die vollständige Freigabe bis NEXUS spielen, extrahieren und zur
-   Station zurückkehren. Signal-/NEXUS-Daten müssen am Kern als Run-Ergebnis
-   lesbar sein; Klingenfokus muss einen Reroll bis zur echten Wahl überleben.
+- Die Avatarfigur und der ruhigere Hintergrund sind bessere Grundlagen.
+- Die neue Klinge entspricht dem ursprünglichen Konzept nicht: Sie besitzt
+  keine echte Kreisbahn um ein Ziel und keinen Rückflug zum Spieler.
+- Der Hintergrund braucht nur noch einen kleinen moderneren, spacigeren
+  Feinschliff.
+- Die Stationsnavigation bleibt hakelig und besteht weiterhin überwiegend aus
+  kurzem Durchklicken.
+- Begrenzte, marginale Boni und wenige Kernstufen erzeugen keinen
+  ausreichenden Grund für weitere Runs.
 
-Zusätzlich zum kopierbaren Run-Bericht diese Fragen beantworten:
+Die technische D-043-Grundlage wird nicht zurückgerollt. Der Fehler liegt im
+damaligen Präsentationsscope: Projektilbewegung und Stationsumfang waren
+ausdrücklich eingefroren. D-044 ersetzt diese Grenzen.
 
-1. Sieht die neue Orbitklinge jetzt hochwertig und bedeutend genug aus?
-2. Ist der Hintergrund spürbar ruhiger, aber weiterhin atmosphärisch?
-3. Ist der störende Dauerring vollständig weg, ohne dass wichtige
-   Signal-/Bosswarnungen verloren gehen?
-4. Wirkt die Startansicht erstmals wie eine echte Orbitalstation statt wie
-   weitere Menüpunkte?
-5. Stimmen Klickflächen, aktiver Baukörper und einzige Zielmarke auch auf
-   deinem Gerät sichtbar überein?
-6. Sind Reparatur, Produktion, Ausbau und Protokollwahl an den Gebäuden
-   verständlich, ohne dass Funktionen verschwunden sind?
-7. Fühlt sich das gesicherte Signal nach der Rückkehr wie ein sichtbares
-   Ergebnis des Runs an?
-8. Schlechteste FPS, 1-%-Low und Anteil unter 55 FPS notieren — und sagen,
-   ob du nach der neuen Präsentation eher Lust auf einen weiteren Run hast.
+## Geplante Besitzerabnahme D-044 – nach technischer Codex-Review
+
+Dieser Test wird erst gefahren, nachdem OpenCode EH-2026-08-26-01 umgesetzt,
+Codex Diff/Migration/Benchmarks unabhängig geprüft und den Stand gepusht hat.
+
+### A – Station und Migration
+
+1. Vor dem ersten Klick Asterit, Stationsdaten, Kernstufe, Ausrüstung und
+   reparierte Module notieren. Nach Reload müssen sie unverändert vorhanden
+   sein; der Save-v5→v6-Übergang darf nichts löschen.
+2. Station betreten, nachdem mindestens zwei Produktionen bereit sind. Eine
+   gemeinsame Ankunftszeile muss alles genau einmal automatisch einsammeln.
+   Modulwechsel und erneutes Rendern dürfen nichts ein zweites Mal gutschreiben.
+3. Mindestens vier Module antippen. Es bleibt immer eine kompakte Aktions-Tray,
+   genau ein aktives Modul und genau eine Zielmarke. Auf Handy dürfen
+   Klickfläche und Baukörper nicht gegeneinander verrutschen.
+4. Ein Modulprojekt anheften. Name, Rang, konkrete Freischaltung,
+   8/16-Asteritkosten, 1/2-Datenkosten und Fortschrittsbalken müssen ohne
+   Suchen verständlich sein.
+5. Ohne Ausbauentscheidung die nächste Sortie mit höchstens zwei bewussten
+   Klicks starten können.
+
+### B – echte Orbitklinge und Hintergrund
+
+1. Im Trümmerring Einzelwürfe beobachten: Die Klinge muss auf einer Kurve
+   hinausfliegen, kurz um das priorisierte Ziel laufen und auf einer
+   sichtbar anderen Kurve zum bewegten Spieler zurückkehren.
+2. Sie muss währenddessen um den eigenen Mittelpunkt rotieren. Stirbt das
+   Ziel, muss sie sauber zurückkehren statt zu verschwinden.
+3. Bei AEGIS und NEXUS prüfen, ob die Priorität klar bleibt und Hin-/Rückweg
+   verständlich sind. Kein cyanfarbener Nebel und kein unsichtbarer
+   Dauer-Tickschaden.
+4. Der Hintergrund soll moderner und räumlicher wirken: wenige große
+   Orbitalformen, dezenter Planet/Nebel und sparsame Sterne. Gegner,
+   XP-Splitter, Klinge und Warnungen bleiben stärker als die Kulisse.
+
+### C – Run → Projekt → nächster Run
+
+1. Eine Acht-Minuten-Sortie mit SIGNAL und NEXUS spielen. Erwartet werden
+   drei Datenquellen: Basis ab 3:00, Signal und NEXUS; eine aktive erfüllte
+   Mission kann eine vierte ergänzen.
+2. Run-Bericht kopieren. Er muss Rekonstruktionsstand, Datenquellen,
+   Mission/Risiko und Orbitklingen-Hin-/Rücktreffer verständlich ausweisen.
+3. Zur Station zurückkehren. Die Ankunft zeigt Asterit, alle Datenquellen,
+   Auto-Produktion und den Fortschritt des angehefteten Projekts.
+4. Ein finanzierbares Projekt bauen. Der echte SVG-Baukörper und der
+   Gesamtstand 0–15 müssen sichtbar umspringen, nicht nur eine Zahl.
+5. Einen freigeschalteten Spielentscheid testen: Fokuswaffe, Banish,
+   Impulsstoß-Variante, Gearziel oder Sektormission. Der Effekt muss im
+   nächsten Run und im Bericht eindeutig nachvollziehbar sein.
+6. Seite neu laden und prüfen, dass Projekt, Ränge und Auswahl erhalten sind.
+
+### Fragen zusätzlich zum Run-Bericht
+
+1. Fühlt sich die Orbitklinge jetzt wirklich wie die namensgebende Waffe an?
+2. Sind Kreisbahn und Rückkehr befriedigend, ohne unübersichtlich zu werden?
+3. Ist der Hintergrund jetzt modern/spacig genug und weiterhin ruhig?
+4. Ist die Station schneller und angenehmer zu bedienen?
+5. War ohne Erklärung klar, welches Projekt als Nächstes gebaut wird und
+   warum dafür ein weiterer Run sinnvoll ist?
+6. Fühlte sich die erste neue Freischaltung relevant oder wieder marginal an?
+7. Hast du nach Ausbau und Vorbereitung konkret Lust, den Effekt in einem
+   weiteren Run auszuprobieren?
+8. Schlechteste FPS, 1-%-Low und Anteil unter 55 FPS notieren.
+
 
 ## Manueller Gesamttest des Phase-0.5-Slices
 

@@ -50,14 +50,13 @@ und Testplan und entscheidet über den Push.
   unregelmäßige Fugen, zwölf schwache Sterne und seltene kontrastarme
   Landmarken. Keine Kachelwand, dichten Mikropunkte, Safe-Area-Balken,
   harten Trennlinien oder Randabdunklung wieder einführen.
-- Die Orbitklinge ist eine 48-Pixel-Wurfwaffe mit weiß-goldenem Kern,
-  asymmetrischer Cyan-Schneide, 24 Richtungen und vier Flugphasen. Projektil,
-  Karte und HUD teilen dieselbe Silhouette; keine kleine Sichel oder
-  franchiseerkennbare Lichtschwertform zurückbringen.
-- Die Station ist seit D-043 ein zusammenhängender 1000×560-SVG-Ort mit sechs
-  Baukörpern, Stegen, Leitungen und zentralem Kern. SVG und Overlay bleiben
-  im selben Seitenverhältnis; genau ein Drawer und genau eine räumliche
-  Zielmarke sind sichtbar.
+- D-044 verlangt für die interne Waffe `bogen` eine echte
+  HINAUS→ORBIT→RÜCKKEHR-Bewegung, sichtbare Eigenrotation und Fang am
+  bewegten Spieler. Die 48-Pixel-Form bleibt, darf aber nicht länger nur ein
+  gerades Projektil mit wechselnden Bildern sein.
+- Die Station bleibt ein zusammenhängender 1000×560-SVG-Ort. D-044 ersetzt
+  die Drawer-Klickstrecke durch genau eine Aktions-Tray, ein angeheftetes
+  Projekt und zwölf sichtbare Modulränge. SVG und Overlay bleiben gekoppelt.
 - Der Orbitträger nutzt SPR.orbiter als weiß-goldenen Lichthüter mit 6 Idle-,
   8 Bewegungs- und 8 Wurfphasen; aufrecht, nur horizontal gespiegelt, nie frei
   rotiert.
@@ -82,17 +81,14 @@ und Testplan und entscheidet über den Push.
 Dieser Abschnitt ist kein Arbeitsauftrag. Priorität und Scope stehen nur in
 `docs/CURRENT_TASK.md`.
 
-**Stand 26.08.2026, nach technischer D-043-Abnahme.** OpenCode hat
-EH-2026-08-25-05 in vier lokalen Commits umgesetzt; Codex hat Diff, Runtime,
-Renderkosten und Baseline unabhängig geprüft und Stationsgeometrie,
-Modulaktivierung, Ein-Ziel-Markierung sowie lokale Avatar-Aura nachgehärtet.
-Die Suite steht bei 60/60 Checks, der Botanker bei 19,78 ±3 und 18
-Baseline-Fingerprints sind bitidentisch.
+**Stand 26.08.2026, nach sichtbarer D-043-Abnahme.** D-043 bleibt technisch
+sauber bei 60/60 Checks, bestand das Produktgate aber nicht: Klinge ohne
+Kreis-/Rückflug, hakelige Station und zu kurze marginale Progression. D-044 /
+EH-2026-08-26-01 ist als einziger aktiver Auftrag freigegeben.
 
-Offen ist ausschließlich der Besitzerlauf für Orbitklinge, ruhige Kulisse,
-fehlenden Dauerring, Orbitalstation und echte FPS auf Desktop/Handy. Bis
-zu diesem Lauf keine weitere Balance oder Darstellung stapeln; danach folgt
-der getrennte Waffenrollenpass.
+OpenCode baut echte Orbitklingenbewegung, kleinen Space-Feinschliff, Save v6,
+zwölf Modulprojekte und einen flüssigen Stationsfluss. Der allgemeine
+Waffenrollenpass wartet bis zur technischen und sichtbaren D-044-Abnahme.
 
 ### Drei Dinge, die eine neue Sitzung wissen muss
 
@@ -101,17 +97,16 @@ der getrennte Waffenrollenpass.
 „zurück auf 21 repariert“, macht den Vertrag kaputt. Der Besitzerlauf nach
 D-036 soll 28–34 Kartenzüge erreichen.
 
-**2. D-043 wartet auf die sichtbare Besitzerabnahme.** Keine weitere Balance
-oder Darstellung stapeln. Der nächste Lauf prüft neue Orbitklinge,
-Hintergrundruhe, fehlenden Dauerring, Stationsszene, Signal→NEXUS→Kern und
-echte FPS als einen Ablauf. Erst danach folgt der Waffenpass; Audio und
-Monetarisierung bleiben eigene Gates.
+**2. D-044 ist der einzige aktive Auftrag.** Keine parallele Balance oder
+Darstellung stapeln. OpenCode arbeitet nur `docs/CURRENT_TASK.md` ab, pusht
+nicht und lässt die kanonischen Projektdokumente geschützt.
 
 **3. Sichtbare Namen sind eine Präsentationsschicht.** `LEX` darf Bezeichnungen
 ändern; IDs wie `bogen`, `glutsehne`, `ring` und der Save-Key
-`emberhold:hold:v1` bleiben für Spielstände und Tests erhalten. Save v5
-ergänzt `stationData`, `coreStage` und `sortieProtocol` additiv; alte
-Begriffe in Migrationen sind deshalb kein sichtbarer Rückfall.
+`emberhold:hold:v1` bleiben für Spielstände und Tests erhalten. Save v5 enthält
+`stationData`, `coreStage` und `sortieProtocol`. D-044 muss diese Felder
+verlustfrei nach v6 migrieren; alte Begriffe in Migrationen sind deshalb kein
+sichtbarer Rückfall.
 
 ### Was weiterhin unverhandelbar ist
 
