@@ -62,51 +62,59 @@ Subjektives Ergebnis:
 Damit ist das NEXUS-Gate positiv abgeschlossen. Die offenen Punkte bilden den
 eigenen D-042-Vertikalschnitt und sind kein Grund, D-041 zurückzurollen.
 
-## Besitzerabnahme D-042 – technisch freigegeben, sichtbar offen
+## Besitzerabnahme D-042 – sichtbar nicht freigegeben
 
-Die technische Codex-Review von EH-2026-08-25-04 ist abgeschlossen:
-`npm test` steht bei 58/58, 18 Baseline-Fingerprints sind bitidentisch,
-Klingenfokus überlebt Rerolls und der Stations-DOM-Vertrag verhindert die
-doppelte Kartenwand. Die sichtbare Browserabnahme konnte wegen des
-Windows-Sandboxfehlers nicht automatisiert werden. Dieser Besitzerlauf ist
-deshalb jetzt der nächste verbindliche Schritt:
+Der Besitzer hat Lichthüter und Systemwechsel positiv bewertet, aber
+Orbitklinge, Hintergrundruhe, permanenten Avatar-Ring und die aus runden
+Menüpunkten bestehende Station abgelehnt. Diese Punkte bilden D-043; D-042
+wird nicht zurückgerollt.
 
-1. Vor dem Start die Station öffnen und prüfen, ob sie als zusammenhängender
-   Ring mit sechs Modulen und zentralem Kern lesbar ist. Jedes Modul einmal
-   antippen; immer muss genau ein passendes Detailpanel offen bleiben, auch
-   nach einem zweiten Tap auf dasselbe Modul.
-2. Bestehende Produktion, Ausrüstung, Meisterschaften, Sektorauswahl,
-   Reroll-Vorbereitung und letzter Run-Bericht müssen noch erreichbar sein.
-3. Trümmerring · 8 Minuten starten. Zwischen 2:30 und 4:00 `SIGNAL SICHERN`
-   aufsuchen, den Ring verlassen und wieder betreten: Fortschritt muss pausieren
-   und danach weiterlaufen, nicht neu beginnen.
-4. AEGIS und NEXUS spielen. Nach NEXUS extrahieren und prüfen, ob genau zwei
-   Stationsdaten gutgeschrieben werden: eine für das Signal, eine für NEXUS.
-5. Zur Station zurückkehren, Kernstufe 1 bauen und `Klingenfokus` wählen. Der
-   Kern muss sich sichtbar verändern. Im nächsten Run beim ersten Kartenzug
-   einmal neu ziehen: Sowohl vor als auch nach dem Reroll muss eine legale
-   Orbitklingen-Aufwertung enthalten sein; nach der tatsächlichen Kartenwahl
-   darf die Garantie nicht erneut greifen.
-6. Seite neu laden. Alte Ressourcen/Gebäude/Ausrüstung sowie neue Daten,
-   Kernstufe und Protokoll müssen vollständig erhalten sein.
+## Besitzerabnahme D-043 – technisch freigegeben, sichtbar offen
+
+Die unabhängige Codex-Review von EH-2026-08-25-05 ist abgeschlossen:
+`npm test` steht bei 60/60, 18 Baseline-Fingerprints sind bitidentisch und
+der Botanker bleibt 19,78 ±3. Responsive Stationsgeometrie, sofortige
+Modulaktivierung und genau eine Zielmarke sind zusätzlich regressionsgeprüft.
+Wegen des Windows-Sandboxfehlers ist folgender Besitzerlauf verbindlich:
+
+1. Station im Querformat öffnen. Sie muss als ein großer zusammenhängender
+   Ort über dem violetten Planeten lesbar sein: zentraler Kern, sechs
+   unterschiedliche Baukörper, Stege und Energieleitungen statt sechs
+   schwebender Menüknöpfe.
+2. Jedes Modul einmal antippen. Klickfläche und sichtbarer Baukörper müssen
+   übereinanderliegen; sofort leuchtet nur das gewählte Modul und genau ein
+   Drawer beziehungsweise Bottom-Sheet bleibt offen.
+3. Eine verfügbare Reparatur, Produktion/Abholung, Kernstufe oder
+   Protokollwahl ausführen. Gebäudezustand, Leitung, Daten- oder
+   Protokollanzeige müssen im selben Moment sichtbar reagieren. Es darf
+   gleichzeitig nur eine goldene Zielmarke geben.
+4. Trümmerring starten. In der ersten Minute Einzel- und Mehrfachwurf der
+   Orbitklinge prüfen: klare physische Waffe, kurze Spur, keine simple Sichel.
+   Bei Photonenschneise muss dieselbe Form stärker, nicht wie eine zweite
+   Trefferfläche wirken.
+5. Während Bewegung und Gegnerpulk prüfen: kein permanenter großer Ring um
+   den Avatar, nur eine kleine lokale Aura; der Hintergrund bleibt ruhig und
+   Gegner, Signal, rote Warnflächen, AEGIS und NEXUS stehen klar davor.
+6. Für die vollständige Freigabe bis NEXUS spielen, extrahieren und zur
+   Station zurückkehren. Signal-/NEXUS-Daten müssen am Kern als Run-Ergebnis
+   lesbar sein; Klingenfokus muss einen Reroll bis zur echten Wahl überleben.
 
 Zusätzlich zum kopierbaren Run-Bericht diese Fragen beantworten:
 
-1. Wirkt der neue Hintergrund endlich wie Orbitblade und nicht mehr wie ein
-   Raster aus Kästen? Bleiben Gegner und Warnflächen trotzdem klar?
-2. Ist der Lichthüter beim Stehen, Laufen, Werfen und Richtungswechsel markant
-   und flüssig genug?
-3. Bleibt der Rammjäger während seiner gesamten Aufladung dieselbe Figur?
-4. Sind EVO-Hinweis links und Signal-/Bossanzeige hilfreich, ohne den Kampf zu
-   verdecken?
-5. Versteht man ohne Erklärung, welches Stationsmodul anklickbar ist, was
-   gerade produziert und was als Nächstes gebaut werden kann?
-6. Fühlt sich das gesicherte Signal nach der Rückkehr wie ein sichtbares
+1. Sieht die neue Orbitklinge jetzt hochwertig und bedeutend genug aus?
+2. Ist der Hintergrund spürbar ruhiger, aber weiterhin atmosphärisch?
+3. Ist der störende Dauerring vollständig weg, ohne dass wichtige
+   Signal-/Bosswarnungen verloren gehen?
+4. Wirkt die Startansicht erstmals wie eine echte Orbitalstation statt wie
+   weitere Menüpunkte?
+5. Stimmen Klickflächen, aktiver Baukörper und einzige Zielmarke auch auf
+   deinem Gerät sichtbar überein?
+6. Sind Reparatur, Produktion, Ausbau und Protokollwahl an den Gebäuden
+   verständlich, ohne dass Funktionen verschwunden sind?
+7. Fühlt sich das gesicherte Signal nach der Rückkehr wie ein sichtbares
    Ergebnis des Runs an?
-7. Erzeugt die Protokollwahl einen konkreten Grund für den nächsten Run oder
-   wirkt sie nur wie eine weitere kleine Zahl?
-8. Schlechteste FPS, 1-%-Low und Anteil unter 55 FPS im Lastfenster sowie im
-   NEXUS-Finale notieren.
+8. Schlechteste FPS, 1-%-Low und Anteil unter 55 FPS notieren — und sagen,
+   ob du nach der neuen Präsentation eher Lust auf einen weiteren Run hast.
 
 ## Manueller Gesamttest des Phase-0.5-Slices
 
@@ -576,6 +584,22 @@ D-041 ergänzt beziehungsweise erweitert vier Verträge:
   D-042 bewusst von unten mittig nach links geändert.
 - `foeSilhouettes` prüft fünf verschiedene Profile; Gate B von D-042 ergänzt,
   dass der Rammjäger in seiner Warnphase nicht auf alte Tiergrafik fällt.
+
+D-042 ergänzt `combatArtV3`, `sectorObjectiveFlow`, `stationCoreFlow`,
+`stationDomContract` und `baselineIsolated` für Lichthüter, Signal,
+Stationsdaten, Protokolle, DOM-Eindeutigkeit und 18 bitidentische Baseline-
+Fingerprints.
+
+D-043 ergänzt zwei Verträge:
+
+- `combatArtV4` prüft Klingenform, einen drawImage-Flugpfad, gemeinsame
+  Karten-/HUD-Silhouette, entfernten Dauerring, auf 70 Welteinheiten
+  begrenzte Aura und reduzierte Kulissendichte.
+- `stationSceneV2` prüft den einzigen 1000×560-Szenengraphen, sechs
+  Baukörper, Kernstufen, Daten, Protokollprojektion und vorhandene Aktionen.
+  Die Verhaltensdiagnosen sichern zusätzlich gekoppelte Overlay-Geometrie,
+  sofortigen Modulwechsel und exakt eine fortgeschriebene Zielmarke.
+
 Seit D-017 führt der Test `resize()` tatsächlich aus und prüft fünf
 Querformate mit demselben Seed:
 

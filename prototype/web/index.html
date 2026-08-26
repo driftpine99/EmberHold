@@ -239,8 +239,8 @@ button.b.danger{background:#c9402e;color:#fff}
   font-variant-numeric:tabular-nums}.holdres span{display:block;color:#777164;font-size:8.5px;
   letter-spacing:.12em;text-transform:uppercase}
 
-.holdscene{order:1;position:relative;width:min(1180px,100%);
-  height:min(72vh,640px);margin:8px auto 0;border-radius:16px;overflow:hidden;
+.holdscene{order:1;position:relative;width:min(1180px,100%,128.571vh);
+  height:auto;aspect-ratio:1000/560;margin:8px auto 0;border-radius:16px;overflow:hidden;
   background:#0b0e1c;border:1px solid #232c44}
 #stationSvg{position:absolute;inset:0;width:100%;height:100%;display:block}
 /* Statuszeile + Ziel bleiben klein am Rand; die Fläche gehört der Station. */
@@ -383,7 +383,7 @@ button.b.danger{background:#c9402e;color:#fff}
 @media (max-width:700px){
   #start.holdsheet{padding:12px 10px 18px}.holdhead{align-items:flex-start;flex-direction:column}
   .holdresources{justify-content:flex-start}.holdres{min-width:78px;padding:4px 8px}
-  .holdscene{height:min(52vh,420px)}
+  .holdscene{width:min(100%,92.857vh);height:auto}
   /* Bottom-Sheet statt Seiten-Drawer; die Station bleibt sichtbar. */
   .detailpanels{left:8px;right:8px;top:auto;bottom:8px;width:auto;height:auto}
   .dpanel{max-height:44vh}
@@ -525,7 +525,7 @@ button.b.danger{background:#c9402e;color:#fff}
    holdstage/crater/embercore) sind entfernt; holdgrid bleibt fuer die
    Detailpanel-Inhalte (holdbuilding-Karten im Drawer). */
 @media (max-height:480px){
-  .holdscene{height:min(56vh,300px)}
+  .holdscene{width:min(100%,100vh);height:auto}
   .hs{width:50px;height:46px}
   .dpanel{max-height:38vh}
   #cards{justify-content:flex-start;padding:8px 20px;gap:6px;overflow-y:auto}
@@ -4485,13 +4485,14 @@ function render(){
   // Stroke-Ring mehr, und der weiche Schein ist auf eine kleine Flaeche
   // direkt am Lichthueter reduziert. lightRadius() selbst bleibt nichtig-
   // frei fuer Signal-/Telegraphie-Logik unveraendert.
-  const grd = ctx.createRadialGradient(S.x,S.y,0,S.x,S.y,lr*0.55);
+  const auraR=Math.min(70,lr*0.35);
+  const grd = ctx.createRadialGradient(S.x,S.y,0,S.x,S.y,auraR);
   grd.addColorStop(0,   'rgba(240,196,90,0.10)');
   grd.addColorStop(0.42,'rgba(150,200,235,0.05)');
   grd.addColorStop(0.78,'rgba(120,170,225,0.02)');
   grd.addColorStop(1,   'rgba(120,170,225,0)');
   ctx.fillStyle=grd;
-  ctx.beginPath(); ctx.arc(S.x,S.y,lr*0.55,0,6.2832); ctx.fill();
+  ctx.beginPath(); ctx.arc(S.x,S.y,auraR,0,6.2832); ctx.fill();
 
   // Boss-Vorschauen liegen unter Figuren und Projektilen, aber ueber dem Boden.
   drawBossTelegraphs(vx0,vx1,vy0,vy1);
@@ -5049,8 +5050,10 @@ function openPanel(modul){
   const start=el('start');
   if(openPanelId) start.setAttribute('data-panel',openPanelId);
   else start.removeAttribute('data-panel');
-  for(const b of document.querySelectorAll('.hotspot,.core'))
+  for(const b of document.querySelectorAll('.hs'))
     b.classList.toggle('active',b.dataset.modul===openPanelId);
+  // Overlay und sichtbarer SVG-Baukoerper reagieren im selben Frame.
+  renderStationMap();
 }
 /** Protokoll-Verwaltung (Gate E): Namen, Sperren und Wahl. */
 const STATION = Object.freeze({
@@ -5141,6 +5144,12 @@ function renderStationMap(){
     }
 
     // Genau ein räumliches Ziel: das nächste sinnvolle Stationsthema leuchtet.
+    // Vorherige Ziele immer explizit entfernen, damit Fortschritt keine alten
+    // Zielmarken am Szenengraphen zuruecklaesst.
+    for(const id of ['modMine','modForge','modArcanum','modYard','modArmory','modMap','coreBody']){
+      const grp=document.getElementById(id);
+      if(grp) grp.classList.remove('is-goal');
+    }
     const ziel=holdGoal().titel||'';
     let zielId=null;
     if(ziel.includes(LEX.modul.mine)) zielId='modMine';

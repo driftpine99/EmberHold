@@ -31,6 +31,14 @@ Alle bedeutenden Projektänderungen werden in dieser Datei dokumentiert.
   - Suite auf 60 Checks: neue Verträge combatArtV4 und stationSceneV2
     (inkl. Interaktionsnachweisen); combatUiV2-Kachelmessung verhaltens-
     basiert präzisiert; alle 18 Baseline-Fingerprints weiter bitidentisch
+  - Codex-Review koppelt SVG und Overlay auf allen Formaten an 1000:560,
+    synchronisiert gewähltes Overlay und sichtbaren Baukörper sofort und
+    entfernt alte Zielmarken vor jeder neuen Stationsziel-Markierung
+  - Die verbleibende kantenlose Avatar-Aura ist auf
+    `min(70, lightRadius × 0.35)` begrenzt und damit tatsächlich lokal
+  - Erweiterte stationSceneV2-Diagnosen belegen responsive Geometrie,
+    unmittelbaren Modulwechsel und exakt ein fortgeschriebenes Ziel;
+    unabhängige Abschlussprüfung weiterhin 60/60 grün, Botanker 19,78 ±3
 
 - EH-2026-08-25-04 / D-042 — Lichthüter, Bergungssignal und Stationsring V1:
   - Der Orbitträger trägt die Lichthüter-Silhouette der lokalen Referenz

@@ -19,24 +19,25 @@ Asteroidensonde, Materiefabrikator, Fluxlabor, Simulationsdeck,
 Ausrüstungsbucht und Sternenkarte mit lokalem Save v5 und begrenzter
 Offline-Produktion.
 
-D-042 ist durch OpenCode umgesetzt und durch Codex technisch abgenommen. Der
-Kampf nutzt jetzt die weiß-goldene Lichthüter-Silhouette vor einer ruhigeren
-kosmischen Kulisse; Rammjäger und EVO-Hinweis sind korrigiert. Die Station ist
-eine Ringkarte mit sechs Hotspots und einem sichtbaren Kern statt einer
-permanenten Kartenwand.
+D-043 ist durch OpenCode umgesetzt und durch Codex technisch abgenommen. Die
+Orbitklinge ist jetzt eine markante weiß-goldene Cyan-Wurfwaffe mit
+vorgerenderten Flugphasen; der permanente Avatar-Ring ist entfernt und die
+kosmische Kampfkulisse deutlich ruhiger.
 
-Im Acht-Minuten-Run verbindet `SIGNAL SICHERN` den Kampf mit dem Stationsausbau:
-Signal und echter NEXUS-Kill liefern je eine todsichere Stationsdatei. Save v5
-speichert Stationsdaten, drei Kernstufen und ein wählbares Sortie-Protokoll.
-Klingenfokus bleibt auch nach einem Reroll für den ersten tatsächlichen
-Kartenzug aktiv; Fluxreserve und Bergungsscanner verändern nur ihren
-ausgewiesenen Run-Aspekt.
+Die Orbitalstation ist keine Ansammlung runder Menüpunkte mehr, sondern eine
+zusammenhängende SVG-Szene über einem violetten Planeten. Sechs Baukörper,
+Stege, Energieleitungen, Kernstufen, Stationsdaten und Protokollprojektion
+reagieren sichtbar auf die vorhandenen Aktionen. `SIGNAL SICHERN` und der
+echte NEXUS-Kill liefern weiterhin je eine todsichere Stationsdatei. Save v5
+und alle bisherigen Ressourcen-, Ausrüstungs- und Produktionspfade bleiben
+erhalten.
 
-Die unabhängige Suite steht bei **58/58 grünen Checks**, der Botanker bleibt
-19,78 ±3 und die Baseline ist über 18 Fingerprints bitidentisch. Die sichtbare
-Besitzerabnahme auf Desktop und Handy steht noch aus. Der letzte Run-Bericht
-bleibt lokal kopierbar; Backend, Ton und Monetarisierung bleiben außerhalb des
-Scopes.
+Die unabhängige Suite steht bei **60/60 grünen Checks**, der Botanker bleibt
+19,78 ±3 und die Baseline ist über 18 Fingerprints bitidentisch. Codex hat
+zusätzlich responsive Klickflächen, sofortige Modulaktivierung, genau eine
+Stations-Zielmarke und die lokale Avatar-Aura nachgehärtet. Die sichtbare
+Besitzerabnahme auf Desktop und Handy steht noch aus; Backend, Ton und
+Monetarisierung bleiben außerhalb des Scopes.
 
 Die Produktfrage der Phase 0 lautet:
 

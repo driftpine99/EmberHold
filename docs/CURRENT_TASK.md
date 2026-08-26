@@ -5,7 +5,7 @@
 - **Task-ID:** EH-2026-08-25-05
 - **Entscheidung:** D-043
 - **Thema:** Orbitklinge V2, ruhige Kampfkulisse und Orbitalstation V2
-- **Status:** **FREIGEGEBEN_FUER_OPENCODE**
+- **Status:** **TECHNISCH_ABGENOMMEN_WARTET_BESITZERTEST**
 - **Auftraggeber:** Besitzer
 - **Projektleitung und Abnahme:** Codex
 - **Ausführung:** OpenCode; unabhängige Review, Dokumentation und Push durch Codex
@@ -422,3 +422,20 @@ liefern:
 - klare Empfehlung an Codex: abnehmen, nacharbeiten oder blockiert lassen.
 
 OpenCode pusht nicht und beginnt keinen Folgeauftrag.
+
+## Codex-Abnahme vom 26.08.2026
+
+Codex hat die vier lokalen OpenCode-Commits unabhängig geprüft. Dabei wurden
+vier Integrationsdetails vor der Freigabe korrigiert:
+
+- SVG-Szene und Overlay-Klickflächen teilen jetzt auf allen unterstützten
+  Formaten dasselbe feste Seitenverhältnis 1000:560;
+- Modulwahl aktiviert Overlay und sichtbaren Baukörper im selben Frame;
+- bei Fortschritt bleibt exakt eine räumliche Zielmarke übrig;
+- die verbleibende Avatar-Aura ist auf höchstens 70 Welteinheiten begrenzt.
+
+Die Regressionen prüfen diese Fälle ausdrücklich. npm test steht bei 60/60,
+alle 18 Baseline-Fingerprints sind bitidentisch und der Botanker bleibt
+19,78 ±3. Der sichtbare Browsertest war wegen des Windows-Sandboxfehlers
+weiterhin nicht möglich. D-043 ist deshalb technisch abgenommen; offen ist
+nur die Besitzerabnahme auf Desktop beziehungsweise Handy.

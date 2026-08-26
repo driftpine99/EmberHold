@@ -41,15 +41,23 @@ und Testplan und entscheidet über den Push.
 
 ## Verbindliche aktuelle Grafikrichtung
 
-- Sichtbarer Produktname und Art Direction sind seit D-037/D-042
+- Sichtbarer Produktname und Art Direction sind seit D-037/D-043
   **Orbitblade**. Repository, Pages-URL, Save-Key und interne IDs bleiben
   vorerst Emberhold.
 - Referenz bleibt docs/concepts/orbitblade-combat-ui-direction-v2.png:
   taktisches flaches 2D-Sci-Fantasy in Navy, Violett, Cyan und Weißgold.
-- D-042 ersetzt die D-041-Kastenfläche durch eine vorgerenderte kosmische
-  Kulisse mit Navy-Grund, Nebel, Parallax-Sternen und großen Ringstrukturen.
-  Keine permanente Kachelwand, Safe-Area-Balken, harten Trennlinien oder
-  Randabdunklung wieder einführen.
+- D-043 reduziert die D-042-Kulisse auf große ruhige Navy-Flächen, wenige
+  unregelmäßige Fugen, zwölf schwache Sterne und seltene kontrastarme
+  Landmarken. Keine Kachelwand, dichten Mikropunkte, Safe-Area-Balken,
+  harten Trennlinien oder Randabdunklung wieder einführen.
+- Die Orbitklinge ist eine 48-Pixel-Wurfwaffe mit weiß-goldenem Kern,
+  asymmetrischer Cyan-Schneide, 24 Richtungen und vier Flugphasen. Projektil,
+  Karte und HUD teilen dieselbe Silhouette; keine kleine Sichel oder
+  franchiseerkennbare Lichtschwertform zurückbringen.
+- Die Station ist seit D-043 ein zusammenhängender 1000×560-SVG-Ort mit sechs
+  Baukörpern, Stegen, Leitungen und zentralem Kern. SVG und Overlay bleiben
+  im selben Seitenverhältnis; genau ein Drawer und genau eine räumliche
+  Zielmarke sind sichtbar.
 - Der Orbitträger nutzt SPR.orbiter als weiß-goldenen Lichthüter mit 6 Idle-,
   8 Bewegungs- und 8 Wurfphasen; aufrecht, nur horizontal gespiegelt, nie frei
   rotiert.
@@ -74,14 +82,15 @@ und Testplan und entscheidet über den Push.
 Dieser Abschnitt ist kein Arbeitsauftrag. Priorität und Scope stehen nur in
 `docs/CURRENT_TASK.md`.
 
-**Stand 25.08.2026, nach technischer D-042-Abnahme.** OpenCode hat
-EH-2026-08-25-04 umgesetzt; Codex hat Diff, Save v5, Signal, Protokolle,
-Renderkosten und Baseline unabhängig geprüft und drei Vertragsabweichungen
-korrigiert. Die Suite steht bei 58/58 Checks, der Botanker bei 19,78 ±3 und
-18 Baseline-Fingerprints sind bitidentisch.
+**Stand 26.08.2026, nach technischer D-043-Abnahme.** OpenCode hat
+EH-2026-08-25-05 in vier lokalen Commits umgesetzt; Codex hat Diff, Runtime,
+Renderkosten und Baseline unabhängig geprüft und Stationsgeometrie,
+Modulaktivierung, Ein-Ziel-Markierung sowie lokale Avatar-Aura nachgehärtet.
+Die Suite steht bei 60/60 Checks, der Botanker bei 19,78 ±3 und 18
+Baseline-Fingerprints sind bitidentisch.
 
-Offen ist ausschließlich der Besitzerlauf für Lichthüter, kosmische Kulisse,
-Stationsring, Signal→NEXUS→Kern-Ablauf und echte FPS auf Desktop/Handy. Bis
+Offen ist ausschließlich der Besitzerlauf für Orbitklinge, ruhige Kulisse,
+fehlenden Dauerring, Orbitalstation und echte FPS auf Desktop/Handy. Bis
 zu diesem Lauf keine weitere Balance oder Darstellung stapeln; danach folgt
 der getrennte Waffenrollenpass.
 
@@ -92,10 +101,11 @@ der getrennte Waffenrollenpass.
 „zurück auf 21 repariert“, macht den Vertrag kaputt. Der Besitzerlauf nach
 D-036 soll 28–34 Kartenzüge erreichen.
 
-**2. D-042 wartet auf die sichtbare Besitzerabnahme.** Keine weitere Balance
-oder Darstellung stapeln. Der nächste Lauf prüft Signal, NEXUS, Stationskern,
-Lichthüter, Hintergrund und echte FPS als einen zusammenhängenden Ablauf.
-Erst danach folgt der Waffenpass; Audio und Monetarisierung bleiben eigene Gates.
+**2. D-043 wartet auf die sichtbare Besitzerabnahme.** Keine weitere Balance
+oder Darstellung stapeln. Der nächste Lauf prüft neue Orbitklinge,
+Hintergrundruhe, fehlenden Dauerring, Stationsszene, Signal→NEXUS→Kern und
+echte FPS als einen Ablauf. Erst danach folgt der Waffenpass; Audio und
+Monetarisierung bleiben eigene Gates.
 
 **3. Sichtbare Namen sind eine Präsentationsschicht.** `LEX` darf Bezeichnungen
 ändern; IDs wie `bogen`, `glutsehne`, `ring` und der Save-Key

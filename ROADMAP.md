@@ -2,40 +2,43 @@
 
 ## Aktueller Arbeitsfokus
 
-**Verbindlicher Stand 25.08.2026:** D-042 /
-EH-2026-08-25-04 ist durch OpenCode umgesetzt und durch Codex technisch
-abgenommen. Die Suite steht bei **58/58 grünen Checks**, der Botanker bleibt
-19,78 ±3 und 18 Baseline-Fingerprints sind bitidentisch zum Ausgangscommit.
+**Verbindlicher Stand 26.08.2026:** D-043 /
+EH-2026-08-25-05 ist durch OpenCode umgesetzt und durch Codex technisch
+abgenommen. Die Suite steht bei **60/60 grünen Checks**, der Botanker bleibt
+19,78 ±3 und alle 18 Baseline-Fingerprints sind bitidentisch.
 
-Umgesetzt sind die fünf zusammenhängenden Gates:
+Der sichtbare Qualitäts- und Stationspass umfasst:
 
-1. weiß-goldener Lichthüter und ruhigere kosmische Orbitblade-Kulisse;
-2. korrigierte Rammjäger-Aufladung und `Nächste EVO` links;
-3. Stationsring mit sechs Hotspots, zentralem Kern und genau einem
-   Detailpanel statt zusätzlicher permanenter Kartenwand;
-4. `SIGNAL SICHERN` zwischen 2:30 und 4:00 sowie je eine todsichere
-   Stationsdatei für Signal und echten NEXUS-Kill;
-5. verlustfreie Save-v5-Migration, drei Kernstufen und drei wählbare
-   Sortie-Protokolle.
+1. eine markante 48-Pixel-Orbitklinge mit 24 Richtungen, vier Flugphasen und
+   gemeinsamem Piktogramm in Projektil, Karte und HUD;
+2. eine deutlich ruhigere Kampfkulisse ohne permanenten Avatar-Radiusring;
+3. eine zusammenhängende Orbitalstation als SVG-Szene mit sechs Baukörpern,
+   Stegen, Leitungen, Kernstufen, Datenanzeige und Protokollprojektion;
+4. sofort sichtbare Zustände für Reparatur, Produktion, Einsammeln,
+   Kernupgrade, Protokollwahl und Rückkehr aus einer Sortie;
+5. responsive Bedienung mit genau einem Drawer beziehungsweise Bottom-Sheet.
 
-Die unabhängige Review hat drei Abweichungen korrigiert: Klingenfokus bleibt
-bei Rerolls bis zur tatsächlichen ersten Kartenwahl aktiv, ein erneut
-angetippter Hotspot lässt sein einziges Detailpanel offen, und Stationsdaten
-verändern nicht zusätzlich die bestehende Bergungswert-/Asteritkurve.
+Codex hat vier Integrationsdetails vor der Freigabe korrigiert: SVG und
+Klickflächen teilen dasselbe 1000:560-Verhältnis, ein gewähltes Modul wird im
+selben Frame aktiv, Fortschritt hinterlässt exakt eine Zielmarke und die
+verbleibende lokale Avatar-Aura ist auf 70 Welteinheiten begrenzt.
 
-Waffenwerte, XP, Dichte, AEGIS und NEXUS blieben unangetastet. Offen ist nur
-die sichtbare Besitzerabnahme auf Desktop und Handy; die Browsersteuerung der
-Codex-Umgebung war wegen eines Windows-Sandboxfehlers nicht verfügbar. Der
-Waffenrollenpass wartet weiterhin auf diesen Feldlauf.
+Waffenwerte, XP, Dichte, AEGIS, NEXUS, Ökonomie und Save v5 blieben
+unangetastet. Die Browsersteuerung der Codex-Umgebung scheiterte erneut am
+Windows-Sandboxfehler. Offen ist deshalb nur die sichtbare Besitzerabnahme
+auf Desktop beziehungsweise Handy.
 
 Nächste verbindliche Reihenfolge:
 
-1. [x] D-041-Besitzerlauf bis NEXUS auswerten.
-2. [x] D-042 entscheiden und EH-2026-08-25-04 freigeben.
-3. [x] OpenCode hat die fünf Gates vollständig umgesetzt, getestet und berichtet.
-4. [x] Codex hat Diff, Migration, Baseline, Protokolle und Renderkosten unabhängig geprüft und nachgehärtet.
-5. [ ] Besitzer prüft einen vollständigen Signal→NEXUS→Stationskern-Ablauf auf Desktop/Handy.
-6. [ ] Erst danach den getrennten Waffenrollenpass planen.
+1. [x] OpenCode setzt D-043 vollständig um und dokumentiert vier lokale Commits.
+2. [x] Codex prüft Diff, Runtime, Renderverträge und Baseline unabhängig,
+   korrigiert die Integrationsfehler und nimmt D-043 technisch ab.
+3. [ ] Besitzer prüft Orbitklinge, Hintergrundruhe, fehlenden Avatar-Ring und
+   die Station als räumlichen Ort auf Desktop oder Handy.
+4. [ ] Erst nach diesem Feldtest den getrennten Waffenrollenpass planen.
+
+Bis zu dieser sichtbaren Abnahme keine weitere Grafik-, Balance- oder
+Contentänderung stapeln.
 
 **Historischer Stand 23.08.2026:** EH-2026-08-23-02 ist durch Claude
 umgesetzt und durch Codex technisch abgenommen. Der Warden hat jetzt ein

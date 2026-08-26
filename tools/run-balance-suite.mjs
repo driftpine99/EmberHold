@@ -43,6 +43,7 @@ function makeElement(id = "") {
     // Pfad; dafuer genuegen eine leere Kindliste und ein Style-Stummel.
     style: { setProperty: noop, removeProperty: noop },
     children: [],
+    dataset: {},
     classList: {
       add: (...names) => names.forEach(n => classes.add(n)),
       remove: (...names) => names.forEach(n => classes.delete(n)),
@@ -93,9 +94,20 @@ globalThis.document = {
     if (!elements.has(id)) elements.set(id, makeElement(id));
     return elements.get(id);
   },
-  querySelectorAll: (selector) => selector === ".sheet"
-    ? ["start", "pause", "extract", "over"].map((id) => globalThis.document.getElementById(id))
-    : [],
+  querySelectorAll: (selector) => {
+    if (selector === ".sheet")
+      return ["start", "pause", "extract", "over"].map((id) =>
+        globalThis.document.getElementById(id));
+    if (selector === ".hs")
+      return [["hsCore","core"],["hsMine","mine"],["hsForge","forge"],
+        ["hsArcanum","arcanum"],["hsYard","yard"],["hsArmory","armory"],
+        ["hsMap","map"],["btnLaunch",null]].map(([id,modul]) => {
+          const node=globalThis.document.getElementById(id);
+          if(modul) node.dataset.modul=modul;
+          return node;
+        });
+    return [];
+  },
 };
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -2700,7 +2712,8 @@ try {
   // 4) Kein permanenter Avatar-Radiusring mehr; lokale kantenlose Aura bleibt.
   const ringWeg = !html.includes("lr*0.985") &&
     !html.includes("'rgba(127,212,232,0.05)'") &&
-    html.includes("lr*0.55");
+    html.includes("const auraR=Math.min(70,lr*0.35)") &&
+    html.includes("S.x,S.y,auraR,0,6.2832");
   // 5) Kulisse beruhigt: keine Mikrosterne/Leitungen in der Kachel,
   //    Landmarks selten, Sternebene klein und schwach.
   const kulisseRuhig = !html.includes("for(let i=0;i<26;i++)") &&
@@ -2743,6 +2756,10 @@ try {
   const alteDekoWeg = !html.includes("scene-stars") && !html.includes("scene-ring") &&
     !html.includes("conduit-l") && !html.includes('class="hotspot') &&
     !html.includes("core-orb");
+  const geometrieGekoppelt = html.includes("aspect-ratio:1000/560") &&
+    html.includes("width:min(1180px,100%,128.571vh)") &&
+    html.includes('viewBox="0 0 1000 560"') &&
+    html.includes('preserveAspectRatio="xMidYMid meet"');
   // 2) Genau ein Drawer; Bottom-Sheet auf kleinen Breiten.
   const drawerEin = (html.match(/class="dpanel"/g) || []).length === 7 &&
     html.includes(".detailpanels{position:absolute;right:10px") &&
@@ -2793,14 +2810,37 @@ try {
     .getAttribute("data-panel")) === "core";
   const ankunftEinmal = JSON.parse(localStorage.getItem("emberhold:arrival:v1")).seen === true;
 
-  stationSceneV2 = szenenGraph && alteDekoWeg && drawerEin && aktionenEinmal &&
+  // 9) Modulwechsel aktualisiert Overlay und SVG-Baukoerper im selben Frame.
+  engine.openPanel("mine");
+  const mineAktiv = modKlasse("hsMine").includes("active") &&
+    modKlasse("modMine").includes("mod-active");
+  engine.openPanel("forge");
+  const modulwechselAktiv = mineAktiv &&
+    !modKlasse("hsMine").includes("active") &&
+    !modKlasse("modMine").includes("mod-active") &&
+    modKlasse("hsForge").includes("active") &&
+    modKlasse("modForge").includes("mod-active");
+  // 10) Fortschritt verschiebt die Zielmarke, statt sie zu vervielfachen.
+  Object.assign(engine.H, { mineLevel: 0, forgeLevel: 0, bowUpgrade: false,
+    arcanumLevel: 0, yardLevel: 0 });
+  engine.renderHold();
+  const zielMine = modKlasse("modMine").includes("is-goal");
+  engine.H.mineLevel=1; engine.renderHold();
+  const zielWechselt = zielMine && !modKlasse("modMine").includes("is-goal") &&
+    modKlasse("modForge").includes("is-goal") &&
+    ["modArcanum","modYard","modArmory","modMap","coreBody"].every(id =>
+      !modKlasse(id).includes("is-goal"));
+
+  stationSceneV2 = szenenGraph && alteDekoWeg && geometrieGekoppelt &&
+    drawerEin && aktionenEinmal &&
     mineOffline && mineOnline && forgeLaeuft && forgeBereit && forgeWartet &&
     kernSichtbar && protoSichtbar && ankunftGezeigt && ankunftGesehen &&
-    fuehrtZumKern && ankunftEinmal;
-  stationSceneDiagnostics = { szenenGraph, alteDekoWeg, drawerEin, aktionenEinmal,
+    fuehrtZumKern && ankunftEinmal && modulwechselAktiv && zielWechselt;
+  stationSceneDiagnostics = { szenenGraph, alteDekoWeg, geometrieGekoppelt,
+    drawerEin, aktionenEinmal,
     mineOffline, mineOnline, forgeLaeuft, forgeBereit, forgeWartet,
     kernSichtbar, protoSichtbar, ankunftGezeigt, ankunftGesehen,
-    fuehrtZumKern, ankunftEinmal };
+    fuehrtZumKern, ankunftEinmal, modulwechselAktiv, zielWechselt };
 } catch (error) {
   stationSceneError = error instanceof Error ? error.message : String(error);
 }

@@ -2017,3 +2017,64 @@ bleiben unangetastet. Die 1:35 des einen NEXUS-Laufs wird nur beobachtet. Der
 Waffenrollenpass folgt nach der technischen und sichtbaren Abnahme von D-042,
 damit Meta-Effekt, neue Kulisse und Waffenbalance nicht gleichzeitig bewertet
 werden müssen.
+
+## D-043 – Orbitklinge und Orbitalstation werden sichtbare Hauptmerkmale
+
+**Status:** umgesetzt und durch Codex technisch abgenommen (26.08.2026);
+sichtbare Besitzerabnahme auf Desktop beziehungsweise Handy offen.
+
+Der Besitzer hat D-042 sichtbar nur teilweise freigegeben: Der Lichthüter
+blieb, aber die kleine Orbitklinge, die überladene Kulisse, der permanente
+Avatar-Ring und die als Menüpunkte gelesene Station verhinderten weiterhin
+den gewünschten Spielspaß. Deshalb wird vor dem Waffenrollenpass ein
+abgegrenzter Präsentations- und Interaktionspass durchgeführt.
+
+### Verbindliche Ausführung
+
+- Die Orbitklinge wird als 48-Pixel-Wurfwaffe mit physischem weiß-goldenem
+  Kern, asymmetrischer Cyan-Schneide, kurzer Flugspur, 24 Richtungen und vier
+  deterministischen Flugphasen vorgerendert. Projektil, Karte und HUD teilen
+  dieselbe Silhouette; Trefferbox und Waffenwerte bleiben unverändert.
+- Die permanente Außenkontur des Macht-/Lichtradius entfällt. Nur eine
+  kantenlose lokale Aura mit höchstens 70 Welteinheiten Radius bleibt;
+  Signal-, Schild- und Bosswarnungen sind davon unabhängig.
+- Der Kampfboden wird auf große ruhige Navy-Flächen, wenige Fugen, zwölf
+  schwache Sterne und seltene kontrastarme Landmarken reduziert. Simulation,
+  D-017-Cover-Skalierung und Gameplay-RNG bleiben unberührt.
+- Die Station wird eine zusammenhängende Inline-SVG-Szene mit sechs
+  Baukörpern, Stegen, Energieleitungen, zentralem Kern, drei Ausbaustufen,
+  Stationsdaten und Protokollprojektion. Die vorhandenen Aktionen bleiben
+  erhalten und öffnen genau einen kontextuellen Drawer beziehungsweise auf
+  kleinen Geräten ein Bottom-Sheet.
+- Reparatur, Produktion, Abholung, Ausbau und Protokollwahl ändern die Szene
+  unmittelbar. Eine einmalige Ankunftsrückmeldung macht Signal- und
+  NEXUS-Daten nach dem Run am Kern sichtbar, ohne Save v5 zu erweitern.
+
+### Technische Abnahme
+
+OpenCode lieferte vier lokale Commits. Codex prüfte Diff und Runtime
+unabhängig und korrigierte vor der Freigabe:
+
+1. SVG und Overlay-Klickflächen verwenden dasselbe feste Seitenverhältnis
+   1000:560, damit sich die Hotspots bei 16:9 und Handyformaten nicht
+   verschieben.
+2. Modulwahl synchronisiert Overlay und sichtbaren SVG-Baukörper im selben
+   Frame.
+3. Vor dem neuen Stationsziel werden alte `is-goal`-Klassen entfernt; genau
+   ein räumliches Ziel bleibt sichtbar.
+4. Die ursprünglich noch mit `0.55 * lightRadius` skalierende Aura wurde auf
+   `min(70, 0.35 * lightRadius)` begrenzt.
+
+`npm test` steht bei 60/60 grünen Checks. Die neuen Diagnosen
+`geometrieGekoppelt`, `modulwechselAktiv` und `zielWechselt` sind grün,
+alle 18 Baseline-Fingerprints bleiben bitidentisch und der Botanker bleibt
+19,78 ±3. Klingenfokus überlebt weiterhin Rerolls bis zur tatsächlichen
+Kartenwahl.
+
+### Bewusste Grenzen und nächster Schritt
+
+Waffen-/Passivwerte, XP, Dichte, AEGIS, NEXUS, Ökonomie und Save v5 werden
+nicht geändert. Wegen des Windows-Sandboxfehlers konnte Codex die sichtbare
+Browserabnahme nicht durchführen. Vor einem Waffenrollen- oder weiteren
+Grafikpass prüft der Besitzer Klinge, Kulissenruhe, fehlenden Dauerring,
+Stationslesbarkeit, responsive Bedienung und echte FPS.
